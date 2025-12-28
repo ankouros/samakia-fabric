@@ -1,0 +1,51 @@
+---
+- name: Ensure bootstrap user exists
+  ansible.builtin.user:
+    name: "{{ bootstrap_user }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Ensure bootstrap user has authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ bootstrap_user }}"
+    key: "{{ item }}"
+    state: present
+  loop: "{{ bootstrap_authorized_keys }}"
+
+- name: Ensure bootstrap user has sudo access (NOPASSWD)
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/90-{{ bootstrap_user }}"
+    content: "{{ bootstrap_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  when: bootstrap_sudo_nopasswd | default(true)
+
+- name: Enforce SSH key-only authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    create: false
+    state: present
+  notify: restart ssh
+
+- name: Disable interactive SSH authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^KbdInteractiveAuthentication'
+    line: 'KbdInteractiveAuthentication no'
+    create: false
+    state: present
+  notify: restart ssh
+
+- name: Disable root SSH access after bootstrap
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: 'PermitRootLogin no'
+    create: false
+    state: present
+  notify: restart ssh

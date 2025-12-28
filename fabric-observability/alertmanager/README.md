@@ -1,3 +1,13 @@
-# README.md
+# Alertmanager (Planned)
 
-Placeholder for Samakia Fabric.
+Alert routing and notification policy for Samakia Fabric.
+
+## Intended Contents
+
+- Routing rules
+- Contact points
+- Silence policy
+
+## Status
+
+Scaffold only. Implementation is pending.

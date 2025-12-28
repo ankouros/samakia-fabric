@@ -1,0 +1,16 @@
+# Samakia Fabric – Production variables (example only)
+# Copy this file locally and replace values. Do not commit secrets.
+
+# Proxmox API access (prefer API tokens)
+pm_api_url          = "https://proxmox1:8006/api2/json"
+pm_api_token_id     = "terraform-prov@pve!fabric-token"
+pm_api_token_secret = "REPLACE_WITH_SECRET"
+
+# Password auth (fallback; do not use for automation)
+# pm_user     = "terraform-prov@pve"
+# pm_password = "REPLACE_WITH_SECRET"
+
+# SSH access for containers
+ssh_public_keys = [
+  "ssh-ed25519 REPLACE_WITH_PUBLIC_KEY"
+]

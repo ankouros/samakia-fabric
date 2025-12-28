@@ -1,0 +1,275 @@
+---
+- name: Ensure baseline packages are installed
+  ansible.builtin.apt:
+    name:
+      - openssh-server
+      - ca-certificates
+    state: present
+    update_cache: true
+
+- name: Ensure unattended-upgrades is installed
+  ansible.builtin.apt:
+    name: unattended-upgrades
+    state: present
+    update_cache: false
+  when: hardening_baseline_enable_unattended_upgrades
+
+###############################################################################
+# SSH daemon hardening (no root SSH; restrict to operator)
+###############################################################################
+
+- name: Ensure sshd_config includes sshd_config.d directory
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "Include /etc/ssh/sshd_config.d/*.conf"
+    state: present
+    insertafter: EOF
+    create: false
+  notify:
+    - Validate sshd config
+    - Reload ssh
+
+- name: Ensure sshd_config.d directory exists
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install Samakia SSH hardening drop-in
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/50-samakia-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Samakia Fabric (harden.yml). Do not edit manually.
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      ChallengeResponseAuthentication no
+
+      AllowUsers {{ hardening_baseline_ssh_allow_users | join(' ') }}
+
+      MaxAuthTries {{ hardening_baseline_ssh_max_auth_tries }}
+      LoginGraceTime {{ hardening_baseline_ssh_login_grace_time }}
+
+      Ciphers {{ hardening_baseline_ssh_ciphers | join(',') }}
+      KexAlgorithms {{ hardening_baseline_ssh_kex_algorithms | join(',') }}
+      MACs {{ hardening_baseline_ssh_macs | join(',') }}
+  notify:
+    - Validate sshd config
+    - Reload ssh
+
+###############################################################################
+# System updates & patching (security updates only; no auto reboot by default)
+###############################################################################
+
+- name: Configure APT auto-upgrades (unattended-upgrades enable)
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      // Managed by Samakia Fabric (harden.yml). Do not edit manually.
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+  when: hardening_baseline_enable_unattended_upgrades
+
+- name: Configure unattended-upgrades (security updates only)
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      // Managed by Samakia Fabric (harden.yml). Do not edit manually.
+      Unattended-Upgrade::Allowed-Origins {
+              "${distro_id}:${distro_codename}-security";
+      };
+
+      Unattended-Upgrade::Automatic-Reboot "{{ 'true' if hardening_baseline_unattended_reboot else 'false' }}";
+      Unattended-Upgrade::Automatic-Reboot-Time "02:00";
+  when: hardening_baseline_enable_unattended_upgrades
+
+###############################################################################
+# Time & locale sanity
+###############################################################################
+
+- name: Read current timezone (if present)
+  ansible.builtin.slurp:
+    path: /etc/timezone
+  register: hardening_baseline_timezone_file
+  failed_when: false
+  changed_when: false
+
+- name: Extract current timezone string
+  ansible.builtin.set_fact:
+    hardening_baseline_current_timezone: "{{ hardening_baseline_timezone_file.content | default('') | b64decode | trim }}"
+
+- name: Determine timezone to apply (UTC unless already set)
+  ansible.builtin.set_fact:
+    hardening_baseline_timezone_effective: >-
+      {{
+        hardening_baseline_current_timezone
+        if hardening_baseline_current_timezone != ''
+        else hardening_baseline_timezone
+      }}
+
+- name: Ensure timezone file is set
+  ansible.builtin.copy:
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: "0644"
+    content: "{{ hardening_baseline_timezone_effective }}\n"
+
+- name: Ensure /etc/localtime matches timezone
+  ansible.builtin.file:
+    src: "/usr/share/zoneinfo/{{ hardening_baseline_timezone_effective }}"
+    dest: /etc/localtime
+    state: link
+    force: true
+
+- name: Ensure systemd-timesyncd is enabled and started
+  ansible.builtin.service:
+    name: systemd-timesyncd
+    enabled: true
+    state: started
+  failed_when: false
+
+###############################################################################
+# Logging baseline (journald persistence + retention)
+###############################################################################
+
+- name: Ensure journald persistent storage directory exists
+  ansible.builtin.file:
+    path: /var/log/journal
+    state: directory
+    owner: root
+    group: systemd-journal
+    mode: "2755"
+
+- name: Ensure journald.conf.d directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure journald persistence and retention
+  ansible.builtin.copy:
+    dest: /etc/systemd/journald.conf.d/50-samakia.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Samakia Fabric (harden.yml). Do not edit manually.
+      [Journal]
+      Storage=persistent
+      SystemMaxUse={{ hardening_baseline_journald_system_max_use }}
+      MaxRetentionSec={{ hardening_baseline_journald_max_retention_sec }}
+  notify: Restart journald
+
+###############################################################################
+# Auditing baseline (skip in LXC when not safe)
+###############################################################################
+
+- name: Detect if running in LXC
+  ansible.builtin.set_fact:
+    hardening_baseline_is_lxc: "{{ ansible_virtualization_type | default('') == 'lxc' }}"
+
+- name: Skip auditd baseline in LXC (not namespace-safe)
+  ansible.builtin.debug:
+    msg: "auditd skipped: not LXC-safe in unprivileged containers."
+  when: hardening_baseline_is_lxc
+
+###############################################################################
+# Sysctl hardening (apply only if supported/writable)
+###############################################################################
+
+- name: Probe sysctl keys for writability
+  ansible.builtin.stat:
+    path: "/proc/sys/{{ item.key | replace('.', '/') }}"
+  register: hardening_baseline_sysctl_probe
+  loop: "{{ hardening_baseline_sysctls }}"
+  changed_when: false
+
+- name: Build effective sysctl list (writable only)
+  ansible.builtin.set_fact:
+    hardening_baseline_sysctls_effective: >-
+      {{
+        hardening_baseline_sysctl_probe.results
+        | selectattr('stat.exists', 'equalto', true)
+        | selectattr('stat.writeable', 'equalto', true)
+        | map(attribute='item')
+        | list
+      }}
+
+- name: Render sysctl config file for writable keys
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-samakia-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Samakia Fabric (harden.yml). Do not edit manually.
+      {% for item in hardening_baseline_sysctls_effective %}
+      {{ item.key }} = {{ item.value }}
+      {% endfor %}
+  notify: Apply sysctl config
+
+###############################################################################
+# Firewall (optional; safe default is disabled)
+###############################################################################
+
+- name: Firewall baseline is disabled by default
+  ansible.builtin.debug:
+    msg: "Firewall hardening is disabled (hardening_baseline_enable_firewall=false)."
+  when: not hardening_baseline_enable_firewall
+
+- name: Configure UFW (optional)
+  when: hardening_baseline_enable_firewall
+  block:
+    - name: Ensure ufw package is installed
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+        update_cache: true
+
+    - name: Check if ufw is usable in this container
+      ansible.builtin.command: ufw status
+      register: hardening_baseline_ufw_status
+      changed_when: false
+      failed_when: false
+
+    - name: Skip UFW if incompatible with this container
+      ansible.builtin.debug:
+        msg: "UFW skipped: incompatible with container networking/privileges."
+      when: hardening_baseline_ufw_status.rc != 0
+
+    - name: Apply UFW rules (keep SSH reachable)
+      when: hardening_baseline_ufw_status.rc == 0
+      block:
+        - name: Allow SSH
+          ansible.builtin.command: ufw allow 22/tcp
+          register: hardening_baseline_ufw_allow_ssh
+          changed_when: "'Skipping' not in hardening_baseline_ufw_allow_ssh.stdout"
+
+        - name: Set default deny incoming
+          ansible.builtin.command: ufw default deny incoming
+          register: hardening_baseline_ufw_default_in
+          changed_when: "'Default incoming policy changed' in hardening_baseline_ufw_default_in.stdout"
+
+        - name: Set default allow outgoing
+          ansible.builtin.command: ufw default allow outgoing
+          register: hardening_baseline_ufw_default_out
+          changed_when: "'Default outgoing policy changed' in hardening_baseline_ufw_default_out.stdout"
+
+        - name: Enable UFW
+          ansible.builtin.command: ufw --force enable
+          register: hardening_baseline_ufw_enable
+          changed_when: "'Firewall is active' in hardening_baseline_ufw_enable.stdout"

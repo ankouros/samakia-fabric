@@ -1,3 +1,13 @@
-# README.md
+# Prometheus (Planned)
 
-Placeholder for Samakia Fabric.
+Prometheus configuration for metrics collection.
+
+## Intended Contents
+
+- Scrape configs
+- Recording and alert rules
+- Service discovery patterns
+
+## Status
+
+Scaffold only. Implementation is pending.

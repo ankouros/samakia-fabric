@@ -1,3 +1,13 @@
-# README.md
+# Kubeadm Bootstrap (Planned)
 
-Placeholder for Samakia Fabric.
+Kubeadm-based cluster bootstrap patterns.
+
+## Intended Contents
+
+- Bootstrap playbooks or manifests
+- Node preparation steps
+- Cluster initialization guidance
+
+## Status
+
+Scaffold only. Implementation is pending.

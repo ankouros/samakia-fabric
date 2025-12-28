@@ -1,0 +1,12 @@
+# Samakia Fabric – Development variables (example only)
+# Copy this file locally to terraform.tfvars and replace values. Do not commit secrets.
+
+# Proxmox API access (prefer API tokens)
+pm_api_url          = "https://proxmox1:8006/api2/json"
+pm_api_token_id     = "terraform-prov@pve!fabric-token"
+pm_api_token_secret = "REPLACE_WITH_SECRET"
+
+# SSH access for containers (bootstrap)
+ssh_public_keys = [
+  "ssh-ed25519 REPLACE_WITH_PUBLIC_KEY"
+]

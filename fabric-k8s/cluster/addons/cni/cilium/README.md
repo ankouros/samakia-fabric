@@ -1,3 +1,13 @@
-# README.md
+# CNI: Cilium (Planned)
 
-Placeholder for Samakia Fabric.
+Cilium CNI configuration scaffolding.
+
+## Intended Contents
+
+- Cilium manifests
+- Network policy defaults
+- Upgrade notes
+
+## Status
+
+Scaffold only. Implementation is pending.

@@ -1,3 +1,13 @@
-# README.md
+# Kubernetes RBAC (Planned)
 
-Placeholder for Samakia Fabric.
+RBAC scaffolding for Kubernetes workloads.
+
+## Intended Contents
+
+- Role and role binding templates
+- Least-privilege guidance
+- Service account policies
+
+## Status
+
+Scaffold only. Implementation is pending.

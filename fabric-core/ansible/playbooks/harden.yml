@@ -1,0 +1,10 @@
+---
+- name: Harden LXC hosts (production baseline)
+  hosts: all
+  remote_user: samakia
+  become: true
+  gather_facts: true
+  serial: 1
+
+  roles:
+    - hardening_baseline

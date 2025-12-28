@@ -1,3 +1,13 @@
-# README.md
+# GitOps Applications (Planned)
 
-Placeholder for Samakia Fabric.
+Application definitions for GitOps workflows.
+
+## Intended Contents
+
+- Application manifests
+- Environment overlays
+- Promotion guidance
+
+## Status
+
+Scaffold only. Implementation is pending.

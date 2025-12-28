@@ -1,0 +1,56 @@
+---
+# SSH
+hardening_baseline_ssh_allow_users:
+  - samakia
+
+hardening_baseline_ssh_max_auth_tries: 3
+hardening_baseline_ssh_login_grace_time: 30
+
+# Ubuntu 24.04 + OpenSSH: allow modern + broadly compatible crypto.
+hardening_baseline_ssh_kex_algorithms:
+  - curve25519-sha256
+  - curve25519-sha256@libssh.org
+  - sntrup761x25519-sha512@openssh.com
+  - diffie-hellman-group-exchange-sha256
+
+hardening_baseline_ssh_ciphers:
+  - chacha20-poly1305@openssh.com
+  - aes256-gcm@openssh.com
+  - aes128-gcm@openssh.com
+  - aes256-ctr
+  - aes128-ctr
+
+hardening_baseline_ssh_macs:
+  - hmac-sha2-512-etm@openssh.com
+  - hmac-sha2-256-etm@openssh.com
+  - umac-128-etm@openssh.com
+  - hmac-sha2-512
+  - hmac-sha2-256
+
+# Updates
+hardening_baseline_enable_unattended_upgrades: true
+hardening_baseline_unattended_reboot: false
+
+# Time
+hardening_baseline_timezone: UTC
+
+# Logging
+hardening_baseline_journald_system_max_use: 200M
+hardening_baseline_journald_max_retention_sec: 1month
+
+# Sysctl (applied only when writable in the container namespace)
+hardening_baseline_sysctls:
+  - { key: net.ipv4.conf.all.accept_redirects, value: "0" }
+  - { key: net.ipv4.conf.default.accept_redirects, value: "0" }
+  - { key: net.ipv4.conf.all.send_redirects, value: "0" }
+  - { key: net.ipv4.conf.default.send_redirects, value: "0" }
+  - { key: net.ipv4.conf.all.rp_filter, value: "1" }
+  - { key: net.ipv4.conf.default.rp_filter, value: "1" }
+  - { key: net.ipv4.icmp_echo_ignore_broadcasts, value: "1" }
+  - { key: net.ipv4.icmp_ignore_bogus_error_responses, value: "1" }
+  - { key: net.ipv4.tcp_syncookies, value: "1" }
+  - { key: net.ipv4.tcp_rfc1337, value: "1" }
+  - { key: net.ipv4.conf.all.log_martians, value: "1" }
+
+# Firewall (optional; default disabled)
+hardening_baseline_enable_firewall: false

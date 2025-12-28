@@ -1,0 +1,25 @@
+---
+- name: Install Proxmox root CA certificate
+  ansible.builtin.copy:
+    src: "{{ proxmox_ca_src }}"
+    dest: "{{ proxmox_ca_dest }}/{{ proxmox_ca_filename }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Update CA certificates
+
+- name: Ensure ca-certificates package is installed
+  ansible.builtin.apt:
+    name: ca-certificates
+    state: present
+    update_cache: false
+
+- name: Verify Proxmox CA is present
+  ansible.builtin.stat:
+    path: "{{ proxmox_ca_dest }}/{{ proxmox_ca_filename }}"
+  register: proxmox_ca_stat
+
+- name: Fail if Proxmox CA was not installed
+  ansible.builtin.fail:
+    msg: "Proxmox CA certificate not installed correctly"
+  when: not proxmox_ca_stat.stat.exists

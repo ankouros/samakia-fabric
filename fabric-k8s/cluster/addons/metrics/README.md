@@ -1,3 +1,13 @@
-# README.md
+# Metrics Addon (Planned)
 
-Placeholder for Samakia Fabric.
+Cluster metrics addon scaffolding.
+
+## Intended Contents
+
+- Metrics server manifests
+- Resource metrics policies
+- Upgrade notes
+
+## Status
+
+Scaffold only. Implementation is pending.

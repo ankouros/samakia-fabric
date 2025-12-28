@@ -1,0 +1,19 @@
+---
+- name: Validate sshd config
+  ansible.builtin.command: sshd -t -f /etc/ssh/sshd_config
+  changed_when: false
+
+- name: Reload ssh
+  ansible.builtin.service:
+    name: ssh
+    state: reloaded
+
+- name: Restart journald
+  ansible.builtin.service:
+    name: systemd-journald
+    state: restarted
+  changed_when: false
+
+- name: Apply sysctl config
+  ansible.builtin.command: sysctl -p /etc/sysctl.d/99-samakia-hardening.conf
+  changed_when: false

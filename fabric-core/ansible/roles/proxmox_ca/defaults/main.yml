@@ -1,0 +1,4 @@
+---
+proxmox_ca_filename: proxmox-root-ca.crt
+proxmox_ca_dest: /usr/local/share/ca-certificates
+proxmox_ca_src: "{{ playbook_dir }}/../../../ops/ca/proxmox-root-ca.crt"

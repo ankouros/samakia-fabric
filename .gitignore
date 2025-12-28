@@ -1,0 +1,179 @@
+###############################################################################
+# Samakia Fabric – .gitignore
+# Purpose: Security, reproducibility, clean GitOps
+###############################################################################
+
+###############################################################################
+# Codex / AI internal artifacts (MUST NOT BE COMMITTED)
+###############################################################################
+
+# Entire Codex suite directory (prompts, reviews, experiments)
+CODEX-SUITE/
+codex/
+.codex/
+
+# Any Codex-generated reports or prompts
+Codex-*.md
+codex-*.md
+*codex*
+*Codex*
+
+###############################################################################
+# Secrets & credentials (NEVER COMMIT)
+###############################################################################
+
+# Terraform variables & secrets
+*.tfvars
+*.tfvars.json
+terraform.tfvars
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# SSH keys
+*.pem
+*.key
+*.crt
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Vault / secrets material
+vault.hcl
+vault.json
+*.vault
+*.secrets
+secrets/
+fabric-security/secrets/**/*
+!fabric-security/secrets/**/README.md
+
+###############################################################################
+# Terraform generated files
+###############################################################################
+
+# State files
+terraform.tfstate
+terraform.tfstate.*
+*.tfstate
+*.tfstate.backup
+
+# Terraform working directories
+.terraform/
+.terraform.lock.hcl
+
+# Terraform outputs
+terraform-output.json
+
+# Crash logs
+crash.log
+crash.*.log
+
+###############################################################################
+# Ansible generated files
+###############################################################################
+
+# Retry files
+*.retry
+
+# Cached facts
+.fact_cache/
+ansible_facts/
+
+# Ansible local overrides
+ansible.cfg.local
+
+###############################################################################
+# Packer artifacts
+###############################################################################
+
+# Built images / rootfs artifacts
+*.tar
+*.tar.gz
+*.img
+*.qcow2
+*.raw
+
+# Packer cache
+packer_cache/
+.packer.d/
+
+###############################################################################
+# Logs & runtime artifacts
+###############################################################################
+
+*.log
+logs/
+tmp/
+temp/
+.cache/
+audit/
+compliance/
+forensics/
+correlation/
+release-readiness/
+
+###############################################################################
+# OS / Editor / Tooling noise
+###############################################################################
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+.nfs*
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+
+###############################################################################
+# CI / test artifacts
+###############################################################################
+
+# Test outputs
+test-results/
+coverage/
+reports/
+
+###############################################################################
+# Kubernetes generated files
+###############################################################################
+
+# Rendered manifests
+*.rendered.yaml
+*.rendered.yml
+
+# Helm
+charts/
+*.tgz
+
+###############################################################################
+# Safety net (explicit allowlist overrides)
+###############################################################################
+
+# Keep documentation READMEs
+!README.md
+!**/README.md
+
+# Allow required audit outputs
+!Codex-review.md
+
+# Keep example configs
+!*.example
+!*.example.*
+
+###############################################################################
+# END
+###############################################################################

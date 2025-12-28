@@ -1,0 +1,6 @@
+---
+- name: Update CA certificates
+  ansible.builtin.command: update-ca-certificates
+  become: true
+  register: ca_update
+  changed_when: "'0 added' not in ca_update.stdout"
