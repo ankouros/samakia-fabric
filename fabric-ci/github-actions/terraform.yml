@@ -1,3 +1,11 @@
-# terraform.yml
+- name: Enforce provider pinning
+  run: |
+    if grep -R "hashicorp/proxmox" fabric-core/terraform; then
+      echo "::error::Forbidden provider hashicorp/proxmox detected"
+      exit 1
+    fi
 
-Placeholder for Samakia Fabric.
+    if ! grep -R "required_providers" fabric-core/terraform; then
+      echo "::error::Missing required_providers blocks"
+      exit 1
+    fi

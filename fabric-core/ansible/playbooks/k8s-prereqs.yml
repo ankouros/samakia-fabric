@@ -1,3 +1,8 @@
-# k8s-prereqs.yml
-
-Placeholder for Samakia Fabric.
+---
+- name: Placeholder playbook (noop)
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Placeholder task
+      ansible.builtin.debug:
+        msg: "This playbook is a scaffold and will be implemented later."

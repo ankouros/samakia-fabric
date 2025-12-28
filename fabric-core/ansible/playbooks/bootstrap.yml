@@ -1,3 +1,62 @@
-# bootstrap.yml
+---
+- name: Bootstrap LXC hosts (initial access only)
+  hosts: all
+  remote_user: root
+  become: false
+  gather_facts: true
 
-Placeholder for Samakia Fabric.
+  collections:
+    - ansible.posix
+
+  roles:
+    - bootstrap
+    - proxmox_ca
+
+  vars:
+    bootstrap_user: samakia
+    bootstrap_authorized_keys_default: >-
+      {{
+        [
+          lookup('file', lookup('env', 'HOME') ~ '/.ssh/id_ed25519.pub', errors='ignore') | default('', true) | trim,
+          lookup('file', lookup('env', 'HOME') ~ '/.ssh/id_rsa.pub', errors='ignore') | default('', true) | trim
+        ]
+        | reject('equalto', '')
+        | list
+      }}
+    bootstrap_sudo_nopasswd: true
+
+  pre_tasks:
+    - name: Wait for SSH to become reachable
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host | default(inventory_hostname) }}"
+        port: 22
+        timeout: 180
+        connect_timeout: 5
+      delegate_to: localhost
+
+    - name: Resolve bootstrap authorized keys
+      ansible.builtin.set_fact:
+        bootstrap_authorized_keys_effective: >-
+          {{
+            (bootstrap_authorized_keys | default([]))
+            if ((bootstrap_authorized_keys | default([])) | length > 0)
+            else bootstrap_authorized_keys_default
+          }}
+
+    - name: Publish bootstrap authorized keys for roles
+      ansible.builtin.set_fact:
+        bootstrap_authorized_keys: "{{ bootstrap_authorized_keys_effective }}"
+
+    - name: Ensure bootstrap authorized keys are provided
+      ansible.builtin.assert:
+        that:
+          - bootstrap_authorized_keys_effective | length > 0
+        fail_msg: >
+          No bootstrap SSH public key found. Set bootstrap_authorized_keys or ensure ~/.ssh/id_ed25519.pub exists on the controller.
+        quiet: true
+
+  handlers:
+    - name: restart ssh
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
