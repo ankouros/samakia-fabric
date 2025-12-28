@@ -17,6 +17,7 @@ All roadmap items must:
 - Preserve security guarantees
 - Avoid breaking changes without explicit versioning
 - Remain operable by humans and AI agents
+- Prefer **deterministic**, **auditable** workflows over convenience
 
 Anything that violates these principles is out of scope.
 
@@ -26,41 +27,71 @@ Anything that violates these principles is out of scope.
 
 Goal: Establish a solid, production-grade base.
 
-### Completed
-- Proxmox-based infrastructure model
-- LXC-first strategy
-- Golden image pipeline (Packer)
-- Terraform modules with Proxmox 9 guards
-- Ansible bootstrap & configuration model
-- Delegated Proxmox user for automation
-- Full documentation set:
-  - ARCHITECTURE.md
-  - AGENTS.md
-  - CONTRIBUTING.md
-  - OPERATIONS.md
-  - SECURITY.md
-  - DECISIONS.md
-  - STYLEGUIDE.md
+### Completed (canonical)
+- Proxmox-based infrastructure model (LXC-first)
+- Golden image pipeline (Packer) with **monotonic immutable versioning** (`*-vN.tar.gz`)
+- Upload of LXC templates via **Proxmox API token only** (no SSH/root on Proxmox)
+- Terraform modules with Proxmox 9 guardrails
+  - Provider pinning enforcement
+  - Forbidden providers blocked
+  - SSH key injection via `ssh_public_keys`
+- **Strict Proxmox TLS** trust model (internal CA)
+  - Host CA installer + guardrails checks (no insecure TLS flags)
+- Ansible **2-phase** model
+  - Phase-1 bootstrap: root-only minimal (CA trust, operator user + keys + sudo, disable root SSH)
+  - Phase-2 hardening: operator-based (`samakia` + become), container-safe baseline
+- Pre-commit / CI guardrails
+  - terraform fmt/validate
+  - ansible-lint
+  - shellcheck
+  - gitleaks
+  - custom Terraform provider pinning hook
+- Operations & lifecycle documentation set (production-grade)
+  - Promotion flow (image → template → env)
+  - Break-glass / recovery
+  - HA failure domains + GameDays simulation
+  - Drift audit reporting (read-only)
+  - Pre-release readiness (Go/No-Go)
+  - Threat modeling (STRIDE + trust boundaries)
+- Compliance / evidence substrate (auditor-grade)
+  - Signed compliance snapshots (sha256 manifest + GPG signatures)
+  - Dual-control signing (2-person rule)
+  - TSA notarization (RFC3161) as opt-in
+  - Offline verification tools
+  - Legal hold / retention labels (independent packs)
+  - Application compliance overlay & evidence model
+  - Post-incident forensics framework (read-only collector + chain-of-custody model)
 
-Status: **Stable**
+Status: **Stable / Production usable**
 
 ---
 
 ## Phase 1 — Operational Hardening (NEXT)
 
-Goal: Make day-2 operations safer and more repeatable.
+Goal: Make day-2 operations safer, more deterministic, and less error-prone.
 
 ### Planned
-- Remote Terraform state (MinIO / S3 backend)
-- State locking
-- Explicit environment separation (dev / staging / prod)
+- Remote Terraform state backend (MinIO / S3) + state locking (no local state drift)
+- Explicit environment separation (dev / staging / prod) with parity checks
+- Deterministic “runner host” bootstrapping:
+  - standard env layout (`~/.config/samakia-fabric/`)
+  - non-interactive default inputs for CI runners
 - LXC lifecycle guard improvements
-- Ansible role hardening (baseline, users, ssh, sudo)
+  - explicit replace/blue-green guidance baked into ops workflow
+- **SSH trust lifecycle** hardening
+  - documented known_hosts rotation rules for replace/recreate
+  - optional out-of-band host key verification path
+- **DHCP/MAC determinism**
+  - reservation by MAC runbook (or fixed MAC contract when supported)
+  - inventory sanity checks for IP changes after replace
 - Inventory validation and sanity checks
+  - loud failures for missing host vars / missing API env
+  - safe redaction (no token leakage)
 
 Outcome:
 - Reduced operator error
 - Safer concurrent operations
+- Faster recovery from expected “sharp edges” (known_hosts, DHCP flips)
 
 ---
 
@@ -69,11 +100,11 @@ Outcome:
 Goal: Establish reusable infrastructure building blocks.
 
 ### Planned
-- Terraform network modules (bridges, VLAN tagging)
+- Terraform network primitives (bridges, VLAN tagging patterns)
 - Proxmox SDN integration (optional, guarded)
 - Load balancer primitives (HAProxy / Keepalived)
-- Shared service containers (DNS, NTP, internal tools)
-- Standard tagging and labeling conventions
+- Shared service containers (DNS, NTP, internal tooling)
+- Standard tagging/labeling conventions across CT/VM/network objects
 
 Outcome:
 - Predictable internal networking
@@ -83,14 +114,14 @@ Outcome:
 
 ## Phase 3 — High Availability & Resilience
 
-Goal: Enable resilient, multi-node deployments.
+Goal: Enable resilient, multi-node deployments with realistic failure semantics.
 
 ### Planned
-- Proxmox HA-aware patterns
-- Multi-node placement strategies
-- Storage abstraction patterns (NFS, Ceph-ready)
-- Failure-domain aware container placement
-- Explicit HA/non-HA workload classification
+- Proxmox HA-aware patterns (workload classification: HA vs non-HA)
+- Multi-node placement strategies + anti-affinity
+- Storage abstraction patterns (NFS today, Ceph-ready)
+- Failure-domain aware placement policy
+- Routine GameDays (failure simulation) with evidence capture
 
 Outcome:
 - Controlled redundancy
@@ -100,18 +131,21 @@ Outcome:
 
 ## Phase 4 — GitOps & CI/CD Integration
 
-Goal: Integrate infrastructure lifecycle with Git workflows.
+Goal: Integrate infrastructure lifecycle with Git workflows safely.
 
 ### Planned
-- Terraform plan/apply via CI (read-only first)
-- Policy-as-code checks
-- Pre-merge validation (fmt, validate, lint)
-- Optional auto-apply for non-prod
-- Drift detection workflows
+- Terraform plan via CI (read-only first) with human gatekeeping
+- Policy-as-code checks (guardrails as mandatory gates)
+- Pre-merge validation (fmt, validate, lint, security checks)
+- Optional auto-apply for non-prod (explicitly opt-in)
+- Drift detection workflows producing **signed evidence packets**
+  - substrate drift packets
+  - app compliance packets
+  - release readiness packets
 
 Outcome:
 - Safer change management
-- Audit-friendly operations
+- Audit-friendly operations with verifiable evidence
 
 ---
 
@@ -120,15 +154,15 @@ Outcome:
 Goal: Strengthen security posture without sacrificing operability.
 
 ### Planned
-- Secrets manager integration
-- SSH key rotation workflows
-- Host-based firewall patterns
-- Enhanced audit logging
-- Optional compliance profiles
+- Secrets manager integration (optional; must preserve offline operability)
+- SSH key rotation workflows (operator keys + break-glass policy)
+- Host firewall patterns (container-safe, default-off unless explicitly enabled)
+- Enhanced audit logging guidance
+- Compliance profiles (baseline → hardened profiles) mapped to control catalog
 
 Outcome:
 - Stronger security guarantees
-- Clear incident response paths
+- Clear incident response paths and custody
 
 ---
 
@@ -137,11 +171,11 @@ Outcome:
 Goal: Make Samakia Fabric consumable by higher-level platforms.
 
 ### Planned
-- Kubernetes-ready primitives
+- Kubernetes-ready primitives (explicitly optional and guarded)
 - Database service patterns
 - Message queue patterns
 - Observability stack foundations
-- Platform documentation for consumers
+- Consumer-facing platform documentation
 
 Outcome:
 - Samakia Fabric as a substrate, not a destination
@@ -153,11 +187,11 @@ Outcome:
 Goal: Enable safe, bounded AI participation.
 
 ### Planned
-- Agent task boundaries
-- Automated plan review workflows
-- Controlled auto-remediation
-- Decision enforcement via documentation
-- AI-readable runbooks
+- Explicit agent task boundaries & refusal rules
+- Automated plan review workflows (read-only by default)
+- Controlled remediation (explicit opt-in, always audited)
+- Decision enforcement via ADRs / runbooks / policy checks
+- AI-readable runbooks + “03:00-safe” operational scripts
 
 Outcome:
 - Reduced cognitive load
@@ -181,9 +215,9 @@ Samakia Fabric is built for operators who value control.
 
 ## Versioning Strategy (Planned)
 
-- Semantic versioning
+- Semantic versioning for repository releases
 - Major versions may introduce breaking changes
-- Golden images versioned independently
+- Golden images versioned independently (monotonic, immutable)
 - Terraform modules versioned explicitly
 
 ---
@@ -210,5 +244,6 @@ If a feature does not improve:
 - Safety
 - Clarity
 - Operability
+- Auditability
 
 It does not belong on this roadmap.
