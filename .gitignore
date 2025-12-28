@@ -167,8 +167,7 @@ charts/
 !README.md
 !**/README.md
 
-# Allow required audit outputs
-!Codex-review.md
+
 
 # Keep example configs
 !*.example
