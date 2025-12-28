@@ -231,7 +231,7 @@ Aligned the bootstrap contract across Packer, Terraform, and Ansible, removed co
 
 13. **Allowed required audit outputs in Git ignore rules**
    - Files affected: `.gitignore`
-   - Reason: `CHANGELOG.md` and `Codex-review.md` were ignored by default, preventing required documentation from being tracked.
+   - Reason: `CHANGELOG.md` and `REVIEW.md` were ignored by default, preventing required documentation from being tracked.
    - Risk level: low
    - Behavior change: These two files are now explicitly allowed while other Codex artifacts remain ignored.
 
@@ -362,7 +362,7 @@ Aligned the bootstrap contract across Packer, Terraform, and Ansible, removed co
    - Behavior change: Provider enforcement ignores `.terraform/` and binary files while still enforcing real HCL source constraints.
 
 35. **Removed insecure TLS guidance from operational docs**
-   - Files affected: `OPERATIONS.md`, `docs/tutorials/01-bootstrap-proxmox.md`, `docs/tutorials/03-deploy-lxc-with-terraform.md`, `fabric-core/ansible/roles/proxmox_ca/README.md`, `Codex-review.md`
+   - Files affected: `OPERATIONS.md`, `docs/tutorials/01-bootstrap-proxmox.md`, `docs/tutorials/03-deploy-lxc-with-terraform.md`, `fabric-core/ansible/roles/proxmox_ca/README.md`, `REVIEW.md`
    - Reason: Documentation must not instruct insecure TLS bypasses; it must reflect the strict CA trust model.
    - Risk level: low
    - Behavior change: Documentation now aligns with “install internal CA in runner trust store” and forbids insecure flags.

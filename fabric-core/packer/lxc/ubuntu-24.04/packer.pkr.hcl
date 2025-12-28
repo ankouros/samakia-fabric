@@ -25,12 +25,12 @@ variable "ubuntu_image" {
 
 variable "fabric_version" {
   type    = string
-  default = "v4"
+  default = "v3"
 }
 
 variable "artifact_basename" {
   type    = string
-  default = "ubuntu-24.04-lxc-rootfs-v4"
+  default = "ubuntu-24.04-lxc-rootfs-v3"
 }
 
 ###############################################################################
