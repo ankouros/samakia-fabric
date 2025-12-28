@@ -165,7 +165,7 @@ packer build .
 Successful output produces:
 
 ```text
-ubuntu-24.04-lxc-rootfs-v4.tar.gz
+ubuntu-24.04-lxc-rootfs-v3.tar.gz
 ```
 
 ---
@@ -175,7 +175,7 @@ ubuntu-24.04-lxc-rootfs-v4.tar.gz
 Before uploading to Proxmox:
 
 ```bash
-tar tzf ubuntu-24.04-lxc-rootfs-v4.tar.gz | head
+tar tzf ubuntu-24.04-lxc-rootfs-v3.tar.gz | head
 ```
 
 You should see:
@@ -203,14 +203,14 @@ export PM_NODE="proxmox1"
 export PM_STORAGE="pve-nfs"
 
 bash fabric-core/packer/lxc/scripts/upload-lxc-template-via-api.sh \
-  fabric-core/packer/lxc/ubuntu-24.04/ubuntu-24.04-lxc-rootfs-v4.tar.gz
+  fabric-core/packer/lxc/ubuntu-24.04/ubuntu-24.04-lxc-rootfs-v3.tar.gz
 ```
 
 Fallback (manual, on the Proxmox node as root):
 
 ```bash
 mkdir -p /mnt/pve/pve-nfs/template/cache
-mv /tmp/ubuntu-24.04-lxc-rootfs-v4.tar.gz \
+mv /tmp/ubuntu-24.04-lxc-rootfs-v3.tar.gz \
   /mnt/pve/pve-nfs/template/cache/
 ```
 

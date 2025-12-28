@@ -17,8 +17,8 @@ set -euo pipefail
 # - PM_STORAGE            default: pve-nfs
 #
 # Usage:
-#   PM_API_URL=... PM_API_TOKEN_ID=... PM_API_TOKEN_SECRET=... \\
-#     ./upload-lxc-template-via-api.sh /path/to/ubuntu-24.04-lxc-rootfs-v4.tar.gz
+#   PM_API_URL=... PM_API_TOKEN_ID=... PM_API_TOKEN_SECRET=... \
+#     ./upload-lxc-template-via-api.sh /path/to/ubuntu-24.04-lxc-rootfs-v3.tar.gz
 ###############################################################################
 
 require_env() {
@@ -72,12 +72,18 @@ EXPECTED_VOLID="${PM_STORAGE}:vztmpl/${ARCHIVE_BASENAME}"
 
 echo "Checking if template already exists (immutable rule): ${EXPECTED_VOLID}"
 
+# NOTE: Use a proper multi-line python program. Compound statements (for/if)
+# cannot follow ";" on the same logical line.
 curl -fsS -H "${AUTH_HEADER}" "${CONTENT_URL}" \
-  | python3 -c 'import json,sys; expected=sys.argv[1]; payload=json.load(sys.stdin); \
-for item in payload.get("data", []): \
-  if item.get("volid") == expected: \
-    print(f"ERROR: template already exists (immutable): {expected}", file=sys.stderr); sys.exit(1); \
-sys.exit(0)' "${EXPECTED_VOLID}"
+  | python3 -c $'import json,sys\n'\
+$'expected=sys.argv[1]\n'\
+$'payload=json.load(sys.stdin)\n'\
+$'for item in payload.get("data", []):\n'\
+$'  volid=item.get("volid")\n'\
+$'  if volid == expected:\n'\
+$'    print(f"ERROR: template already exists (immutable): {expected}", file=sys.stderr)\n'\
+$'    sys.exit(1)\n'\
+$'sys.exit(0)\n' "${EXPECTED_VOLID}"
 
 echo "Uploading ${ARCHIVE_BASENAME} to ${PM_NODE}/${PM_STORAGE} as vztmpl..."
 

@@ -87,7 +87,7 @@ Upload the versioned rootfs artifact to Proxmox as an immutable LXC template (AP
 Requires: `PM_API_URL`, `PM_API_TOKEN_ID`, `PM_API_TOKEN_SECRET`.
 
 ```bash
-bash fabric-core/packer/lxc/scripts/upload-lxc-template-via-api.sh ./ubuntu-24.04-lxc-rootfs-v4.tar.gz
+bash fabric-core/packer/lxc/scripts/upload-lxc-template-via-api.sh ./ubuntu-24.04-lxc-rootfs-v3.tar.gz
 ```
 
 Validate:

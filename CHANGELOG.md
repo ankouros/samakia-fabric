@@ -299,9 +299,9 @@ Aligned the bootstrap contract across Packer, Terraform, and Ansible, removed co
    - Files affected: `fabric-core/packer/lxc/ubuntu-24.04/packer.pkr.hcl`, `fabric-core/packer/lxc/ubuntu-24.04/provision.sh`, `docs/tutorials/02-build-lxc-image.md`
    - Reason: Bootstrap failed because the container lacked Python, which is required for Ansible modules (and `python3-apt` for apt-based tasks).
    - Risk level: medium
-   - Behavior change: Default image version is now `v4` (`ubuntu-24.04-lxc-rootfs-v4.tar.gz`) and includes `python3` + `python3-apt` while remaining userless and key-only.
+   - Behavior change: Default image version is now `v3` (`ubuntu-24.04-lxc-rootfs-v3.tar.gz`) and includes `python3` + `python3-apt` while remaining userless and key-only.
 
-25. **Updated prod Terraform environment to consume the new `v4` template**
+25. **Updated prod Terraform environment to consume the new `v3` template**
    - Files affected: `fabric-core/terraform/envs/samakia-prod/main.tf`, `docs/tutorials/03-deploy-lxc-with-terraform.md`
    - Reason: The running container needed to be recreated from the corrected immutable image to satisfy the bootstrap contract end-to-end.
    - Risk level: high

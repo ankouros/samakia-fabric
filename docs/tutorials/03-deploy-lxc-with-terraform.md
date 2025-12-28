@@ -125,7 +125,7 @@ module "monitoring_1" {
   hostname = "monitoring-1"
   node     = "proxmox1"
 
-  template = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-v4.tar.gz"
+  template = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-v3.tar.gz"
   storage  = "pve-nfs"
   bridge   = "vmbr0"
 
@@ -201,13 +201,13 @@ This is expected and desired.
 Image update example:
 
 ```hcl
-template = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-v4.tar.gz"
+template = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-v3.tar.gz"
 ```
 
 to:
 
 ```hcl
-template = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-v4.tar.gz"
+template = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-v3.tar.gz"
 ```
 
 Then:

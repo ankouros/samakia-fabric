@@ -6,7 +6,7 @@ locals {
   # Promotion contract:
   # - this value is pinned in Git (no "latest")
   # - dev may advance faster than prod; promotion is an explicit Git change in prod
-  lxc_rootfs_version = "v4"
+  lxc_rootfs_version = "v3"
   lxc_template       = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-${local.lxc_rootfs_version}.tar.gz"
 }
 
