@@ -40,20 +40,17 @@ This runs on the **runner host** (your workstation / CI runner) that already tru
 
 ### Upload procedure
 
-1) Build a new image artifact with Packer (example: `v6`):
+1) Build a new image artifact (monotonic auto-bump; example outcome: `v6`):
 
 ```bash
-cd fabric-core/packer/lxc/ubuntu-24.04
-packer init .
-packer validate .
-packer build .
+make image.build-next
 ```
 
 2) Upload the artifact to Proxmox storage as an LXC template:
 
 ```bash
 bash fabric-core/packer/lxc/scripts/upload-lxc-template-via-api.sh \
-  fabric-core/packer/lxc/ubuntu-24.04/ubuntu-24.04-lxc-rootfs-v6.tar.gz
+  fabric-core/packer/lxc/ubuntu-24.04/ubuntu-24.04-lxc-rootfs-v<N>.tar.gz
 ```
 
 ### Success / failure rules

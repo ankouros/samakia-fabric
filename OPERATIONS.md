@@ -164,17 +164,13 @@ Do NOT rebuild images for:
 ### Image Build Procedure
 
 ```bash
-cd fabric-core/packer/lxc/ubuntu-24.04
-
-packer init .
-packer validate .
-packer build .
+	make image.build-next
 ```
 
 Expected artifact:
 
 ```text
-ubuntu-24.04-lxc-rootfs-v<version>.tar.gz
+ubuntu-24.04-lxc-rootfs-v<N>.tar.gz
 ```
 
 ### Image Import to Proxmox
@@ -183,7 +179,7 @@ Upload the versioned rootfs artifact to Proxmox as an immutable LXC template (AP
 Requires: `PM_API_URL`, `PM_API_TOKEN_ID`, `PM_API_TOKEN_SECRET`.
 
 ```bash
-bash fabric-core/packer/lxc/scripts/upload-lxc-template-via-api.sh ./ubuntu-24.04-lxc-rootfs-v3.tar.gz
+bash fabric-core/packer/lxc/scripts/upload-lxc-template-via-api.sh ./ubuntu-24.04-lxc-rootfs-v<N>.tar.gz
 ```
 
 Validate:

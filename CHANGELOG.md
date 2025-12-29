@@ -15,6 +15,12 @@ The format is inspired by:
 ## [Unreleased]
 
 ### Added
+#### Golden image automation
+- Artifact-driven golden image auto-bump (no repo edits per version)
+  - Version resolver: `ops/scripts/image-next-version.sh` (+ unit test `ops/scripts/test-image-next-version.sh`)
+  - `make image.build` now builds next version by default; `VERSION=N` builds an explicit version without overwriting
+  - `make image.build-next` prints max/next/artifact path and injects vars into Packer at runtime
+  - `fabric-ci/scripts/validate.sh` runs the versioning unit test (no packer, no Proxmox)
 - MinIO HA Terraform backend (Terraform + Ansible + acceptance, non-interactive)
   - Terraform env: `fabric-core/terraform/envs/samakia-minio/` (5 LXCs: `minio-edge-1/2`, `minio-1/2/3` with static IPs and pinned image version)
   - Proxmox SDN ensure script: `ops/scripts/proxmox-sdn-ensure-stateful-plane.sh` (zone `zminio`, vnet `vminio`, VLAN140 subnet `10.10.140.0/24`)

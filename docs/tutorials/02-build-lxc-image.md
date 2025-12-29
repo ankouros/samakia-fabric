@@ -68,7 +68,7 @@ fabric-core/packer/lxc/ubuntu-24.04/
 └── README.md
 ```
 
-Each image version lives in Git.
+Each image version is **artifact-driven** (monotonic, immutable) and then pinned in Git during promotion.
 
 ---
 
@@ -154,18 +154,16 @@ Proxmox expects `tar.gz`.
 
 ## Running the Build
 
-From the image directory:
+Preferred (artifact-driven monotonic versions; no repo edits per version):
 
 ```bash
-packer init .
-packer validate .
-packer build .
+make image.build-next
 ```
 
 Successful output produces:
 
 ```text
-ubuntu-24.04-lxc-rootfs-v3.tar.gz
+ubuntu-24.04-lxc-rootfs-v<N>.tar.gz
 ```
 
 ---
@@ -175,7 +173,7 @@ ubuntu-24.04-lxc-rootfs-v3.tar.gz
 Before uploading to Proxmox:
 
 ```bash
-tar tzf ubuntu-24.04-lxc-rootfs-v3.tar.gz | head
+tar tzf fabric-core/packer/lxc/ubuntu-24.04/ubuntu-24.04-lxc-rootfs-v<N>.tar.gz | head
 ```
 
 You should see:
@@ -203,22 +201,11 @@ export PM_NODE="proxmox1"
 export PM_STORAGE="pve-nfs"
 
 bash fabric-core/packer/lxc/scripts/upload-lxc-template-via-api.sh \
-  fabric-core/packer/lxc/ubuntu-24.04/ubuntu-24.04-lxc-rootfs-v3.tar.gz
+  fabric-core/packer/lxc/ubuntu-24.04/ubuntu-24.04-lxc-rootfs-v<N>.tar.gz
 ```
 
-Fallback (manual, on the Proxmox node as root):
-
-```bash
-mkdir -p /mnt/pve/pve-nfs/template/cache
-mv /tmp/ubuntu-24.04-lxc-rootfs-v3.tar.gz \
-  /mnt/pve/pve-nfs/template/cache/
-```
-
-Verify:
-
-```bash
-ls /mnt/pve/pve-nfs/template/cache
-```
+Forbidden:
+- Manual Proxmox node shell uploads (SSH/SCP/root on Proxmox nodes is out of contract).
 
 ---
 

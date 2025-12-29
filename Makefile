@@ -29,6 +29,7 @@ PACKER_SCRIPTS_DIR := $(REPO_ROOT)/fabric-core/packer/lxc/scripts
 PACKER_TEMPLATE := packer.pkr.hcl
 PACKER_ARTIFACT_GLOB ?= ubuntu-24.04-lxc-rootfs-v*.tar.gz
 PACKER_ARTIFACT_PREFIX ?= ubuntu-24.04-lxc-rootfs-v
+PACKER_NEXT_VERSION_SCRIPT ?= $(OPS_SCRIPTS_DIR)/image-next-version.sh
 
 TERRAFORM_ENV_DIR := $(REPO_ROOT)/fabric-core/terraform/envs/$(ENV)
 ANSIBLE_DIR := $(REPO_ROOT)/fabric-core/ansible
@@ -119,10 +120,32 @@ precommit: ## Run all pre-commit hooks (must pass before commit)
 ###############################################################################
 
 .PHONY: image.build
-image.build: ## Build golden LXC image via Packer (uses Packer template defaults)
+image.build: ## Build golden LXC image (VERSION=N optional; default: next)
 	@test -d "$(PACKER_IMAGE_DIR)" || (echo "ERROR: PACKER_IMAGE_DIR not found: $(PACKER_IMAGE_DIR)"; exit 1)
 	@command -v packer >/dev/null 2>&1 || (echo "ERROR: packer not found in PATH"; exit 1)
-	cd "$(PACKER_IMAGE_DIR)" && packer init . && packer validate . && packer build "$(PACKER_TEMPLATE)"
+	@bash -euo pipefail -c '\
+		dir_abs="$$(cd "$(PACKER_IMAGE_DIR)" && pwd)"; \
+		prefix="ubuntu-24.04-lxc-rootfs"; \
+		version="$(VERSION)"; \
+		if [[ -z "$$version" ]]; then \
+			next="$$(bash "$(PACKER_NEXT_VERSION_SCRIPT)" --dir "$$dir_abs")"; \
+		else \
+			version="$${version#v}"; \
+			if [[ ! "$$version" =~ ^[0-9]+$$ ]]; then echo "ERROR: VERSION must be numeric or vN (got: $(VERSION))" >&2; exit 2; fi; \
+			next="$$version"; \
+		fi; \
+		fabric_version="v$${next}"; \
+		artifact_basename="$${prefix}-v$${next}"; \
+		out="$$dir_abs/$${artifact_basename}.tar.gz"; \
+		if [[ -e "$$out" ]]; then echo "ERROR: artifact already exists (refusing to overwrite): $$out" >&2; exit 1; fi; \
+		echo "max+1 build: artifact=$${artifact_basename}.tar.gz"; \
+		cd "$$dir_abs"; \
+		packer init .; \
+		packer validate .; \
+		packer build -var "fabric_version=$$fabric_version" -var "artifact_basename=$$artifact_basename" "$(PACKER_TEMPLATE)"; \
+		if [[ ! -f "$$out" ]]; then echo "ERROR: build completed but artifact not found: $$out" >&2; exit 1; fi; \
+		echo "$$out" \
+	'
 
 .PHONY: image.build-next
 image.build-next: ## Build next image version v{max+1} (deterministic, no overwrite)
@@ -131,13 +154,9 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 	@bash -euo pipefail -c '\
 		dir_abs="$$(cd "$(PACKER_IMAGE_DIR)" && pwd)"; \
 		prefix="ubuntu-24.04-lxc-rootfs"; \
-		# Robust max version discovery (no reliance on shell glob behavior) \
-		max="$$(ls -1 "$$dir_abs/$${prefix}-v"*.tar.gz 2>/dev/null \
-			| sed -E "s/.*-v([0-9]+)\\.tar\\.gz/\\1/" \
-			| sort -n \
-			| tail -n1)"; \
-		if [[ -z "$$max" ]]; then max=0; fi; \
-		next="$$((max+1))"; \
+		# Robust max version discovery is delegated to a unit-tested resolver script. \
+		next="$$(bash "$(PACKER_NEXT_VERSION_SCRIPT)" --dir "$$dir_abs")"; \
+		max="$$((next-1))"; \
 		fabric_version="v$${next}"; \
 		artifact_basename="$${prefix}-v$${next}"; \
 		out="$$dir_abs/$${artifact_basename}.tar.gz"; \
@@ -145,7 +164,9 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 			echo "ERROR: next artifact already exists (refusing to overwrite): $$out" >&2; \
 			exit 1; \
 		fi; \
-		echo "Building $${artifact_basename} (fabric_version=$$fabric_version)"; \
+		echo "Discovered max version: v$${max}"; \
+		echo "Selected next version:  v$${next}"; \
+		echo "Output artifact path:  $$out"; \
 		cd "$$dir_abs"; \
 		packer init .; \
 		packer validate .; \
@@ -156,8 +177,12 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 			ls -lah "$$dir_abs" >&2 || true; \
 			exit 1; \
 		fi; \
-		echo "$$out" \
+			echo "$$out" \
 	'
+
+.PHONY: image.version.test
+image.version.test: ## Unit test image version resolver (no packer, no Proxmox)
+	bash "$(OPS_SCRIPTS_DIR)/test-image-next-version.sh"
 
 
 .PHONY: image.list

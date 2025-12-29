@@ -421,6 +421,47 @@ Authoritative DNS (infra.samakia.net) records must include:
 - No additional DNS endpoints on LAN are permitted.
 - No direct LAN-to-VLAN service access is permitted outside explicitly declared ports on `dns-edge-*`.
 
+## ADR-0015 — Golden Image Versioning: Artifact-Driven Monotonic Versions
+
+**Status:** Accepted
+**Date:** 2025-12-29
+
+### Decision
+
+Golden image versions are derived from **existing artifacts on disk**, not from manual edits in repo files.
+
+- Artifact naming is canonical and immutable:
+  - `ubuntu-24.04-lxc-rootfs-v<N>.tar.gz`
+- The next version is computed as:
+  - `N = max(existing artifacts) + 1` (or `1` if none exist)
+- Builds MUST refuse to overwrite an existing versioned artifact.
+
+Version bumps MUST NOT require editing:
+- Packer HCL files
+- Makefile variables
+- docs/README per version
+
+### Rationale
+
+- Keeps image build promotion **boring and deterministic**.
+- Prevents accidental overwrites of a supposedly immutable artifact.
+- Aligns with GitOps:
+  - artifacts are immutable
+  - environment pins are Git changes
+  - rollbacks are Git reversions to a previous pinned version
+
+### Operational contract (canonical)
+
+Build (auto-bump):
+- `make image.build-next` (computes `vN`, builds, prints absolute artifact path)
+
+Upload (API-token workflow; refuses overwrite):
+- `make image.upload IMAGE=<artifact-path>`
+- or `bash fabric-core/packer/lxc/scripts/upload-lxc-template-via-api.sh <artifact-path>`
+
+Promote (Git change only):
+- `make image.promote IMAGE=<artifact-path> DST_ENV=<env>`
+
 
 
 
