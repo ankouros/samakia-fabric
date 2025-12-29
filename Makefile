@@ -426,8 +426,10 @@ tf.apply: ## Terraform apply for ENV
 			env_file="$(RUNNER_ENV_FILE)"; \
 			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) tf.backend.init; \
+		auto_approve=""; \
+		if [[ "$(CI)" = "1" ]]; then auto_approve="-auto-approve"; fi; \
 		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $(TF_APPLY_FLAGS); \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $$auto_approve $(TF_APPLY_FLAGS); \
 	'
 
 ###############################################################################
@@ -774,7 +776,9 @@ minio.tf.apply: ## MinIO Terraform apply (bootstrap-local; ENV=samakia-minio)
 				if [[ "$(DRY_RUN)" = "1" ]]; then \
 					terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
 				else \
-					terraform -chdir="$$work_dir" apply -input=false -lock=false $(TF_APPLY_FLAGS); \
+					auto_approve=""; \
+					if [[ "$(CI)" = "1" ]]; then auto_approve="-auto-approve"; fi; \
+					terraform -chdir="$$work_dir" apply -input=false -lock=false $$auto_approve $(TF_APPLY_FLAGS); \
 				fi; \
 				if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
 				if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
@@ -844,12 +848,12 @@ minio.up: ## One-command MinIO backend deployment (tf apply -> bootstrap -> stat
 			if [[ "$(DRY_RUN)" = "1" ]]; then \
 				echo "DRY_RUN=1: planning only (no backend.configure, no terraform apply, no ansible, no migration)"; \
 				$(MAKE) minio.tf.plan; \
-				$(MAKE) minio.tf.apply DRY_RUN=1; \
+				$(MAKE) minio.tf.apply DRY_RUN=1 CI=1; \
 				exit 0; \
 			fi; \
 			$(MAKE) backend.configure; \
 			$(MAKE) minio.tf.plan; \
-			$(MAKE) minio.tf.apply; \
+			$(MAKE) minio.tf.apply CI=1; \
 			$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
 			$(MAKE) minio.ansible.apply; \
 			$(MAKE) minio.accept; \

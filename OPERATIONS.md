@@ -109,6 +109,10 @@ Operational flow (non-interactive):
 - `make minio.accept`
 - `make minio.state.migrate ENV=samakia-minio` (one-time migration to S3 backend)
 
+Non-interactive apply note:
+- `make minio.up` runs Terraform apply with `CI=1` to avoid interactive approval prompts (adds `-auto-approve`).
+- If you want an interactive approval gate, run `make minio.tf.plan` then `make minio.tf.apply` without `CI=1`.
+
 Dry-run (no infra mutation):
 
 ```bash

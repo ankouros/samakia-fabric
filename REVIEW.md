@@ -45,6 +45,21 @@ Guardrails:
 - `make tf.backend.init ENV=samakia-minio` fails loudly by design.
 - `make tf.plan/tf.apply ENV=samakia-minio` are forbidden; use `minio.tf.plan/minio.tf.apply` (bootstrap-local).
 
+### Failure: Terraform apply prompted for approval (EOF)
+
+Reproduction:
+
+```bash
+ENV=samakia-minio make minio.up
+```
+
+Root cause:
+- `terraform apply` prompts for an interactive `yes` confirmation unless `-auto-approve` is set.
+- In non-interactive contexts, this fails with `Error: error asking for approval: EOF`.
+
+Fix:
+- Makefile now passes `-auto-approve` automatically when `CI=1` (used by one-command orchestration targets), so `make minio.up` is deterministic and non-interactive.
+
 ## DNS Infrastructure — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-dns/`
