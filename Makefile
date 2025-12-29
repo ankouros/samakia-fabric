@@ -832,18 +832,24 @@ minio.state.migrate: ## Migrate samakia-minio state to remote backend (requires 
 .PHONY: minio.up
 minio.up: ## One-command MinIO backend deployment (tf apply -> bootstrap -> state-backend -> acceptance -> state migrate)
 	@bash -euo pipefail -c '\
-		if [[ "$(ENV)" != "samakia-minio" ]]; then echo "ERROR: set ENV=samakia-minio" >&2; exit 2; fi; \
-		$(MAKE) backend.configure; \
-		env_file="$(RUNNER_ENV_FILE)"; \
-		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
-		$(MAKE) runner.env.check; \
-		$(MAKE) minio.tf.plan; \
-		$(MAKE) minio.tf.apply; \
-		$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
-		$(MAKE) minio.ansible.apply; \
-		$(MAKE) minio.accept; \
-		$(MAKE) minio.state.migrate; \
-	'
+			if [[ "$(ENV)" != "samakia-minio" ]]; then echo "ERROR: set ENV=samakia-minio" >&2; exit 2; fi; \
+			env_file="$(RUNNER_ENV_FILE)"; \
+			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			$(MAKE) runner.env.check; \
+			if [[ "$(DRY_RUN)" = "1" ]]; then \
+				echo "DRY_RUN=1: planning only (no backend.configure, no terraform apply, no ansible, no migration)"; \
+				$(MAKE) minio.tf.plan; \
+				$(MAKE) minio.tf.apply DRY_RUN=1; \
+				exit 0; \
+			fi; \
+			$(MAKE) backend.configure; \
+			$(MAKE) minio.tf.plan; \
+			$(MAKE) minio.tf.apply; \
+			$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+			$(MAKE) minio.ansible.apply; \
+			$(MAKE) minio.accept; \
+			$(MAKE) minio.state.migrate; \
+		'
 
 ###############################################################################
 # DNS infrastructure (Terraform + Ansible + acceptance)

@@ -81,6 +81,8 @@ make minio.up ENV=samakia-minio
 
 The MinIO environment is the Terraform backend provider, so it **must not depend on itself** at bootstrap time.
 
+#### Terraform Backend Bootstrap Invariant
+
 Invariant:
 - `ENV=samakia-minio` must always start with **local state**:
   - `terraform init -backend=false`
@@ -95,6 +97,12 @@ Operational flow (non-interactive):
 - `make minio.ansible.apply ENV=samakia-minio`
 - `make minio.accept`
 - `make minio.state.migrate ENV=samakia-minio` (one-time migration to S3 backend)
+
+Dry-run (no infra mutation):
+
+```bash
+DRY_RUN=1 make minio.up ENV=samakia-minio
+```
 
 This flow:
 - Generates runner-local backend credentials and CA material under `~/.config/samakia-fabric/` (never committed).
