@@ -847,6 +847,25 @@ minio.converged.accept: ## MinIO cluster convergence acceptance (read-only; requ
 		$(MAKE) runner.env.check; \
 		$(MAKE) minio.sdn.accept ENV="$(ENV)"; \
 		bash "$(OPS_SCRIPTS_DIR)/minio-convergence-accept.sh"; \
+		$(MAKE) minio.quorum.guard ENV="$(ENV)"; \
+	'
+
+.PHONY: minio.quorum.guard
+minio.quorum.guard: ## MinIO quorum-loss guard (detect-only; blocks unsafe state writes)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		set +e; \
+		bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
+		rc="$$?"; \
+		set -e; \
+		if [[ "$$rc" -eq 2 && "$(ALLOW_DEGRADED)" = "1" ]]; then \
+			echo "[WARN] MinIO quorum guard returned WARN; proceeding because ALLOW_DEGRADED=1 (read-only use only)" >&2; \
+			exit 0; \
+		fi; \
+		exit "$$rc"; \
 	'
 
 .PHONY: minio.state.migrate
@@ -856,6 +875,7 @@ minio.state.migrate: ## Migrate samakia-minio state to remote backend (requires 
 		env_file="$(RUNNER_ENV_FILE)"; \
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) runner.env.check; \
+		bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
 		bash "$(OPS_SCRIPTS_DIR)/tf-backend-init.sh" "$(ENV)" --migrate; \
 	'
 
@@ -875,11 +895,12 @@ minio.up: ## One-command MinIO backend deployment (tf apply -> bootstrap -> stat
 			$(MAKE) backend.configure; \
 			$(MAKE) minio.tf.plan; \
 			$(MAKE) minio.tf.apply CI=1; \
-			$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
-			$(MAKE) minio.ansible.apply; \
-			$(MAKE) minio.accept; \
-			$(MAKE) minio.state.migrate; \
-		'
+				$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+				$(MAKE) minio.ansible.apply; \
+				$(MAKE) minio.accept; \
+				bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
+				$(MAKE) minio.state.migrate; \
+			'
 
 ###############################################################################
 # DNS infrastructure (Terraform + Ansible + acceptance)
@@ -929,6 +950,7 @@ dns.up: ## One-command DNS deployment (tf apply -> bootstrap -> dns -> acceptanc
 		env_file="$(RUNNER_ENV_FILE)"; \
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) runner.env.check; \
+		ENV=samakia-minio bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
 		$(MAKE) dns.tf.plan; \
 		$(MAKE) dns.tf.apply; \
 		$(MAKE) ansible.bootstrap ENV="$(ENV)"; \

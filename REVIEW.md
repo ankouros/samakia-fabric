@@ -42,6 +42,21 @@ After `ENV=samakia-minio make minio.converged.accept` returns PASS (and the SDN 
 - Cluster membership signals show 3 nodes and no offline/healing/rebalancing indicators (best-effort).
 - Terraform backend bucket/state object presence and basic access posture invariants (no anonymous, terraform user not admin).
 
+### MinIO Quorum Guard (detect-only)
+
+`ENV=samakia-minio make minio.quorum.guard` is a conservative, detect-only gate that blocks unsafe control-plane operations when MinIO is not quorum/HA-safe.
+
+PASS means (best-effort):
+- VIP endpoints are reachable over strict TLS and the cluster health endpoint indicates quorum.
+- Edge HA sanity holds (exactly one VIP owner; keepalived/haproxy active on both edges).
+- Backend reachability signals are present (all 3 MinIO backends reachable via the active edge).
+- Admin health signals show no offline/healing/rebalancing indicators (when available via edge `mc admin info`).
+
+It does not guarantee:
+- Application-level HA (only platform/backend health signals).
+- Absence of latent storage faults beyond what MinIO reports.
+- That future failures won’t occur during a long-running apply (it’s a point-in-time safety gate).
+
 ### Terraform Backend Bootstrap Invariant
 
 The Terraform remote backend **must not depend on itself** to exist.

@@ -27,6 +27,9 @@ export ANSIBLE_CONFIG="$ANSIBLE_DIR/ansible.cfg"
 # Golden image versioning unit test (no packer, no Proxmox).
 bash "$ROOT_DIR/ops/scripts/test-image-next-version.sh"
 
+# MinIO quorum guard decision logic unit test (offline; no Proxmox/MinIO).
+bash "$ROOT_DIR/ops/scripts/test-minio-quorum-guard.sh"
+
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 
 for env_dir in "$TERRAFORM_ENVS_DIR"/*; do

@@ -17,6 +17,7 @@ usage() {
   cat >&2 <<EOF
 Usage:
   proxmox-sdn-ensure-stateful-plane.sh
+  proxmox-sdn-ensure-stateful-plane.sh --check-only
 
 Ensures Proxmox SDN primitives exist for the stateful VLAN plane (idempotent, strict TLS):
   - zone:   ${ZONE_NAME} (type=${ZONE_TYPE}, bridge=${ZONE_BRIDGE})
@@ -33,12 +34,24 @@ Behavior:
   - Validate shape if present
   - Fail loudly on mismatch (no dangerous mutation)
 
+Check-only:
+  --check-only performs a read-only assertion:
+    - Does not create anything
+    - Fails loudly if any primitive is missing or mismatched
+
 EOF
 }
+
+check_only=0
 
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   usage
   exit 0
+fi
+
+if [[ "${1:-}" == "--check-only" ]]; then
+  check_only=1
+  shift
 fi
 
 api_url="${PM_API_URL:-${TF_VAR_pm_api_url:-}}"
@@ -67,7 +80,7 @@ python3 - <<'PY' \
   "${api_url}" "${token_id}" "${token_secret}" \
   "${ZONE_NAME}" "${ZONE_TYPE}" "${ZONE_BRIDGE}" \
   "${VNET_NAME}" "${VLAN_TAG}" \
-  "${SUBNET_CIDR}" "${SUBNET_GATEWAY}"
+  "${SUBNET_CIDR}" "${SUBNET_GATEWAY}" "${check_only}"
 import json
 import ssl
 import sys
@@ -75,7 +88,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-api_url, token_id, token_secret, zone_name, zone_type, zone_bridge, vnet_name, vlan_tag, subnet_cidr, subnet_gw = sys.argv[1:]
+api_url, token_id, token_secret, zone_name, zone_type, zone_bridge, vnet_name, vlan_tag, subnet_cidr, subnet_gw, check_only_s = sys.argv[1:]
+check_only = check_only_s == "1"
 
 base = api_url.rstrip("/")
 ctx = ssl.create_default_context()
@@ -110,6 +124,8 @@ def get(path: str) -> list[dict]:
     return [x for x in data if isinstance(x, dict)]
 
 def post(path: str, data: dict) -> None:
+    if check_only:
+        raise RuntimeError(f"check-only mode: refusing to create {path}")
     _req("POST", path, data=data)
 
 def find_by_key(items: list[dict], key: str, value: str) -> dict | None:
@@ -123,6 +139,8 @@ changes: list[str] = []
 zones = get("/cluster/sdn/zones")
 zone = find_by_key(zones, "zone", zone_name) or find_by_key(zones, "name", zone_name)
 if not zone:
+    if check_only:
+        raise RuntimeError(f"missing zone: {zone_name}")
     post("/cluster/sdn/zones", {"zone": zone_name, "type": zone_type, "bridge": zone_bridge})
     changes.append(f"created zone={zone_name}")
     zones = get("/cluster/sdn/zones")
@@ -140,6 +158,8 @@ if actual_bridge and actual_bridge != zone_bridge:
 vnets = get("/cluster/sdn/vnets")
 vnet = find_by_key(vnets, "vnet", vnet_name) or find_by_key(vnets, "name", vnet_name)
 if not vnet:
+    if check_only:
+        raise RuntimeError(f"missing vnet: {vnet_name}")
     post("/cluster/sdn/vnets", {"vnet": vnet_name, "zone": zone_name, "tag": vlan_tag})
     changes.append(f"created vnet={vnet_name}")
     vnets = get("/cluster/sdn/vnets")
@@ -158,6 +178,8 @@ if actual_tag and actual_tag != vlan_tag:
 subnets = get(f"/cluster/sdn/vnets/{vnet_name}/subnets")
 subnet = find_by_key(subnets, "subnet", subnet_cidr)
 if not subnet:
+    if check_only:
+        raise RuntimeError(f"missing subnet: {subnet_cidr}")
     post(f"/cluster/sdn/vnets/{vnet_name}/subnets", {"subnet": subnet_cidr, "gateway": subnet_gw})
     changes.append(f"created subnet={subnet_cidr}")
     subnets = get(f"/cluster/sdn/vnets/{vnet_name}/subnets")
@@ -172,5 +194,5 @@ if actual_gw and actual_gw != subnet_gw:
 if changes:
     print("OK: SDN stateful plane ensured (" + ", ".join(changes) + ")")
 else:
-    print("OK: SDN stateful plane already present (no changes)")
+    print("OK: SDN stateful plane already present (no changes)" if not check_only else "OK: SDN stateful plane present (check-only)")
 PY

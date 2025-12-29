@@ -169,6 +169,29 @@ What it checks (read-only):
 - Cluster membership: `mc admin info` indicates 3 MinIO nodes and no offline/healing/rebalancing signals (best-effort parsing).
 - Control-plane invariants: Terraform backend bucket exists; `samakia-minio` tfstate object exists post-migration; anonymous access disabled; terraform user is not admin.
 
+### MinIO Quorum Guard (detect-only)
+
+Detect-only gate that answers:
+“Is the MinIO backend safe enough to rely on it for Terraform remote state writes (and state migration)?”
+
+```bash
+ENV=samakia-minio make minio.quorum.guard
+```
+
+Output:
+- Prints a secrets-safe summary to stdout (PASS/WARN/FAIL).
+- Writes an auditor-grade report to `audit/minio-quorum-guard/<UTC>/report.md` (no credentials/tokens are written).
+
+Meaning:
+- **PASS**: safe to proceed with Terraform state writes/migration (subject to normal operator governance).
+- **WARN**: degraded; safe for reads only; blocks state migration and any flow requiring safe writes.
+- **FAIL**: unsafe; blocks.
+
+Hard gates:
+- `make minio.state.migrate ENV=samakia-minio`
+- `make minio.up ENV=samakia-minio` (before state migration)
+- `make dns.up ENV=samakia-dns` (DNS uses the MinIO remote backend)
+
 
 ---
 
