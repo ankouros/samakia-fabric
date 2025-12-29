@@ -513,6 +513,7 @@ Therefore, the backend-providing environment `ENV=samakia-minio` MUST always boo
 
 Implementation note:
 - Makefile targets bootstrap from a runner-local workspace that copies the env Terraform files excluding `backend.tf` (backend remains in Git), because Terraform cannot `plan/apply` with an uninitialized `backend "s3"` configuration.
+- Terraform `local-exec` must not rely on the runner's working directory; the repo root is injected as `TF_VAR_fabric_repo_root` and local-exec references scripts via `${var.fabric_repo_root}/ops/scripts/...`.
 
 Only AFTER MinIO is deployed and accepted may its Terraform state be migrated to the remote S3 backend.
 

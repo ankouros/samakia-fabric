@@ -68,6 +68,7 @@ The format is inspired by:
 ### Fixed
 - MinIO backend bootstrap invariant: `samakia-minio` always bootstraps with `terraform init -backend=false`, with explicit post-acceptance state migration
   - Guardrails: `make tf.backend.init ENV=samakia-minio` and `make tf.apply ENV=samakia-minio` fail loudly by design; use `minio.tf.plan/minio.tf.apply` instead
+- MinIO bootstrap local-exec path invariant: local-exec provisioners use repo-root injection (`TF_VAR_fabric_repo_root`) and absolute script paths (no relative path assumptions)
 
 ### Changed
 - Migrated Codex remediation log into `CHANGELOG.md` (retired `codex-changelog.md`)

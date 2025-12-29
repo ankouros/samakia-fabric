@@ -34,3 +34,10 @@ check "bootstrap_keys" {
     error_message = "ssh_public_keys must contain valid SSH public keys (expected entries starting with 'ssh-')."
   }
 }
+
+check "repo_root" {
+  assert {
+    condition     = trimspace(var.fabric_repo_root) != ""
+    error_message = "fabric_repo_root is required (absolute repo root path) so local-exec provisioners can run bootstrap scripts deterministically."
+  }
+}

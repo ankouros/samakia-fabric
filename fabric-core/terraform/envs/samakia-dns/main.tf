@@ -64,7 +64,7 @@ resource "null_resource" "sdn_dns_plane" {
   }
 
   provisioner "local-exec" {
-    command = "bash ${path.module}/../../../..//ops/scripts/proxmox-sdn-ensure-dns-plane.sh"
+    command = "bash \"${var.fabric_repo_root}/ops/scripts/proxmox-sdn-ensure-dns-plane.sh\""
   }
 }
 

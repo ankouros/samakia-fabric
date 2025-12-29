@@ -90,6 +90,7 @@ Invariant:
 
 Implementation detail (no manual steps):
 - The Makefile bootstraps Terraform from a runner-local workspace that copies the env files **excluding** `backend.tf` (backend remains in Git), because Terraform cannot `plan/apply` against an uninitialized `backend "s3"` block.
+- The Makefile exports `TF_VAR_fabric_repo_root` so Terraform `local-exec` can run repo scripts via absolute paths during bootstrap (no cwd/relative-path assumptions).
 
 Operational flow (non-interactive):
 - `make backend.configure`

@@ -75,7 +75,7 @@ resource "null_resource" "sdn_stateful_plane" {
   }
 
   provisioner "local-exec" {
-    command = "bash ${path.module}/../../../..//ops/scripts/proxmox-sdn-ensure-stateful-plane.sh"
+    command = "bash \"${var.fabric_repo_root}/ops/scripts/proxmox-sdn-ensure-stateful-plane.sh\""
   }
 }
 

@@ -24,3 +24,8 @@ variable "ssh_public_keys" {
   description = "SSH public keys injected into LXC containers (temporary bootstrap access)."
   type        = list(string)
 }
+
+variable "fabric_repo_root" {
+  description = "Absolute path to the Samakia Fabric repo root (used for bootstrap-safe local-exec script paths)."
+  type        = string
+}

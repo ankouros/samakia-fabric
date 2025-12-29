@@ -13,6 +13,11 @@ SHELL := /usr/bin/env
 ###############################################################################
 REPO_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
+# Canonical repo root for bootstrap-safe local-exec (must not rely on cwd)
+FABRIC_REPO_ROOT ?= $(shell git -C "$(REPO_ROOT)" rev-parse --show-toplevel 2>/dev/null || echo "$(REPO_ROOT)")
+export FABRIC_REPO_ROOT
+export TF_VAR_fabric_repo_root ?= $(FABRIC_REPO_ROOT)
+
 ###############################################################################
 # Global variables (override via env or CLI)
 ###############################################################################
