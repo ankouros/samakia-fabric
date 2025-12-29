@@ -36,6 +36,7 @@ Therefore, `ENV=samakia-minio` is bootstrapped with **local state only**:
 
 Implementation note:
 - Make targets bootstrap via a runner-local workspace that copies the env Terraform files excluding `backend.tf` (backend remains in Git) so that `plan/apply` can run before remote S3 exists.
+- Bootstrap scripts and script-to-script calls are executed via an explicit repo root (`FABRIC_REPO_ROOT` / `TF_VAR_fabric_repo_root`), never via relative paths or `cwd`.
 
 Only after MinIO is deployed and accepted do we migrate state to the remote S3 backend (explicit step):
 - `make minio.state.migrate ENV=samakia-minio`

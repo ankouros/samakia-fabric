@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+: "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
+
 ENV_FILE="${HOME}/.config/samakia-fabric/env.sh"
 
 MINIO_VIP="192.168.11.101"
@@ -66,7 +68,7 @@ require_proxmox_api() {
   if [[ "${proxmox_token_id}" != *"!"* ]]; then
     fail "PM_API_TOKEN_ID must include '!': ${proxmox_token_id}"
   fi
-  bash fabric-ci/scripts/check-proxmox-ca-and-tls.sh >/dev/null
+  bash "${FABRIC_REPO_ROOT}/fabric-ci/scripts/check-proxmox-ca-and-tls.sh" >/dev/null
 }
 
 get_lxc_tags() {

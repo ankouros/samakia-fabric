@@ -25,7 +25,7 @@ fi
 if [[ -n "${api_url}" || -n "${token_id}" || -n "${token_secret}" || -n "${pm_user}" || -n "${pm_password}" ]]; then
   if [[ ! -f "${CA_FILE}" ]]; then
     echo "ERROR: Proxmox CA is required for secure TLS but is missing: ${CA_FILE}" >&2
-    echo "Run: bash ops/scripts/install-proxmox-ca.sh" >&2
+    echo "Run: bash \"${REPO_ROOT}/ops/scripts/install-proxmox-ca.sh\"" >&2
     exit 1
   fi
 
@@ -38,7 +38,7 @@ if [[ -n "${api_url}" || -n "${token_id}" || -n "${token_secret}" || -n "${pm_us
 
   if [[ ! -f "/usr/local/share/ca-certificates/proxmox-root-ca.crt" && ! -f "/etc/ssl/certs/proxmox-root-ca.pem" ]]; then
     echo "ERROR: Proxmox CA is not installed in the host trust store." >&2
-    echo "Run: bash ops/scripts/install-proxmox-ca.sh" >&2
+    echo "Run: bash \"${REPO_ROOT}/ops/scripts/install-proxmox-ca.sh\"" >&2
     exit 1
   fi
 fi

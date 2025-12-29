@@ -37,10 +37,20 @@ Samakia Fabric assumes Terraform and Ansible run from a trusted **runner host** 
 - Proxmox internal CA installed in the host trust store (strict TLS, no bypass flags)
 - A canonical local environment file with API tokens and backend configuration
 
+### Repository root invariant (scripts)
+
+Operational scripts are written to be bootstrap-safe and must not rely on the current working directory.
+
+Set the repo root once per shell session (the Makefile exports this automatically):
+
+```bash
+export FABRIC_REPO_ROOT="$(git rev-parse --show-toplevel)"
+```
+
 ### Install Proxmox internal CA (runner host)
 
 ```bash
-bash ops/scripts/install-proxmox-ca.sh
+bash "$FABRIC_REPO_ROOT/ops/scripts/install-proxmox-ca.sh"
 ```
 
 ### Install runner env file (canonical)
@@ -48,13 +58,13 @@ bash ops/scripts/install-proxmox-ca.sh
 Creates `~/.config/samakia-fabric/env.sh` with `chmod 600` (local-only; never committed):
 
 ```bash
-bash ops/scripts/runner-env-install.sh
+bash "$FABRIC_REPO_ROOT/ops/scripts/runner-env-install.sh"
 ```
 
 Validate (presence-only; secrets are never printed):
 
 ```bash
-bash ops/scripts/runner-env-check.sh
+bash "$FABRIC_REPO_ROOT/ops/scripts/runner-env-check.sh"
 ```
 
 ### Install MinIO/S3 backend CA (only if required)
@@ -62,7 +72,7 @@ bash ops/scripts/runner-env-check.sh
 If your backend uses an internal CA not already trusted by the host:
 
 ```bash
-bash ops/scripts/install-s3-backend-ca.sh
+bash "$FABRIC_REPO_ROOT/ops/scripts/install-s3-backend-ca.sh"
 ```
 
 ---

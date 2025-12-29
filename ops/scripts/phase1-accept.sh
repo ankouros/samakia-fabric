@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+: "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
+
 ENV_NAME="${ENV:-samakia-prod}"
 
 echo "== Phase 1 acceptance (static checks) =="
-bash fabric-ci/scripts/lint.sh
-bash fabric-ci/scripts/validate.sh
+bash "${FABRIC_REPO_ROOT}/fabric-ci/scripts/lint.sh"
+bash "${FABRIC_REPO_ROOT}/fabric-ci/scripts/validate.sh"
 
 echo
 echo "== Phase 1 acceptance (guardrails) =="
-bash ops/scripts/env-parity-check.sh
-bash ops/scripts/runner-env-check.sh
+bash "${FABRIC_REPO_ROOT}/ops/scripts/env-parity-check.sh"
+bash "${FABRIC_REPO_ROOT}/ops/scripts/runner-env-check.sh"
 
 echo
 echo "== Phase 1 acceptance (inventory) =="

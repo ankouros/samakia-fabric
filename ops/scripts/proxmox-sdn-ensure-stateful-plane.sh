@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+: "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
+
 ZONE_NAME="zminio"
 ZONE_TYPE="vlan"
 ZONE_BRIDGE="vmbr0"
@@ -59,7 +61,7 @@ if [[ "${token_id}" != *"!"* ]]; then
 fi
 
 # Enforce strict TLS + token-only constraints (and verify host CA trust).
-bash fabric-ci/scripts/check-proxmox-ca-and-tls.sh >/dev/null
+bash "${FABRIC_REPO_ROOT}/fabric-ci/scripts/check-proxmox-ca-and-tls.sh" >/dev/null
 
 python3 - <<'PY' \
   "${api_url}" "${token_id}" "${token_secret}" \

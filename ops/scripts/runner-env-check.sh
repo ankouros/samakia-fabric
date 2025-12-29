@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+: "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
+
 DEFAULT_ENV_FILE="${HOME}/.config/samakia-fabric/env.sh"
 BACKEND_CA_DST="/usr/local/share/ca-certificates/samakia-fabric-s3-backend-ca.crt"
 
@@ -93,7 +95,7 @@ fi
 
 echo
 echo "== Proxmox TLS guardrails =="
-bash fabric-ci/scripts/check-proxmox-ca-and-tls.sh
+bash "${FABRIC_REPO_ROOT}/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 
 echo
 echo "== SSH bootstrap key contract =="
@@ -143,7 +145,7 @@ if [[ "${backend_configured}" -eq 1 ]]; then
 
     if [[ ! -f "${BACKEND_CA_DST}" && ! -f "/etc/ssl/certs/samakia-fabric-s3-backend-ca.pem" ]]; then
       echo "ERROR: backend CA is not installed in the host trust store." >&2
-      echo "Run: bash ops/scripts/install-s3-backend-ca.sh" >&2
+      echo "Run: bash \"${FABRIC_REPO_ROOT}/ops/scripts/install-s3-backend-ca.sh\"" >&2
       missing=1
     fi
   fi

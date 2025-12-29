@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+: "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
+
 DEFAULT_ENV_FILE="${HOME}/.config/samakia-fabric/env.sh"
 DEFAULT_CREDENTIALS_FILE="${HOME}/.config/samakia-fabric/credentials"
 DEFAULT_PKI_DIR="${HOME}/.config/samakia-fabric/pki"
@@ -234,10 +236,10 @@ chmod 600 "${env_file}" || true
 echo "Installing backend CA into host trust store (strict TLS)..."
 if command -v sudo >/dev/null 2>&1; then
   if sudo -n true 2>/dev/null; then
-    TF_BACKEND_S3_CA_SRC="${ca_crt}" bash ops/scripts/install-s3-backend-ca.sh >/dev/null
+    TF_BACKEND_S3_CA_SRC="${ca_crt}" bash "${FABRIC_REPO_ROOT}/ops/scripts/install-s3-backend-ca.sh" >/dev/null
   else
     echo "ERROR: sudo non-interactive check failed; CA install requires NOPASSWD or root." >&2
-    echo "Run: sudo bash ops/scripts/install-s3-backend-ca.sh --src ${ca_crt}" >&2
+    echo "Run: sudo bash \"${FABRIC_REPO_ROOT}/ops/scripts/install-s3-backend-ca.sh\" --src ${ca_crt}" >&2
     exit 1
   fi
 else
@@ -248,4 +250,4 @@ fi
 echo "OK: backend configured (env file + credentials + CA + TLS bundle)."
 echo "Next:"
 echo "  source ${env_file}"
-echo "  bash ops/scripts/runner-env-check.sh --file ${env_file}"
+echo "  bash \"${FABRIC_REPO_ROOT}/ops/scripts/runner-env-check.sh\" --file ${env_file}"
