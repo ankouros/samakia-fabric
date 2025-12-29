@@ -30,6 +30,9 @@ bash "$ROOT_DIR/ops/scripts/test-image-next-version.sh"
 # MinIO quorum guard decision logic unit test (offline; no Proxmox/MinIO).
 bash "$ROOT_DIR/ops/scripts/test-minio-quorum-guard.sh"
 
+# MinIO Terraform backend smoke parsing unit test (offline; no MinIO/Proxmox).
+bash "$ROOT_DIR/ops/scripts/test-minio-terraform-backend-smoke.sh"
+
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 
 for env_dir in "$TERRAFORM_ENVS_DIR"/*; do

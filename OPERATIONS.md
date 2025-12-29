@@ -205,6 +205,27 @@ Safety guarantees:
 - Attempts recovery automatically if a post-check fails.
 - Uses strict TLS and strict SSH host key checking (no insecure flags).
 
+### MinIO Terraform Backend Smoke Test (real init+plan)
+
+Hard gate that answers:
+“Can Terraform initialize and plan against the real MinIO S3 backend with strict TLS and lockfiles?”
+
+```bash
+ENV=samakia-minio make minio.backend.smoke
+```
+
+This test:
+- Creates an isolated ephemeral workspace under `_tmp/` (auto-cleaned).
+- Runs `terraform init` (remote backend; no `-backend=false`).
+- Runs `terraform plan` (no resources; expects “No changes”).
+- Verifies backend metadata indicates `s3`, endpoint matches `https://192.168.11.101:9000`, and `use_lockfile=true`.
+- Requires observing state lock activity during `plan`.
+
+This gate is enforced automatically before:
+- `make minio.state.migrate ENV=samakia-minio`
+- any non-minio `make tf.apply ENV=<env>`
+- `make dns.up ENV=samakia-dns`
+
 
 ---
 

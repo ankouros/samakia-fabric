@@ -66,6 +66,17 @@ PASS means (best-effort):
 - Exactly one VIP owner exists before, during, and after recovery (no split-brain).
 - The faulted edge services are restored to active state.
 
+### Terraform Backend Smoke Test
+
+`ENV=samakia-minio make minio.backend.smoke` performs a real `terraform init` + `terraform plan` against the MinIO S3 backend from an isolated workspace and fails loud if:
+- TLS trust is missing (no insecure flags permitted).
+- Backend locking is not observed during plan.
+- Backend metadata does not match the canonical endpoint and lockfile settings.
+
+It does not guarantee:
+- That the backend will remain stable for the full duration of an apply (point-in-time check).
+- That state writes will succeed under concurrent lock contention (it validates locking is active, not contention behavior).
+
 ### Terraform Backend Bootstrap Invariant
 
 The Terraform remote backend **must not depend on itself** to exist.

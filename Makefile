@@ -423,14 +423,15 @@ tf.apply: ## Terraform apply for ENV
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
-			env_file="$(RUNNER_ENV_FILE)"; \
-			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
-		$(MAKE) tf.backend.init; \
-		auto_approve=""; \
-		if [[ "$(CI)" = "1" ]]; then auto_approve="-auto-approve"; fi; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $$auto_approve $(TF_APPLY_FLAGS); \
-	'
+				env_file="$(RUNNER_ENV_FILE)"; \
+				if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			ENV=samakia-minio $(MAKE) minio.backend.smoke; \
+			$(MAKE) tf.backend.init; \
+			auto_approve=""; \
+			if [[ "$(CI)" = "1" ]]; then auto_approve="-auto-approve"; fi; \
+			terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
+			terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $$auto_approve $(TF_APPLY_FLAGS); \
+		'
 
 ###############################################################################
 # Ansible lifecycle
@@ -875,6 +876,7 @@ minio.state.migrate: ## Migrate samakia-minio state to remote backend (requires 
 		env_file="$(RUNNER_ENV_FILE)"; \
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) runner.env.check; \
+		$(MAKE) minio.backend.smoke ENV=samakia-minio; \
 		bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
 		bash "$(OPS_SCRIPTS_DIR)/tf-backend-init.sh" "$(ENV)" --migrate; \
 	'
@@ -917,6 +919,16 @@ minio.failure.sim: ## MinIO edge failure simulation (reversible; requires EDGE=m
 		$(MAKE) minio.sdn.accept ENV="$(ENV)"; \
 		$(MAKE) minio.accept ENV="$(ENV)"; \
 		$(MAKE) minio.converged.accept ENV="$(ENV)"; \
+	'
+
+.PHONY: minio.backend.smoke
+minio.backend.smoke: ## MinIO Terraform backend smoke test (real init+plan against S3 backend; no apply)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		bash "$(OPS_SCRIPTS_DIR)/minio-terraform-backend-smoke.sh"; \
 	'
 
 ###############################################################################
@@ -967,6 +979,7 @@ dns.up: ## One-command DNS deployment (tf apply -> bootstrap -> dns -> acceptanc
 		env_file="$(RUNNER_ENV_FILE)"; \
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) runner.env.check; \
+		ENV=samakia-minio $(MAKE) minio.backend.smoke; \
 		ENV=samakia-minio bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
 		$(MAKE) dns.tf.plan; \
 		$(MAKE) dns.tf.apply; \
