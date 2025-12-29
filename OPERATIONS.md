@@ -138,6 +138,23 @@ DNS becomes unblocked after the backend is available:
 make dns.up ENV=samakia-dns
 ```
 
+### MinIO SDN Acceptance
+
+Validates the MinIO **stateful SDN plane** (zminio/vminio/VLAN140) and the expected LXC wiring signals in a **read-only**, **non-destructive** way.
+
+```bash
+ENV=samakia-minio make minio.sdn.accept
+```
+
+Prerequisite:
+- The runner’s Proxmox API token must have permission to read SDN primitives, and the SDN plane must already exist.
+- If `zminio` does not exist and your token lacks `SDN.Allocate`, the test will fail loudly by design (the plane must be created by an operator with `SDN.Allocate`).
+
+What it checks (best-effort):
+- Proxmox SDN primitives exist and match the contract (zone/vnet/subnet/gateway VIP).
+- MinIO CTs are VLAN-only (no LAN bridge attached) and default-route via `10.10.140.1` (when CT configs exist).
+- MinIO edges are dual-homed and provide the VLAN gateway VIP + NAT readiness (when SSH is reachable).
+
 
 ---
 

@@ -828,6 +828,16 @@ minio.ansible.apply: ## MinIO Ansible apply (state-backend.yml; requires bootstr
 minio.accept: ## MinIO acceptance (VIP TLS, HA checks, bucket checks, idempotency)
 	bash "$(OPS_SCRIPTS_DIR)/minio-accept.sh"
 
+.PHONY: minio.sdn.accept
+minio.sdn.accept: ## MinIO SDN acceptance (stateful plane validation; read-only)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		bash "$(OPS_SCRIPTS_DIR)/minio-sdn-accept.sh"; \
+	'
+
 .PHONY: minio.state.migrate
 minio.state.migrate: ## Migrate samakia-minio state to remote backend (requires MinIO up)
 	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)

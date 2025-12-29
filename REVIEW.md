@@ -27,6 +27,13 @@ This document records what was implemented for the **Terraform remote state back
 - **Acceptance suite**: `ops/scripts/minio-accept.sh` (non-interactive)
   - Includes read-only Proxmox API verification of the tag schema (strict TLS, token-only).
 
+### MinIO SDN: Acceptance Coverage
+
+Additional SDN-plane validation is available (read-only):
+- `ENV=samakia-minio make minio.sdn.accept`
+- Guarantees after PASS (best-effort): SDN primitives exist (zminio/vminio/VLAN140/subnet/gateway VIP), MinIO nodes are VLAN-only and default-route via `10.10.140.1`, and edge gateway VIP/NAT signals are present when edges are reachable.
+- Note: if the Proxmox API token cannot read SDN primitives (or the SDN plane is not created yet), this check fails loudly by design.
+
 ### Terraform Backend Bootstrap Invariant
 
 The Terraform remote backend **must not depend on itself** to exist.
