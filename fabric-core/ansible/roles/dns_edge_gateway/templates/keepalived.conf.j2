@@ -1,0 +1,40 @@
+! Managed by Samakia Fabric (dns-edge). Do not edit manually.
+
+global_defs {
+  enable_script_security
+  router_id {{ inventory_hostname }}
+}
+
+vrrp_instance VI_LAN_DNS {
+  state {{ 'MASTER' if (dns_edge_role | default('backup')) == 'master' else 'BACKUP' }}
+  interface {{ dns_edge_gateway_lan_iface }}
+  virtual_router_id 11
+  priority {{ dns_edge_priority | default(100) }}
+  advert_int 1
+
+  unicast_src_ip {{ dns_edge_lan_ip }}
+  unicast_peer {
+    {{ '192.168.11.102' if inventory_hostname == 'dns-edge-1' else '192.168.11.103' }}
+  }
+
+  virtual_ipaddress {
+    {{ dns_edge_gateway_lan_vip }}/24 dev {{ dns_edge_gateway_lan_iface }}
+  }
+}
+
+vrrp_instance VI_VLAN_GW {
+  state {{ 'MASTER' if (dns_edge_role | default('backup')) == 'master' else 'BACKUP' }}
+  interface {{ dns_edge_gateway_vlan_iface }}
+  virtual_router_id 12
+  priority {{ dns_edge_priority | default(100) }}
+  advert_int 1
+
+  unicast_src_ip {{ dns_edge_vlan_ip }}
+  unicast_peer {
+    {{ '10.10.100.12' if inventory_hostname == 'dns-edge-1' else '10.10.100.11' }}
+  }
+
+  virtual_ipaddress {
+    {{ dns_edge_gateway_vlan_gw_vip }}/24 dev {{ dns_edge_gateway_vlan_iface }}
+  }
+}

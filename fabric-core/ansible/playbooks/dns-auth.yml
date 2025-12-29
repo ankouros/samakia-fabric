@@ -1,0 +1,12 @@
+---
+- name: DNS Authoritative (PowerDNS) – master
+  hosts: dns-auth-1
+  become: true
+  roles:
+    - role: dns_auth_powerdns
+
+- name: DNS Authoritative (PowerDNS) – slave
+  hosts: dns-auth-2
+  become: true
+  roles:
+    - role: dns_auth_powerdns

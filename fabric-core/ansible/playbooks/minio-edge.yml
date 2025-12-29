@@ -1,0 +1,6 @@
+---
+- name: MinIO edge LB (VIP + HAProxy + NAT)
+  hosts: minio-edge-*
+  become: true
+  roles:
+    - role: minio_edge_lb

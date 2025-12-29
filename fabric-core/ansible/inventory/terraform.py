@@ -63,15 +63,27 @@ def _fetch_json_retry(
     headers: dict[str, str],
     attempts: int = 8,
     delay_seconds: float = 1.0,
-) -> dict | None:
+) -> tuple[dict | None, str | None]:
     last_error: Exception | None = None
     for _ in range(attempts):
         try:
-            return _fetch_json(url, headers=headers)
+            return _fetch_json(url, headers=headers), None
         except (urllib.error.URLError, ValueError) as exc:
             last_error = exc
             time.sleep(delay_seconds)
-    return None
+    return None, str(last_error) if last_error else None
+
+def _looks_like_ipv4(value: str) -> bool:
+    parts = value.split(".")
+    if len(parts) != 4:
+        return False
+    try:
+        nums = [int(p) for p in parts]
+    except ValueError:
+        return False
+    if any(n < 0 or n > 255 for n in nums):
+        return False
+    return value != "127.0.0.1"
 
 def _discover_lxc_ipv4(
     *,
@@ -80,24 +92,42 @@ def _discover_lxc_ipv4(
     vmid: int,
     token_id: str,
     token_secret: str,
-) -> str | None:
-    url = f"{pm_api_url.rstrip('/')}/nodes/{node}/lxc/{vmid}/interfaces"
+) -> tuple[str | None, str | None]:
+    base = pm_api_url.rstrip("/")
     headers = {"Authorization": f"PVEAPIToken={token_id}={token_secret}"}
 
-    payload = _fetch_json_retry(url, headers=headers)
-    if not payload:
-        return None
-
-    for iface in payload.get("data", []):
-        if iface.get("name") != "eth0":
-            continue
-        for addr in iface.get("ip-addresses", []):
-            if addr.get("ip-address-type") != "inet":
+    url = f"{base}/nodes/{node}/lxc/{vmid}/interfaces"
+    payload, err1 = _fetch_json_retry(url, headers=headers)
+    if payload and isinstance(payload, dict):
+        for iface in payload.get("data", []) or []:
+            name = str(iface.get("name") or "")
+            if not (name == "eth0" or name.startswith("eth0")):
                 continue
-            ip = addr.get("ip-address")
-            if ip and ip != "127.0.0.1":
-                return ip
-    return None
+            for addr in iface.get("ip-addresses", []) or []:
+                addr_type = addr.get("ip-address-type")
+                if addr_type not in ("inet", "ipv4"):
+                    continue
+                ip = addr.get("ip-address")
+                if ip and _looks_like_ipv4(ip):
+                    return ip, None
+
+    url = f"{base}/nodes/{node}/lxc/{vmid}/status/current"
+    payload, err2 = _fetch_json_retry(url, headers=headers)
+    if not payload or not isinstance(payload, dict):
+        detail = " | ".join([x for x in [err1, err2] if x])
+        return None, detail or None
+
+    data = payload.get("data")
+    if isinstance(data, dict):
+        direct = data.get("ip")
+        if isinstance(direct, str) and _looks_like_ipv4(direct):
+            return direct, None
+        for v in data.values():
+            if isinstance(v, str) and _looks_like_ipv4(v):
+                return v, None
+
+    detail = " | ".join([x for x in [err1, err2] if x])
+    return None, detail or None
 
 data = None
 
@@ -135,7 +165,7 @@ for _, host in lxc_inventory.items():
 
     if "ansible_host" not in inventory["_meta"]["hostvars"][hostname]:
         if pm_api_url and pm_token_id and pm_token_secret:
-            ip = _discover_lxc_ipv4(
+            ip, detail = _discover_lxc_ipv4(
                 pm_api_url=pm_api_url,
                 node=host["node"],
                 vmid=int(host["vmid"]),
@@ -145,8 +175,9 @@ for _, host in lxc_inventory.items():
             if ip:
                 inventory["_meta"]["hostvars"][hostname]["ansible_host"] = ip
             else:
+                suffix = f" (details: {detail})" if detail else ""
                 errors.append(
-                    f"{hostname}: failed to resolve IPv4 via Proxmox API (node={host['node']} vmid={host['vmid']}); ensure the container is running and DHCP reservation exists for the pinned MAC."
+                    f"{hostname}: failed to resolve IPv4 via Proxmox API (node={host['node']} vmid={host['vmid']}){suffix}; ensure the container is running and DHCP reservation exists for the pinned MAC."
                 )
         else:
             errors.append(

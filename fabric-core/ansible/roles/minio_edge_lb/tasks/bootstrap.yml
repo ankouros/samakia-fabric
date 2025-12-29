@@ -1,0 +1,141 @@
+---
+- name: Resolve MinIO root credentials from controller env
+  ansible.builtin.set_fact:
+    minio_edge_lb_root_user: "{{ lookup('ansible.builtin.env', 'MINIO_ROOT_USER') | default('', true) }}"
+    minio_edge_lb_root_password: "{{ lookup('ansible.builtin.env', 'MINIO_ROOT_PASSWORD') | default('', true) }}"
+    minio_edge_lb_tf_access_key: "{{ lookup('ansible.builtin.env', 'AWS_ACCESS_KEY_ID') | default('', true) }}"
+    minio_edge_lb_tf_secret_key: "{{ lookup('ansible.builtin.env', 'AWS_SECRET_ACCESS_KEY') | default('', true) }}"
+    minio_edge_lb_tf_bucket_effective: "{{ lookup('ansible.builtin.env', 'TF_BACKEND_S3_BUCKET') | default(minio_edge_lb_tf_bucket, true) }}"
+  no_log: true
+
+- name: Fail if required backend credentials are missing
+  ansible.builtin.assert:
+    that:
+      - minio_edge_lb_root_user | length > 0
+      - minio_edge_lb_root_password | length > 0
+      - minio_edge_lb_tf_access_key | length > 0
+      - minio_edge_lb_tf_secret_key | length > 0
+      - minio_edge_lb_tf_bucket_effective | length > 0
+    fail_msg: "Missing MINIO_ROOT_USER/MINIO_ROOT_PASSWORD or AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY or TF_BACKEND_S3_BUCKET."
+    quiet: true
+
+- name: Wait for MinIO nodes to be reachable (health)
+  ansible.builtin.command:
+    argv:
+      - curl
+      - -fsS
+      - "http://{{ item }}:9000/minio/health/live"
+  register: minio_edge_lb_node_health
+  retries: 30
+  delay: 2
+  until: minio_edge_lb_node_health.rc == 0
+  loop: "{{ minio_edge_lb_minio_backends }}"
+  changed_when: false
+
+- name: Wait for MinIO VIP health endpoint (strict TLS)
+  ansible.builtin.command:
+    argv:
+      - curl
+      - -fsS
+      - "https://{{ minio_edge_lb_lan_vip }}:{{ minio_edge_lb_s3_port }}/minio/health/live"
+  register: minio_edge_lb_vip_health
+  retries: 30
+  delay: 2
+  until: minio_edge_lb_vip_health.rc == 0
+  changed_when: false
+
+- name: Configure mc aliases (root + terraform user)
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - alias
+      - set
+      - samakia-root
+      - "https://{{ minio_edge_lb_lan_vip }}:{{ minio_edge_lb_s3_port }}"
+      - "{{ minio_edge_lb_root_user }}"
+      - "{{ minio_edge_lb_root_password }}"
+  no_log: true
+  changed_when: false
+
+- name: Ensure state bucket exists (idempotent)
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - mb
+      - --ignore-existing
+      - "samakia-root/{{ minio_edge_lb_tf_bucket_effective }}"
+  changed_when: false
+
+- name: Install terraform state policy (bucket-scoped)
+  ansible.builtin.template:
+    src: tfstate-policy.json.j2
+    dest: /root/tfstate-policy.json
+    owner: root
+    group: root
+    mode: "0600"
+  changed_when: false
+
+- name: Ensure terraform state policy exists
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - admin
+      - policy
+      - create
+      - samakia-root
+      - tfstate-policy
+      - /root/tfstate-policy.json
+  register: minio_edge_lb_policy_create
+  changed_when: "'created' in (minio_edge_lb_policy_create.stdout | lower)"
+  failed_when: false
+
+- name: Ensure terraform user exists
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - admin
+      - user
+      - add
+      - samakia-root
+      - "{{ minio_edge_lb_tf_access_key }}"
+      - "{{ minio_edge_lb_tf_secret_key }}"
+  register: minio_edge_lb_user_add
+  no_log: true
+  changed_when: "'added' in (minio_edge_lb_user_add.stdout | lower)"
+  failed_when: false
+
+- name: Ensure terraform policy is attached to terraform user
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - admin
+      - policy
+      - attach
+      - samakia-root
+      - tfstate-policy
+      - --user
+      - "{{ minio_edge_lb_tf_access_key }}"
+  register: minio_edge_lb_policy_attach
+  changed_when: "'attached' in (minio_edge_lb_policy_attach.stdout | lower)"
+  failed_when: false
+
+- name: Verify terraform credentials can list the state bucket (no admin)
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - alias
+      - set
+      - samakia-tf
+      - "https://{{ minio_edge_lb_lan_vip }}:{{ minio_edge_lb_s3_port }}"
+      - "{{ minio_edge_lb_tf_access_key }}"
+      - "{{ minio_edge_lb_tf_secret_key }}"
+  no_log: true
+  changed_when: false
+
+- name: Verify state bucket list with terraform user
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - ls
+      - "samakia-tf/{{ minio_edge_lb_tf_bucket_effective }}"
+  changed_when: false

@@ -1,0 +1,6 @@
+---
+- name: DNS Edge (VRRP VIP + dnsdist + unbound + NAT)
+  hosts: dns-edge-*
+  become: true
+  roles:
+    - role: dns_edge_gateway

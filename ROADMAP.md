@@ -66,27 +66,24 @@ Status: **Stable / Production usable**
 
 ---
 
-## Phase 1 — Operational Hardening (NEXT)
+## Phase 1 — Operational Hardening (COMPLETED ✅)
 
 Goal: Make day-2 operations safer, more deterministic, and less error-prone.
 
-### Planned
-- Remote Terraform state backend (MinIO / S3) + state locking (no local state drift)
-- Explicit environment separation (dev / staging / prod) with parity checks
-- Deterministic “runner host” bootstrapping:
-  - standard env layout (`~/.config/samakia-fabric/`)
-  - non-interactive default inputs for CI runners
-- LXC lifecycle guard improvements
-  - explicit replace/blue-green guidance baked into ops workflow
-- **SSH trust lifecycle** hardening
-  - documented known_hosts rotation rules for replace/recreate
-  - optional out-of-band host key verification path
-- **DHCP/MAC determinism**
-  - reservation by MAC runbook (or fixed MAC contract when supported)
-  - inventory sanity checks for IP changes after replace
-- Inventory validation and sanity checks
-  - loud failures for missing host vars / missing API env
-  - safe redaction (no token leakage)
+### Completed (canonical)
+- Remote Terraform state backend (MinIO/S3) with locking (`use_lockfile = true`) and strict TLS (no secrets in Git)
+- Explicit environment separation with parity checks (`samakia-dev`, `samakia-staging`, `samakia-prod`)
+- Deterministic runner host bootstrapping:
+  - canonical env file: `~/.config/samakia-fabric/env.sh` (chmod 600)
+  - runner install/check scripts (presence-only output; strict TLS + token-only)
+- CI-safe non-interactive defaults for Terraform targets (`-input=false`, lock timeout, no prompts in `CI=1`)
+- LXC lifecycle guard improvements:
+  - replace-in-place and blue/green runbook + make guidance targets (no auto-apply)
+- SSH trust lifecycle hardening:
+  - strict known_hosts rotation workflow (no `StrictHostKeyChecking` disablement)
+- DHCP/MAC determinism + inventory sanity checks:
+  - loud failure on pinned IP mismatches; warning-only on unpinned IP discovery
+- Inventory validation target (`make inventory.check`) and safe redaction guarantees (no token leakage)
 
 Outcome:
 - Reduced operator error
@@ -98,6 +95,9 @@ Outcome:
 ## Phase 2 — Networking & Platform Primitives
 
 Goal: Establish reusable infrastructure building blocks.
+
+### Completed (early)
+- DNS infrastructure plane (SDN VLAN + VIP-based edge/gateway pattern)
 
 ### Planned
 - Terraform network primitives (bridges, VLAN tagging patterns)

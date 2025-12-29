@@ -1,0 +1,27 @@
+#!/usr/sbin/nft -f
+
+# Managed by Samakia Fabric (minio_cluster). Do not edit manually.
+
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+
+    iif "lo" accept
+    ct state established,related accept
+
+    # Allow SSH + MinIO ports from edge nodes only (VLAN140).
+    {% for ip in minio_cluster_nft_allow_from_ips %}
+    ip saddr {{ ip }} tcp dport 22 accept
+    ip saddr {{ ip }} tcp dport {{ minio_cluster_s3_port }} accept
+    ip saddr {{ ip }} tcp dport {{ minio_cluster_console_port }} accept
+    {% endfor %}
+  }
+
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}

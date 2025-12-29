@@ -1,0 +1,49 @@
+#!/usr/sbin/nft -f
+
+# Managed by Samakia Fabric (dns-edge). Do not edit manually.
+
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+
+    iif "lo" accept
+    ct state established,related accept
+
+    # Allow SSH for operations (LAN only).
+    ip saddr {{ dns_edge_gateway_lan_cidr }} tcp dport 22 accept
+
+    # VRRP (unicast) between peers on both interfaces.
+    ip protocol vrrp ip saddr { 192.168.11.102, 192.168.11.103, 10.10.100.11, 10.10.100.12 } accept
+
+    # DNS endpoint is VIP only (but packets may arrive via LAN or VLAN interface).
+    ip daddr {{ dns_edge_gateway_lan_vip }} udp dport 53 accept
+    ip daddr {{ dns_edge_gateway_lan_vip }} tcp dport 53 accept
+  }
+
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+
+    ct state established,related accept
+
+    # VLAN100 egress NAT to LAN uplink.
+    iif "{{ dns_edge_gateway_vlan_iface }}" oif "{{ dns_edge_gateway_lan_iface }}" ip saddr {{ dns_edge_gateway_vlan_cidr }} accept
+  }
+
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}
+
+table ip nat {
+  chain postrouting {
+    type nat hook postrouting priority 100;
+    policy accept;
+
+    oif "{{ dns_edge_gateway_lan_iface }}" ip saddr {{ dns_edge_gateway_vlan_cidr }} masquerade
+  }
+}

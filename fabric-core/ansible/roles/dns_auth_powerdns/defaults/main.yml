@@ -1,0 +1,50 @@
+---
+dns_auth_powerdns_zone_name: infra.samakia.net
+dns_auth_powerdns_zone_ttl: 60
+# Host role for PowerDNS: master | slave
+dns_auth_powerdns_role: ""
+dns_auth_powerdns_master_hostname: dns-auth-1
+dns_auth_powerdns_master_ip: 10.10.100.21
+dns_auth_powerdns_slave_hostname: dns-auth-2
+dns_auth_powerdns_slave_ip: 10.10.100.22
+dns_auth_powerdns_edge_1_vlan_ip: 10.10.100.11
+dns_auth_powerdns_edge_2_vlan_ip: 10.10.100.12
+dns_auth_powerdns_dns_vip: 192.168.11.100
+dns_auth_powerdns_minio_vip: 192.168.11.101
+# PowerDNS binds to the node's VLAN address (VLAN-only service).
+dns_auth_powerdns_listen_ip: "{{ ansible_host }}"
+dns_auth_powerdns_rrsets:
+  - name: "@"
+    type: "NS"
+    ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+    values:
+      - "dns-auth-1.{{ dns_auth_powerdns_zone_name }}."
+      - "dns-auth-2.{{ dns_auth_powerdns_zone_name }}."
+  - name: "dns"
+    type: "A"
+    ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+    values: ["{{ dns_auth_powerdns_dns_vip }}"]
+  - name: "dns-edge-1"
+    type: "A"
+    ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+    values: ["{{ dns_auth_powerdns_edge_1_vlan_ip }}"]
+  - name: "dns-edge-2"
+    type: "A"
+    ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+    values: ["{{ dns_auth_powerdns_edge_2_vlan_ip }}"]
+  - name: "dns-auth-1"
+    type: "A"
+    ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+    values: ["{{ dns_auth_powerdns_master_ip }}"]
+  - name: "dns-auth-2"
+    type: "A"
+    ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+    values: ["{{ dns_auth_powerdns_slave_ip }}"]
+  - name: "minio"
+    type: "A"
+    ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+    values: ["{{ dns_auth_powerdns_minio_vip }}"]
+  - name: "minio-console"
+    type: "A"
+    ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+    values: ["{{ dns_auth_powerdns_minio_vip }}"]

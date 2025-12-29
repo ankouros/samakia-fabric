@@ -31,6 +31,71 @@ This document does NOT cover:
 - Proxmox internal CA: install CA into the runner host trust store (no insecure flags)
 - CI environments MUST use valid CA
 
+## Runner Host Setup (Phase 1)
+
+Samakia Fabric assumes Terraform and Ansible run from a trusted **runner host** with:
+- Proxmox internal CA installed in the host trust store (strict TLS, no bypass flags)
+- A canonical local environment file with API tokens and backend configuration
+
+### Install Proxmox internal CA (runner host)
+
+```bash
+bash ops/scripts/install-proxmox-ca.sh
+```
+
+### Install runner env file (canonical)
+
+Creates `~/.config/samakia-fabric/env.sh` with `chmod 600` (local-only; never committed):
+
+```bash
+bash ops/scripts/runner-env-install.sh
+```
+
+Validate (presence-only; secrets are never printed):
+
+```bash
+bash ops/scripts/runner-env-check.sh
+```
+
+### Install MinIO/S3 backend CA (only if required)
+
+If your backend uses an internal CA not already trusted by the host:
+
+```bash
+bash ops/scripts/install-s3-backend-ca.sh
+```
+
+---
+
+## Remote State Backend (MinIO HA)
+
+Samakia Fabric uses a remote S3-compatible backend (MinIO) for Terraform state and locking (`use_lockfile = true`).
+
+One-command deployment (non-interactive; requires runner env for Proxmox token + bootstrap SSH key):
+
+```bash
+make minio.up ENV=samakia-minio
+```
+
+This flow:
+- Generates runner-local backend credentials and CA material under `~/.config/samakia-fabric/` (never committed).
+- Installs the backend CA into the runner host trust store (strict TLS; requires non-interactive sudo).
+- Applies Terraform (bootstrap-local state), bootstraps hosts, configures MinIO cluster + HAProxy VIP, and runs acceptance.
+- Migrates the `samakia-minio` Terraform state into the remote backend.
+
+After MinIO is up, initialize other env backends (per env):
+
+```bash
+ENV=samakia-prod make tf.backend.init
+ENV=samakia-dns  make tf.backend.init
+```
+
+DNS becomes unblocked after the backend is available:
+
+```bash
+make dns.up ENV=samakia-dns
+```
+
 
 ---
 
@@ -47,6 +112,37 @@ Production upgrades are Git-driven and version-pinned:
 - Image (`ubuntu-24.04-lxc-rootfs-vN.tar.gz`) → Proxmox template (`vztmpl/...-vN.tar.gz`) → Terraform env pin.
 
 See `OPERATIONS_PROMOTION_FLOW.md`.
+
+---
+
+## DNS Infrastructure (infra.samakia.net)
+
+Samakia Fabric DNS is a dedicated substrate:
+- Single DNS endpoint for the entire estate: `192.168.11.100` (LAN VIP)
+- Dual `dns-edge` nodes provide the VIP via VRRP and act as VLAN gateways (NAT egress)
+- PowerDNS Authoritative runs on VLAN-only `dns-auth` nodes (master/slave)
+
+One-command deployment (non-interactive):
+
+```bash
+make dns.up ENV=samakia-dns
+```
+
+Acceptance (non-interactive):
+
+```bash
+make dns.accept
+```
+
+Expected behavior:
+- Exactly one edge holds `192.168.11.100` at any time.
+- Exactly one edge holds VLAN gateway VIP `10.10.100.1` at any time.
+- Queries for `infra.samakia.net` are answered authoritatively (dnsdist → PowerDNS).
+- All other queries recurse via unbound (dnsdist → unbound).
+
+Notes:
+- Proxmox SDN objects for VLAN100 are created/validated during `terraform apply` (token-only via Proxmox API).
+- `dns-auth-*` are VLAN-only; Ansible connects via `ProxyJump` through `dns-edge` (no DNS dependency).
 
 ---
 
@@ -116,12 +212,26 @@ Never run Terraform inside `modules/`.
 
 ### Standard Terraform Workflow
 
+Samakia Fabric uses a remote backend (MinIO/S3) with locking (`use_lockfile = true`).
+Backend configuration is **not stored in Git**; it is initialized from runner env vars.
+
+Initialize backend (per environment):
+
 ```bash
-terraform fmt -recursive
-terraform init
-terraform validate
-terraform plan
-terraform apply
+ENV=samakia-prod make tf.backend.init
+```
+
+Optional: migrate existing local state deliberately:
+
+```bash
+ENV=samakia-prod MIGRATE_STATE=1 make tf.backend.init
+```
+
+Plan/apply (non-interactive defaults, strict locking):
+
+```bash
+ENV=samakia-prod make tf.plan
+ENV=samakia-prod make tf.apply
 ```
 
 Destroy/recreate is acceptable and expected when:
@@ -276,6 +386,31 @@ Failure to enforce this model is considered a security incident.
 
 ---
 
+## LXC Lifecycle (Replace / Blue-Green)
+
+Preferred operational patterns (deterministic, GitOps-driven):
+- Replace in-place (same VMID) for immutable upgrades
+- Blue/green (new VMID) for cutovers
+
+Runbook:
+- `OPERATIONS_LXC_LIFECYCLE.md`
+
+Make targets (guidance; never auto-apply):
+
+```bash
+ENV=samakia-prod make ops.replace.inplace
+ENV=samakia-prod make ops.bluegreen.plan
+```
+
+SSH trust rotation after replace/recreate (never disable StrictHostKeyChecking):
+
+```bash
+make ssh.trust.rotate HOST=<ip>
+make ssh.trust.verify HOST=<ip>
+```
+
+---
+
 ## Failure and Recovery Scenarios
 
 ### Terraform Apply Failure
@@ -315,7 +450,7 @@ Never re-enable password authentication as a workaround.
 Terraform state:
 - Must be treated as critical data
 - Must not be edited manually
-- Remote state (S3/MinIO) is strongly recommended
+- Remote state (S3/MinIO) is the canonical model (Phase 1)
 
 State loss recovery:
 - Re-import resources where possible
@@ -361,6 +496,24 @@ Emergency changes:
 - Hot-patching Proxmox outside code
 - Using passwords for SSH
 - Treating containers as pets
+
+---
+
+## Acceptance & Verification (Phase 1)
+
+Run the Phase 1 acceptance suite from repo root (safe output; no secrets printed):
+
+```bash
+ENV=samakia-prod make phase1.accept
+```
+
+This runs:
+- `bash fabric-ci/scripts/lint.sh`
+- `bash fabric-ci/scripts/validate.sh`
+- env parity checks (dev/staging/prod shape)
+- runner env checks (strict TLS + token-only)
+- inventory parse + DHCP/IP sanity
+- Terraform validate + plan (`-input=false`)
 
 ---
 

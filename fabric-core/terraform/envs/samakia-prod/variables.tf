@@ -7,19 +7,6 @@ variable "pm_api_url" {
   type        = string
 }
 
-variable "pm_user" {
-  description = "Proxmox API user (e.g. terraform-prov@pve). Use only for password auth."
-  type        = string
-  default     = null
-}
-
-variable "pm_password" {
-  description = "Proxmox API password. Prefer API token auth instead."
-  type        = string
-  default     = null
-  sensitive   = true
-}
-
 variable "pm_api_token_id" {
   description = "Proxmox API token id (e.g. terraform-prov@pve!fabric-token)."
   type        = string

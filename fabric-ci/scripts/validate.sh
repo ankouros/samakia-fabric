@@ -44,5 +44,11 @@ ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/bootstrap.yml" --syntax-c
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/harden.yml" --syntax-check
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/hardening.yml" --syntax-check
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/k8s-prereqs.yml" --syntax-check
+ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/dns.yml" --syntax-check
+ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/dns-edge.yml" --syntax-check
+ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/dns-auth.yml" --syntax-check
+ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/minio.yml" --syntax-check
+ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/minio-edge.yml" --syntax-check
+ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/state-backend.yml" --syntax-check
 
 echo "Validation checks completed"

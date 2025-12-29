@@ -1,0 +1,49 @@
+#!/usr/sbin/nft -f
+
+# Managed by Samakia Fabric (minio_edge_lb). Do not edit manually.
+
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+
+    iif "lo" accept
+    ct state established,related accept
+
+    # Allow SSH for operations (LAN only).
+    ip saddr {{ minio_edge_lb_lan_cidr }} tcp dport 22 accept
+
+    # VRRP (unicast) between peers on both interfaces.
+    ip protocol vrrp ip saddr { {{ minio_edge_lb_lan_ip }}, {{ minio_edge_lb_peer_lan_ip }}, {{ minio_edge_lb_vlan_ip }}, {{ minio_edge_lb_peer_vlan_ip }} } accept
+
+    # MinIO endpoints on VIP only (LAN).
+    ip daddr {{ minio_edge_lb_lan_vip }} tcp dport {{ minio_edge_lb_s3_port }} accept
+    ip daddr {{ minio_edge_lb_lan_vip }} tcp dport {{ minio_edge_lb_console_port }} accept
+  }
+
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+
+    ct state established,related accept
+
+    # VLAN140 egress NAT to LAN uplink.
+    iif "{{ minio_edge_lb_vlan_iface }}" oif "{{ minio_edge_lb_lan_iface }}" ip saddr {{ minio_edge_lb_vlan_cidr }} accept
+  }
+
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}
+
+table ip nat {
+  chain postrouting {
+    type nat hook postrouting priority 100;
+    policy accept;
+
+    oif "{{ minio_edge_lb_lan_iface }}" ip saddr {{ minio_edge_lb_vlan_cidr }} masquerade
+  }
+}

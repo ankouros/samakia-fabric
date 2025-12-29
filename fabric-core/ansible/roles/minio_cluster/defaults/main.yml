@@ -1,0 +1,26 @@
+---
+minio_cluster_minio_release: minio.RELEASE.2025-09-07T16-13-09Z
+minio_cluster_minio_url: "https://dl.min.io/server/minio/release/linux-amd64/archive/{{ minio_cluster_minio_release }}"
+minio_cluster_minio_checksum: "sha256:7c5bd8512c6e966455b1d198209358b2d191c77a83ab377c4073281065fb855f"
+
+minio_cluster_user: minio
+minio_cluster_group: minio
+
+minio_cluster_s3_port: 9000
+minio_cluster_console_port: 9001
+
+minio_cluster_data_dirs:
+  - /data1
+  - /data2
+
+minio_cluster_node_ips:
+  - 10.10.140.11
+  - 10.10.140.12
+  - 10.10.140.13
+
+minio_cluster_server_url: "https://192.168.11.101:9000"
+minio_cluster_browser_redirect_url: "https://192.168.11.101:9001"
+
+minio_cluster_nft_allow_from_ips:
+  - 10.10.140.2
+  - 10.10.140.3

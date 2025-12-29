@@ -1,0 +1,22 @@
+# Managed by Samakia Fabric (dns-auth). Do not edit manually.
+
+launch=gsqlite3
+gsqlite3-database=/var/lib/powerdns/pdns.sqlite3
+
+local-address={{ dns_auth_powerdns_listen_ip }}
+local-port=53
+
+webserver=no
+version-string=anonymous
+
+{% if dns_auth_powerdns_role == 'master' %}
+master=yes
+slave=no
+also-notify={{ dns_auth_powerdns_slave_ip }}
+allow-axfr-ips={{ dns_auth_powerdns_slave_ip }}
+{% else %}
+master=no
+slave=yes
+allow-notify-from={{ dns_auth_powerdns_master_ip }}
+allow-axfr-ips={{ dns_auth_powerdns_master_ip }}
+{% endif %}

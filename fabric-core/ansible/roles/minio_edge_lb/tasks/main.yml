@@ -1,0 +1,150 @@
+---
+- name: Resolve backend TLS material (controller-side)
+  ansible.builtin.set_fact:
+    minio_edge_lb_tls_pem_src_effective: >-
+      {{
+        lookup('ansible.builtin.env', 'MINIO_EDGE_LB_TLS_PEM_SRC')
+        | default(lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/minio-edge.pem', true)
+      }}
+    minio_edge_lb_backend_ca_src_effective: "{{ lookup('ansible.builtin.env', 'TF_BACKEND_S3_CA_SRC') | default('', true) }}"
+
+- name: Validate backend CA source file exists on controller
+  ansible.builtin.stat:
+    path: "{{ minio_edge_lb_backend_ca_src_effective }}"
+  delegate_to: localhost
+  register: minio_edge_lb_backend_ca_src_stat
+  changed_when: false
+
+- name: Fail if backend CA source is missing (strict TLS required)
+  ansible.builtin.assert:
+    that:
+      - minio_edge_lb_backend_ca_src_effective | length > 0
+      - minio_edge_lb_backend_ca_src_stat.stat.exists
+    fail_msg: "Missing TF_BACKEND_S3_CA_SRC (backend CA) on controller; strict TLS requires a trusted CA for the MinIO endpoint."
+    quiet: true
+
+- name: Validate HAProxy TLS pem exists on controller
+  ansible.builtin.stat:
+    path: "{{ minio_edge_lb_tls_pem_src_effective }}"
+  delegate_to: localhost
+  register: minio_edge_lb_tls_pem_src_stat
+  changed_when: false
+
+- name: Fail if HAProxy TLS pem is missing
+  ansible.builtin.assert:
+    that:
+      - minio_edge_lb_tls_pem_src_effective | length > 0
+      - minio_edge_lb_tls_pem_src_stat.stat.exists
+    fail_msg: "Missing MinIO edge TLS pem on controller (set MINIO_EDGE_LB_TLS_PEM_SRC or create ~/.config/samakia-fabric/pki/minio-edge.pem)."
+    quiet: true
+
+- name: Ensure required packages are installed
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - keepalived
+      - haproxy
+      - nftables
+      - iproute2
+      - dnsutils
+    state: present
+    update_cache: true
+
+- name: Ensure HAProxy cert directory exists
+  ansible.builtin.file:
+    path: /etc/haproxy/certs
+    state: directory
+    owner: root
+    group: haproxy
+    mode: "0750"
+
+- name: Install backend CA certificate on edge (for strict TLS)
+  ansible.builtin.copy:
+    src: "{{ minio_edge_lb_backend_ca_src_effective }}"
+    dest: "{{ minio_edge_lb_backend_ca_dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Update CA certificates
+
+- name: Install HAProxy TLS cert+key bundle (pem)
+  ansible.builtin.copy:
+    src: "{{ minio_edge_lb_tls_pem_src_effective }}"
+    dest: "{{ minio_edge_lb_tls_pem_dst }}"
+    owner: root
+    group: haproxy
+    mode: "0640"
+  notify: Restart haproxy
+  no_log: true
+
+- name: Enable IPv4 forwarding and non-local bind for VIP services
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/60-samakia-minio-edge.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Samakia Fabric (minio-edge). Do not edit manually.
+      net.ipv4.ip_forward = 1
+      net.ipv4.ip_nonlocal_bind = 1
+  notify: Restart nftables
+
+- name: Apply sysctl settings
+  ansible.builtin.command:
+    argv: ["sysctl", "--system"]
+  changed_when: false
+
+- name: Install HAProxy configuration
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart haproxy
+
+- name: Ensure haproxy is enabled and started
+  ansible.builtin.service:
+    name: haproxy
+    enabled: true
+    state: started
+
+- name: Install keepalived configuration
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart keepalived
+
+- name: Ensure keepalived is enabled and started
+  ansible.builtin.service:
+    name: keepalived
+    enabled: true
+    state: started
+
+- name: Install nftables ruleset
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nftables
+
+- name: Ensure nftables is enabled and started
+  ansible.builtin.service:
+    name: nftables
+    enabled: true
+    state: started
+
+- name: Install mc (MinIO client) binary (pinned)
+  ansible.builtin.get_url:
+    url: "{{ minio_edge_lb_mc_url }}"
+    dest: /usr/local/bin/mc
+    mode: "0755"
+    owner: root
+    group: root
+    checksum: "{{ minio_edge_lb_mc_checksum }}"

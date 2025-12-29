@@ -1,0 +1,28 @@
+---
+minio_edge_lb_lan_iface: eth0
+minio_edge_lb_vlan_iface: eth1
+
+minio_edge_lb_lan_vip: 192.168.11.101
+minio_edge_lb_vlan_gw_vip: 10.10.140.1
+
+minio_edge_lb_lan_cidr: 192.168.11.0/24
+minio_edge_lb_vlan_cidr: 10.10.140.0/24
+
+minio_edge_lb_s3_port: 9000
+minio_edge_lb_console_port: 9001
+
+minio_edge_lb_minio_backends:
+  - 10.10.140.11
+  - 10.10.140.12
+  - 10.10.140.13
+
+minio_edge_lb_tls_pem_src: ""
+minio_edge_lb_tls_pem_dst: /etc/haproxy/certs/minio-edge.pem
+minio_edge_lb_backend_ca_src: ""
+minio_edge_lb_backend_ca_dest: /usr/local/share/ca-certificates/samakia-fabric-s3-backend-ca.crt
+
+minio_edge_lb_mc_release: mc.RELEASE.2025-08-13T08-35-41Z
+minio_edge_lb_mc_url: "https://dl.min.io/client/mc/release/linux-amd64/archive/{{ minio_edge_lb_mc_release }}"
+minio_edge_lb_mc_checksum: "sha256:01f866e9c5f9b87c2b09116fa5d7c06695b106242d829a8bb32990c00312e891"
+
+minio_edge_lb_tf_bucket: samakia-terraform

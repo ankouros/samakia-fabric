@@ -1,0 +1,15 @@
+[Unit]
+Description=MinIO (Samakia Fabric state backend)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ minio_cluster_user }}
+Group={{ minio_cluster_group }}
+EnvironmentFile=/etc/default/minio
+ExecStart=/usr/local/bin/minio server --address :{{ minio_cluster_s3_port }} --console-address :{{ minio_cluster_console_port }} {% for ip in minio_cluster_node_ips %}{% for d in minio_cluster_data_dirs %}http://{{ ip }}{{ d }} {% endfor %}{% endfor %}
+Restart=always
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

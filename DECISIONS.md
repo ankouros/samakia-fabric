@@ -294,6 +294,137 @@ following explicit rules (`AGENTS.md`).
 - Rules must be explicit
 - Ambiguity is a bug
 
+
+
+
+## ADR-0013: DNS Edge Nodes are VLAN Gateways + Controlled Ingress (Single LAN VIP)
+
+**Status:** Accepted
+**Date:** 2025-12-28
+
+### Context
+We operate multiple VLAN-scoped LXC networks where:
+- VLAN workloads must have reliable internet egress.
+- A single stable DNS endpoint is required for all VMs and LXCs.
+- LAN exposure of VLAN services must be strictly controlled and port-scoped.
+- HA is required across Proxmox nodes.
+
+The public domain is `samakia.net`. The internal authoritative zone is `infra.samakia.net`.
+
+###  Decision
+We will deploy two `dns-edge` nodes (`dns-edge-1`, `dns-edge-2`) as the **only** ingress/egress gateways for VLAN-scoped LXC networks and as the **single DNS endpoint** for all infrastructure.
+
+### DNS VIP (LAN)
+- The canonical DNS endpoint for **all** VMs and LXCs is:
+  - `192.168.11.100` (LAN VIP)
+- `dns-edge-*` hold this VIP using Keepalived (VRRP).
+- DNS must answer on UDP/TCP 53 on the VIP.
+- `dns-edge-*` provide recursion via Unbound and forward `infra.samakia.net` to PowerDNS Authoritative.
+
+### VLAN Gateways (Egress)
+- Every VLAN has a **gateway VIP** hosted on `dns-edge-*` using VRRP on the corresponding VLAN interface/subinterface.
+- All VLAN LXCs must use the VLAN gateway VIP as their default gateway.
+- `dns-edge-*` must provide NAT/SNAT for VLAN subnets to reach the internet via the LAN uplink.
+- Inbound from LAN to VLAN is denied by default.
+
+### Controlled Ingress (LAN -> VLAN via specific ports)
+- VLAN services are exposed to LAN **only** via `dns-edge-*` and **only** on explicitly approved ports.
+- TCP ingress is implemented via HAProxy listeners on the LAN VIP (or dedicated LAN VIPs if required).
+- UDP ingress is implemented via explicitly scoped nftables DNAT rules (or HAProxy where supported).
+- No direct LAN routing to VLAN services is allowed (no “flat” access).
+
+### Authoritative DNS
+- PowerDNS Authoritative runs on VLAN-only nodes (`dns-auth-1` master, `dns-auth-2` slave).
+- The internal zone is `infra.samakia.net`.
+- `dns-edge-*` forward `infra.samakia.net` to `dns-auth-*` and recurse everything else via Unbound.
+
+### VLAN100 is the canonical DNS/control-plane VLAN: 10.10.100.0/24
+### Gateway VIP for VLAN100: 10.10.100.1 (VRRP on dns-edge nodes)
+
+### Proxmox SDN (IaC-managed prerequisite)
+- SDN zone: `zonedns`
+- SDN vnet: `vlandns` (VLAN tag `100`)
+- SDN subnet: `10.10.100.0/24` with gateway VIP `10.10.100.1`
+
+### Minimum authoritative records (infra.samakia.net)
+At minimum, the authoritative zone must contain:
+- `dns.infra.samakia.net` → `192.168.11.100` (DNS VIP)
+- `dns-edge-1.infra.samakia.net` → `10.10.100.11`
+- `dns-edge-2.infra.samakia.net` → `10.10.100.12`
+- `dns-auth-1.infra.samakia.net` → `10.10.100.21` (master)
+- `dns-auth-2.infra.samakia.net` → `10.10.100.22` (slave)
+
+## Consequences
+- All clients use a single LAN IP for DNS, simplifying DHCP and runner configuration.
+- VLAN internet access is deterministic and HA-capable via VRRP gateway VIPs.
+- Exposure of VLAN services is centralized, auditable, and port-scoped.
+- Subsequent stateful services (e.g., MinIO, Vault, Postgres, etc.) must be deployed behind this gateway/ingress pattern.
+
+## ADR-0014 — Terraform Remote State Backend: MinIO HA Behind Dedicated Stateful Edges
+
+### Decision
+
+Terraform state is stored in a remote S3-compatible backend implemented as:
+- **MinIO distributed cluster** on a dedicated **stateful VLAN**
+- A dedicated **edge pair** (`minio-edge-*`) providing:
+  - a single stable **LAN VIP** for the S3 endpoint
+  - a **VLAN gateway VIP** for the stateful VLAN
+  - HAProxy as the S3/console front door
+  - NAT egress for stateful VLAN services
+
+### Rationale
+
+- Terraform state is a platform control-plane dependency and must be:
+  - shared (not local-only)
+  - lockable (`use_lockfile = true`)
+  - recoverable
+  - reachable without DNS dependency (VIP IP is sufficient)
+- HAProxy + Keepalived is a boring, deterministic HA front door that fits the existing edge/gateway contract.
+- MinIO provides a self-hosted S3 API compatible with Terraform backends without introducing cloud services.
+
+### Topology (canonical)
+
+Stateful VLAN plane:
+- VLAN: `140`
+- SDN zone: `zminio`
+- SDN vnet: `vminio` (tag `140`)
+- Subnet: `10.10.140.0/24`
+- Gateway VIP (VRRP): `10.10.140.1` (on `minio-edge-*`)
+
+MinIO cluster nodes (VLAN-only IPs):
+- `minio-1` → `10.10.140.11` (proxmox1)
+- `minio-2` → `10.10.140.12` (proxmox2)
+- `minio-3` → `10.10.140.13` (proxmox3)
+
+MinIO edge / front door:
+- `minio-edge-1` dual-homed (LAN + VLAN140)
+- `minio-edge-2` dual-homed (LAN + VLAN140)
+- S3/console LAN VIP: `192.168.11.101`
+  - S3: `https://192.168.11.101:9000`
+  - Console: `https://192.168.11.101:9001`
+
+Authoritative DNS (infra.samakia.net) records must include:
+- `minio.infra.samakia.net` → `192.168.11.101`
+- `minio-console.infra.samakia.net` → `192.168.11.101`
+
+### Security and contracts
+
+- Strict TLS:
+  - HAProxy terminates TLS with a certificate issued by the backend internal CA
+  - The backend CA is installed in the runner host trust store (no insecure flags)
+- Proxmox access remains API token only (no node SSH/SCP).
+- No secrets are committed to Git; runner-local credentials and CA material live under `~/.config/samakia-fabric/`.
+- Terraform locking uses S3 lockfiles (no DynamoDB).
+
+## Non-negotiable Rules
+- This decision is canonical. All subsequent implementations MUST follow it.
+- No additional DNS endpoints on LAN are permitted.
+- No direct LAN-to-VLAN service access is permitted outside explicitly declared ports on `dns-edge-*`.
+
+
+
+
+
 ---
 
 ## How to Add a New Decision

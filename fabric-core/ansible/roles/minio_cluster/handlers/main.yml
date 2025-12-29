@@ -1,0 +1,10 @@
+---
+- name: Restart minio
+  ansible.builtin.service:
+    name: minio
+    state: restarted
+
+- name: Restart nftables
+  ansible.builtin.service:
+    name: nftables
+    state: restarted

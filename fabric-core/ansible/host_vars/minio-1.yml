@@ -1,0 +1,5 @@
+ansible_host: 10.10.140.11
+ansible_become: true
+ansible_become_method: sudo
+# VLAN-only node: access via minio-edge jump host on LAN.
+ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new -o ProxyJump=192.168.11.111,192.168.11.112"

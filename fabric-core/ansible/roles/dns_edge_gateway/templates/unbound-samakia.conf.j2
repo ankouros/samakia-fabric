@@ -1,0 +1,16 @@
+# Managed by Samakia Fabric (dns-edge). Do not edit manually.
+server:
+  interface: 127.0.0.1
+  port: {{ dns_edge_gateway_unbound_listen_port }}
+
+  do-ip6: no
+  hide-identity: yes
+  hide-version: yes
+
+  # Conservative hardening (LXC-safe)
+  harden-glue: yes
+  harden-dnssec-stripped: yes
+  harden-referral-path: yes
+  qname-minimisation: yes
+
+  access-control: 127.0.0.0/8 allow

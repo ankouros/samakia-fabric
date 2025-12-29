@@ -1,0 +1,9 @@
+ansible_host: 192.168.11.103
+ansible_become: true
+ansible_become_method: sudo
+# Non-interactive first-connect for new containers (does not disable host key checking).
+ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new"
+dns_edge_role: master
+dns_edge_priority: 150
+dns_edge_lan_ip: 192.168.11.103
+dns_edge_vlan_ip: 10.10.100.11

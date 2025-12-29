@@ -1,0 +1,40 @@
+! Managed by Samakia Fabric (minio_edge_lb). Do not edit manually.
+
+global_defs {
+  enable_script_security
+  router_id {{ inventory_hostname }}
+}
+
+vrrp_instance VI_LAN_MINIO {
+  state {{ 'MASTER' if (minio_edge_lb_role | default('backup')) == 'master' else 'BACKUP' }}
+  interface {{ minio_edge_lb_lan_iface }}
+  virtual_router_id 21
+  priority {{ minio_edge_lb_priority | default(100) }}
+  advert_int 1
+
+  unicast_src_ip {{ minio_edge_lb_lan_ip }}
+  unicast_peer {
+    {{ minio_edge_lb_peer_lan_ip }}
+  }
+
+  virtual_ipaddress {
+    {{ minio_edge_lb_lan_vip }}/24 dev {{ minio_edge_lb_lan_iface }}
+  }
+}
+
+vrrp_instance VI_VLAN_GW {
+  state {{ 'MASTER' if (minio_edge_lb_role | default('backup')) == 'master' else 'BACKUP' }}
+  interface {{ minio_edge_lb_vlan_iface }}
+  virtual_router_id 22
+  priority {{ minio_edge_lb_priority | default(100) }}
+  advert_int 1
+
+  unicast_src_ip {{ minio_edge_lb_vlan_ip }}
+  unicast_peer {
+    {{ minio_edge_lb_peer_vlan_ip }}
+  }
+
+  virtual_ipaddress {
+    {{ minio_edge_lb_vlan_gw_vip }}/24 dev {{ minio_edge_lb_vlan_iface }}
+  }
+}

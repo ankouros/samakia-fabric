@@ -1,0 +1,14 @@
+-- Managed by Samakia Fabric (dns-edge). Do not edit manually.
+
+setLocal("{{ dns_edge_gateway_lan_vip }}:53")
+
+setACL({"{{ dns_edge_gateway_lan_cidr }}", "{{ dns_edge_gateway_vlan_cidr }}", "127.0.0.0/8"})
+
+newServer({address="127.0.0.1:{{ dns_edge_gateway_unbound_listen_port }}", pool="recursor"})
+
+{% for ip in dns_edge_gateway_upstream_auth_servers %}
+newServer({address="{{ ip }}:53", pool="auth"})
+{% endfor %}
+
+addAction("{{ dns_edge_gateway_zone_name }}.", PoolAction("auth"))
+addAction(AllRule(), PoolAction("recursor"))

@@ -1,0 +1,113 @@
+---
+- name: Install DNS edge packages
+  ansible.builtin.apt:
+    name:
+      - keepalived
+      - dnsdist
+      - unbound
+      - nftables
+      - dnsutils
+      - iproute2
+    state: present
+    update_cache: true
+
+- name: Enable IPv4 forwarding and non-local bind for VIP services
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/60-samakia-dns-edge.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Samakia Fabric (dns-edge). Do not edit manually.
+      net.ipv4.ip_forward = 1
+      net.ipv4.ip_nonlocal_bind = 1
+  notify: Restart nftables
+
+- name: Apply sysctl settings
+  ansible.builtin.command:
+    argv: ["sysctl", "--system"]
+  changed_when: false
+
+###############################################################################
+# Unbound (local recursion)
+###############################################################################
+
+- name: Ensure unbound config dir exists
+  ansible.builtin.file:
+    path: /etc/unbound/unbound.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install unbound config (local-only)
+  ansible.builtin.template:
+    src: unbound-samakia.conf.j2
+    dest: /etc/unbound/unbound.conf.d/50-samakia.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart unbound
+
+- name: Ensure unbound is enabled and started
+  ansible.builtin.service:
+    name: unbound
+    enabled: true
+    state: started
+
+###############################################################################
+# dnsdist (front door, binds to VIP only)
+###############################################################################
+
+- name: Install dnsdist configuration
+  ansible.builtin.template:
+    src: dnsdist.conf.j2
+    dest: /etc/dnsdist/dnsdist.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart dnsdist
+
+- name: Ensure dnsdist is enabled and started
+  ansible.builtin.service:
+    name: dnsdist
+    enabled: true
+    state: started
+
+###############################################################################
+# keepalived (VRRP VIPs)
+###############################################################################
+
+- name: Install keepalived configuration
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart keepalived
+
+- name: Ensure keepalived is enabled and started
+  ansible.builtin.service:
+    name: keepalived
+    enabled: true
+    state: started
+
+###############################################################################
+# nftables (default deny + DNS/SSH + NAT)
+###############################################################################
+
+- name: Install nftables ruleset
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nftables
+
+- name: Ensure nftables is enabled and started
+  ansible.builtin.service:
+    name: nftables
+    enabled: true
+    state: started

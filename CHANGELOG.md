@@ -15,6 +15,29 @@ The format is inspired by:
 ## [Unreleased]
 
 ### Added
+- MinIO HA Terraform backend (Terraform + Ansible + acceptance, non-interactive)
+  - Terraform env: `fabric-core/terraform/envs/samakia-minio/` (5 LXCs: `minio-edge-1/2`, `minio-1/2/3` with static IPs and pinned image version)
+  - Proxmox SDN ensure script: `ops/scripts/proxmox-sdn-ensure-stateful-plane.sh` (zone `zminio`, vnet `vminio`, VLAN140 subnet `10.10.140.0/24`)
+  - Ansible playbooks: `fabric-core/ansible/playbooks/state-backend.yml`, `fabric-core/ansible/playbooks/minio.yml`, `fabric-core/ansible/playbooks/minio-edge.yml`
+  - Ansible roles: `fabric-core/ansible/roles/minio_cluster`, `fabric-core/ansible/roles/minio_edge_lb`
+  - Runner bootstrap helper: `ops/scripts/backend-configure.sh` (local-only credentials + backend CA + HAProxy TLS pem; installs backend CA into host trust store with non-interactive sudo)
+  - One-command automation: `make minio.up ENV=samakia-minio` + acceptance `make minio.accept` (`ops/scripts/minio-accept.sh`)
+- DNS infrastructure substrate (Terraform + Ansible + acceptance, non-interactive)
+  - Terraform env: `fabric-core/terraform/envs/samakia-dns/` (4 LXCs: `dns-edge-1/2`, `dns-auth-1/2` with static IPs and pinned image version)
+  - Proxmox SDN ensure script: `ops/scripts/proxmox-sdn-ensure-dns-plane.sh` (zone `zonedns`, vnet `vlandns`, VLAN100 subnet `10.10.100.0/24`)
+  - Ansible playbooks: `fabric-core/ansible/playbooks/dns.yml`, `fabric-core/ansible/playbooks/dns-edge.yml`, `fabric-core/ansible/playbooks/dns-auth.yml`
+  - Ansible roles: `fabric-core/ansible/roles/dns_edge_gateway`, `fabric-core/ansible/roles/dns_auth_powerdns`
+  - One-command automation: `make dns.up` + acceptance `make dns.accept` (`ops/scripts/dns-accept.sh`)
+- Phase 1 operational hardening (remote state + runner bootstrapping + CI-safe orchestration)
+- Remote Terraform backend initialization for MinIO/S3 with lockfiles (`ops/scripts/tf-backend-init.sh`; no DynamoDB; strict TLS)
+- Runner host env management (`ops/scripts/runner-env-install.sh`, `ops/scripts/runner-env-check.sh`) with canonical env file `~/.config/samakia-fabric/env.sh` (chmod 600; presence-only output)
+- Optional backend CA installer for MinIO/S3 (`ops/scripts/install-s3-backend-ca.sh`) to support strict TLS without insecure flags
+- Environment parity guardrail (`ops/scripts/env-parity-check.sh`) enforcing dev/staging/prod structural equivalence
+- New Terraform environment `fabric-core/terraform/envs/samakia-staging/` (parity with dev/prod)
+- Inventory sanity guardrail for DHCP/IP determinism (`ops/scripts/inventory-sanity-check.sh`) + `make inventory.check`
+- SSH trust lifecycle tools (`ops/scripts/ssh-trust-rotate.sh`, `ops/scripts/ssh-trust-verify.sh`) to support strict host key checking after replace/recreate
+- Phase 1 acceptance suite (`ops/scripts/phase1-accept.sh` + `make phase1.accept`) to validate parity, runner env, inventory parse, and non-interactive Terraform plan
+- `OPERATIONS_LXC_LIFECYCLE.md` (replace-in-place vs blue/green runbook; DHCP/MAC determinism and SSH trust workflow)
 - Future improvements tracked in `ROADMAP.md`
 - `INCIDENT_SEVERITY_TAXONOMY.md` (S0–S4) with evidence depth + signing/dual-control/TSA requirements
 - `OPERATIONS_POST_INCIDENT_FORENSICS.md` severity-driven evidence collection flow (proportional, authorization-first)
@@ -32,6 +55,9 @@ The format is inspired by:
 
 ### Changed
 - Migrated Codex remediation log into `CHANGELOG.md` (retired `codex-changelog.md`)
+- Enforced Proxmox API token-only auth in Terraform envs and runner guardrails (password auth variables are no longer supported)
+- Enabled strict SSH host key checking in Ansible (`fabric-core/ansible/ansible.cfg`), requiring explicit known_hosts rotation/enrollment on host replacement
+- MinIO HA backend corrections (repo-wide): SDN zone/vnet renamed to `zminio`/`vminio` (≤ 8 chars) and MinIO LAN VIP set to `192.168.11.101` (updated Terraform/Ansible/scripts/docs; `dns-edge-1` LAN IP moved to `192.168.11.103` to avoid VIP collision)
 
 ### Fixed
 - Excluded `<evidence>/legal-hold/` label packs from evidence `manifest.sha256` generation while keeping label packs independently signable/notarizable

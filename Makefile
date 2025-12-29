@@ -36,6 +36,9 @@ ANSIBLE_DIR := $(REPO_ROOT)/fabric-core/ansible
 OPS_SCRIPTS_DIR := $(REPO_ROOT)/ops/scripts
 FABRIC_CI_DIR := $(REPO_ROOT)/fabric-ci/scripts
 
+# Runner host env file (canonical)
+RUNNER_ENV_FILE ?= $(HOME)/.config/samakia-fabric/env.sh
+
 # Optional inputs
 IMAGE ?=
 RELEASE_ID ?=
@@ -52,10 +55,16 @@ LEGAL_HOLD_ACTION ?= list
 FORENSICS_FLAGS ?= --env $(ENV)
 DOCTOR_FULL ?= 0
 
+# Non-interactive / CI defaults
+CI ?= 0
+INTERACTIVE ?= 0
+MIGRATE_STATE ?= 0
+
 # Terraform flags
 TF_INIT_FLAGS ?=
 TF_PLAN_FLAGS ?=
 TF_APPLY_FLAGS ?=
+TF_LOCK_TIMEOUT ?= 60s
 
 # Ansible flags
 ANSIBLE_INVENTORY ?= inventory/terraform.py
@@ -80,6 +89,22 @@ help: ## Show this help
 		/^[a-zA-Z0-9_.-]+:.*##/ \
 		{printf "\033[36m%-32s\033[0m %s\n", $$1, $$2}' \
 		$(MAKEFILE_LIST)
+
+###############################################################################
+# Phase 1 – Runner host bootstrapping
+###############################################################################
+
+.PHONY: runner.env.install
+runner.env.install: ## Install runner env file (~/.config/samakia-fabric/env.sh; chmod 600)
+	bash "$(OPS_SCRIPTS_DIR)/runner-env-install.sh" --file "$(RUNNER_ENV_FILE)"
+
+.PHONY: runner.env.check
+runner.env.check: ## Validate runner env (presence-only; validates Proxmox CA and backend CA if required)
+	bash "$(OPS_SCRIPTS_DIR)/runner-env-check.sh" --file "$(RUNNER_ENV_FILE)"
+
+.PHONY: backend.configure
+backend.configure: ## Configure local MinIO backend (env + credentials + CA + TLS bundle; no secrets printed)
+	bash "$(OPS_SCRIPTS_DIR)/backend-configure.sh" --file "$(RUNNER_ENV_FILE)"
 
 ###############################################################################
 # Hygiene / Quality gates
@@ -174,7 +199,7 @@ image.select: ## Interactive image picker (prints IMAGE=<absolute-path>; non-int
 			echo "ERROR: no images found under $$dir_abs matching $(PACKER_ARTIFACT_GLOB)" >&2; \
 			exit 1; \
 		fi; \
-		if [[ ! -t 0 || ! -t 1 ]]; then \
+		if [[ "$(INTERACTIVE)" != "1" || "$(CI)" = "1" || ! -t 0 || ! -t 1 ]]; then \
 			latest="$$(LC_ALL=C ls -1t "$$dir_abs"/$(PACKER_ARTIFACT_GLOB) 2>/dev/null | head -n 1)"; \
 			echo "IMAGE=$$latest"; \
 			exit 0; \
@@ -208,6 +233,8 @@ image.upload: ## Upload golden image to Proxmox via API (IMAGE=... or interactiv
 	@command -v curl >/dev/null 2>&1 || (echo "ERROR: curl not found in PATH"; exit 1)
 	@command -v python3 >/dev/null 2>&1 || (echo "ERROR: python3 not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		# Env contract: prefer PM_*; fallback to TF_VAR_* (no printing of secrets). \
 		pm_url="$${PM_API_URL:-$${TF_VAR_pm_api_url:-}}"; \
 		pm_id="$${PM_API_TOKEN_ID:-$${TF_VAR_pm_api_token_id:-}}"; \
@@ -219,8 +246,8 @@ image.upload: ## Upload golden image to Proxmox via API (IMAGE=... or interactiv
 		image="$${IMAGE:-}"; \
 		dir_abs="$$(cd "$(PACKER_IMAGE_DIR)" && pwd)"; \
 		if [[ -z "$$image" ]]; then \
-			if [[ ! -t 0 || ! -t 1 ]]; then \
-				echo "ERROR: IMAGE is required in non-interactive mode (e.g. make image.upload IMAGE=...)" >&2; \
+			if [[ "$(INTERACTIVE)" != "1" || "$(CI)" = "1" || ! -t 0 || ! -t 1 ]]; then \
+				echo "ERROR: IMAGE is required unless INTERACTIVE=1 (e.g. make image.upload IMAGE=...)" >&2; \
 				exit 1; \
 			fi; \
 			shopt -s nullglob; \
@@ -263,7 +290,7 @@ image.build-upload: ## Build next image version then upload (interactive select 
 		artifact="$$( $(MAKE) -s image.build-next )"; \
 		image="$${IMAGE:-}"; \
 		if [[ -z "$$image" ]]; then \
-			if [[ -t 0 && -t 1 ]]; then \
+			if [[ "$(INTERACTIVE)" = "1" && "$(CI)" != "1" && -t 0 && -t 1 ]]; then \
 				echo "Built: $$artifact" >&2; \
 				picked="$$(IMAGE="" $(MAKE) -s image.select)"; \
 				image="$${picked#IMAGE=}"; \
@@ -278,7 +305,7 @@ image.build-upload: ## Build next image version then upload (interactive select 
 image.promote: ## Promote image version (GitOps-only: prints the exact pin to apply in Terraform)
 	@bash -euo pipefail -c '\
 		image="$${IMAGE:-}"; \
-		if [[ -z "$$image" && -t 0 && -t 1 ]]; then \
+		if [[ -z "$$image" && "$(INTERACTIVE)" = "1" && "$(CI)" != "1" && -t 0 && -t 1 ]]; then \
 			mapfile -t candidates < <(ls -1 "$(PACKER_DIR)"/ubuntu-24.04-lxc-rootfs-v*.tar.gz 2>/dev/null || true); \
 			if [[ "$${#candidates[@]}" -eq 0 ]]; then \
 				echo "ERROR: no versioned images found under $(PACKER_DIR) (expected ubuntu-24.04-lxc-rootfs-vN.tar.gz)" >&2; \
@@ -293,7 +320,8 @@ image.promote: ## Promote image version (GitOps-only: prints the exact pin to ap
 			fi; \
 		fi; \
 		if [[ -z "$$image" ]]; then \
-			echo "ERROR: set IMAGE=... (e.g. $(PACKER_DIR)/ubuntu-24.04-lxc-rootfs-v3.tar.gz) to compute a promotion pin" >&2; \
+			echo "ERROR: set IMAGE=... (or run with INTERACTIVE=1) to compute a promotion pin" >&2; \
+			echo "Example: make image.promote IMAGE=$(PACKER_DIR)/ubuntu-24.04-lxc-rootfs-v3.tar.gz" >&2; \
 			exit 1; \
 		fi; \
 		base="$$(basename "$$image")"; \
@@ -315,27 +343,55 @@ image.promote: ## Promote image version (GitOps-only: prints the exact pin to ap
 # Terraform lifecycle
 ###############################################################################
 
+.PHONY: tf.backend.init
+tf.backend.init: ## Terraform backend init (remote S3/MinIO state; strict TLS; no prompts)
+	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
+	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		if [[ "$(MIGRATE_STATE)" = "1" ]]; then \
+			bash "$(OPS_SCRIPTS_DIR)/tf-backend-init.sh" "$(ENV)" --migrate; \
+		else \
+			bash "$(OPS_SCRIPTS_DIR)/tf-backend-init.sh" "$(ENV)"; \
+		fi \
+	'
+
 .PHONY: tf.init
 tf.init: ## Terraform init for ENV
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
-	terraform -chdir="$(TERRAFORM_ENV_DIR)" init $(TF_INIT_FLAGS)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) tf.backend.init; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" init -input=false $(TF_INIT_FLAGS) >/dev/null; \
+	'
 
 .PHONY: tf.plan
 tf.plan: ## Terraform plan for ENV
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
-	terraform -chdir="$(TERRAFORM_ENV_DIR)" init $(TF_INIT_FLAGS) >/dev/null
-	terraform -chdir="$(TERRAFORM_ENV_DIR)" validate
-	terraform -chdir="$(TERRAFORM_ENV_DIR)" plan $(TF_PLAN_FLAGS)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) tf.backend.init; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" plan -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $(TF_PLAN_FLAGS); \
+	'
 
 .PHONY: tf.apply
 tf.apply: ## Terraform apply for ENV
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
-	terraform -chdir="$(TERRAFORM_ENV_DIR)" init $(TF_INIT_FLAGS) >/dev/null
-	terraform -chdir="$(TERRAFORM_ENV_DIR)" validate
-	terraform -chdir="$(TERRAFORM_ENV_DIR)" apply $(TF_APPLY_FLAGS)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) tf.backend.init; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $(TF_APPLY_FLAGS); \
+	'
 
 ###############################################################################
 # Ansible lifecycle
@@ -345,27 +401,52 @@ tf.apply: ## Terraform apply for ENV
 ansible.inventory: ## Show resolved Ansible inventory
 	@test -d "$(ANSIBLE_DIR)" || (echo "ERROR: ANSIBLE_DIR not found: $(ANSIBLE_DIR)"; exit 1)
 	@command -v ansible-inventory >/dev/null 2>&1 || (echo "ERROR: ansible-inventory not found in PATH"; exit 1)
-	FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
-		ansible-inventory -i "$(ANSIBLE_INVENTORY_PATH)" --list
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
+			ansible-inventory -i "$(ANSIBLE_INVENTORY_PATH)" --list; \
+	'
+
+.PHONY: inventory.check
+inventory.check: ## Validate inventory parse + DHCP/MAC/IP sanity (no DNS)
+	@test -d "$(ANSIBLE_DIR)" || (echo "ERROR: ANSIBLE_DIR not found: $(ANSIBLE_DIR)"; exit 1)
+	@command -v ansible-inventory >/dev/null 2>&1 || (echo "ERROR: ansible-inventory not found in PATH"; exit 1)
+	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		echo "Checking ansible-inventory parse..."; \
+		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
+			ansible-inventory -i "$(ANSIBLE_INVENTORY_PATH)" --list >/dev/null; \
+		echo "Checking inventory sanity (DHCP/MAC/IP)..."; \
+		bash "$(OPS_SCRIPTS_DIR)/inventory-sanity-check.sh" "$(ENV)"; \
+	'
 
 .PHONY: ansible.bootstrap
 ansible.bootstrap: ## Phase-1 bootstrap (root-only)
 	@test -d "$(ANSIBLE_DIR)" || (echo "ERROR: ANSIBLE_DIR not found: $(ANSIBLE_DIR)"; exit 1)
 	@command -v ansible-playbook >/dev/null 2>&1 || (echo "ERROR: ansible-playbook not found in PATH"; exit 1)
-	@test -f "$(ANSIBLE_BOOTSTRAP_KEYS_PATH)" || ( \
-		echo "ERROR: missing bootstrap keys file: $(ANSIBLE_BOOTSTRAP_KEYS_PATH)"; \
-		echo "Create it (untracked) with: bootstrap_authorized_keys: [\"ssh-ed25519 ...\"]"; \
-		exit 1 \
-	)
-	FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
-		ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/bootstrap.yml" -u root -e @"$(ANSIBLE_BOOTSTRAP_KEYS_PATH)" $(ANSIBLE_FLAGS)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		keys_arg=(); \
+		if [[ -f "$(ANSIBLE_BOOTSTRAP_KEYS_PATH)" ]]; then keys_arg+=( -e @"$(ANSIBLE_BOOTSTRAP_KEYS_PATH)" ); fi; \
+		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
+			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/bootstrap.yml" -u root "$${keys_arg[@]}" $(ANSIBLE_FLAGS); \
+	'
 
 .PHONY: ansible.harden
 ansible.harden: ## Phase-2 hardening (runs as samakia)
 	@test -d "$(ANSIBLE_DIR)" || (echo "ERROR: ANSIBLE_DIR not found: $(ANSIBLE_DIR)"; exit 1)
 	@command -v ansible-playbook >/dev/null 2>&1 || (echo "ERROR: ansible-playbook not found in PATH"; exit 1)
-	FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
-		ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/harden.yml" -u "$(ANSIBLE_USER)" $(ANSIBLE_FLAGS)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
+			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/harden.yml" -u "$(ANSIBLE_USER)" $(ANSIBLE_FLAGS); \
+	'
 
 ###############################################################################
 # Drift / Compliance / Audit
@@ -386,8 +467,8 @@ compliance.verify: ## Verify compliance snapshot offline (SNAPSHOT_DIR=... or in
 	@bash -euo pipefail -c '\
 		dir="$${SNAPSHOT_DIR:-}"; \
 		if [[ -z "$$dir" ]]; then \
-			if [[ ! -t 0 || ! -t 1 ]]; then \
-				echo "ERROR: SNAPSHOT_DIR is required in non-interactive mode (e.g. make compliance.verify SNAPSHOT_DIR=...)" >&2; \
+			if [[ "$(INTERACTIVE)" != "1" || "$(CI)" = "1" || ! -t 0 || ! -t 1 ]]; then \
+				echo "ERROR: SNAPSHOT_DIR is required unless INTERACTIVE=1 (e.g. make compliance.verify SNAPSHOT_DIR=...)" >&2; \
 				exit 1; \
 			fi; \
 			mapfile -t candidates < <(ls -d $(COMPLIANCE_VERIFY_GLOB) 2>/dev/null | LC_ALL=C sort || true); \
@@ -556,6 +637,190 @@ app.clean: ## Clean legacy C/C++ build artifacts
 
 clean: ## Backward-compatible clean target
 	$(MAKE) app.clean || true
+
+###############################################################################
+# Phase 1 – Operational Hardening targets
+###############################################################################
+
+.PHONY: env.parity.check
+env.parity.check: ## Enforce env parity (dev/staging/prod Terraform structure)
+	bash "$(OPS_SCRIPTS_DIR)/env-parity-check.sh"
+
+.PHONY: ssh.trust.rotate
+ssh.trust.rotate: ## Rotate known_hosts entry for HOST=... (no enroll by default)
+	@test -n "$(HOST)" || (echo "ERROR: HOST is required (e.g. make ssh.trust.rotate HOST=192.0.2.10)"; exit 1)
+	bash "$(OPS_SCRIPTS_DIR)/ssh-trust-rotate.sh" --host "$(HOST)"
+
+.PHONY: ssh.trust.verify
+ssh.trust.verify: ## Show known_hosts fingerprints for HOST=...
+	@test -n "$(HOST)" || (echo "ERROR: HOST is required (e.g. make ssh.trust.verify HOST=192.0.2.10)"; exit 1)
+	bash "$(OPS_SCRIPTS_DIR)/ssh-trust-verify.sh" --host "$(HOST)"
+
+.PHONY: ops.replace.inplace
+ops.replace.inplace: ## Runbook pointer: replace/recreate same VMID (no auto-apply)
+	@echo "Replace (in-place VMID) guidance:"
+	@echo "- Edit ENV=$(ENV) template pin (fabric-core/terraform/envs/$(ENV)/main.tf lxc_rootfs_version)"
+	@echo "- Run: make tf.plan ENV=$(ENV)"
+	@echo "- Apply deliberately: make tf.apply ENV=$(ENV)"
+	@echo "- Then: make ansible.bootstrap ENV=$(ENV) && make ansible.harden ENV=$(ENV)"
+	@echo "- Validate: ssh samakia@<ip> succeeds; ssh root@<ip> fails"
+	@echo "- SSH trust rotation: make ssh.trust.rotate HOST=<ip> (optionally enroll after out-of-band verification)"
+
+.PHONY: ops.bluegreen.plan
+ops.bluegreen.plan: ## Runbook pointer: blue/green CT replacement (no auto-apply)
+	@echo "Blue/green guidance (new VMID + cutover):"
+	@echo "- Add a new module instance with a new VMID + new MAC reservation"
+	@echo "- Apply: make tf.apply ENV=$(ENV)"
+	@echo "- Bootstrap + harden the new CT (root-only then samakia)"
+	@echo "- Cut over traffic at the application ingress layer (no DNS dependency assumed)"
+	@echo "- Decommission old CT via Git change + apply"
+
+.PHONY: phase1.accept
+phase1.accept: ## Run Phase 1 acceptance suite (ENV=...; CI-safe; no prompts)
+	ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase1-accept.sh"
+
+###############################################################################
+# MinIO HA backend (Terraform + Ansible + acceptance)
+###############################################################################
+
+.PHONY: minio.tf.plan
+minio.tf.plan: ## MinIO Terraform plan (bootstrap-local; ENV=samakia-minio)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
+	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" init -input=false -backend=false >/dev/null; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
+	'
+
+.PHONY: minio.tf.apply
+minio.tf.apply: ## MinIO Terraform apply (bootstrap-local; ENV=samakia-minio)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
+	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" init -input=false -backend=false >/dev/null; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock=false $(TF_APPLY_FLAGS); \
+	'
+
+.PHONY: minio.tf.destroy
+minio.tf.destroy: ## MinIO Terraform destroy (bootstrap-local; guarded; CONFIRM=YES)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@test "$(CONFIRM)" = "YES" || (echo "ERROR: destructive. Re-run with CONFIRM=YES"; exit 2)
+	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
+	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" init -input=false -backend=false >/dev/null; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" destroy -input=false -lock=false; \
+	'
+
+.PHONY: minio.ansible.apply
+minio.ansible.apply: ## MinIO Ansible apply (state-backend.yml; requires bootstrap already done)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@test -d "$(ANSIBLE_DIR)" || (echo "ERROR: ANSIBLE_DIR not found: $(ANSIBLE_DIR)"; exit 1)
+	@command -v ansible-playbook >/dev/null 2>&1 || (echo "ERROR: ansible-playbook not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
+			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/state-backend.yml" -u "$(ANSIBLE_USER)" $(ANSIBLE_FLAGS); \
+	'
+
+.PHONY: minio.accept
+minio.accept: ## MinIO acceptance (VIP TLS, HA checks, bucket checks, idempotency)
+	bash "$(OPS_SCRIPTS_DIR)/minio-accept.sh"
+
+.PHONY: minio.state.migrate
+minio.state.migrate: ## Migrate samakia-minio state to remote backend (requires MinIO up)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		bash "$(OPS_SCRIPTS_DIR)/tf-backend-init.sh" "$(ENV)" --migrate; \
+	'
+
+.PHONY: minio.up
+minio.up: ## One-command MinIO backend deployment (tf apply -> bootstrap -> state-backend -> acceptance -> state migrate)
+	@bash -euo pipefail -c '\
+		if [[ "$(ENV)" != "samakia-minio" ]]; then echo "ERROR: set ENV=samakia-minio" >&2; exit 2; fi; \
+		$(MAKE) backend.configure; \
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		$(MAKE) minio.tf.plan; \
+		$(MAKE) minio.tf.apply; \
+		$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		$(MAKE) minio.ansible.apply; \
+		$(MAKE) minio.accept; \
+		$(MAKE) minio.state.migrate; \
+	'
+
+###############################################################################
+# DNS infrastructure (Terraform + Ansible + acceptance)
+###############################################################################
+
+.PHONY: dns.tf.plan
+dns.tf.plan: ## DNS Terraform plan (ENV=samakia-dns)
+	@test "$(ENV)" = "samakia-dns" || (echo "ERROR: set ENV=samakia-dns"; exit 2)
+	ENV="$(ENV)" $(MAKE) tf.plan CI=1
+
+.PHONY: dns.tf.apply
+dns.tf.apply: ## DNS Terraform apply (ENV=samakia-dns)
+	@test "$(ENV)" = "samakia-dns" || (echo "ERROR: set ENV=samakia-dns"; exit 2)
+	ENV="$(ENV)" $(MAKE) tf.apply CI=1
+
+.PHONY: dns.tf.destroy
+dns.tf.destroy: ## DNS Terraform destroy (guarded; CONFIRM=YES)
+	@test "$(ENV)" = "samakia-dns" || (echo "ERROR: set ENV=samakia-dns"; exit 2)
+	@test "$(CONFIRM)" = "YES" || (echo "ERROR: destructive. Re-run with CONFIRM=YES"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) tf.backend.init ENV="$(ENV)"; \
+		terraform -chdir="$(REPO_ROOT)/fabric-core/terraform/envs/$(ENV)" destroy -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)"; \
+	'
+
+.PHONY: dns.ansible.apply
+dns.ansible.apply: ## DNS Ansible apply (dns.yml orchestrator; requires bootstrap already done)
+	@test "$(ENV)" = "samakia-dns" || (echo "ERROR: set ENV=samakia-dns"; exit 2)
+	@test -d "$(ANSIBLE_DIR)" || (echo "ERROR: ANSIBLE_DIR not found: $(ANSIBLE_DIR)"; exit 1)
+	@command -v ansible-playbook >/dev/null 2>&1 || (echo "ERROR: ansible-playbook not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
+			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/dns.yml" -u "$(ANSIBLE_USER)" $(ANSIBLE_FLAGS); \
+	'
+
+.PHONY: dns.accept
+dns.accept: ## DNS acceptance (VIP queries, HA checks, NAT checks, idempotency)
+	bash "$(OPS_SCRIPTS_DIR)/dns-accept.sh"
+
+.PHONY: dns.up
+dns.up: ## One-command DNS deployment (tf apply -> bootstrap -> dns -> acceptance)
+	@bash -euo pipefail -c '\
+		if [[ "$(ENV)" != "samakia-dns" ]]; then echo "ERROR: set ENV=samakia-dns" >&2; exit 2; fi; \
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		$(MAKE) dns.tf.plan; \
+		$(MAKE) dns.tf.apply; \
+		$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		$(MAKE) dns.ansible.apply; \
+		$(MAKE) dns.accept; \
+	'
 
 ###############################################################################
 # END

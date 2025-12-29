@@ -1,0 +1,12 @@
+---
+dns_edge_gateway_zone_name: infra.samakia.net
+dns_edge_gateway_lan_iface: eth0
+dns_edge_gateway_vlan_iface: eth1
+dns_edge_gateway_lan_vip: 192.168.11.100
+dns_edge_gateway_vlan_gw_vip: 10.10.100.1
+dns_edge_gateway_lan_cidr: 192.168.11.0/24
+dns_edge_gateway_vlan_cidr: 10.10.100.0/24
+dns_edge_gateway_upstream_auth_servers:
+  - 10.10.100.21
+  - 10.10.100.22
+dns_edge_gateway_unbound_listen_port: 5353

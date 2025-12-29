@@ -1,0 +1,6 @@
+---
+- name: MinIO cluster nodes (distributed)
+  hosts: minio-*
+  become: true
+  roles:
+    - role: minio_cluster

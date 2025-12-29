@@ -17,6 +17,11 @@ if [[ -n "${TF_VAR_pm_tls_insecure:-}" || -n "${PM_TLS_INSECURE:-}" ]]; then
   exit 1
 fi
 
+if [[ -n "${pm_user}" || -n "${pm_password}" ]]; then
+  echo "ERROR: password-based Proxmox auth is forbidden. Use API tokens only (TF_VAR_pm_api_token_id/TF_VAR_pm_api_token_secret)." >&2
+  exit 1
+fi
+
 if [[ -n "${api_url}" || -n "${token_id}" || -n "${token_secret}" || -n "${pm_user}" || -n "${pm_password}" ]]; then
   if [[ ! -f "${CA_FILE}" ]]; then
     echo "ERROR: Proxmox CA is required for secure TLS but is missing: ${CA_FILE}" >&2

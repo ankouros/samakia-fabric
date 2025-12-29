@@ -21,3 +21,59 @@ check "template_version_pinned" {
     error_message = "Dev template filename must be versioned and immutable (expected '*-v<monotonic>.tar.gz')."
   }
 }
+
+module "monitoring_1" {
+  source = "../../modules/lxc-container"
+
+  ###########################################################################
+  # Identity
+  ###########################################################################
+  vmid     = 1200
+  hostname = "monitoring-dev-1"
+  node     = "proxmox1"
+
+  ###########################################################################
+  # Template & storage
+  ###########################################################################
+  template    = local.lxc_template
+  storage     = "pve-nfs"
+  bridge      = "vmbr0"
+  mac_address = "BC:24:11:AD:49:D1"
+
+  ###########################################################################
+  # Resources
+  ###########################################################################
+  cores       = 2
+  memory      = 2048
+  swap        = 1024
+  rootfs_size = 20
+
+  ###########################################################################
+  # Access
+  ###########################################################################
+  ssh_public_keys = var.ssh_public_keys
+
+  ###########################################################################
+  # Metadata
+  ###########################################################################
+  tags = [
+    "fabric",
+    "monitoring",
+    "dev"
+  ]
+}
+
+###############################################################################
+# Outputs for Ansible inventory
+###############################################################################
+
+output "lxc_inventory" {
+  description = "Inventory data for Ansible"
+  value = {
+    monitoring_1 = {
+      hostname = module.monitoring_1.hostname
+      node     = module.monitoring_1.node
+      vmid     = module.monitoring_1.vmid
+    }
+  }
+}

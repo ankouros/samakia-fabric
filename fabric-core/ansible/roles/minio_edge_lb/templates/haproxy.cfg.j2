@@ -1,0 +1,40 @@
+# Managed by Samakia Fabric (minio_edge_lb). Do not edit manually.
+
+global
+  log /dev/log local0
+  log /dev/log local1 notice
+  daemon
+  maxconn 4096
+
+defaults
+  log global
+  mode http
+  option httplog
+  option dontlognull
+  timeout connect 5s
+  timeout client 60s
+  timeout server 60s
+
+frontend fe_minio_s3
+  bind {{ minio_edge_lb_lan_vip }}:{{ minio_edge_lb_s3_port }} ssl crt {{ minio_edge_lb_tls_pem_dst }}
+  http-request set-header X-Forwarded-Proto https
+  default_backend be_minio_s3
+
+backend be_minio_s3
+  option httpchk GET /minio/health/live
+  http-check expect status 200
+  balance roundrobin
+{% for ip in minio_edge_lb_minio_backends %}
+  server minio_{{ loop.index }} {{ ip }}:{{ minio_edge_lb_s3_port }} check
+{% endfor %}
+
+frontend fe_minio_console
+  bind {{ minio_edge_lb_lan_vip }}:{{ minio_edge_lb_console_port }} ssl crt {{ minio_edge_lb_tls_pem_dst }}
+  http-request set-header X-Forwarded-Proto https
+  default_backend be_minio_console
+
+backend be_minio_console
+  balance roundrobin
+{% for ip in minio_edge_lb_minio_backends %}
+  server minio_console_{{ loop.index }} {{ ip }}:{{ minio_edge_lb_console_port }} check
+{% endfor %}

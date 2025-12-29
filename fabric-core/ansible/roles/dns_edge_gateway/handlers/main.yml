@@ -1,0 +1,17 @@
+---
+- name: Restart unbound
+  ansible.builtin.service:
+    name: unbound
+    state: restarted
+- name: Restart dnsdist
+  ansible.builtin.service:
+    name: dnsdist
+    state: restarted
+- name: Restart keepalived
+  ansible.builtin.service:
+    name: keepalived
+    state: restarted
+- name: Restart nftables
+  ansible.builtin.service:
+    name: nftables
+    state: restarted

@@ -1,0 +1,21 @@
+---
+- name: MinIO edge LB (VIP + HAProxy + NAT)
+  hosts: minio-edge-*
+  become: true
+  roles:
+    - role: minio_edge_lb
+
+- name: MinIO cluster nodes (distributed)
+  hosts: minio-*
+  become: true
+  roles:
+    - role: minio_cluster
+
+- name: MinIO bootstrap (bucket + terraform user)
+  hosts: minio-edge-1
+  become: true
+  tasks:
+    - name: Bootstrap state backend on primary edge
+      ansible.builtin.include_role:
+        name: minio_edge_lb
+        tasks_from: bootstrap
