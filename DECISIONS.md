@@ -462,6 +462,42 @@ Upload (API-token workflow; refuses overwrite):
 Promote (Git change only):
 - `make image.promote IMAGE=<artifact-path> DST_ENV=<env>`
 
+## ADR-0016 — Proxmox UI Tagging: Deterministic key/value tags (Proxmox-safe) for golden image + planes
+
+**Status:** Accepted
+**Date:** 2025-12-29
+
+### Decision
+
+All Terraform-managed LXCs MUST have deterministic Proxmox UI tags, set by Terraform as the source of truth.
+
+Canonical schema (semicolon-separated; Proxmox tag charset-safe):
+
+- `golden-vN;plane-<plane>;env-<env>;role-<role>`
+
+Rules:
+
+- `golden-vN` is derived from the immutable template artifact name (`*-v<N>.tar.gz`).
+- `plane` expresses the infrastructure plane (`dns`, `minio`, `monitoring`, ...).
+- `env` is one of:
+  - `dev|staging|prod` for standard environments
+  - `infra` for dedicated infra planes (`samakia-dns`, `samakia-minio`)
+- `role` is workload-specific but must be short and stable (`edge`, `auth`, `minio`, `mon`, ...).
+- `-` is used as a key/value separator because Proxmox tags do not allow `=` in tag values.
+- Tags MUST NOT contain secrets, IPs, or spaces.
+- Tags MUST be semicolon-separated; commas are forbidden.
+
+### Rationale
+
+- Makes the golden image version visible on every running CT in Proxmox UI (filtering, audits, incident response).
+- Prevents tag drift from manual UI edits (Terraform remains authoritative).
+- Provides compact, stable metadata usable across runbooks and operator workflows.
+
+### Consequences
+
+- Manual tag edits in Proxmox UI are treated as drift and will be corrected by Terraform on the next apply.
+- Unversioned templates (missing `-vN.tar.gz`) are invalid and must fail loudly (immutability contract).
+
 
 
 

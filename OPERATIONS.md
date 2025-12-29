@@ -235,6 +235,17 @@ Destroy/recreate is acceptable and expected when:
 - Storage changes
 - Immutable attributes change
 
+### Proxmox UI Tags (Terraform-managed metadata)
+
+Terraform is the source of truth for Proxmox tags on LXCs. Tags are compact, deterministic, and semicolon-separated:
+
+- `golden-vN;plane-<plane>;env-<env>;role-<role>`
+
+Operational rules:
+- Do not edit tags manually in Proxmox UI (treated as drift).
+- `golden-vN` is derived from the pinned template artifact name (`*-vN.tar.gz`).
+- Tags must not contain secrets, IPs, or spaces.
+
 ### Provider and Permissions
 
 Terraform runs with a delegated Proxmox user.

@@ -75,6 +75,12 @@ Changing the version:
 - is **expected** to trigger **destroy/recreate**
 - is the **only supported upgrade/rollback mechanism**
 
+Terraform also sets deterministic Proxmox UI tags on each LXC:
+
+- `golden-vN;plane-<plane>;env-<env>;role-<role>`
+
+When you promote/rollback by changing the pinned template version, the recreated containers will also carry the updated `golden-vN` tag automatically.
+
 ---
 
 ## 4) Promotion mechanics (GitOps-style)

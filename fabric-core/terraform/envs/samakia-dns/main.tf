@@ -22,6 +22,10 @@ locals {
   vlan_vnet   = "vlandns"
   vlan_cidr   = "10.10.100.0/24"
   vlan_gw_vip = "10.10.100.1"
+
+  tag_env   = "infra"
+  tag_plane = "dns"
+  golden    = regex("-(v[0-9]+)\\.tar\\.gz$", local.lxc_template)[0]
 }
 
 check "template_version_pinned" {
@@ -33,6 +37,13 @@ check "template_version_pinned" {
   assert {
     condition     = can(regex("-v[0-9]+\\.tar\\.gz$", local.lxc_template))
     error_message = "DNS env template filename must be versioned and immutable (expected '*-v<monotonic>.tar.gz')."
+  }
+}
+
+check "tag_schema" {
+  assert {
+    condition     = can(regex("^v[0-9]+$", local.golden))
+    error_message = "Failed to derive golden image version from template (expected vN): ${local.lxc_template}"
   }
 }
 
@@ -102,12 +113,11 @@ resource "proxmox_lxc" "dns_edge_1" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,dns,edge,vlan100"
+  tags            = "golden-${local.golden};plane-${local.tag_plane};env-${local.tag_env};role-edge"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }
@@ -152,12 +162,11 @@ resource "proxmox_lxc" "dns_edge_2" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,dns,edge,vlan100"
+  tags            = "golden-${local.golden};plane-${local.tag_plane};env-${local.tag_env};role-edge"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }
@@ -195,12 +204,11 @@ resource "proxmox_lxc" "dns_auth_1" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,dns,auth,vlan100"
+  tags            = "golden-${local.golden};plane-${local.tag_plane};env-${local.tag_env};role-auth"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }
@@ -238,12 +246,11 @@ resource "proxmox_lxc" "dns_auth_2" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,dns,auth,vlan100"
+  tags            = "golden-${local.golden};plane-${local.tag_plane};env-${local.tag_env};role-auth"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }

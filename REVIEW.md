@@ -13,6 +13,7 @@ This document records what was implemented for the **Terraform remote state back
     - `minio-2` (`proxmox2`): VLAN `10.10.140.12` (gw `10.10.140.1`)
     - `minio-3` (`proxmox3`): VLAN `10.10.140.13` (gw `10.10.140.1`)
   - Stable **LAN VIP** for the Terraform S3 endpoint: `192.168.11.101` (HAProxy+Keepalived on `minio-edge-*`).
+  - Deterministic Proxmox UI tags on all CTs: `golden-vN;plane-minio;env-infra;role-edge|role-minio` (Terraform-managed).
 
 - **Ansible playbooks**: `fabric-core/ansible/playbooks/state-backend.yml` (orchestrator)
   - MinIO distributed cluster (`minio-1/2/3`)
@@ -24,6 +25,7 @@ This document records what was implemented for the **Terraform remote state back
   - Installs backend CA into the runner host trust store (strict TLS, no insecure flags)
 
 - **Acceptance suite**: `ops/scripts/minio-accept.sh` (non-interactive)
+  - Includes read-only Proxmox API verification of the tag schema (strict TLS, token-only).
 
 ## DNS Infrastructure — What was implemented
 
@@ -35,6 +37,7 @@ This document records what was implemented for the **Terraform remote state back
     - `dns-auth-1` (`proxmox3`): VLAN `10.10.100.21`
     - `dns-auth-2` (`proxmox2`): VLAN `10.10.100.22`
   - Version-pinned template contract (no “latest”) and immutable rootfs naming.
+  - Deterministic Proxmox UI tags on all CTs: `golden-vN;plane-dns;env-infra;role-edge|role-auth` (Terraform-managed).
 
 - **Ansible playbooks**: `fabric-core/ansible/playbooks/dns.yml`, `fabric-core/ansible/playbooks/dns-edge.yml`, `fabric-core/ansible/playbooks/dns-auth.yml`
   - **dns-edge** role: keepalived VRRP (LAN VIP `192.168.11.100` + VLAN GW VIP `10.10.100.1`), dnsdist (VIP-only), unbound, nftables NAT.
@@ -45,6 +48,7 @@ This document records what was implemented for the **Terraform remote state back
 
 - **Acceptance suite**: `ops/scripts/dns-accept.sh`
   - Non-interactive checks: VIP authoritative answers, recursion, keepalived VIP holder invariants, NAT readiness, pdns replication sanity, Ansible idempotency, best-effort token leak scan.
+  - Includes read-only Proxmox API verification of the tag schema (strict TLS, token-only).
 
 ## DNS Infrastructure — How to run (one command)
 

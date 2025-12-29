@@ -56,18 +56,38 @@ resource "proxmox_lxc" "this" {
   ###########################################################################
   # Metadata
   ###########################################################################
-  tags = join(",", var.tags)
+  tags = join(";", concat(
+    [
+      "golden-${regex("-(v[0-9]+)\\.tar\\.gz$", var.template)[0]}",
+      "plane-${var.tag_plane}",
+      "env-${var.tag_env}",
+      "role-${var.tag_role}",
+    ],
+    var.tags_extra
+  ))
 
   ###########################################################################
   # Proxmox 9 guards – prevent false drift & broken updates
   ###########################################################################
   lifecycle {
+    precondition {
+      condition     = can(regex("-(v[0-9]+)\\.tar\\.gz$", var.template))
+      error_message = "Template must be versioned and immutable (expected '*-v<monotonic>.tar.gz'): ${var.template}"
+    }
+
+    precondition {
+      condition     = can(regex("^[a-z0-9_-]+$", var.tag_plane)) && can(regex("^[a-z0-9_-]+$", var.tag_env)) && can(regex("^[a-z0-9_-]+$", var.tag_role))
+      error_message = "Tags must be compact and UI-safe: tag_plane/tag_env/tag_role must match ^[a-z0-9_-]+$."
+    }
+
+    precondition {
+      condition     = alltrue([for t in var.tags_extra : can(regex("^[A-Za-z0-9][A-Za-z0-9-._]*$", t))])
+      error_message = "tags_extra entries must be Proxmox tag-safe: start with alnum and contain only [A-Za-z0-9-._] (no '=', no ';', no spaces)."
+    }
+
     ignore_changes = [
       # Proxmox 9 API may reorder or normalize these
       network,
-
-      # Tags handling is inconsistent across PVE 9 API calls
-      tags,
 
       # LXC feature flags are immutable controls; delegated users must not manage them
       features,

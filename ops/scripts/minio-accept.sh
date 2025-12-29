@@ -47,9 +47,90 @@ need curl
 need ssh
 need grep
 need awk
+need python3
 
 pass() { echo "PASS: $*"; }
 fail() { echo "FAIL: $*" >&2; exit 1; }
+
+proxmox_api_url="${PM_API_URL:-${TF_VAR_pm_api_url:-}}"
+proxmox_token_id="${PM_API_TOKEN_ID:-${TF_VAR_pm_api_token_id:-}}"
+proxmox_token_secret="${PM_API_TOKEN_SECRET:-${TF_VAR_pm_api_token_secret:-}}"
+
+require_proxmox_api() {
+  if [[ -z "${proxmox_api_url}" || -z "${proxmox_token_id}" || -z "${proxmox_token_secret}" ]]; then
+    fail "missing Proxmox API token env vars (PM_API_URL/PM_API_TOKEN_ID/PM_API_TOKEN_SECRET or TF_VAR_* equivalents); required for tag verification"
+  fi
+  if [[ ! "${proxmox_api_url}" =~ ^https:// ]]; then
+    fail "PM_API_URL must be https:// (strict TLS): ${proxmox_api_url}"
+  fi
+  if [[ "${proxmox_token_id}" != *"!"* ]]; then
+    fail "PM_API_TOKEN_ID must include '!': ${proxmox_token_id}"
+  fi
+  bash fabric-ci/scripts/check-proxmox-ca-and-tls.sh >/dev/null
+}
+
+get_lxc_tags() {
+  local node="$1"
+  local vmid="$2"
+  PROXMOX_TOKEN_ID="${proxmox_token_id}" PROXMOX_TOKEN_SECRET="${proxmox_token_secret}" \
+    python3 - "${proxmox_api_url}" "${node}" "${vmid}" <<'PY'
+import json
+import os
+import ssl
+import sys
+import urllib.request
+
+api_url, node, vmid = sys.argv[1:]
+token_id = os.environ.get("PROXMOX_TOKEN_ID", "")
+token_secret = os.environ.get("PROXMOX_TOKEN_SECRET", "")
+
+ctx = ssl.create_default_context()
+headers = {"Authorization": f"PVEAPIToken={token_id}={token_secret}"}
+url = f"{api_url.rstrip('/')}/nodes/{node}/lxc/{vmid}/config"
+req = urllib.request.Request(url, headers=headers, method="GET")
+
+with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+    raw = resp.read().decode("utf-8")
+
+payload = json.loads(raw) if raw else {}
+data = payload.get("data") if isinstance(payload, dict) else None
+if not isinstance(data, dict):
+    print("")
+else:
+    print(str(data.get("tags", "")).strip())
+PY
+}
+
+assert_tag() {
+  local node="$1"
+  local vmid="$2"
+  local expected_plane="$3"
+  local expected_env="$4"
+  local expected_role="$5"
+
+  local tags
+  tags="$(get_lxc_tags "${node}" "${vmid}")"
+  if [[ -z "${tags}" ]]; then
+    fail "missing Proxmox tags for CT ${node}/${vmid}"
+  fi
+
+  if echo "${tags}" | grep -q ","; then
+    fail "CT ${node}/${vmid} tags contain ',' (expected ';' separated tags): ${tags}"
+  fi
+
+  if ! echo "${tags}" | grep -Eq '(^|;)golden-v[0-9]+(;|$)'; then
+    fail "CT ${node}/${vmid} tags missing golden-vN: ${tags}"
+  fi
+  if ! echo "${tags}" | grep -Eq "(^|;)plane-${expected_plane}(;|$)"; then
+    fail "CT ${node}/${vmid} tags missing plane-${expected_plane}: ${tags}"
+  fi
+  if ! echo "${tags}" | grep -Eq "(^|;)env-${expected_env}(;|$)"; then
+    fail "CT ${node}/${vmid} tags missing env-${expected_env}: ${tags}"
+  fi
+  if ! echo "${tags}" | grep -Eq "(^|;)role-${expected_role}(;|$)"; then
+    fail "CT ${node}/${vmid} tags missing role-${expected_role}: ${tags}"
+  fi
+}
 
 ssh_run() {
   local host="$1"
@@ -136,7 +217,20 @@ fi
 pass "minio admin info OK via mc (root alias)"
 
 ###############################################################################
-# 5) Idempotency
+# 5) Proxmox UI tags (golden=image version; plane/env/role)
+###############################################################################
+
+require_proxmox_api
+
+assert_tag "proxmox1" "3201" "minio" "infra" "edge"
+assert_tag "proxmox2" "3202" "minio" "infra" "edge"
+assert_tag "proxmox1" "3211" "minio" "infra" "minio"
+assert_tag "proxmox2" "3212" "minio" "infra" "minio"
+assert_tag "proxmox3" "3213" "minio" "infra" "minio"
+pass "Proxmox tags present and match schema (golden/plane/env/role)"
+
+###############################################################################
+# 6) Idempotency
 ###############################################################################
 
 if command -v ansible-playbook >/dev/null 2>&1; then

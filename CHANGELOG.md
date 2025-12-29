@@ -15,6 +15,12 @@ The format is inspired by:
 ## [Unreleased]
 
 ### Added
+#### Proxmox UI metadata
+- Deterministic Proxmox tags for all Terraform-managed LXCs (semicolon-separated; prefix-encoded key/value schema)
+  - Tag schema: `golden-vN;plane-<plane>;env-<env>;role-<role>` (Terraform-managed; no manual UI edits)
+  - `golden-vN` derived from pinned template artifact name (`*-vN.tar.gz`), enforced via Terraform checks/preconditions
+  - DNS/MinIO acceptance scripts verify tags via Proxmox API (strict TLS, token-only; secrets-safe)
+
 #### Golden image automation
 - Artifact-driven golden image auto-bump (no repo edits per version)
   - Version resolver: `ops/scripts/image-next-version.sh` (+ unit test `ops/scripts/test-image-next-version.sh`)

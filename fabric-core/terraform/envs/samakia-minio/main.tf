@@ -10,6 +10,16 @@ locals {
   lxc_template       = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-${local.lxc_rootfs_version}.tar.gz"
 
   ###########################################################################
+  # Proxmox UI tags (deterministic; Terraform is source of truth)
+  ###########################################################################
+  tag_env   = "infra"
+  tag_plane = "minio"
+  tag_golden = try(
+    regex("-(v[0-9]+)\\.tar\\.gz$", local.lxc_template)[0],
+    null,
+  )
+
+  ###########################################################################
   # Network contracts (explicit)
   ###########################################################################
   lan_cidr      = "192.168.11.0/24"
@@ -33,6 +43,18 @@ check "template_version_pinned" {
   assert {
     condition     = can(regex("-v[0-9]+\\.tar\\.gz$", local.lxc_template))
     error_message = "MinIO env template filename must be versioned and immutable (expected '*-v<monotonic>.tar.gz')."
+  }
+}
+
+check "tag_schema" {
+  assert {
+    condition     = local.tag_golden != null && can(regex("^v[0-9]+$", local.tag_golden))
+    error_message = "MinIO env could not derive golden image version from local.lxc_template (expected '*-v<N>.tar.gz' so tags can include 'golden-vN')."
+  }
+
+  assert {
+    condition     = can(regex("^[a-z0-9_-]+$", local.tag_env)) && can(regex("^[a-z0-9_-]+$", local.tag_plane))
+    error_message = "MinIO env tag values must match ^[a-z0-9_-]+$ for Proxmox UI compatibility."
   }
 }
 
@@ -102,12 +124,11 @@ resource "proxmox_lxc" "minio_edge_1" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,minio,edge,vlan140"
+  tags            = "golden-${local.tag_golden};plane-${local.tag_plane};env-${local.tag_env};role-edge"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }
@@ -152,12 +173,11 @@ resource "proxmox_lxc" "minio_edge_2" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,minio,edge,vlan140"
+  tags            = "golden-${local.tag_golden};plane-${local.tag_plane};env-${local.tag_env};role-edge"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }
@@ -195,12 +215,11 @@ resource "proxmox_lxc" "minio_1" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,minio,node,vlan140"
+  tags            = "golden-${local.tag_golden};plane-${local.tag_plane};env-${local.tag_env};role-minio"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }
@@ -238,12 +257,11 @@ resource "proxmox_lxc" "minio_2" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,minio,node,vlan140"
+  tags            = "golden-${local.tag_golden};plane-${local.tag_plane};env-${local.tag_env};role-minio"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }
@@ -281,12 +299,11 @@ resource "proxmox_lxc" "minio_3" {
   }
 
   ssh_public_keys = join("\n", var.ssh_public_keys)
-  tags            = "fabric,minio,node,vlan140"
+  tags            = "golden-${local.tag_golden};plane-${local.tag_plane};env-${local.tag_env};role-minio"
 
   lifecycle {
     ignore_changes = [
       network,
-      tags,
       features,
     ]
   }

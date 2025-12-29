@@ -101,8 +101,23 @@ variable "ssh_public_keys" {
   type        = list(string)
 }
 
-variable "tags" {
-  description = "List of Proxmox tags. Used for grouping and automation."
+variable "tag_env" {
+  description = "Deterministic environment tag (dev|staging|prod|infra)."
+  type        = string
+}
+
+variable "tag_plane" {
+  description = "Deterministic plane tag (e.g. dns|minio|monitoring)."
+  type        = string
+}
+
+variable "tag_role" {
+  description = "Deterministic role tag (e.g. edge|auth|minio|mon)."
+  type        = string
+}
+
+variable "tags_extra" {
+  description = "Optional additional Proxmox tags in key=value form."
   type        = list(string)
   default     = []
 }
