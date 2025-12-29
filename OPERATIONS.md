@@ -192,6 +192,19 @@ Hard gates:
 - `make minio.up ENV=samakia-minio` (before state migration)
 - `make dns.up ENV=samakia-dns` (DNS uses the MinIO remote backend)
 
+### MinIO Edge Failure Simulation
+
+Deterministic, reversible acceptance-level simulation that stops `haproxy` + `keepalived` on **one** MinIO edge and verifies the VIP remains available.
+
+```bash
+make minio.failure.sim ENV=samakia-minio EDGE=minio-edge-1
+```
+
+Safety guarantees:
+- Stops only `haproxy` + `keepalived` on the selected edge (no reboots, no CT deletion, no Terraform state changes).
+- Attempts recovery automatically if a post-check fails.
+- Uses strict TLS and strict SSH host key checking (no insecure flags).
+
 
 ---
 

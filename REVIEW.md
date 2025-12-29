@@ -57,6 +57,15 @@ It does not guarantee:
 - Absence of latent storage faults beyond what MinIO reports.
 - That future failures won’t occur during a long-running apply (it’s a point-in-time safety gate).
 
+### Failure Tolerance Verification
+
+`make minio.failure.sim ENV=samakia-minio EDGE=minio-edge-1` performs a reversible failure simulation by stopping `haproxy` + `keepalived` on one edge and verifying VIP continuity and post-recovery steady state.
+
+PASS means (best-effort):
+- VIP stays reachable over strict TLS during the edge outage.
+- Exactly one VIP owner exists before, during, and after recovery (no split-brain).
+- The faulted edge services are restored to active state.
+
 ### Terraform Backend Bootstrap Invariant
 
 The Terraform remote backend **must not depend on itself** to exist.

@@ -882,7 +882,7 @@ minio.state.migrate: ## Migrate samakia-minio state to remote backend (requires 
 .PHONY: minio.up
 minio.up: ## One-command MinIO backend deployment (tf apply -> bootstrap -> state-backend -> acceptance -> state migrate)
 	@bash -euo pipefail -c '\
-			if [[ "$(ENV)" != "samakia-minio" ]]; then echo "ERROR: set ENV=samakia-minio" >&2; exit 2; fi; \
+				if [[ "$(ENV)" != "samakia-minio" ]]; then echo "ERROR: set ENV=samakia-minio" >&2; exit 2; fi; \
 			env_file="$(RUNNER_ENV_FILE)"; \
 			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 			$(MAKE) runner.env.check; \
@@ -899,8 +899,25 @@ minio.up: ## One-command MinIO backend deployment (tf apply -> bootstrap -> stat
 				$(MAKE) minio.ansible.apply; \
 				$(MAKE) minio.accept; \
 				bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
-				$(MAKE) minio.state.migrate; \
-			'
+					$(MAKE) minio.state.migrate; \
+				'
+
+.PHONY: minio.failure.sim
+minio.failure.sim: ## MinIO edge failure simulation (reversible; requires EDGE=minio-edge-1|minio-edge-2)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@test -n "$(EDGE)" || (echo "ERROR: set EDGE=minio-edge-1|minio-edge-2"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		bash "$(OPS_SCRIPTS_DIR)/proxmox-sdn-ensure-stateful-plane.sh" --check-only; \
+		$(MAKE) minio.accept ENV="$(ENV)"; \
+		$(MAKE) minio.converged.accept ENV="$(ENV)"; \
+		EDGE="$(EDGE)" ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/minio-edge-failure-sim.sh"; \
+		$(MAKE) minio.sdn.accept ENV="$(ENV)"; \
+		$(MAKE) minio.accept ENV="$(ENV)"; \
+		$(MAKE) minio.converged.accept ENV="$(ENV)"; \
+	'
 
 ###############################################################################
 # DNS infrastructure (Terraform + Ansible + acceptance)

@@ -33,6 +33,7 @@ The format is inspired by:
   - MinIO SDN acceptance tests: `ops/scripts/minio-sdn-accept.sh` + `ENV=samakia-minio make minio.sdn.accept` (read-only validation of stateful SDN plane + wiring signals)
   - MinIO cluster convergence checks: `ops/scripts/minio-convergence-accept.sh` + `ENV=samakia-minio make minio.converged.accept` (read-only runtime health + HA invariants after `minio.up`)
   - MinIO quorum-loss guard: `ops/scripts/minio-quorum-guard.sh` + `ENV=samakia-minio make minio.quorum.guard` (detect-only PASS/WARN/FAIL gate; blocks unsafe state migration and gates `dns.up`)
+  - MinIO edge failure simulation hook: `ops/scripts/minio-edge-failure-sim.sh` + `make minio.failure.sim ENV=samakia-minio EDGE=minio-edge-1` (reversible stop/start of keepalived+haproxy on one edge; validates VIP continuity)
   - Ansible playbooks: `fabric-core/ansible/playbooks/state-backend.yml`, `fabric-core/ansible/playbooks/minio.yml`, `fabric-core/ansible/playbooks/minio-edge.yml`
   - Ansible roles: `fabric-core/ansible/roles/minio_cluster`, `fabric-core/ansible/roles/minio_edge_lb`
   - Runner bootstrap helper: `ops/scripts/backend-configure.sh` (local-only credentials + backend CA + HAProxy TLS pem; installs backend CA into host trust store with non-interactive sudo)
