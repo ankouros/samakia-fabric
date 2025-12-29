@@ -117,7 +117,7 @@ variable "tag_role" {
 }
 
 variable "tags_extra" {
-  description = "Optional additional Proxmox tags in key=value form."
+  description = "Optional additional Proxmox tags (single tag tokens; must be Proxmox tag-safe)."
   type        = list(string)
   default     = []
 }
