@@ -838,6 +838,17 @@ minio.sdn.accept: ## MinIO SDN acceptance (stateful plane validation; read-only)
 		bash "$(OPS_SCRIPTS_DIR)/minio-sdn-accept.sh"; \
 	'
 
+.PHONY: minio.converged.accept
+minio.converged.accept: ## MinIO cluster convergence acceptance (read-only; requires SDN acceptance PASS)
+	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		$(MAKE) minio.sdn.accept ENV="$(ENV)"; \
+		bash "$(OPS_SCRIPTS_DIR)/minio-convergence-accept.sh"; \
+	'
+
 .PHONY: minio.state.migrate
 minio.state.migrate: ## Migrate samakia-minio state to remote backend (requires MinIO up)
 	@test "$(ENV)" = "samakia-minio" || (echo "ERROR: set ENV=samakia-minio"; exit 2)

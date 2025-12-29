@@ -34,6 +34,14 @@ Additional SDN-plane validation is available (read-only):
 - Guarantees after PASS (best-effort): SDN primitives exist (zminio/vminio/VLAN140/subnet/gateway VIP), MinIO nodes are VLAN-only and default-route via `10.10.140.1`, and edge gateway VIP/NAT signals are present when edges are reachable.
 - Note: if the Proxmox API token cannot read SDN primitives (or the SDN plane is not created yet), this check fails loudly by design.
 
+### MinIO Convergence Guarantees
+
+After `ENV=samakia-minio make minio.converged.accept` returns PASS (and the SDN acceptance prerequisite is PASS), the runner has verified:
+- MinIO VIP endpoints are reachable over strict TLS (S3 + console), with no plaintext HTTP on those ports.
+- Both edges are running keepalived + haproxy, and VIP ownership is singular and stable.
+- Cluster membership signals show 3 nodes and no offline/healing/rebalancing indicators (best-effort).
+- Terraform backend bucket/state object presence and basic access posture invariants (no anonymous, terraform user not admin).
+
 ### Terraform Backend Bootstrap Invariant
 
 The Terraform remote backend **must not depend on itself** to exist.

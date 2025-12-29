@@ -155,6 +155,20 @@ What it checks (best-effort):
 - MinIO CTs are VLAN-only (no LAN bridge attached) and default-route via `10.10.140.1` (when CT configs exist).
 - MinIO edges are dual-homed and provide the VLAN gateway VIP + NAT readiness (when SSH is reachable).
 
+### MinIO Cluster Convergence Acceptance
+
+Validates the MinIO distributed cluster is **formed and healthy** after `make minio.up ENV=samakia-minio`.
+
+```bash
+ENV=samakia-minio make minio.converged.accept
+```
+
+What it checks (read-only):
+- VIP TLS endpoints: `https://192.168.11.101:9000` (S3) and `https://192.168.11.101:9001` (console) respond with strict TLS.
+- HA signals: keepalived/haproxy active on both edges; exactly one VIP holder; all backends healthy via edge.
+- Cluster membership: `mc admin info` indicates 3 MinIO nodes and no offline/healing/rebalancing signals (best-effort parsing).
+- Control-plane invariants: Terraform backend bucket exists; `samakia-minio` tfstate object exists post-migration; anonymous access disabled; terraform user is not admin.
+
 
 ---
 
