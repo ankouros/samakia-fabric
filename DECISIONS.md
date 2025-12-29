@@ -498,6 +498,42 @@ Rules:
 - Manual tag edits in Proxmox UI are treated as drift and will be corrected by Terraform on the next apply.
 - Unversioned templates (missing `-vN.tar.gz`) are invalid and must fail loudly (immutability contract).
 
+## ADR-0017 — Terraform Backend Cannot Depend on Itself (MinIO bootstrap invariant)
+
+**Status:** Accepted
+**Date:** 2025-12-29
+
+### Decision
+
+The Terraform remote backend MUST NOT depend on itself to exist.
+
+Therefore, the backend-providing environment `ENV=samakia-minio` MUST always bootstrap with **local state**:
+
+- `terraform init -backend=false`
+
+Implementation note:
+- Makefile targets bootstrap from a runner-local workspace that copies the env Terraform files excluding `backend.tf` (backend remains in Git), because Terraform cannot `plan/apply` with an uninitialized `backend "s3"` configuration.
+
+Only AFTER MinIO is deployed and accepted may its Terraform state be migrated to the remote S3 backend.
+
+Operational contract (canonical):
+
+- Bootstrap-local (allowed):
+  - `make minio.tf.plan ENV=samakia-minio` (runs `terraform init -backend=false`)
+  - `make minio.tf.apply ENV=samakia-minio` (runs `terraform init -backend=false`)
+- Migration (explicit, one-time):
+  - `make minio.state.migrate ENV=samakia-minio` (migrates local state to remote backend)
+
+### Guardrails
+
+- `make tf.backend.init ENV=samakia-minio` MUST fail loudly.
+- `make tf.plan/tf.apply ENV=samakia-minio` MUST fail loudly (use `minio.tf.*`).
+
+### Rationale
+
+- Prevents the expected bootstrap failure: “Backend initialization required”.
+- Keeps the bootstrap deterministic and CI-safe without introducing manual steps or insecure flags.
+
 
 
 

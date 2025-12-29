@@ -2,7 +2,7 @@ check "proxmox_auth" {
   assert {
     condition = (
       var.pm_api_token_id != null && var.pm_api_token_secret != null &&
-      trim(var.pm_api_token_id) != "" && trim(var.pm_api_token_secret) != ""
+      trimspace(var.pm_api_token_id) != "" && trimspace(var.pm_api_token_secret) != ""
     )
     error_message = "Set Proxmox credentials using API token auth only: (pm_api_token_id, pm_api_token_secret)."
   }
@@ -30,7 +30,7 @@ check "bootstrap_keys" {
   }
 
   assert {
-    condition     = alltrue([for k in var.ssh_public_keys : can(regex("^ssh-", trim(k)))])
+    condition     = alltrue([for k in var.ssh_public_keys : can(regex("^ssh-", trimspace(k)))])
     error_message = "ssh_public_keys must contain valid SSH public keys (expected entries starting with 'ssh-')."
   }
 }

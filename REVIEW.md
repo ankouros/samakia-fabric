@@ -27,6 +27,23 @@ This document records what was implemented for the **Terraform remote state back
 - **Acceptance suite**: `ops/scripts/minio-accept.sh` (non-interactive)
   - Includes read-only Proxmox API verification of the tag schema (strict TLS, token-only).
 
+### Terraform Backend Bootstrap Invariant
+
+The Terraform remote backend **must not depend on itself** to exist.
+
+Therefore, `ENV=samakia-minio` is bootstrapped with **local state only**:
+- `terraform init -backend=false`
+
+Implementation note:
+- Make targets bootstrap via a runner-local workspace that copies the env Terraform files excluding `backend.tf` (backend remains in Git) so that `plan/apply` can run before remote S3 exists.
+
+Only after MinIO is deployed and accepted do we migrate state to the remote S3 backend (explicit step):
+- `make minio.state.migrate ENV=samakia-minio`
+
+Guardrails:
+- `make tf.backend.init ENV=samakia-minio` fails loudly by design.
+- `make tf.plan/tf.apply ENV=samakia-minio` are forbidden; use `minio.tf.plan/minio.tf.apply` (bootstrap-local).
+
 ## DNS Infrastructure — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-dns/`

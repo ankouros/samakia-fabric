@@ -65,6 +65,10 @@ The format is inspired by:
 - `OPERATIONS_PRE_RELEASE_READINESS.md` (pre-release readiness audit runbook: checklist-driven Go/No-Go, signable readiness packet definition)
 - `ops/scripts/pre-release-readiness.sh` (optional helper to scaffold `release-readiness/<release-id>/` with evidence references; no enforcement, no signing, no network)
 
+### Fixed
+- MinIO backend bootstrap invariant: `samakia-minio` always bootstraps with `terraform init -backend=false`, with explicit post-acceptance state migration
+  - Guardrails: `make tf.backend.init ENV=samakia-minio` and `make tf.apply ENV=samakia-minio` fail loudly by design; use `minio.tf.plan/minio.tf.apply` instead
+
 ### Changed
 - Migrated Codex remediation log into `CHANGELOG.md` (retired `codex-changelog.md`)
 - Enforced Proxmox API token-only auth in Terraform envs and runner guardrails (password auth variables are no longer supported)

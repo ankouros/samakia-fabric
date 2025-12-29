@@ -40,6 +40,9 @@ FABRIC_CI_DIR := $(REPO_ROOT)/fabric-ci/scripts
 # Runner host env file (canonical)
 RUNNER_ENV_FILE ?= $(HOME)/.config/samakia-fabric/env.sh
 
+# MinIO bootstrap workspace (runner-local; keeps backend.tf in Git while bootstrapping local state)
+MINIO_BOOTSTRAP_DIR ?= $(HOME)/.cache/samakia-fabric/tf-bootstrap/samakia-minio
+
 # Optional inputs
 IMAGE ?=
 RELEASE_ID ?=
@@ -370,11 +373,12 @@ image.promote: ## Promote image version (GitOps-only: prints the exact pin to ap
 
 .PHONY: tf.backend.init
 tf.backend.init: ## Terraform backend init (remote S3/MinIO state; strict TLS; no prompts)
+	@test "$(ENV)" != "samakia-minio" || (echo "ERROR: tf.backend.init is forbidden for ENV=samakia-minio (backend bootstrap invariant). Use: make minio.tf.apply ENV=samakia-minio (local state) then: make minio.state.migrate ENV=samakia-minio"; exit 2)
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
-		env_file="$(RUNNER_ENV_FILE)"; \
-		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			env_file="$(RUNNER_ENV_FILE)"; \
+			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) runner.env.check; \
 		if [[ "$(MIGRATE_STATE)" = "1" ]]; then \
 			bash "$(OPS_SCRIPTS_DIR)/tf-backend-init.sh" "$(ENV)" --migrate; \
@@ -385,22 +389,24 @@ tf.backend.init: ## Terraform backend init (remote S3/MinIO state; strict TLS; n
 
 .PHONY: tf.init
 tf.init: ## Terraform init for ENV
+	@test "$(ENV)" != "samakia-minio" || (echo "ERROR: tf.init is forbidden for ENV=samakia-minio (backend bootstrap invariant). Use: make minio.tf.plan/minio.tf.apply ENV=samakia-minio"; exit 2)
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
-		env_file="$(RUNNER_ENV_FILE)"; \
-		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			env_file="$(RUNNER_ENV_FILE)"; \
+			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) tf.backend.init; \
 		terraform -chdir="$(TERRAFORM_ENV_DIR)" init -input=false $(TF_INIT_FLAGS) >/dev/null; \
 	'
 
 .PHONY: tf.plan
 tf.plan: ## Terraform plan for ENV
+	@test "$(ENV)" != "samakia-minio" || (echo "ERROR: tf.plan is forbidden for ENV=samakia-minio (backend bootstrap invariant). Use: make minio.tf.plan ENV=samakia-minio"; exit 2)
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
-		env_file="$(RUNNER_ENV_FILE)"; \
-		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			env_file="$(RUNNER_ENV_FILE)"; \
+			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) tf.backend.init; \
 		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
 		terraform -chdir="$(TERRAFORM_ENV_DIR)" plan -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $(TF_PLAN_FLAGS); \
@@ -408,11 +414,12 @@ tf.plan: ## Terraform plan for ENV
 
 .PHONY: tf.apply
 tf.apply: ## Terraform apply for ENV
+	@test "$(ENV)" != "samakia-minio" || (echo "ERROR: tf.apply is forbidden for ENV=samakia-minio (backend bootstrap invariant). Use: make minio.tf.apply ENV=samakia-minio"; exit 2)
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
-		env_file="$(RUNNER_ENV_FILE)"; \
-		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			env_file="$(RUNNER_ENV_FILE)"; \
+			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) tf.backend.init; \
 		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
 		terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $(TF_APPLY_FLAGS); \
@@ -714,13 +721,27 @@ minio.tf.plan: ## MinIO Terraform plan (bootstrap-local; ENV=samakia-minio)
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
-		env_file="$(RUNNER_ENV_FILE)"; \
-		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
-		$(MAKE) runner.env.check; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" init -input=false -backend=false >/dev/null; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
-	'
+			env_file="$(RUNNER_ENV_FILE)"; \
+			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			$(MAKE) runner.env.check; \
+			src_dir="$(TERRAFORM_ENV_DIR)"; \
+			work_dir="$(MINIO_BOOTSTRAP_DIR)"; \
+			mkdir -p "$$work_dir"; \
+			rm -rf "$$work_dir/.terraform" || true; \
+			rm -f "$$work_dir"/*.tf "$$work_dir"/.terraform.lock.hcl 2>/dev/null || true; \
+			for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
+				base="$$(basename "$$f")"; \
+				if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
+				cp -f "$$f" "$$work_dir/"; \
+			done; \
+			if [[ -f "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
+			if [[ -f "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
+			terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
+			terraform -chdir="$$work_dir" validate; \
+			terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
+			if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
+			if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
+		'
 
 .PHONY: minio.tf.apply
 minio.tf.apply: ## MinIO Terraform apply (bootstrap-local; ENV=samakia-minio)
@@ -728,13 +749,31 @@ minio.tf.apply: ## MinIO Terraform apply (bootstrap-local; ENV=samakia-minio)
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
-		env_file="$(RUNNER_ENV_FILE)"; \
-		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
-		$(MAKE) runner.env.check; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" init -input=false -backend=false >/dev/null; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock=false $(TF_APPLY_FLAGS); \
-	'
+			env_file="$(RUNNER_ENV_FILE)"; \
+			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			$(MAKE) runner.env.check; \
+			src_dir="$(TERRAFORM_ENV_DIR)"; \
+			work_dir="$(MINIO_BOOTSTRAP_DIR)"; \
+			mkdir -p "$$work_dir"; \
+			rm -rf "$$work_dir/.terraform" || true; \
+			rm -f "$$work_dir"/*.tf "$$work_dir"/.terraform.lock.hcl 2>/dev/null || true; \
+			for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
+				base="$$(basename "$$f")"; \
+				if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
+				cp -f "$$f" "$$work_dir/"; \
+			done; \
+			if [[ -f "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
+			if [[ -f "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
+			terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
+			terraform -chdir="$$work_dir" validate; \
+				if [[ "$(DRY_RUN)" = "1" ]]; then \
+					terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
+				else \
+					terraform -chdir="$$work_dir" apply -input=false -lock=false $(TF_APPLY_FLAGS); \
+				fi; \
+				if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
+				if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
+			'
 
 .PHONY: minio.tf.destroy
 minio.tf.destroy: ## MinIO Terraform destroy (bootstrap-local; guarded; CONFIRM=YES)
@@ -743,12 +782,26 @@ minio.tf.destroy: ## MinIO Terraform destroy (bootstrap-local; guarded; CONFIRM=
 	@test -d "$(TERRAFORM_ENV_DIR)" || (echo "ERROR: Terraform env dir not found: $(TERRAFORM_ENV_DIR)"; exit 1)
 	@command -v terraform >/dev/null 2>&1 || (echo "ERROR: terraform not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
-		env_file="$(RUNNER_ENV_FILE)"; \
-		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
-		$(MAKE) runner.env.check; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" init -input=false -backend=false >/dev/null; \
-		terraform -chdir="$(TERRAFORM_ENV_DIR)" destroy -input=false -lock=false; \
-	'
+			env_file="$(RUNNER_ENV_FILE)"; \
+			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+			$(MAKE) runner.env.check; \
+			src_dir="$(TERRAFORM_ENV_DIR)"; \
+			work_dir="$(MINIO_BOOTSTRAP_DIR)"; \
+			mkdir -p "$$work_dir"; \
+			rm -rf "$$work_dir/.terraform" || true; \
+			rm -f "$$work_dir"/*.tf "$$work_dir"/.terraform.lock.hcl 2>/dev/null || true; \
+			for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
+				base="$$(basename "$$f")"; \
+				if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
+				cp -f "$$f" "$$work_dir/"; \
+			done; \
+			if [[ -f "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
+			if [[ -f "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
+			terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
+			terraform -chdir="$$work_dir" destroy -input=false -lock=false; \
+			if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
+			if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
+		'
 
 .PHONY: minio.ansible.apply
 minio.ansible.apply: ## MinIO Ansible apply (state-backend.yml; requires bootstrap already done)

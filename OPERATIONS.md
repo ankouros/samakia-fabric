@@ -77,6 +77,25 @@ One-command deployment (non-interactive; requires runner env for Proxmox token +
 make minio.up ENV=samakia-minio
 ```
 
+### MinIO bootstrap lifecycle (canonical)
+
+The MinIO environment is the Terraform backend provider, so it **must not depend on itself** at bootstrap time.
+
+Invariant:
+- `ENV=samakia-minio` must always start with **local state**:
+  - `terraform init -backend=false`
+- Only after MinIO is deployed and accepted may the state be migrated to remote S3.
+
+Implementation detail (no manual steps):
+- The Makefile bootstraps Terraform from a runner-local workspace that copies the env files **excluding** `backend.tf` (backend remains in Git), because Terraform cannot `plan/apply` against an uninitialized `backend "s3"` block.
+
+Operational flow (non-interactive):
+- `make backend.configure`
+- `make minio.tf.apply ENV=samakia-minio` (local state; `-backend=false`)
+- `make minio.ansible.apply ENV=samakia-minio`
+- `make minio.accept`
+- `make minio.state.migrate ENV=samakia-minio` (one-time migration to S3 backend)
+
 This flow:
 - Generates runner-local backend credentials and CA material under `~/.config/samakia-fabric/` (never committed).
 - Installs the backend CA into the runner host trust store (strict TLS; requires non-interactive sudo).
