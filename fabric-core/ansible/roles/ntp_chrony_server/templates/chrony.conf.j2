@@ -1,0 +1,16 @@
+# Managed by Samakia Fabric (ntp_chrony_server). Do not edit manually.
+
+{% for srv in ntp_chrony_server_upstream_servers %}
+server {{ srv }} iburst
+{% endfor %}
+
+{% for cidr in ntp_chrony_server_allow_cidrs %}
+allow {{ cidr }}
+{% endfor %}
+
+local stratum {{ ntp_chrony_server_local_stratum }}
+
+makestep 1.0 3
+rtcsync
+
+logdir /var/log/chrony

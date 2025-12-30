@@ -1,0 +1,10 @@
+ansible_host: 10.10.120.21
+ansible_become: true
+ansible_become_method: sudo
+# VLAN-only node: access via ntp edge jump hosts on LAN.
+ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new -o ProxyJump=samakia@192.168.11.106,samakia@192.168.11.107"
+
+vault_server_node_id: vault-1
+vault_server_api_addr: https://10.10.120.21:8200
+vault_server_cluster_addr: https://10.10.120.21:8201
+vault_server_retry_join: ""

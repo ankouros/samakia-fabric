@@ -1,0 +1,26 @@
+---
+vault_server_user: vault
+vault_server_group: vault
+
+vault_server_tls_dir: /etc/vault/ssl
+vault_server_ca_src: "{{ lookup('env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-bootstrap-ca.crt' }}"
+vault_server_ca_key_src: "{{ lookup('env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-bootstrap-ca.key' }}"
+vault_server_cert_src: "{{ lookup('env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-vault.crt' }}"
+vault_server_key_src: "{{ lookup('env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-vault.key' }}"
+
+vault_server_ca_dest: /etc/vault/ssl/shared-bootstrap-ca.crt
+vault_server_cert_dest: /etc/vault/ssl/vault.crt
+vault_server_key_dest: /etc/vault/ssl/vault.key
+
+vault_server_config_path: /etc/vault.d/vault.hcl
+vault_server_data_dir: /var/lib/vault
+
+vault_server_cluster_addr: ""
+vault_server_api_addr: ""
+vault_server_node_id: ""
+vault_server_retry_join: []
+vault_server_force_reinit: false
+
+vault_server_local_dir: "{{ lookup('env', 'HOME') ~ '/.config/samakia-fabric/vault' }}"
+vault_server_init_file: "{{ vault_server_local_dir }}/init.json"
+vault_server_root_token_file: "{{ vault_server_local_dir }}/root-token"

@@ -1,0 +1,11 @@
+ansible_host: 192.168.11.107
+ansible_become: true
+ansible_become_method: sudo
+
+shared_edge_gateway_role: backup
+shared_edge_gateway_priority: 100
+shared_edge_gateway_lan_ip: 192.168.11.107
+shared_edge_gateway_peer_lan_ip: 192.168.11.106
+shared_edge_gateway_vlan_ip: 10.10.120.12
+shared_edge_gateway_peer_vlan_ip: 10.10.120.11
+shared_edge_gateway_mgmt_ssh_allow_cidrs: "{{ (lookup('env', 'FABRIC_ADMIN_CIDRS') | default('192.168.11.0/24', true)).split(',') }}"

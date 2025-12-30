@@ -1,0 +1,37 @@
+---
+shared_edge_gateway_lan_iface: eth0
+shared_edge_gateway_vlan_iface: eth1
+
+shared_edge_gateway_lan_vips:
+  - 192.168.11.120
+  - 192.168.11.121
+  - 192.168.11.122
+
+shared_edge_gateway_ntp_vip: 192.168.11.120
+shared_edge_gateway_vault_vip: 192.168.11.121
+shared_edge_gateway_obs_vip: 192.168.11.122
+
+shared_edge_gateway_vlan_gw_vip: 10.10.120.1
+
+shared_edge_gateway_lan_cidr: 192.168.11.0/24
+shared_edge_gateway_vlan_cidr: 10.10.120.0/24
+
+shared_edge_gateway_vault_port: 8200
+shared_edge_gateway_grafana_port: 3000
+shared_edge_gateway_prometheus_port: 9090
+shared_edge_gateway_alertmanager_port: 9093
+shared_edge_gateway_loki_port: 3100
+
+shared_edge_gateway_vault_backends:
+  - 10.10.120.21
+  - 10.10.120.22
+
+shared_edge_gateway_obs_backends:
+  - 10.10.120.31
+
+shared_edge_gateway_tls_pem_src: ""
+shared_edge_gateway_tls_pem_dst: /etc/haproxy/certs/shared-edge.pem
+shared_edge_gateway_backend_ca_src: ""
+shared_edge_gateway_backend_ca_dest: /usr/local/share/ca-certificates/samakia-fabric-shared-ca.crt
+
+shared_edge_gateway_mgmt_ssh_allow_cidrs: []

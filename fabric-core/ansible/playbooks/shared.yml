@@ -1,0 +1,9 @@
+---
+- name: Shared NTP edges (chrony + shared gateway)
+  import_playbook: shared-ntp.yml
+- name: Shared secrets (Vault)
+  import_playbook: shared-secrets.yml
+- name: Shared PKI (Vault PKI)
+  import_playbook: shared-pki.yml
+- name: Shared observability
+  import_playbook: shared-observability.yml

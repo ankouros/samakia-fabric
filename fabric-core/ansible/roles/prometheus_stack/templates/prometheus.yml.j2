@@ -1,0 +1,14 @@
+# Managed by Samakia Fabric (prometheus_stack). Do not edit manually.
+
+global:
+  scrape_interval: {{ prometheus_stack_scrape_interval }}
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: {{ prometheus_stack_alertmanager_targets | to_json }}
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

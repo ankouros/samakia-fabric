@@ -1,0 +1,15 @@
+---
+pki_vault_path: pki
+pki_vault_common_name: "Samakia Shared Root CA"
+pki_vault_role_name: shared-services
+pki_vault_ttl: 87600h
+pki_vault_api_addr: https://127.0.0.1:8200
+pki_vault_issuing_url: https://192.168.11.121:8200
+pki_vault_allowed_domains:
+  - infra.samakia.net
+
+pki_vault_cert_dir: "{{ lookup('env', 'HOME') ~ '/.config/samakia-fabric/pki' }}"
+pki_vault_ca_path: "{{ pki_vault_cert_dir }}/shared-pki-ca.crt"
+pki_vault_edge_pem: "{{ pki_vault_cert_dir }}/shared-edge.pem"
+pki_vault_edge_cn: shared-edge.infra.samakia.net
+pki_vault_edge_ip_sans: 192.168.11.120,192.168.11.121,192.168.11.122

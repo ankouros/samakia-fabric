@@ -1,0 +1,10 @@
+---
+- name: Restart vault
+  ansible.builtin.service:
+    name: vault
+    state: restarted
+
+- name: Update system CA trust store
+  ansible.builtin.command:
+    argv: ["update-ca-certificates"]
+  changed_when: true

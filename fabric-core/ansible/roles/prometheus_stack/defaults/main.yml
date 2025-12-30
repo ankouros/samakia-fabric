@@ -1,0 +1,4 @@
+---
+prometheus_stack_scrape_interval: 15s
+prometheus_stack_alertmanager_targets:
+  - localhost:9093

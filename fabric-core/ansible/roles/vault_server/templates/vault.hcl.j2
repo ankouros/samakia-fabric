@@ -1,0 +1,27 @@
+# Managed by Samakia Fabric (vault_server). Do not edit manually.
+
+ui = true
+disable_mlock = true
+
+listener "tcp" {
+  address       = "0.0.0.0:8200"
+  tls_cert_file = "{{ vault_server_cert_dest }}"
+  tls_key_file  = "{{ vault_server_key_dest }}"
+}
+
+storage "raft" {
+  path    = "{{ vault_server_data_dir }}"
+  node_id = "{{ vault_server_node_id }}"
+{% for peer in vault_server_retry_join_list %}
+  retry_join {
+    leader_api_addr = "{{ peer }}"
+    leader_ca_cert_file = "{{ vault_server_ca_dest }}"
+  }
+{% endfor %}
+}
+
+api_addr     = "{{ vault_server_api_addr }}"
+cluster_addr = "{{ vault_server_cluster_addr }}"
+
+# Allow issuing certs via API (internal PKI)
+raw_storage_endpoint = true

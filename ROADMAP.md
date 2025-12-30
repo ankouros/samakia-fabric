@@ -110,6 +110,26 @@ Outcome:
 
 ---
 
+## Phase 2.1 — Shared Control Plane Services
+
+Goal: Provide internal time, PKI, secrets, and observability as reusable primitives.
+
+### Completed (canonical)
+- Shared services SDN plane (VLAN120, `zshared`/`vshared`, subnet `10.10.120.0/24`, GW VIP `10.10.120.1`)
+- Shared edge VIPs on LAN:
+  - NTP: `192.168.11.120` (UDP/123)
+  - Vault: `192.168.11.121` (TLS/8200)
+  - Observability: `192.168.11.122` (TLS/3000, 9090, 9093, 3100)
+- Internal time authority (chrony servers) + client policy
+- Vault HA (raft) with bootstrap CA + Vault PKI issuance for shared services
+- Observability substrate (Prometheus, Alertmanager, Loki, Grafana)
+- Read-only acceptance gates + one-command deployment (`make shared.up` / `make shared.accept`)
+
+Outcome:
+- Shared control-plane services are deterministic, TLS-validated, and ready for reuse
+
+---
+
 ## Phase 3 — High Availability & Resilience
 
 Goal: Enable resilient, multi-node deployments with realistic failure semantics.

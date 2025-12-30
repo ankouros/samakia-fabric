@@ -431,6 +431,7 @@ tf.apply: ## Terraform apply for ENV
 			if [[ "$(CI)" = "1" ]]; then auto_approve="-auto-approve"; fi; \
 			terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
 			terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $$auto_approve $(TF_APPLY_FLAGS); \
+			terraform -chdir="$(TERRAFORM_ENV_DIR)" output -json > "$(TERRAFORM_ENV_DIR)/terraform-output.json"; \
 		'
 
 ###############################################################################
@@ -749,6 +750,14 @@ phase2.accept: ## Run Phase 2 acceptance suite (read-only; DNS + MinIO planes)
 		$(MAKE) minio.quorum.guard ENV=samakia-minio; \
 		$(MAKE) minio.backend.smoke ENV=samakia-minio; \
 	'
+
+.PHONY: phase2.1.entry.check
+phase2.1.entry.check: ## Phase 2.1 entry checklist (writes acceptance/PHASE2_1_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase2-1-entry-check.sh"
+
+.PHONY: phase2.1.accept
+phase2.1.accept: ## Run Phase 2.1 acceptance suite (read-only; shared control-plane services)
+	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase2-1-accept.sh"
 
 .PHONY: phase0.accept
 phase0.accept: ## Run Phase 0 acceptance suite (static checks; no infra mutations)
@@ -1117,6 +1126,102 @@ dns.up: ## One-command DNS deployment (tf apply -> bootstrap -> dns -> acceptanc
 		fi; \
 		$(MAKE) dns.ansible.apply; \
 		$(MAKE) dns.accept; \
+	'
+
+###############################################################################
+# Shared control-plane services (Phase 2.1)
+###############################################################################
+
+.PHONY: shared.ansible.apply
+shared.ansible.apply: ## Shared services Ansible apply (shared.yml orchestrator)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@test -d "$(ANSIBLE_DIR)" || (echo "ERROR: ANSIBLE_DIR not found: $(ANSIBLE_DIR)"; exit 1)
+	@command -v ansible-playbook >/dev/null 2>&1 || (echo "ERROR: ansible-playbook not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		extra_vars=""; \
+		if [[ "${VAULT_FORCE_REINIT:-}" = "1" ]]; then extra_vars="--extra-vars vault_server_force_reinit=true"; fi; \
+		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
+			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/shared.yml" -u "$(ANSIBLE_USER)" $$extra_vars $(ANSIBLE_FLAGS); \
+	'
+
+.PHONY: shared.sdn.accept
+shared.sdn.accept: ## Shared SDN acceptance (shared plane validation; read-only)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		bash "$(OPS_SCRIPTS_DIR)/shared-sdn-accept.sh"; \
+	'
+
+.PHONY: shared.ntp.accept
+shared.ntp.accept: ## Shared NTP acceptance (chrony + VIP)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OPS_SCRIPTS_DIR)/shared-ntp-accept.sh"
+
+.PHONY: shared.vault.accept
+shared.vault.accept: ## Shared Vault acceptance (VIP + status)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OPS_SCRIPTS_DIR)/shared-vault-accept.sh"
+
+.PHONY: shared.pki.accept
+shared.pki.accept: ## Shared PKI acceptance (Vault PKI engine)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OPS_SCRIPTS_DIR)/shared-pki-accept.sh"
+
+.PHONY: shared.obs.accept
+shared.obs.accept: ## Shared observability acceptance (Grafana/Prometheus/Alertmanager/Loki)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OPS_SCRIPTS_DIR)/shared-obs-accept.sh"
+
+.PHONY: shared.accept
+shared.accept: ## Shared services acceptance (SDN + NTP + Vault + PKI + Observability)
+	@ENV="$(ENV)" $(MAKE) shared.sdn.accept
+	@ENV="$(ENV)" $(MAKE) shared.ntp.accept
+	@ENV="$(ENV)" $(MAKE) shared.vault.accept
+	@ENV="$(ENV)" $(MAKE) shared.pki.accept
+	@ENV="$(ENV)" $(MAKE) shared.obs.accept
+
+.PHONY: shared.up
+shared.up: ## One-command shared services deployment (tf apply -> bootstrap -> shared -> acceptance)
+	@bash -euo pipefail -c '\
+		if [[ "$(ENV)" != "samakia-shared" ]]; then echo "ERROR: set ENV=samakia-shared" >&2; exit 2; fi; \
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		if [[ "$(DRY_RUN)" = "1" ]]; then \
+			echo "DRY_RUN=1: planning only (no terraform apply, no ansible)"; \
+			$(MAKE) tf.plan ENV="$(ENV)" CI=1; \
+			exit 0; \
+		fi; \
+		bash "$(OPS_SCRIPTS_DIR)/proxmox-sdn-ensure-shared-plane.sh" --apply; \
+		$(MAKE) tf.plan ENV="$(ENV)"; \
+		$(MAKE) tf.apply ENV="$(ENV)" CI=1; \
+		bash "$(OPS_SCRIPTS_DIR)/proxmox-lxc-ensure-running.sh" "$(ENV)"; \
+		$(MAKE) inventory.check ENV="$(ENV)"; \
+		edges_need_bootstrap=0; \
+		for ip in 192.168.11.106 192.168.11.107; do \
+			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "root@$$ip" true >/dev/null 2>&1; then edges_need_bootstrap=1; fi; \
+		done; \
+		if [[ "$$edges_need_bootstrap" -eq 1 ]]; then \
+			ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit ntp-*" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		fi; \
+		jump=""; \
+		for ip in 192.168.11.106 192.168.11.107; do \
+			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "samakia@$$ip" true >/dev/null 2>&1; then jump="samakia@$$ip"; break; fi; \
+		done; \
+		if [[ -z "$$jump" ]]; then echo "ERROR: cannot reach any shared edge as samakia (192.168.11.106/107); bootstrap cannot proceed" >&2; exit 1; fi; \
+		vlan_need_bootstrap=0; \
+		for ip in 10.10.120.21 10.10.120.22 10.10.120.31; do \
+			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@$$ip" true >/dev/null 2>&1; then vlan_need_bootstrap=1; fi; \
+		done; \
+		if [[ "$$vlan_need_bootstrap" -eq 1 ]]; then \
+			ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit vault-1,vault-2,obs-1" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		fi; \
+		$(MAKE) shared.ansible.apply ENV="$(ENV)"; \
+		$(MAKE) shared.accept ENV="$(ENV)"; \
 	'
 
 ###############################################################################

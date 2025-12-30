@@ -1,0 +1,71 @@
+---
+- name: Ensure /etc/apt/keyrings exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download Grafana GPG key (armored)
+  ansible.builtin.get_url:
+    url: https://apt.grafana.com/gpg.key
+    dest: /etc/apt/keyrings/grafana-archive-keyring.asc
+    mode: "0644"
+
+- name: Dearmor Grafana GPG key
+  ansible.builtin.command:
+    argv:
+      - gpg
+      - --dearmor
+      - --yes
+      - --output
+      - /etc/apt/keyrings/grafana-archive-keyring.gpg
+      - /etc/apt/keyrings/grafana-archive-keyring.asc
+    creates: /etc/apt/keyrings/grafana-archive-keyring.gpg
+
+- name: Configure Grafana APT repo
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/grafana.list
+    content: "deb [signed-by=/etc/apt/keyrings/grafana-archive-keyring.gpg] https://apt.grafana.com stable main\n"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure Loki and Promtail are installed
+  ansible.builtin.apt:
+    name:
+      - loki
+      - promtail
+    state: present
+    update_cache: true
+
+- name: Install Loki configuration
+  ansible.builtin.template:
+    src: loki-config.yml.j2
+    dest: /etc/loki/config.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart loki
+
+- name: Install Promtail configuration
+  ansible.builtin.template:
+    src: promtail-config.yml.j2
+    dest: /etc/promtail/config.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart promtail
+
+- name: Ensure Loki is enabled and started
+  ansible.builtin.service:
+    name: loki
+    enabled: true
+    state: started
+
+- name: Ensure Promtail is enabled and started
+  ansible.builtin.service:
+    name: promtail
+    enabled: true
+    state: started

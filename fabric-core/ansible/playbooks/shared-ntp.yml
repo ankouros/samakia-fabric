@@ -1,0 +1,7 @@
+---
+- name: Shared edge NTP servers + gateway
+  hosts: ntp-*
+  become: true
+  roles:
+    - role: ntp_chrony_server
+    - role: shared_edge_gateway

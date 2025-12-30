@@ -1,0 +1,12 @@
+---
+ntp_chrony_server_upstream_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+  - 3.pool.ntp.org
+
+ntp_chrony_server_allow_cidrs:
+  - 192.168.11.0/24
+  - 10.10.120.0/24
+
+ntp_chrony_server_local_stratum: 10

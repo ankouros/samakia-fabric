@@ -1,0 +1,10 @@
+# Managed by Samakia Fabric (ntp_chrony_client). Do not edit manually.
+
+{% for srv in ntp_chrony_client_servers %}
+server {{ srv }} iburst
+{% endfor %}
+
+makestep 1.0 3
+rtcsync
+
+logdir /var/log/chrony

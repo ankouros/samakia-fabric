@@ -1,0 +1,260 @@
+---
+- name: Resolve shared edge TLS material (controller-side)
+  ansible.builtin.set_fact:
+    shared_edge_gateway_tls_pem_src_effective: >-
+      {{
+        lookup('ansible.builtin.env', 'SHARED_EDGE_TLS_PEM_SRC')
+        | default(lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-edge.pem', true)
+      }}
+    shared_edge_gateway_backend_ca_src_effective: >-
+      {{
+        lookup('ansible.builtin.env', 'SHARED_BOOTSTRAP_CA_SRC')
+        | default(lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-bootstrap-ca.crt', true)
+      }}
+    shared_edge_gateway_backend_ca_key_effective: >-
+      {{
+        lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-bootstrap-ca.key'
+      }}
+    shared_edge_gateway_edge_key_effective: >-
+      {{
+        lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-edge.key'
+      }}
+    shared_edge_gateway_edge_csr_effective: >-
+      {{
+        lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-edge.csr'
+      }}
+    shared_edge_gateway_edge_cert_effective: >-
+      {{
+        lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-edge.crt'
+      }}
+    shared_edge_gateway_edge_ext_effective: >-
+      {{
+        lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/shared-edge.ext'
+      }}
+
+- name: Ensure local shared PKI directory exists (controller)
+  ansible.builtin.file:
+    path: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki' }}"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Bootstrap shared control-plane CA on controller (if missing)
+  ansible.builtin.command: >-
+    openssl req -x509 -new -nodes
+    -keyout "{{ shared_edge_gateway_backend_ca_key_effective }}"
+    -out "{{ shared_edge_gateway_backend_ca_src_effective }}"
+    -sha256 -days 3650
+    -subj "/CN=Samakia Shared Control Plane CA"
+  args:
+    creates: "{{ shared_edge_gateway_backend_ca_src_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Bootstrap shared-edge key (controller, if missing)
+  ansible.builtin.command:
+    argv: ["openssl", "genrsa", "-out", "{{ shared_edge_gateway_edge_key_effective }}", "2048"]
+  args:
+    creates: "{{ shared_edge_gateway_edge_key_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Bootstrap shared-edge CSR (controller, if missing)
+  ansible.builtin.command: >-
+    openssl req -new -key "{{ shared_edge_gateway_edge_key_effective }}"
+    -subj "/CN=shared-edge.infra.samakia.net"
+    -out "{{ shared_edge_gateway_edge_csr_effective }}"
+  args:
+    creates: "{{ shared_edge_gateway_edge_csr_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Render shared-edge SAN config (controller)
+  ansible.builtin.copy:
+    dest: "{{ shared_edge_gateway_edge_ext_effective }}"
+    mode: "0600"
+    content: |
+      subjectAltName={{ shared_edge_gateway_lan_vips | map('regex_replace', '^', 'IP:') | join(',') }}
+      basicConstraints=CA:FALSE
+      keyUsage=digitalSignature,keyEncipherment
+      extendedKeyUsage=serverAuth
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Bootstrap shared-edge certificate (controller, if missing)
+  ansible.builtin.command: >-
+    openssl x509 -req -in "{{ shared_edge_gateway_edge_csr_effective }}"
+    -CA "{{ shared_edge_gateway_backend_ca_src_effective }}"
+    -CAkey "{{ shared_edge_gateway_backend_ca_key_effective }}" -CAcreateserial
+    -out "{{ shared_edge_gateway_edge_cert_effective }}" -days 825 -sha256
+    -extfile "{{ shared_edge_gateway_edge_ext_effective }}"
+  args:
+    creates: "{{ shared_edge_gateway_edge_cert_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Bootstrap shared-edge pem bundle (controller, if missing)
+  ansible.builtin.shell: >-
+    cat "{{ shared_edge_gateway_edge_key_effective }}"
+    "{{ shared_edge_gateway_edge_cert_effective }}"
+    "{{ shared_edge_gateway_backend_ca_src_effective }}"
+    > "{{ shared_edge_gateway_tls_pem_src_effective }}"
+  args:
+    creates: "{{ shared_edge_gateway_tls_pem_src_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Validate backend CA source file exists on controller
+  ansible.builtin.stat:
+    path: "{{ shared_edge_gateway_backend_ca_src_effective }}"
+  delegate_to: localhost
+  become: false
+  register: shared_edge_gateway_backend_ca_src_stat
+  changed_when: false
+
+- name: Fail if backend CA source is missing (strict TLS required)
+  ansible.builtin.assert:
+    that:
+      - shared_edge_gateway_backend_ca_src_effective | length > 0
+      - shared_edge_gateway_backend_ca_src_stat.stat.exists
+    fail_msg: "Missing SHARED_BOOTSTRAP_CA_SRC (shared bootstrap CA) on controller; strict TLS requires a trusted CA for Vault backend verification."
+    quiet: true
+
+- name: Validate HAProxy TLS pem exists on controller
+  ansible.builtin.stat:
+    path: "{{ shared_edge_gateway_tls_pem_src_effective }}"
+  delegate_to: localhost
+  become: false
+  register: shared_edge_gateway_tls_pem_src_stat
+  changed_when: false
+
+- name: Fail if HAProxy TLS pem is missing
+  ansible.builtin.assert:
+    that:
+      - shared_edge_gateway_tls_pem_src_effective | length > 0
+      - shared_edge_gateway_tls_pem_src_stat.stat.exists
+    fail_msg: "Missing shared edge TLS pem on controller (set SHARED_EDGE_TLS_PEM_SRC or create ~/.config/samakia-fabric/pki/shared-edge.pem)."
+    quiet: true
+
+- name: Fail if SSH allowlist is empty
+  ansible.builtin.assert:
+    that:
+      - shared_edge_gateway_mgmt_ssh_allow_cidrs | length > 0
+    fail_msg: "shared_edge_gateway_mgmt_ssh_allow_cidrs must be set to an explicit allowlist (e.g. FABRIC_ADMIN_CIDRS)."
+    quiet: true
+
+- name: Ensure required packages are installed
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - keepalived
+      - haproxy
+      - nftables
+      - iproute2
+      - dnsutils
+    state: present
+    update_cache: true
+
+- name: Ensure HAProxy cert directory exists
+  ansible.builtin.file:
+    path: /etc/haproxy/certs
+    state: directory
+    owner: root
+    group: haproxy
+    mode: "0750"
+
+- name: Install shared control-plane CA certificate on edge (strict TLS)
+  ansible.builtin.copy:
+    src: "{{ shared_edge_gateway_backend_ca_src_effective }}"
+    dest: "{{ shared_edge_gateway_backend_ca_dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Update CA certificates
+
+- name: Install HAProxy TLS cert+key bundle (pem)
+  ansible.builtin.copy:
+    src: "{{ shared_edge_gateway_tls_pem_src_effective }}"
+    dest: "{{ shared_edge_gateway_tls_pem_dst }}"
+    owner: root
+    group: haproxy
+    mode: "0640"
+  notify: Restart haproxy
+  no_log: true
+
+- name: Enable IPv4 forwarding and non-local bind for VIP services
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/60-samakia-shared-edge.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Samakia Fabric (shared-edge). Do not edit manually.
+      net.ipv4.ip_forward = 1
+      net.ipv4.ip_nonlocal_bind = 1
+  notify: Restart nftables
+
+- name: Apply sysctl settings
+  ansible.builtin.command:
+    argv: ["sysctl", "--system"]
+  changed_when: false
+
+- name: Install HAProxy configuration
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart haproxy
+
+- name: Ensure haproxy is enabled and started
+  ansible.builtin.service:
+    name: haproxy
+    enabled: true
+    state: started
+
+- name: Install keepalived configuration
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart keepalived
+
+- name: Ensure keepalived is enabled and started
+  ansible.builtin.service:
+    name: keepalived
+    enabled: true
+    state: started
+
+- name: Install nftables ruleset
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nftables
+
+- name: Ensure nftables is enabled and started
+  ansible.builtin.service:
+    name: nftables
+    enabled: true
+    state: started

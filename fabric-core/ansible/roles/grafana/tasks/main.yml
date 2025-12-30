@@ -1,0 +1,91 @@
+---
+- name: Ensure /etc/apt/keyrings exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download Grafana GPG key (armored)
+  ansible.builtin.get_url:
+    url: https://apt.grafana.com/gpg.key
+    dest: /etc/apt/keyrings/grafana-archive-keyring.asc
+    mode: "0644"
+
+- name: Dearmor Grafana GPG key
+  ansible.builtin.command:
+    argv:
+      - gpg
+      - --dearmor
+      - --yes
+      - --output
+      - /etc/apt/keyrings/grafana-archive-keyring.gpg
+      - /etc/apt/keyrings/grafana-archive-keyring.asc
+    creates: /etc/apt/keyrings/grafana-archive-keyring.gpg
+
+- name: Configure Grafana APT repo
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/grafana.list
+    content: "deb [signed-by=/etc/apt/keyrings/grafana-archive-keyring.gpg] https://apt.grafana.com stable main\n"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure Grafana is installed
+  ansible.builtin.apt:
+    name: grafana
+    state: present
+    update_cache: true
+
+- name: Ensure Grafana local credentials dir exists (controller)
+  ansible.builtin.file:
+    path: "{{ grafana_admin_password_file | dirname }}"
+    state: directory
+    owner: "{{ lookup('env', 'USER') }}"
+    group: "{{ lookup('env', 'USER') }}"
+    mode: "0700"
+  delegate_to: localhost
+  become: true
+
+- name: Generate Grafana admin password (controller)
+  ansible.builtin.command: >-
+    python3 - <<'PY'
+    import secrets
+    import string
+    from pathlib import Path
+
+    out = Path("{{ grafana_admin_password_file }}")
+    if out.exists():
+        raise SystemExit(0)
+    alphabet = string.ascii_letters + string.digits
+    pwd = "".join(secrets.choice(alphabet) for _ in range(24))
+    out.write_text(pwd + "\n", encoding="utf-8")
+    out.chmod(0o600)
+    PY
+  delegate_to: localhost
+  become: false
+  changed_when: false
+
+- name: Read Grafana admin password (controller)
+  ansible.builtin.set_fact:
+    grafana_admin_password: "{{ lookup('file', grafana_admin_password_file) | trim }}"
+  delegate_to: localhost
+  become: false
+  no_log: true
+
+- name: Install Grafana configuration
+  ansible.builtin.template:
+    src: grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    owner: root
+    group: grafana
+    mode: "0640"
+  notify: Restart grafana
+  no_log: true
+
+- name: Ensure Grafana is enabled and started
+  ansible.builtin.service:
+    name: grafana-server
+    enabled: true
+    state: started

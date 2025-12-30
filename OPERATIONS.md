@@ -288,6 +288,53 @@ Notes:
 
 ---
 
+## Shared Control Plane Services (Phase 2.1)
+
+Shared services provide internal time, PKI, secrets, and observability as reusable primitives.
+They run on a dedicated SDN plane (VLAN120, `zshared`/`vshared`, `10.10.120.0/24`).
+
+Service endpoints (VIPs on LAN):
+- NTP: `192.168.11.120` (UDP/123)
+- Vault: `192.168.11.121` (TLS/8200)
+- Observability: `192.168.11.122` (TLS/3000, 9090, 9093, 3100)
+
+Shared edge mgmt IPs (ops-only, SSH allowlisted):
+- `ntp-1`: `192.168.11.106`
+- `ntp-2`: `192.168.11.107`
+
+One-command deployment (non-interactive):
+
+```bash
+make shared.up ENV=samakia-shared
+```
+
+Acceptance (read-only):
+
+```bash
+make shared.accept ENV=samakia-shared
+```
+
+Granular acceptance checks:
+- `make shared.sdn.accept ENV=samakia-shared`
+- `make shared.ntp.accept ENV=samakia-shared`
+- `make shared.vault.accept ENV=samakia-shared`
+- `make shared.pki.accept ENV=samakia-shared`
+- `make shared.obs.accept ENV=samakia-shared`
+
+Local credentials and CA material (runner-only, never committed):
+- Vault init + root token: `~/.config/samakia-fabric/vault/init.json` and `~/.config/samakia-fabric/vault/root-token`
+- Shared bootstrap CA (Vault TLS): `~/.config/samakia-fabric/pki/shared-bootstrap-ca.crt`
+- Shared PKI CA (Vault PKI): `~/.config/samakia-fabric/pki/shared-pki-ca.crt`
+- Shared edge VIP TLS pem: `~/.config/samakia-fabric/pki/shared-edge.pem`
+- Grafana admin password: `~/.config/samakia-fabric/grafana/admin-password`
+
+Notes:
+- VIPs are the only service endpoints; shared-edge mgmt IPs are ops-only.
+- SSH allowlist for shared edges is controlled via `FABRIC_ADMIN_CIDRS` (comma-separated CIDRs).
+- No DNS dependency for bootstrap or acceptance (use VIP IPs).
+
+---
+
 ## Golden Image Operations (Packer)
 
 ### When to Build a New Image

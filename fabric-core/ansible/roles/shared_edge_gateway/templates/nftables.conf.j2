@@ -1,0 +1,56 @@
+#!/usr/sbin/nft -f
+
+# Managed by Samakia Fabric (shared_edge_gateway). Do not edit manually.
+
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+
+    iif "lo" accept
+    ct state established,related accept
+
+{% for cidr in shared_edge_gateway_mgmt_ssh_allow_cidrs %}
+    ip saddr {{ cidr }} tcp dport 22 accept
+{% endfor %}
+
+    # VRRP (unicast) between peers on both interfaces.
+    ip protocol vrrp ip saddr { {{ shared_edge_gateway_lan_ip }}, {{ shared_edge_gateway_peer_lan_ip }}, {{ shared_edge_gateway_vlan_ip }}, {{ shared_edge_gateway_peer_vlan_ip }} } accept
+
+    # NTP service on LAN VIP.
+    ip daddr {{ shared_edge_gateway_ntp_vip }} udp dport 123 accept
+
+    # Vault + observability VIPs (LAN).
+    ip daddr {{ shared_edge_gateway_vault_vip }} tcp dport {{ shared_edge_gateway_vault_port }} accept
+    ip daddr {{ shared_edge_gateway_obs_vip }} tcp dport {{ shared_edge_gateway_grafana_port }} accept
+    ip daddr {{ shared_edge_gateway_obs_vip }} tcp dport {{ shared_edge_gateway_prometheus_port }} accept
+    ip daddr {{ shared_edge_gateway_obs_vip }} tcp dport {{ shared_edge_gateway_alertmanager_port }} accept
+    ip daddr {{ shared_edge_gateway_obs_vip }} tcp dport {{ shared_edge_gateway_loki_port }} accept
+  }
+
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+
+    ct state established,related accept
+
+    # VLAN120 egress NAT to LAN uplink.
+    iif "{{ shared_edge_gateway_vlan_iface }}" oif "{{ shared_edge_gateway_lan_iface }}" ip saddr {{ shared_edge_gateway_vlan_cidr }} accept
+  }
+
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}
+
+table ip nat {
+  chain postrouting {
+    type nat hook postrouting priority 100;
+    policy accept;
+
+    oif "{{ shared_edge_gateway_lan_iface }}" ip saddr {{ shared_edge_gateway_vlan_cidr }} masquerade
+  }
+}

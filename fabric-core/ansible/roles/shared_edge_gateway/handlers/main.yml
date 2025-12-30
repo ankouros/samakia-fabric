@@ -1,0 +1,20 @@
+---
+- name: Update CA certificates
+  ansible.builtin.command:
+    argv: ["update-ca-certificates"]
+  changed_when: false
+
+- name: Restart haproxy
+  ansible.builtin.service:
+    name: haproxy
+    state: restarted
+
+- name: Restart keepalived
+  ansible.builtin.service:
+    name: keepalived
+    state: restarted
+
+- name: Restart nftables
+  ansible.builtin.service:
+    name: nftables
+    state: restarted

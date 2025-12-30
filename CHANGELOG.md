@@ -46,6 +46,15 @@ The format is inspired by:
   - Ansible playbooks: `fabric-core/ansible/playbooks/dns.yml`, `fabric-core/ansible/playbooks/dns-edge.yml`, `fabric-core/ansible/playbooks/dns-auth.yml`
   - Ansible roles: `fabric-core/ansible/roles/dns_edge_gateway`, `fabric-core/ansible/roles/dns_auth_powerdns`
   - One-command automation: `make dns.up` + acceptance `make dns.accept` (`ops/scripts/dns-accept.sh`)
+#### Shared control-plane services (Phase 2.1)
+- Shared services SDN plane (VLAN120, `zshared`/`vshared`, subnet `10.10.120.0/24`, GW VIP `10.10.120.1`)
+- Terraform env: `fabric-core/terraform/envs/samakia-shared/` (NTP edges, Vault HA, observability node)
+- Ansible playbooks: `fabric-core/ansible/playbooks/shared.yml`, `shared-ntp.yml`, `shared-secrets.yml`, `shared-pki.yml`, `shared-observability.yml`
+- Ansible roles: `ntp_chrony_server`, `ntp_chrony_client`, `shared_edge_gateway`, `vault_server`, `pki_vault`, `prometheus_stack`, `loki_stack`, `grafana`
+- SDN ensure script: `ops/scripts/proxmox-sdn-ensure-shared-plane.sh` (token-only, strict TLS, apply on change)
+- Acceptance scripts: `shared-sdn-accept.sh`, `shared-ntp-accept.sh`, `shared-vault-accept.sh`, `shared-pki-accept.sh`, `shared-obs-accept.sh`
+- Orchestration targets: `make shared.up`, `make shared.accept`, and `make phase2.1.accept`
+- Phase 2.1 entry checklist: `acceptance/PHASE2_1_ENTRY_CHECKLIST.md`
 - Phase 1 operational hardening (remote state + runner bootstrapping + CI-safe orchestration)
 - Remote Terraform backend initialization for MinIO/S3 with lockfiles (`ops/scripts/tf-backend-init.sh`; no DynamoDB; strict TLS)
 - Runner host env management (`ops/scripts/runner-env-install.sh`, `ops/scripts/runner-env-check.sh`) with canonical env file `~/.config/samakia-fabric/env.sh` (chmod 600; presence-only output)

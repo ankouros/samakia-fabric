@@ -1,0 +1,42 @@
+---
+- name: Observability stack (Prometheus + Loki + Grafana)
+  hosts: obs-*
+  become: true
+  pre_tasks:
+    - name: Ensure /etc/apt/keyrings exists (Grafana repo)
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Download Grafana GPG key (armored)
+      ansible.builtin.get_url:
+        url: https://apt.grafana.com/gpg.key
+        dest: /etc/apt/keyrings/grafana-archive-keyring.asc
+        mode: "0644"
+
+    - name: Dearmor Grafana GPG key
+      ansible.builtin.command:
+        argv:
+          - gpg
+          - --dearmor
+          - --yes
+          - --output
+          - /etc/apt/keyrings/grafana-archive-keyring.gpg
+          - /etc/apt/keyrings/grafana-archive-keyring.asc
+        creates: /etc/apt/keyrings/grafana-archive-keyring.gpg
+
+    - name: Configure Grafana APT repo
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/grafana.list
+        content: "deb [signed-by=/etc/apt/keyrings/grafana-archive-keyring.gpg] https://apt.grafana.com stable main\n"
+        owner: root
+        group: root
+        mode: "0644"
+  roles:
+    - role: ntp_chrony_client
+    - role: prometheus_stack
+    - role: loki_stack
+    - role: grafana

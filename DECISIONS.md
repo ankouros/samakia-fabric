@@ -550,6 +550,51 @@ Operational contract (canonical):
 - Prevents the expected bootstrap failure: “Backend initialization required”.
 - Keeps the bootstrap deterministic and CI-safe without introducing manual steps or insecure flags.
 
+## ADR-0018 — Shared Control Plane Services (Phase 2.1) and VLAN120 Plane
+
+**Status:** Accepted
+**Date:** 2025-12-31
+
+### Decision
+
+Samakia Fabric introduces a **shared control-plane services plane** that provides
+time, PKI, secrets, and observability as reusable primitives. This plane is
+implemented as a dedicated SDN VLAN with explicit VIP endpoints.
+
+Canonical SDN plane:
+- Zone: `zshared`
+- VNet: `vshared`
+- VLAN: `120`
+- Subnet: `10.10.120.0/24`
+- Gateway VIP: `10.10.120.1` (VRRP on shared edges)
+
+Service endpoints (VIPs on LAN, VIP-only policy):
+- NTP VIP: `192.168.11.120` (UDP/123)
+- Vault VIP: `192.168.11.121` (TCP/8200)
+- Observability VIP: `192.168.11.122` (TCP/3000, 9090, 9093, 3100)
+
+Shared edges (ops-only LAN mgmt IPs; not service endpoints):
+- `ntp-1`: `192.168.11.106`
+- `ntp-2`: `192.168.11.107`
+
+PKI decision:
+- **Vault PKI** is the authoritative internal CA for shared services (step-ca not used).
+- A **bootstrap CA** is generated for Vault TLS on first install, and Vault PKI
+  issues the shared edge VIP certificate after Vault is initialized.
+
+### Rationale
+
+- Separates core control-plane services from application planes.
+- Ensures deterministic networking and strict TLS for internal control services.
+- Provides reusable primitives (NTP, PKI, secrets, observability) without
+  introducing manual steps or DNS dependency.
+
+### Consequences
+
+- Shared services must be deployed through `samakia-shared` only.
+- LAN VIPs are the only service endpoints; shared-edge LAN IPs are ops-only.
+- Shared edge HAProxy must terminate TLS using Vault PKI-issued certs.
+
 
 
 

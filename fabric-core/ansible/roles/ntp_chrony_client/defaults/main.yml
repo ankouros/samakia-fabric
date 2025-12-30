@@ -1,0 +1,4 @@
+---
+ntp_chrony_client_servers:
+  - 10.10.120.1
+  - 192.168.11.120

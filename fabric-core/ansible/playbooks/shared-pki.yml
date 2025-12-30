@@ -1,0 +1,8 @@
+---
+- name: Vault PKI configuration (primary)
+  hosts: vault-1
+  become: true
+  vars:
+    pki_vault_api_addr: "{{ vault_server_api_addr }}"
+  roles:
+    - role: pki_vault

@@ -1,0 +1,73 @@
+# Managed by Samakia Fabric (shared_edge_gateway). Do not edit manually.
+
+global
+  log /dev/log local0
+  maxconn 4096
+  user haproxy
+  group haproxy
+  daemon
+
+defaults
+  log     global
+  mode    http
+  option  httplog
+  option  dontlognull
+  timeout connect 5s
+  timeout client  60s
+  timeout server  60s
+
+frontend vault_tls
+  bind {{ shared_edge_gateway_vault_vip }}:{{ shared_edge_gateway_vault_port }} ssl crt {{ shared_edge_gateway_tls_pem_dst }}
+  mode http
+  default_backend vault_backend
+
+backend vault_backend
+  mode http
+  option httpchk GET /v1/sys/health
+{% for ip in shared_edge_gateway_vault_backends %}
+  server vault_{{ loop.index }} {{ ip }}:{{ shared_edge_gateway_vault_port }} ssl verify required ca-file {{ shared_edge_gateway_backend_ca_dest }} check
+{% endfor %}
+
+frontend grafana_tls
+  bind {{ shared_edge_gateway_obs_vip }}:{{ shared_edge_gateway_grafana_port }} ssl crt {{ shared_edge_gateway_tls_pem_dst }}
+  mode http
+  default_backend grafana_backend
+
+backend grafana_backend
+  mode http
+{% for ip in shared_edge_gateway_obs_backends %}
+  server grafana_{{ loop.index }} {{ ip }}:{{ shared_edge_gateway_grafana_port }} check
+{% endfor %}
+
+frontend prometheus_tls
+  bind {{ shared_edge_gateway_obs_vip }}:{{ shared_edge_gateway_prometheus_port }} ssl crt {{ shared_edge_gateway_tls_pem_dst }}
+  mode http
+  default_backend prometheus_backend
+
+backend prometheus_backend
+  mode http
+{% for ip in shared_edge_gateway_obs_backends %}
+  server prometheus_{{ loop.index }} {{ ip }}:{{ shared_edge_gateway_prometheus_port }} check
+{% endfor %}
+
+frontend alertmanager_tls
+  bind {{ shared_edge_gateway_obs_vip }}:{{ shared_edge_gateway_alertmanager_port }} ssl crt {{ shared_edge_gateway_tls_pem_dst }}
+  mode http
+  default_backend alertmanager_backend
+
+backend alertmanager_backend
+  mode http
+{% for ip in shared_edge_gateway_obs_backends %}
+  server alertmanager_{{ loop.index }} {{ ip }}:{{ shared_edge_gateway_alertmanager_port }} check
+{% endfor %}
+
+frontend loki_tls
+  bind {{ shared_edge_gateway_obs_vip }}:{{ shared_edge_gateway_loki_port }} ssl crt {{ shared_edge_gateway_tls_pem_dst }}
+  mode http
+  default_backend loki_backend
+
+backend loki_backend
+  mode http
+{% for ip in shared_edge_gateway_obs_backends %}
+  server loki_{{ loop.index }} {{ ip }}:{{ shared_edge_gateway_loki_port }} check
+{% endfor %}

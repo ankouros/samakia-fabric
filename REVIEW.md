@@ -282,6 +282,7 @@ Samakia Fabric είναι πλέον ένα production-grade IaaS substrate γι
 - Break-glass / recovery runbooks: SSH lockout, firewall lockout, sshd repair, key restore via console, safe rerun rules (bootstrap vs harden).
 - Pre-release readiness audit framework: Go/No-Go gate, acceptance criteria, signable readiness packet scaffolding.
 - Legal hold/retention automation: label-only packs independent from evidence manifests, dual-control markers, release workflow.
+- Shared control-plane services: deterministic SDN plane + VIP endpoints (NTP/Vault/observability) with read-only acceptance gates.
 
 **Operational sharp edges**
 - DHCP determinism: σε in-place replace αλλάζει MAC → αλλάζει IP. Αυτό απαιτεί:

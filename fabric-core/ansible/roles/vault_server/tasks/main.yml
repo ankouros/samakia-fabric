@@ -1,0 +1,471 @@
+---
+- name: Ensure local vault directory exists (controller)
+  ansible.builtin.file:
+    path: "{{ vault_server_local_dir }}"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Normalize retry_join list (string input)
+  ansible.builtin.set_fact:
+    vault_server_retry_join_list: "{{ (vault_server_retry_join | regex_replace('\\s+', '')) | split(',') }}"
+  changed_when: false
+  when:
+    - vault_server_retry_join is string
+    - vault_server_retry_join | trim != ''
+
+- name: Normalize retry_join list (string input empty)
+  ansible.builtin.set_fact:
+    vault_server_retry_join_list: []
+  changed_when: false
+  when:
+    - vault_server_retry_join is string
+    - vault_server_retry_join | trim == ''
+
+- name: Normalize retry_join list (list input)
+  ansible.builtin.set_fact:
+    vault_server_retry_join_list: "{{ vault_server_retry_join | default([]) }}"
+  changed_when: false
+  when: vault_server_retry_join is not string
+
+- name: Remove stale HashiCorp repo list (if present)
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/hashicorp.list
+    state: absent
+
+- name: Remove legacy HashiCorp keyring (if present)
+  ansible.builtin.file:
+    path: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    state: absent
+
+- name: Ensure HashiCorp repo prerequisites are installed
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - gnupg
+    state: present
+    update_cache: true
+
+- name: Download HashiCorp repo key (armored)
+  ansible.builtin.get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /tmp/hashicorp-archive-keyring.gpg
+    mode: "0644"
+
+- name: Ensure /etc/apt/keyrings exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Dearmor HashiCorp repo key
+  ansible.builtin.command:
+    argv:
+      - gpg
+      - --dearmor
+      - -o
+      - /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+      - /tmp/hashicorp-archive-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+
+- name: Ensure HashiCorp keyring permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+    mode: "0644"
+
+- name: Ensure HashiCorp repo is configured
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+    state: present
+    filename: hashicorp
+
+- name: Ensure Vault is installed
+  ansible.builtin.apt:
+    name: vault
+    state: present
+    update_cache: true
+
+- name: Ensure Vault TLS directory exists
+  ansible.builtin.file:
+    path: "{{ vault_server_tls_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure Vault data directory exists
+  ansible.builtin.file:
+    path: "{{ vault_server_data_dir }}"
+    state: directory
+    owner: "{{ vault_server_user }}"
+    group: "{{ vault_server_group }}"
+    mode: "0750"
+
+- name: Generate shared control-plane CA (controller)
+  ansible.builtin.command: >-
+    openssl req -x509 -new -nodes
+    -keyout "{{ vault_server_ca_key_src }}"
+    -out "{{ vault_server_ca_src }}"
+    -sha256 -days 3650
+    -subj "/CN=Samakia Shared Control Plane CA"
+  args:
+    creates: "{{ vault_server_ca_src }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Generate Vault TLS key (controller)
+  ansible.builtin.command: >-
+    openssl genrsa -out "{{ vault_server_key_src }}" 2048
+  args:
+    creates: "{{ vault_server_key_src }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Generate Vault CSR (controller)
+  ansible.builtin.command: >-
+    openssl req -new -key "{{ vault_server_key_src }}"
+    -subj "/CN=vault.shared.samakia" -out "{{ vault_server_key_src }}.csr"
+  args:
+    creates: "{{ vault_server_key_src }}.csr"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Render Vault TLS SAN config (controller)
+  ansible.builtin.copy:
+    dest: "{{ vault_server_key_src }}.ext"
+    mode: "0600"
+    content: |
+      subjectAltName=IP:192.168.11.121,IP:10.10.120.21,IP:10.10.120.22
+      basicConstraints=CA:FALSE
+      keyUsage=digitalSignature,keyEncipherment
+      extendedKeyUsage=serverAuth
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Sign Vault TLS certificate (controller)
+  ansible.builtin.command: >-
+    openssl x509 -req -in "{{ vault_server_key_src }}.csr"
+    -CA "{{ vault_server_ca_src }}" -CAkey "{{ vault_server_ca_key_src }}" -CAcreateserial
+    -out "{{ vault_server_cert_src }}" -days 825 -sha256
+    -extfile "{{ vault_server_key_src }}.ext"
+  args:
+    creates: "{{ vault_server_cert_src }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Install shared CA on vault node
+  ansible.builtin.copy:
+    src: "{{ vault_server_ca_src }}"
+    dest: "{{ vault_server_ca_dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install shared CA into system trust
+  ansible.builtin.copy:
+    src: "{{ vault_server_ca_src }}"
+    dest: /usr/local/share/ca-certificates/samakia-shared-bootstrap-ca.crt
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Update system CA trust store
+
+- name: Install Vault TLS cert on node
+  ansible.builtin.copy:
+    src: "{{ vault_server_cert_src }}"
+    dest: "{{ vault_server_cert_dest }}"
+    owner: "{{ vault_server_user }}"
+    group: "{{ vault_server_group }}"
+    mode: "0644"
+  no_log: true
+
+- name: Install Vault TLS key on node
+  ansible.builtin.copy:
+    src: "{{ vault_server_key_src }}"
+    dest: "{{ vault_server_key_dest }}"
+    owner: "{{ vault_server_user }}"
+    group: "{{ vault_server_group }}"
+    mode: "0640"
+  no_log: true
+
+- name: Install Vault configuration
+  ansible.builtin.template:
+    src: vault.hcl.j2
+    dest: "{{ vault_server_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart vault
+
+- name: Ensure vault is enabled and started
+  ansible.builtin.service:
+    name: vault
+    enabled: true
+    state: started
+
+- name: Apply vault config changes before status checks
+  ansible.builtin.meta: flush_handlers
+
+- name: Read vault status (best-effort)
+  ansible.builtin.command:
+    argv: ["vault", "status", "-format=json"]
+  environment:
+    VAULT_ADDR: "{{ vault_server_api_addr }}"
+    VAULT_CACERT: "{{ vault_server_ca_dest }}"
+  register: vault_server_status_raw
+  failed_when: false
+  changed_when: false
+
+- name: Parse vault status
+  ansible.builtin.set_fact:
+    vault_server_status: "{{ (vault_server_status_raw.stdout | default('{}')) | from_json }}"
+  failed_when: false
+
+- name: Initialize vault on primary (if needed)
+  ansible.builtin.command:
+    argv: ["vault", "operator", "init", "-format=json"]
+  environment:
+    VAULT_ADDR: "{{ vault_server_api_addr }}"
+    VAULT_CACERT: "{{ vault_server_ca_dest }}"
+  register: vault_server_init
+  changed_when: true
+  no_log: true
+  when:
+    - inventory_hostname == 'vault-1'
+    - vault_server_status.initialized is defined
+    - not vault_server_status.initialized
+
+- name: Persist vault init material locally (controller)
+  ansible.builtin.copy:
+    dest: "{{ vault_server_init_file }}"
+    content: "{{ vault_server_init.stdout }}"
+    mode: "0600"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  when:
+    - vault_server_init is defined
+    - vault_server_init.stdout is defined
+  no_log: true
+
+- name: Persist vault root token locally (controller)
+  ansible.builtin.copy:
+    dest: "{{ vault_server_root_token_file }}"
+    content: "{{ (vault_server_init.stdout | from_json).root_token }}"
+    mode: "0600"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  when:
+    - vault_server_init is defined
+    - vault_server_init.stdout is defined
+  no_log: true
+
+- name: Check for vault init material on controller
+  ansible.builtin.stat:
+    path: "{{ vault_server_init_file }}"
+  delegate_to: localhost
+  become: false
+  register: vault_server_init_file_stat
+  changed_when: false
+
+- name: Record vault init material presence (controller)
+  ansible.builtin.set_fact:
+    vault_server_init_exists: "{{ vault_server_init_file_stat.stat.exists | default(false) }}"
+  delegate_to: localhost
+  become: false
+  changed_when: false
+
+- name: Force reinit when init material is missing (destructive; opt-in)
+  when:
+    - vault_server_force_reinit | bool
+    - not vault_server_init_exists
+  block:
+    - name: Stop vault service (force reinit)
+      ansible.builtin.service:
+        name: vault
+        state: stopped
+
+    - name: Remove Vault data directory (force reinit)
+      ansible.builtin.file:
+        path: "{{ vault_server_data_dir }}"
+        state: absent
+
+    - name: Recreate Vault data directory (force reinit)
+      ansible.builtin.file:
+        path: "{{ vault_server_data_dir }}"
+        state: directory
+        owner: "{{ vault_server_user }}"
+        group: "{{ vault_server_group }}"
+        mode: "0750"
+
+    - name: Start vault service (force reinit)
+      ansible.builtin.service:
+        name: vault
+        enabled: true
+        state: started
+
+    - name: Reinitialize vault on primary (force reinit)
+      ansible.builtin.command:
+        argv: ["vault", "operator", "init", "-format=json"]
+      environment:
+        VAULT_ADDR: "{{ vault_server_api_addr }}"
+        VAULT_CACERT: "{{ vault_server_ca_dest }}"
+      register: vault_server_reinit
+      changed_when: true
+      no_log: true
+      when: inventory_hostname == 'vault-1'
+
+    - name: Persist vault init material locally (controller, force reinit)
+      ansible.builtin.copy:
+        dest: "{{ vault_server_init_file }}"
+        content: "{{ vault_server_reinit.stdout }}"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      run_once: true
+      when:
+        - vault_server_reinit is defined
+        - vault_server_reinit.stdout is defined
+      no_log: true
+
+    - name: Persist vault root token locally (controller, force reinit)
+      ansible.builtin.copy:
+        dest: "{{ vault_server_root_token_file }}"
+        content: "{{ (vault_server_reinit.stdout | from_json).root_token }}"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      run_once: true
+      when:
+        - vault_server_reinit is defined
+        - vault_server_reinit.stdout is defined
+      no_log: true
+
+    - name: Re-check vault init material on controller (force reinit)
+      ansible.builtin.stat:
+        path: "{{ vault_server_init_file }}"
+      delegate_to: localhost
+      become: false
+      register: vault_server_init_file_stat_reinit
+      changed_when: false
+
+    - name: Update init material presence flag (force reinit)
+      ansible.builtin.set_fact:
+        vault_server_init_exists: "{{ vault_server_init_file_stat_reinit.stat.exists | default(false) }}"
+      delegate_to: localhost
+      become: false
+      changed_when: false
+
+- name: Use reinit stat result when present
+  ansible.builtin.set_fact:
+    vault_server_init_file_stat: "{{ vault_server_init_file_stat_reinit }}"
+  when: vault_server_init_file_stat_reinit is defined
+  changed_when: false
+
+- name: Fail if vault init material is missing on controller
+  ansible.builtin.assert:
+    that:
+      - vault_server_init_exists | default(false)
+    fail_msg: "Vault init material missing on controller ({{ vault_server_init_file }}). Restore init.json or rebootstrap Vault if appropriate."
+    quiet: true
+  delegate_to: localhost
+  become: false
+
+- name: Read vault init material from controller
+  ansible.builtin.set_fact:
+    vault_server_init_material: "{{ lookup('file', vault_server_init_file) | from_json }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Refresh vault status (post-init)
+  ansible.builtin.command:
+    argv: ["vault", "status", "-format=json"]
+  environment:
+    VAULT_ADDR: "{{ vault_server_api_addr }}"
+    VAULT_CACERT: "{{ vault_server_ca_dest }}"
+  register: vault_server_status_fresh_raw
+  changed_when: false
+  failed_when: false
+  no_log: true
+
+- name: Parse vault status (post-init)
+  ansible.builtin.set_fact:
+    vault_server_status_fresh: "{{ (vault_server_status_fresh_raw.stdout | default('{}', true)) | from_json }}"
+  changed_when: false
+
+- name: Unseal vault primary (vault-1)
+  ansible.builtin.command:
+    argv: ["vault", "operator", "unseal", "{{ item }}"]
+  environment:
+    VAULT_ADDR: "{{ vault_server_api_addr }}"
+    VAULT_CACERT: "{{ vault_server_ca_dest }}"
+  loop: "{{ vault_server_init_material.unseal_keys_b64[0:3] }}"
+  no_log: true
+  when:
+    - inventory_hostname == 'vault-1'
+    - vault_server_init_material is defined
+    - vault_server_status_fresh.sealed | default(true)
+  changed_when: true
+
+- name: Unseal vault secondary (vault-2)
+  ansible.builtin.command:
+    argv: ["vault", "operator", "unseal", "{{ item }}"]
+  environment:
+    VAULT_ADDR: "{{ vault_server_api_addr }}"
+    VAULT_CACERT: "{{ vault_server_ca_dest }}"
+  loop: "{{ vault_server_init_material.unseal_keys_b64[0:3] }}"
+  no_log: true
+  when:
+    - inventory_hostname == 'vault-2'
+    - vault_server_init_material is defined
+    - vault_server_status_fresh.sealed | default(true)
+  changed_when: true
+
+- name: Read raft peers (vault-2, best-effort)
+  ansible.builtin.command:
+    argv: ["vault", "operator", "raft", "list-peers", "-format=json"]
+  environment:
+    VAULT_ADDR: "{{ vault_server_api_addr }}"
+    VAULT_CACERT: "{{ vault_server_ca_dest }}"
+    VAULT_TOKEN: "{{ lookup('file', vault_server_root_token_file) }}"
+  register: vault_server_peers_raw
+  changed_when: false
+  failed_when: false
+  when: inventory_hostname == 'vault-2'
+  no_log: true
+
+- name: Parse raft peers (vault-2)
+  ansible.builtin.set_fact:
+    vault_server_peer_ids: "{{ (vault_server_peers_raw.stdout | default('{}', true)) | from_json | json_query('data[*].node_id') }}"
+  when: inventory_hostname == 'vault-2'
+  failed_when: false
+
+- name: Join raft cluster (vault-2)
+  ansible.builtin.command:
+    argv: ["vault", "operator", "raft", "join", "{{ vault_server_retry_join_list[0] }}"]
+  environment:
+    VAULT_ADDR: "{{ vault_server_api_addr }}"
+    VAULT_CACERT: "{{ vault_server_ca_dest }}"
+    VAULT_TOKEN: "{{ lookup('file', vault_server_root_token_file) }}"
+  when:
+    - inventory_hostname == 'vault-2'
+    - vault_server_retry_join_list | length > 0
+    - vault_server_peer_ids is not defined or vault_server_node_id not in vault_server_peer_ids
+  changed_when: true
+  no_log: true

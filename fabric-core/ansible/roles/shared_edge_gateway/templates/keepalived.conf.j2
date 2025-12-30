@@ -1,0 +1,42 @@
+! Managed by Samakia Fabric (shared_edge_gateway). Do not edit manually.
+
+global_defs {
+  enable_script_security
+  router_id {{ inventory_hostname }}
+}
+
+vrrp_instance VI_LAN_SHARED {
+  state {{ 'MASTER' if (shared_edge_gateway_role | default('backup')) == 'master' else 'BACKUP' }}
+  interface {{ shared_edge_gateway_lan_iface }}
+  virtual_router_id 31
+  priority {{ shared_edge_gateway_priority | default(100) }}
+  advert_int 1
+
+  unicast_src_ip {{ shared_edge_gateway_lan_ip }}
+  unicast_peer {
+    {{ shared_edge_gateway_peer_lan_ip }}
+  }
+
+  virtual_ipaddress {
+{% for vip in shared_edge_gateway_lan_vips %}
+    {{ vip }}/24 dev {{ shared_edge_gateway_lan_iface }}
+{% endfor %}
+  }
+}
+
+vrrp_instance VI_VLAN_GW_SHARED {
+  state {{ 'MASTER' if (shared_edge_gateway_role | default('backup')) == 'master' else 'BACKUP' }}
+  interface {{ shared_edge_gateway_vlan_iface }}
+  virtual_router_id 32
+  priority {{ shared_edge_gateway_priority | default(100) }}
+  advert_int 1
+
+  unicast_src_ip {{ shared_edge_gateway_vlan_ip }}
+  unicast_peer {
+    {{ shared_edge_gateway_peer_vlan_ip }}
+  }
+
+  virtual_ipaddress {
+    {{ shared_edge_gateway_vlan_gw_vip }}/24 dev {{ shared_edge_gateway_vlan_iface }}
+  }
+}
