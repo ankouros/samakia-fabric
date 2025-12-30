@@ -54,6 +54,9 @@ The format is inspired by:
 - Inventory sanity guardrail for DHCP/IP determinism (`ops/scripts/inventory-sanity-check.sh`) + `make inventory.check`
 - SSH trust lifecycle tools (`ops/scripts/ssh-trust-rotate.sh`, `ops/scripts/ssh-trust-verify.sh`) to support strict host key checking after replace/recreate
 - Phase 1 acceptance suite (`ops/scripts/phase1-accept.sh` + `make phase1.accept`) to validate parity, runner env, inventory parse, and non-interactive Terraform plan
+- Phase 1 acceptance marker: `acceptance/PHASE1_ACCEPTED.md` (hashed; no secrets)
+- Phase 0 acceptance suite (`ops/scripts/phase0-accept.sh` + `make phase0.accept`) for foundation guardrails
+- Phase 0 acceptance marker: `acceptance/PHASE0_ACCEPTED.md` (hashed; no secrets)
 - `OPERATIONS_LXC_LIFECYCLE.md` (replace-in-place vs blue/green runbook; DHCP/MAC determinism and SSH trust workflow)
 - Future improvements tracked in `ROADMAP.md`
 - `INCIDENT_SEVERITY_TAXONOMY.md` (S0–S4) with evidence depth + signing/dual-control/TSA requirements

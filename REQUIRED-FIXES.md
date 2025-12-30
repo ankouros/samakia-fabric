@@ -2,6 +2,35 @@
 
 This document records what was fixed, what remains blocked (if anything), and the exact verification status for the MinIO backend automation in **Samakia Fabric**.
 
+---
+
+## Phase 1 Remediation Status (from verification report)
+
+### PHASE1-TF-NONINTERACTIVE
+- **Description:** `CI=1 make tf.plan ENV=samakia-prod` failed due to interactive backend migration prompt.
+- **Impact:** Violates Phase 1 requirement for non-interactive Terraform defaults.
+- **Root cause:** Remote backend state for `samakia-prod` required migration; `terraform init -input=false` cannot prompt.
+- **Required remediation:** Migrate state to MinIO backend non-interactively.
+- **Resolution status:** **FIXED**
+- **Evidence:**
+  - `bash ops/scripts/tf-backend-init.sh samakia-prod --migrate` (completed)
+  - `CI=1 make tf.plan ENV=samakia-prod` (PASS)
+  - `ENV=samakia-prod make phase1.accept` (PASS)
+
+### PHASE1-INVENTORY-SANITY
+- **Description:** `make inventory.check` failed for `monitoring-1` (IPv4 not resolvable via Proxmox API).
+- **Impact:** Violates Phase 1 requirement for DHCP/MAC determinism + inventory sanity.
+- **Root cause:** `monitoring-1` container was deleted outside Terraform and template `v3` was missing in Proxmox storage.
+- **Required remediation:** Upload missing template and recreate `monitoring-1` via Terraform apply.
+- **Resolution status:** **FIXED**
+- **Evidence:**
+  - `make image.upload IMAGE=fabric-core/packer/lxc/ubuntu-24.04/ubuntu-24.04-lxc-rootfs-v3.tar.gz` (uploaded `v3` template)
+  - `CI=1 make tf.apply ENV=samakia-prod` (recreated CT 1100)
+  - `make inventory.check ENV=samakia-prod` (PASS with warning)
+  - `ENV=samakia-prod make phase1.accept` (PASS)
+
+---
+
 ## Fixed
 
 - **Proxmox SDN planes are applied after creation (required for immediate use)**

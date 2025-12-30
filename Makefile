@@ -735,6 +735,10 @@ ops.bluegreen.plan: ## Runbook pointer: blue/green CT replacement (no auto-apply
 phase1.accept: ## Run Phase 1 acceptance suite (ENV=...; CI-safe; no prompts)
 	ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase1-accept.sh"
 
+.PHONY: phase0.accept
+phase0.accept: ## Run Phase 0 acceptance suite (static checks; no infra mutations)
+	bash "$(OPS_SCRIPTS_DIR)/phase0-accept.sh"
+
 ###############################################################################
 # MinIO HA backend (Terraform + Ansible + acceptance)
 ###############################################################################

@@ -656,6 +656,14 @@ Run the Phase 1 acceptance suite from repo root (safe output; no secrets printed
 ENV=samakia-prod make phase1.accept
 ```
 
+## Acceptance & Verification (Phase 0)
+
+Phase 0 is verified with static checks only (no infrastructure mutation):
+
+```bash
+make phase0.accept
+```
+
 This runs:
 - `bash fabric-ci/scripts/lint.sh`
 - `bash fabric-ci/scripts/validate.sh`
