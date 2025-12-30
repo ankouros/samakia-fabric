@@ -100,3 +100,27 @@ Commands executed (local):
 
 Final status:
 - `make minio.up ENV=samakia-minio`: **PASS**
+
+---
+
+## Phase 2.1 Blockers
+
+### PHASE2_1-SDN-ACCEPT-NFT
+- **Description:** `ENV=samakia-shared make phase2.1.accept` failed in `shared.sdn.accept` during nftables/NAT validation on the active shared edge.
+- **Impact:** Phase 2.1 acceptance cannot proceed; shared plane not locked.
+- **Root cause:** `ops/scripts/shared-sdn-accept.sh` executed nftables checks on the edge without sufficient privileges. The remote command returned `Operation not permitted (you must be root)` and the script failed the NAT masquerade check.
+- **Required remediation:** Update `ops/scripts/shared-sdn-accept.sh` to run nftables inspection with `sudo -n`, and fail loudly if sudo is not permitted.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-shared make shared.sdn.accept` (PASS)
+  - `ENV=samakia-shared make phase2.1.accept` (progressed past shared.sdn.accept)
+
+### PHASE2_1-OBS-GRAFANA
+- **Description:** `ENV=samakia-shared make phase2.1.accept` failed in `shared.obs.accept` with Grafana returning HTTP 503 on VIP `https://192.168.11.122:3000/`.
+- **Impact:** Phase 2.1 acceptance cannot complete; shared observability plane not validated.
+- **Root cause:** Grafana admin password file was not created on the controller; Prometheus failed to start due to systemd sandboxing in unprivileged LXC.
+- **Required remediation:** Fix Grafana password file creation and apply an LXC-safe Prometheus systemd override, then re-run shared observability apply.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-shared make shared.obs.accept` (PASS)
+  - `ENV=samakia-shared make phase2.1.accept` (PASS)

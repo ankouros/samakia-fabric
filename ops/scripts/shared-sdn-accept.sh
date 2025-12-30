@@ -378,7 +378,11 @@ if ssh_run "${edge1_lan}" true >/dev/null 2>&1 && ssh_run "${edge2_lan}" true >/
   ssh_run "${active_edge}" "sysctl -n net.ipv4.ip_forward" | grep -q "^1$" || fail "ip_forward=1 not set on active edge"
   ok "ip_forward=1 on active edge"
 
-  ssh_run "${active_edge}" "nft list ruleset | grep -q 'masquerade'" || fail "nftables masquerade rule missing on active edge"
+  if ! ssh_run "${active_edge}" "sudo -n true" >/dev/null 2>&1; then
+    fail "sudo is required for nftables inspection on ${active_edge} (read-only); allow passwordless sudo for the operator"
+  fi
+
+  ssh_run "${active_edge}" "sudo -n nft list ruleset | grep -q 'masquerade'" || fail "nftables masquerade rule missing on active edge"
   ok "nftables masquerade rule present (best-effort)"
 
   ssh_run "${active_edge}" "ping -c1 -W1 ${LAN_GW} >/dev/null" || fail "active edge cannot reach LAN gateway ${LAN_GW}"

@@ -5,7 +5,7 @@ set -euo pipefail
 
 ENV_FILE="${HOME}/.config/samakia-fabric/env.sh"
 OBS_VIP="192.168.11.122"
-CA_DEFAULT="${HOME}/.config/samakia-fabric/pki/shared-pki-ca.crt"
+CA_DEFAULT="${HOME}/.config/samakia-fabric/pki/shared-bootstrap-ca.crt"
 
 usage() {
   cat >&2 <<'EOF'
@@ -38,7 +38,7 @@ if [[ -f "${ENV_FILE}" ]]; then
   source "${ENV_FILE}"
 fi
 
-ca_path="${SHARED_EDGE_CA_SRC:-${CA_DEFAULT}}"
+ca_path="${OBS_CA_SRC:-${SHARED_EDGE_CA_SRC:-${CA_DEFAULT}}}"
 if [[ ! -f "${ca_path}" ]]; then
   echo "[FAIL] shared CA not found: ${ca_path} (run shared PKI setup first)" >&2
   exit 1

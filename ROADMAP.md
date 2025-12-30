@@ -124,6 +124,7 @@ Goal: Provide internal time, PKI, secrets, and observability as reusable primiti
 - Vault HA (raft) with bootstrap CA + Vault PKI issuance for shared services
 - Observability substrate (Prometheus, Alertmanager, Loki, Grafana)
 - Read-only acceptance gates + one-command deployment (`make shared.up` / `make shared.accept`)
+- Phase 2.1 acceptance locked (`acceptance/PHASE2_1_ACCEPTED.md`)
 
 Outcome:
 - Shared control-plane services are deterministic, TLS-validated, and ready for reuse

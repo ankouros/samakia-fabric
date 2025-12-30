@@ -49,23 +49,20 @@
   become: true
 
 - name: Generate Grafana admin password (controller)
-  ansible.builtin.command: >-
-    python3 - <<'PY'
-    import secrets
-    import string
-    from pathlib import Path
-
-    out = Path("{{ grafana_admin_password_file }}")
-    if out.exists():
-        raise SystemExit(0)
-    alphabet = string.ascii_letters + string.digits
-    pwd = "".join(secrets.choice(alphabet) for _ in range(24))
-    out.write_text(pwd + "\n", encoding="utf-8")
-    out.chmod(0o600)
-    PY
+  ansible.builtin.stat:
+    path: "{{ grafana_admin_password_file }}"
   delegate_to: localhost
   become: false
-  changed_when: false
+  register: grafana_admin_password_stat
+
+- name: Create Grafana admin password file (controller)
+  ansible.builtin.copy:
+    dest: "{{ grafana_admin_password_file }}"
+    content: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') }}\n"
+    mode: "0600"
+  delegate_to: localhost
+  become: false
+  when: not grafana_admin_password_stat.stat.exists
 
 - name: Read Grafana admin password (controller)
   ansible.builtin.set_fact:

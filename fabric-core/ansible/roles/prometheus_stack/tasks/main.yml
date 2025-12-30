@@ -25,6 +25,30 @@
     mode: "0644"
   notify: Restart alertmanager
 
+- name: Ensure Prometheus systemd override dir exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/prometheus.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Disable user namespaces for Prometheus (LXC-safe)
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/prometheus.service.d/override.conf
+    content: |
+      [Service]
+      PrivateUsers=no
+      RestrictNamespaces=no
+      ProtectSystem=off
+      ProtectHome=no
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart prometheus
+
 - name: Ensure Prometheus is enabled and started
   ansible.builtin.service:
     name: prometheus
