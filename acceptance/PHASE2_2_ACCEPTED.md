@@ -10,8 +10,8 @@ Assurance statement:
 Read-only acceptance; strict TLS; token-only Proxmox; no DNS dependency; no secrets.
 
 Repository:
-- Commit: f87e8c5208e66652544b97bcf8669e8f03502b89
-- Timestamp (UTC): 2025-12-30T23:40:31Z
+- Commit: 6f6d43ffab4f10b3c567755eded1f330c2a4b94f
+- Timestamp (UTC): 2025-12-30T23:41:37Z
 
 Environment:
 - ENV: samakia-shared
@@ -31,4 +31,4 @@ Acceptance gates:
 Remediation ledger:
 - REQUIRED-FIXES.md
 
-SHA256 (content excluding this line): 7644a1f69e9a6784e57722a20319ecacff9dca2a3bf892833742df511ce71518
+SHA256 (content excluding this line): b710e0b1f2cb2b14373df46093aab59ae6336f793209f4b8eb3b329bae2ed79b
