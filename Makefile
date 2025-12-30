@@ -735,6 +735,21 @@ ops.bluegreen.plan: ## Runbook pointer: blue/green CT replacement (no auto-apply
 phase1.accept: ## Run Phase 1 acceptance suite (ENV=...; CI-safe; no prompts)
 	ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase1-accept.sh"
 
+.PHONY: phase2.accept
+phase2.accept: ## Run Phase 2 acceptance suite (read-only; DNS + MinIO planes)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		bash "$(FABRIC_CI_DIR)/lint.sh"; \
+		bash "$(FABRIC_CI_DIR)/validate.sh"; \
+		$(MAKE) dns.sdn.accept ENV=samakia-dns; \
+		$(MAKE) dns.accept; \
+		$(MAKE) minio.sdn.accept ENV=samakia-minio; \
+		$(MAKE) minio.converged.accept ENV=samakia-minio; \
+		$(MAKE) minio.quorum.guard ENV=samakia-minio; \
+		$(MAKE) minio.backend.smoke ENV=samakia-minio; \
+	'
+
 .PHONY: phase0.accept
 phase0.accept: ## Run Phase 0 acceptance suite (static checks; no infra mutations)
 	bash "$(OPS_SCRIPTS_DIR)/phase0-accept.sh"
@@ -1057,6 +1072,16 @@ dns.ansible.apply: ## DNS Ansible apply (dns.yml orchestrator; requires bootstra
 .PHONY: dns.accept
 dns.accept: ## DNS acceptance (VIP queries, HA checks, NAT checks, idempotency)
 	bash "$(OPS_SCRIPTS_DIR)/dns-accept.sh"
+
+.PHONY: dns.sdn.accept
+dns.sdn.accept: ## DNS SDN acceptance (DNS plane validation; read-only)
+	@test "$(ENV)" = "samakia-dns" || (echo "ERROR: set ENV=samakia-dns"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		bash "$(OPS_SCRIPTS_DIR)/dns-sdn-accept.sh"; \
+	'
 
 .PHONY: dns.up
 dns.up: ## One-command DNS deployment (tf apply -> bootstrap -> dns -> acceptance)

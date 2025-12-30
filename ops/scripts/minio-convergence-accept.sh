@@ -157,12 +157,17 @@ if [[ -z "${admin_json}" ]]; then
   fail "mc admin info returned empty output (active_edge=${active_edge})"
 fi
 
-python3 - <<'PY' "${admin_json}"
+tmp_admin="$(mktemp)"
+trap 'rm -f "${tmp_admin}"' RETURN
+printf '%s' "${admin_json}" > "${tmp_admin}"
+
+python3 - <<'PY' "${tmp_admin}"
 import json
 import re
 import sys
+from pathlib import Path
 
-raw = sys.argv[1]
+raw = Path(sys.argv[1]).read_text()
 
 objs = []
 for line in raw.splitlines():
@@ -187,24 +192,27 @@ for bad in ("offline", "healing", "rebalancing"):
         print(f"[FAIL] cluster state contains forbidden signal: {bad}", file=sys.stderr)
         sys.exit(1)
 
-endpoints = set()
+ips = set()
 for obj in objs:
-    # tolerate different mc output shapes
-    for k in ("endpoint", "addr", "address", "host", "node"):
-        v = obj.get(k)
-        if isinstance(v, str) and v:
-            endpoints.add(v)
-    # some outputs include 'info' dict with 'addr'
     info = obj.get("info")
     if isinstance(info, dict):
-        v = info.get("addr") or info.get("endpoint") or info.get("host")
-        if isinstance(v, str) and v:
-            endpoints.add(v)
+        servers = info.get("servers")
+        if isinstance(servers, list):
+            for srv in servers:
+                if not isinstance(srv, dict):
+                    continue
+                ep = srv.get("endpoint") or srv.get("addr") or srv.get("address")
+                if isinstance(ep, str) and ep:
+                    ips.add(ep.split(":")[0])
 
-ip_re = re.compile(r"(10\\.10\\.140\\.(11|12|13))")
-ips = set(m.group(1) for m in ip_re.finditer(text))
-if len(ips) != 3:
-    print(f"[FAIL] expected exactly 3 minio node IPs in admin info; got {sorted(ips)}", file=sys.stderr)
+if not ips:
+    ip_re = re.compile(r"(10\\.10\\.140\\.(11|12|13))")
+    ips = set(m.group(1) for m in ip_re.finditer(text))
+
+expected = {"10.10.140.11", "10.10.140.12", "10.10.140.13"}
+found = sorted(set(ips) & expected)
+if len(found) != 3:
+    print(f"[FAIL] expected exactly 3 minio node IPs in admin info; got {found}", file=sys.stderr)
     sys.exit(1)
 
 print("[OK] mc admin info includes 3 minio node IPs and no offline/healing/rebalancing signals")
@@ -263,7 +271,7 @@ fi
 ok "terraform user is not admin (mc admin info fails as expected)"
 
 check "Anonymous access disabled (best-effort)"
-anon_out="$(ssh_run "${active_edge}" "sudo /usr/local/bin/mc anonymous get samakia-tf/${bucket} 2>/dev/null" || true)"
+anon_out="$(ssh_run "${active_edge}" "sudo /usr/local/bin/mc anonymous get samakia-root/${bucket} 2>/dev/null" || true)"
 if ! echo "${anon_out}" | grep -qi "private"; then
   fail "anonymous access not confirmed private (output redacted); expected 'private'"
 fi

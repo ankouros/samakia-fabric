@@ -96,15 +96,13 @@ Outcome:
 
 Goal: Establish reusable infrastructure building blocks.
 
-### Completed (early)
+### Completed (canonical)
+- Proxmox SDN integration (guarded, applied after changes)
 - DNS infrastructure plane (SDN VLAN + VIP-based edge/gateway pattern)
-
-### Planned
-- Terraform network primitives (bridges, VLAN tagging patterns)
-- Proxmox SDN integration (optional, guarded)
-- Load balancer primitives (HAProxy / Keepalived)
-- Shared service containers (DNS, NTP, internal tooling)
+- MinIO backend plane (stateful SDN + VIP front door)
+- Load balancer primitives (HAProxy / Keepalived patterns)
 - Standard tagging/labeling conventions across CT/VM/network objects
+- SDN + service acceptance gates (read-only)
 
 Outcome:
 - Predictable internal networking

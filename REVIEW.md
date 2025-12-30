@@ -133,6 +133,12 @@ Fix:
   - Non-interactive checks: VIP authoritative answers, recursion, keepalived VIP holder invariants, NAT readiness, pdns replication sanity, Ansible idempotency, best-effort token leak scan.
   - Includes read-only Proxmox API verification of the tag schema (strict TLS, token-only).
 
+### DNS SDN: Acceptance Coverage
+
+Read-only SDN-plane validation is available:
+- `ENV=samakia-dns make dns.sdn.accept`
+- Guarantees after PASS: SDN primitives exist (zonedns/vlandns/VLAN100/subnet/gateway VIP) and match canonical values.
+
 ## DNS Infrastructure — How to run (one command)
 
 1) Ensure runner prerequisites (token env vars + CA trust) are installed per `OPERATIONS.md`.

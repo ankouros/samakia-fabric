@@ -196,7 +196,7 @@ payload=json.load(sys.stdin)
 data=payload.get("data",[])
 subnet=sys.argv[1]
 for s in data:
-    if str(s.get("subnet",""))==subnet:
+    if str(s.get("cidr",""))==subnet or str(s.get("subnet",""))==subnet:
         print("1"); sys.exit(0)
 print("0")
 ' "${SDN_SUBNET}"
@@ -209,7 +209,7 @@ payload=json.load(sys.stdin)
 data=payload.get("data",[])
 subnet=sys.argv[1]
 for s in data:
-    if str(s.get("subnet",""))==subnet:
+    if str(s.get("cidr",""))==subnet or str(s.get("subnet",""))==subnet:
         gw=s.get("gateway","")
         print("" if gw is None else str(gw))
         sys.exit(0)
@@ -219,7 +219,8 @@ print("")
 
 extract_ct_networks() {
   # prints lines: key<TAB>bridge<TAB>ip<TAB>gw
-  python3 - <<'PY'
+  local code
+  code="$(cat <<'PY'
 import json
 import re
 import sys
@@ -242,8 +243,10 @@ for key, value in sorted(data.items()):
     if not re.match(r"^net\d+$", str(key)):
         continue
     net = parse_net(value)
-    print(f"{key}\t{net.get('bridge','')}\t{net.get('ip','')}\t{net.get('gw','')}")
+    print("{}\t{}\t{}\t{}".format(key, net.get("bridge", ""), net.get("ip", ""), net.get("gw", "")))
 PY
+)"
+  python3 -c "${code}"
 }
 
 ct_config_or_skip() {
@@ -255,6 +258,11 @@ ct_config_or_skip() {
   if ! api_get "/nodes/${node}/lxc/${vmid}/config" >"${tmp}" 2>/dev/null; then
     rm -f "${tmp}"
     skip "${label}: CT config not found via API (node=${node} vmid=${vmid}); deploy the env first"
+    return 1
+  fi
+  if [[ ! -s "${tmp}" ]] || ! python3 -c 'import json,sys; json.load(open(sys.argv[1], "r", encoding="utf-8"))' "${tmp}" >/dev/null 2>&1; then
+    rm -f "${tmp}"
+    skip "${label}: CT config unreadable via API (node=${node} vmid=${vmid}); check Proxmox API permissions"
     return 1
   fi
   cat "${tmp}"

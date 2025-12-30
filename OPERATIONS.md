@@ -672,6 +672,24 @@ This runs:
 - inventory parse + DHCP/IP sanity
 - Terraform validate + plan (`-input=false`)
 
+## Acceptance & Verification (Phase 2)
+
+Phase 2 acceptance validates SDN planes and platform services (read-only):
+
+```bash
+make phase2.accept
+```
+
+Individual checks (read-only):
+```bash
+make dns.sdn.accept ENV=samakia-dns
+make dns.accept
+make minio.sdn.accept ENV=samakia-minio
+make minio.converged.accept ENV=samakia-minio
+make minio.quorum.guard ENV=samakia-minio
+make minio.backend.smoke ENV=samakia-minio
+```
+
 ---
 
 ## Operational Philosophy

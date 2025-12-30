@@ -42,6 +42,7 @@ The format is inspired by:
 - DNS infrastructure substrate (Terraform + Ansible + acceptance, non-interactive)
   - Terraform env: `fabric-core/terraform/envs/samakia-dns/` (4 LXCs: `dns-edge-1/2`, `dns-auth-1/2` with static IPs and pinned image version)
   - Proxmox SDN ensure script: `ops/scripts/proxmox-sdn-ensure-dns-plane.sh` (zone `zonedns`, vnet `vlandns`, VLAN100 subnet `10.10.100.0/24`)
+  - DNS SDN acceptance tests: `ops/scripts/dns-sdn-accept.sh` + `ENV=samakia-dns make dns.sdn.accept` (read-only validation of DNS SDN plane)
   - Ansible playbooks: `fabric-core/ansible/playbooks/dns.yml`, `fabric-core/ansible/playbooks/dns-edge.yml`, `fabric-core/ansible/playbooks/dns-auth.yml`
   - Ansible roles: `fabric-core/ansible/roles/dns_edge_gateway`, `fabric-core/ansible/roles/dns_auth_powerdns`
   - One-command automation: `make dns.up` + acceptance `make dns.accept` (`ops/scripts/dns-accept.sh`)
@@ -57,6 +58,9 @@ The format is inspired by:
 - Phase 1 acceptance marker: `acceptance/PHASE1_ACCEPTED.md` (hashed; no secrets)
 - Phase 0 acceptance suite (`ops/scripts/phase0-accept.sh` + `make phase0.accept`) for foundation guardrails
 - Phase 0 acceptance marker: `acceptance/PHASE0_ACCEPTED.md` (hashed; no secrets)
+- Phase 2 entry checklist: `acceptance/PHASE2_ENTRY_CHECKLIST.md` (pre-flight PASS/FAIL record; no secrets)
+- Phase 2 acceptance suite: `make phase2.accept` (read-only DNS + MinIO acceptance gate)
+- Phase 2 acceptance marker: `acceptance/PHASE2_ACCEPTED.md` (self-hash included; no secrets)
 - `OPERATIONS_LXC_LIFECYCLE.md` (replace-in-place vs blue/green runbook; DHCP/MAC determinism and SSH trust workflow)
 - Future improvements tracked in `ROADMAP.md`
 - `INCIDENT_SEVERITY_TAXONOMY.md` (S0–S4) with evidence depth + signing/dual-control/TSA requirements
@@ -76,6 +80,7 @@ The format is inspired by:
 ### Fixed
 - MinIO backend bootstrap invariant: `samakia-minio` always bootstraps with `terraform init -backend=false`, with explicit post-acceptance state migration
   - Guardrails: `make tf.backend.init ENV=samakia-minio` and `make tf.apply ENV=samakia-minio` fail loudly by design; use `minio.tf.plan/minio.tf.apply` instead
+- MinIO convergence acceptance: parse `mc admin info` via server endpoint list and verify anonymous access with admin alias (prevents false negatives)
 - MinIO bootstrap local-exec path invariant: local-exec provisioners use repo-root injection (`TF_VAR_fabric_repo_root`) and absolute script paths (no relative path assumptions)
 - Deterministic script invocation invariant: repo scripts call other repo scripts via explicit repo root (no `cwd`/relative-path assumptions), and affected ops scripts fail loudly when `FABRIC_REPO_ROOT` is unset
 - Makefile non-interactive apply invariant: Terraform `apply` uses `-auto-approve` when `CI=1` (prevents EOF failures in `make minio.up`/`make dns.up` and other non-interactive runs)
