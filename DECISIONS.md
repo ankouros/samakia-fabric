@@ -321,6 +321,12 @@ We will deploy two `dns-edge` nodes (`dns-edge-1`, `dns-edge-2`) as the **only**
 - DNS must answer on UDP/TCP 53 on the VIP.
 - `dns-edge-*` provide recursion via Unbound and forward `infra.samakia.net` to PowerDNS Authoritative.
 
+### DNS edge management IPs (LAN; ops-only)
+- `dns-edge-1`: `192.168.11.111`
+- `dns-edge-2`: `192.168.11.112`
+
+These are **not service endpoints**. The DNS service endpoint on LAN is **only** the VIP (`192.168.11.100`).
+
 ### VLAN Gateways (Egress)
 - Every VLAN has a **gateway VIP** hosted on `dns-edge-*` using VRRP on the corresponding VLAN interface/subinterface.
 - All VLAN LXCs must use the VLAN gateway VIP as their default gateway.
@@ -403,6 +409,10 @@ MinIO edge / front door:
   - S3: `https://192.168.11.101:9000`
   - Console: `https://192.168.11.101:9001`
 
+MinIO edge management IPs (LAN; ops-only; not service endpoints):
+- `minio-edge-1`: `192.168.11.102`
+- `minio-edge-2`: `192.168.11.103`
+
 Authoritative DNS (infra.samakia.net) records must include:
 - `minio.infra.samakia.net` → `192.168.11.101`
 - `minio-console.infra.samakia.net` → `192.168.11.101`
@@ -413,6 +423,10 @@ Authoritative DNS (infra.samakia.net) records must include:
   - HAProxy terminates TLS with a certificate issued by the backend internal CA
   - The backend CA is installed in the runner host trust store (no insecure flags)
 - Proxmox access remains API token only (no node SSH/SCP).
+- Proxmox SDN creation:
+  - If the `zminio/vminio` SDN plane does not already exist, the API token running automation must have `SDN.Allocate` to create SDN primitives via `/cluster/sdn/*`.
+  - If the automation token does not have `SDN.Allocate`, an operator must pre-create the SDN plane first (automation then validates/uses it).
+  - Proxmox SDN changes are not usable until applied cluster-wide (`PUT /cluster/sdn`); Samakia Fabric automation performs this apply step when it creates/updates SDN primitives.
 - No secrets are committed to Git; runner-local credentials and CA material live under `~/.config/samakia-fabric/`.
 - Terraform locking uses S3 lockfiles (no DynamoDB).
 

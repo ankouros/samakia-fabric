@@ -81,11 +81,17 @@ The format is inspired by:
 - Migrated Codex remediation log into `CHANGELOG.md` (retired `codex-changelog.md`)
 - Enforced Proxmox API token-only auth in Terraform envs and runner guardrails (password auth variables are no longer supported)
 - Enabled strict SSH host key checking in Ansible (`fabric-core/ansible/ansible.cfg`), requiring explicit known_hosts rotation/enrollment on host replacement
-- MinIO HA backend corrections (repo-wide): SDN zone/vnet renamed to `zminio`/`vminio` (≤ 8 chars) and MinIO LAN VIP set to `192.168.11.101` (updated Terraform/Ansible/scripts/docs; `dns-edge-1` LAN IP moved to `192.168.11.103` to avoid VIP collision)
+- MinIO HA backend corrections (repo-wide): SDN zone/vnet renamed to `zminio`/`vminio` (≤ 8 chars), MinIO LAN VIP set to `192.168.11.101`, and edge management IPs aligned to avoid collisions (`minio-edge-1/2=192.168.11.102/103`, `dns-edge-1/2=192.168.11.111/112`)
 
 ### Fixed
 - Excluded `<evidence>/legal-hold/` label packs from evidence `manifest.sha256` generation while keeping label packs independently signable/notarizable
 - Ensured `ops/scripts/compliance-snapshot.sh` exports signer public keys in sign-only mode so verification works offline for add-on packs (e.g., legal hold records)
+- Ensured Proxmox SDN VLAN planes are **applied** after creation/update (SDN config is not usable until cluster-wide apply completes)
+- Made `fabric-ci/scripts/validate.sh` backend-credential-agnostic by isolating Terraform init/validate from any existing remote backend config (`TF_DATA_DIR` per env)
+- DNS deployment correctness:
+  - `make dns.up ENV=samakia-dns` bootstraps LAN-reachable `dns-edge-*` first, then VLAN-only `dns-auth-*` via ProxyJump
+  - PowerDNS SQLite backend is initialized on first boot and packaged bindbackend config is disabled to avoid conflicting settings
+  - `ops/scripts/dns-accept.sh` reads nftables rules via `sudo` to avoid false negatives
 
 ### Removed
 - —

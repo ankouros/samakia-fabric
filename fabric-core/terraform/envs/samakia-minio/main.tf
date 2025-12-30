@@ -6,7 +6,7 @@ locals {
   ###########################################################################
   # Promotion contract: pinned template version (no "latest")
   ###########################################################################
-  lxc_rootfs_version = "v3"
+  lxc_rootfs_version = "v4"
   lxc_template       = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-${local.lxc_rootfs_version}.tar.gz"
 
   ###########################################################################
@@ -75,7 +75,7 @@ resource "null_resource" "sdn_stateful_plane" {
   }
 
   provisioner "local-exec" {
-    command = "bash \"${var.fabric_repo_root}/ops/scripts/proxmox-sdn-ensure-stateful-plane.sh\""
+    command = "bash \"${var.fabric_repo_root}/ops/scripts/proxmox-sdn-ensure-stateful-plane.sh\" --apply"
   }
 }
 
@@ -111,7 +111,7 @@ resource "proxmox_lxc" "minio_edge_1" {
     name   = "eth0"
     bridge = local.lan_bridge
     hwaddr = "BC:24:11:AD:50:A1"
-    ip     = "192.168.11.111/24"
+    ip     = "192.168.11.102/24"
     gw     = local.lan_gateway
   }
 
@@ -161,7 +161,7 @@ resource "proxmox_lxc" "minio_edge_2" {
     name   = "eth0"
     bridge = local.lan_bridge
     hwaddr = "BC:24:11:AD:50:B1"
-    ip     = "192.168.11.112/24"
+    ip     = "192.168.11.103/24"
     gw     = local.lan_gateway
   }
 
@@ -206,6 +206,22 @@ resource "proxmox_lxc" "minio_1" {
     size    = "30G"
   }
 
+  mountpoint {
+    key     = "mp0"
+    slot    = 0
+    mp      = "/data1"
+    storage = "pve-nfs"
+    size    = "20G"
+  }
+
+  mountpoint {
+    key     = "mp1"
+    slot    = 1
+    mp      = "/data2"
+    storage = "pve-nfs"
+    size    = "20G"
+  }
+
   network {
     name   = "eth0"
     bridge = local.vlan_vnet
@@ -248,6 +264,22 @@ resource "proxmox_lxc" "minio_2" {
     size    = "30G"
   }
 
+  mountpoint {
+    key     = "mp0"
+    slot    = 0
+    mp      = "/data1"
+    storage = "pve-nfs"
+    size    = "20G"
+  }
+
+  mountpoint {
+    key     = "mp1"
+    slot    = 1
+    mp      = "/data2"
+    storage = "pve-nfs"
+    size    = "20G"
+  }
+
   network {
     name   = "eth0"
     bridge = local.vlan_vnet
@@ -288,6 +320,22 @@ resource "proxmox_lxc" "minio_3" {
   rootfs {
     storage = "pve-nfs"
     size    = "30G"
+  }
+
+  mountpoint {
+    key     = "mp0"
+    slot    = 0
+    mp      = "/data1"
+    storage = "pve-nfs"
+    size    = "20G"
+  }
+
+  mountpoint {
+    key     = "mp1"
+    slot    = 1
+    mp      = "/data2"
+    storage = "pve-nfs"
+    size    = "20G"
   }
 
   network {
@@ -356,8 +404,8 @@ output "minio_endpoints" {
       "10.10.140.13",
     ]
     minio_edges = {
-      minio_edge_1 = { lan_ip = "192.168.11.111", vlan_ip = "10.10.140.2" }
-      minio_edge_2 = { lan_ip = "192.168.11.112", vlan_ip = "10.10.140.3" }
+      minio_edge_1 = { lan_ip = "192.168.11.102", vlan_ip = "10.10.140.2" }
+      minio_edge_2 = { lan_ip = "192.168.11.103", vlan_ip = "10.10.140.3" }
     }
   }
 }

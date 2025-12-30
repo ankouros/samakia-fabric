@@ -21,7 +21,9 @@ frontend fe_minio_s3
   default_backend be_minio_s3
 
 backend be_minio_s3
-  option httpchk GET /minio/health/live
+  # MinIO returns 400 for HTTP/1.0 without Host header; enforce HTTP/1.1 + Host.
+  option httpchk
+  http-check send meth GET uri /minio/health/live ver HTTP/1.1 hdr Host localhost
   http-check expect status 200
   balance roundrobin
 {% for ip in minio_edge_lb_minio_backends %}

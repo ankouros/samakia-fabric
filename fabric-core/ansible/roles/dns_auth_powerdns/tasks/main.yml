@@ -20,11 +20,53 @@
 - name: Install Samakia PowerDNS config
   ansible.builtin.template:
     src: pdns-samakia.conf.j2
-    dest: /etc/powerdns/pdns.d/50-samakia.conf
+    # Must override any packaged `launch+=...` snippets (e.g. bindbackend).
+    # We install our config last so `launch=gsqlite3` wins deterministically.
+    dest: /etc/powerdns/pdns.d/zz-samakia.conf
     owner: root
     group: root
     mode: "0644"
   notify: Restart PowerDNS
+
+- name: Remove legacy Samakia PowerDNS config filename (if present)
+  ansible.builtin.file:
+    path: /etc/powerdns/pdns.d/50-samakia.conf
+    state: absent
+
+- name: Disable packaged bind backend snippet (incompatible with sqlite-only deployment)
+  ansible.builtin.file:
+    path: /etc/powerdns/pdns.d/bind.conf
+    state: absent
+
+- name: Ensure PowerDNS SQLite DB parent dir exists
+  ansible.builtin.file:
+    path: /var/lib/powerdns
+    state: directory
+    owner: pdns
+    group: pdns
+    mode: "0755"
+
+- name: Check if PowerDNS SQLite DB exists
+  ansible.builtin.stat:
+    path: /var/lib/powerdns/pdns.sqlite3
+  register: dns_auth_powerdns_sqlite_db
+
+- name: Initialize PowerDNS SQLite DB schema (first boot)
+  ansible.builtin.command:
+    argv:
+      - sqlite3
+      - /var/lib/powerdns/pdns.sqlite3
+      - ".read /usr/share/pdns-backend-sqlite3/schema/schema.sqlite3.sql"
+  changed_when: true
+  when: not dns_auth_powerdns_sqlite_db.stat.exists
+
+- name: Ensure PowerDNS SQLite DB ownership
+  ansible.builtin.file:
+    path: /var/lib/powerdns/pdns.sqlite3
+    state: file
+    owner: pdns
+    group: pdns
+    mode: "0640"
 
 - name: Ensure PowerDNS is enabled and started
   ansible.builtin.service:
@@ -93,12 +135,12 @@
   ansible.builtin.command:
     argv: ["pdns_control", "retrieve", "{{ dns_auth_powerdns_zone_name }}"]
   register: dns_auth_powerdns_retrieve
-  changed_when: true
-  when: dns_auth_powerdns_role == "slave" and dns_auth_powerdns_create_slave is changed
+  changed_when: false
+  when: dns_auth_powerdns_role == "slave"
 
 - name: Verify slave answers for infra zone (best-effort wait)
   ansible.builtin.command:
-    argv: ["dig", "@127.0.0.1", "{{ dns_auth_powerdns_zone_name }}", "SOA", "+short"]
+    argv: ["dig", "@{{ dns_auth_powerdns_listen_ip }}", "{{ dns_auth_powerdns_zone_name }}", "SOA", "+short"]
   register: dns_auth_powerdns_slave_soa
   retries: 15
   delay: 2

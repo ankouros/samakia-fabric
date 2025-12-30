@@ -3,7 +3,7 @@
   hosts: all
   remote_user: root
   become: false
-  gather_facts: true
+  gather_facts: false
 
   collections:
     - ansible.posix
@@ -27,12 +27,13 @@
 
   pre_tasks:
     - name: Wait for SSH to become reachable
-      ansible.builtin.wait_for:
-        host: "{{ ansible_host | default(inventory_hostname) }}"
-        port: 22
+      ansible.builtin.wait_for_connection:
         timeout: 180
         connect_timeout: 5
-      delegate_to: localhost
+        sleep: 2
+
+    - name: Gather facts
+      ansible.builtin.setup:
 
     - name: Resolve bootstrap authorized keys
       ansible.builtin.set_fact:

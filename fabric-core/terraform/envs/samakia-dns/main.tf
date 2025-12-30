@@ -6,7 +6,7 @@ locals {
   ###########################################################################
   # Promotion contract: pinned template version (no "latest")
   ###########################################################################
-  lxc_rootfs_version = "v3"
+  lxc_rootfs_version = "v4"
   lxc_template       = "pve-nfs:vztmpl/ubuntu-24.04-lxc-rootfs-${local.lxc_rootfs_version}.tar.gz"
 
   ###########################################################################
@@ -64,7 +64,7 @@ resource "null_resource" "sdn_dns_plane" {
   }
 
   provisioner "local-exec" {
-    command = "bash \"${var.fabric_repo_root}/ops/scripts/proxmox-sdn-ensure-dns-plane.sh\""
+    command = "bash \"${var.fabric_repo_root}/ops/scripts/proxmox-sdn-ensure-dns-plane.sh\" --apply"
   }
 }
 
@@ -100,7 +100,7 @@ resource "proxmox_lxc" "dns_edge_1" {
     name   = "eth0"
     bridge = local.lan_bridge
     hwaddr = "BC:24:11:AD:49:A1"
-    ip     = "192.168.11.103/24"
+    ip     = "192.168.11.111/24"
     gw     = local.lan_gateway
   }
 
@@ -150,7 +150,7 @@ resource "proxmox_lxc" "dns_edge_2" {
     name   = "eth0"
     bridge = local.lan_bridge
     hwaddr = "BC:24:11:AD:49:B1"
-    ip     = "192.168.11.102/24"
+    ip     = "192.168.11.112/24"
     gw     = local.lan_gateway
   }
 
@@ -293,11 +293,11 @@ output "dns_endpoints" {
     dns_vip     = local.lan_dns_vip
     vlan_gw_vip = local.vlan_gw_vip
     dns_edge_1 = {
-      lan_ip  = "192.168.11.103"
+      lan_ip  = "192.168.11.111"
       vlan_ip = "10.10.100.11"
     }
     dns_edge_2 = {
-      lan_ip  = "192.168.11.102"
+      lan_ip  = "192.168.11.112"
       vlan_ip = "10.10.100.12"
     }
     dns_auth_1 = "10.10.100.21"

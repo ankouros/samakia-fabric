@@ -114,14 +114,18 @@ force_path_style = true
 skip_region_validation      = true
 skip_credentials_validation = true
 skip_metadata_api_check     = true
+skip_requesting_account_id  = true
 
 # Locking without DynamoDB
 use_lockfile = true
 EOF
 
-args=(init -input=false -reconfigure "-backend-config=${tmp_cfg}")
+args=(init -input=false "-backend-config=${tmp_cfg}")
 if [[ "${migrate}" -eq 1 ]]; then
-  args+=( -migrate-state )
+  # Non-interactive state migration: avoid prompts (safe after acceptance/guards).
+  args+=( -migrate-state -force-copy )
+else
+  args+=( -reconfigure )
 fi
 
 echo "Initializing Terraform backend for env=${ENV_NAME} (endpoint set; secrets redacted)..."

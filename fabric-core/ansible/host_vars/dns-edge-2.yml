@@ -1,9 +1,9 @@
-ansible_host: 192.168.11.102
+ansible_host: 192.168.11.112
 ansible_become: true
 ansible_become_method: sudo
 # Non-interactive first-connect for new containers (does not disable host key checking).
 ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new"
 dns_edge_role: backup
 dns_edge_priority: 100
-dns_edge_lan_ip: 192.168.11.102
+dns_edge_lan_ip: 192.168.11.112
 dns_edge_vlan_ip: 10.10.100.12

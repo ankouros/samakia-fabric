@@ -3,5 +3,5 @@ ansible_become: true
 ansible_become_method: sudo
 # VLAN-only node: access via dns-edge jump host on LAN.
 # Non-interactive first-connect for new containers (does not disable host key checking).
-ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new -o ProxyJump=192.168.11.103,192.168.11.102"
+ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new -o ProxyJump=samakia@192.168.11.111"
 dns_auth_powerdns_role: slave

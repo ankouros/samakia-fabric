@@ -33,12 +33,19 @@ bash "$ROOT_DIR/ops/scripts/test-minio-quorum-guard.sh"
 # MinIO Terraform backend smoke parsing unit test (offline; no MinIO/Proxmox).
 bash "$ROOT_DIR/ops/scripts/test-minio-terraform-backend-smoke.sh"
 
+# DNS rrset check unit test (offline; no Proxmox/DNS needed).
+bash "$ROOT_DIR/ops/scripts/test-dns-rrset-check.sh"
+
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 
 for env_dir in "$TERRAFORM_ENVS_DIR"/*; do
   if [[ -d "$env_dir" ]] && compgen -G "$env_dir/*.tf" >/dev/null; then
-    terraform -chdir="$env_dir" init -backend=false
-    terraform -chdir="$env_dir" validate
+    # Validate must not require backend credentials and must not depend on any
+    # pre-existing `.terraform/` directory (which may be configured for remote state).
+    tf_data_dir="$(mktemp -d)"
+    TF_DATA_DIR="${tf_data_dir}" terraform -chdir="$env_dir" init -backend=false -input=false
+    TF_DATA_DIR="${tf_data_dir}" terraform -chdir="$env_dir" validate
+    rm -rf "${tf_data_dir}" 2>/dev/null || true
   fi
 done
 

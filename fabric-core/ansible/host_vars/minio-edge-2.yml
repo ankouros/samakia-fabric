@@ -1,10 +1,10 @@
-ansible_host: 192.168.11.112
+ansible_host: 192.168.11.103
 ansible_become: true
 ansible_become_method: sudo
 ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new"
 minio_edge_lb_role: backup
 minio_edge_lb_priority: 100
-minio_edge_lb_lan_ip: 192.168.11.112
+minio_edge_lb_lan_ip: 192.168.11.103
 minio_edge_lb_vlan_ip: 10.10.140.3
-minio_edge_lb_peer_lan_ip: 192.168.11.111
+minio_edge_lb_peer_lan_ip: 192.168.11.102
 minio_edge_lb_peer_vlan_ip: 10.10.140.2

@@ -18,6 +18,12 @@ table inet filter {
     ip saddr {{ ip }} tcp dport {{ minio_cluster_s3_port }} accept
     ip saddr {{ ip }} tcp dport {{ minio_cluster_console_port }} accept
     {% endfor %}
+
+    # Allow MinIO cluster traffic between MinIO nodes (VLAN140).
+    {% for ip in minio_cluster_node_ips %}
+    ip saddr {{ ip }} tcp dport {{ minio_cluster_s3_port }} accept
+    ip saddr {{ ip }} tcp dport {{ minio_cluster_console_port }} accept
+    {% endfor %}
   }
 
   chain output {

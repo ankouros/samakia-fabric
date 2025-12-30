@@ -14,7 +14,7 @@ vrrp_instance VI_LAN_DNS {
 
   unicast_src_ip {{ dns_edge_lan_ip }}
   unicast_peer {
-    {{ '192.168.11.102' if inventory_hostname == 'dns-edge-1' else '192.168.11.103' }}
+    {{ '192.168.11.112' if inventory_hostname == 'dns-edge-1' else '192.168.11.111' }}
   }
 
   virtual_ipaddress {

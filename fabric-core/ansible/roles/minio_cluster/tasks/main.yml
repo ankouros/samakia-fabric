@@ -110,3 +110,38 @@
   delay: 2
   until: minio_cluster_health.rc == 0
   changed_when: false
+
+- name: Detect uninitialized MinIO server state (root endpoint returns 503)
+  ansible.builtin.command:
+    argv:
+      - curl
+      - -sS
+      - -o
+      - /dev/null
+      - -w
+      - "%{http_code}"
+      - "http://127.0.0.1:{{ minio_cluster_s3_port }}/"
+  register: minio_cluster_root_http_code
+  changed_when: false
+
+- name: Restart MinIO if server is not initialized yet (mountpoints may have changed)
+  ansible.builtin.service:
+    name: minio
+    state: restarted
+  when: minio_cluster_root_http_code.stdout == "503"
+
+- name: Wait for MinIO S3 API to be initialized (root endpoint must not be 503)
+  ansible.builtin.command:
+    argv:
+      - curl
+      - -sS
+      - -o
+      - /dev/null
+      - -w
+      - "%{http_code}"
+      - "http://127.0.0.1:{{ minio_cluster_s3_port }}/"
+  register: minio_cluster_root_http_code_ready
+  retries: 60
+  delay: 2
+  until: minio_cluster_root_http_code_ready.stdout != "503"
+  changed_when: false

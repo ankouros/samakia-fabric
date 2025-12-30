@@ -44,6 +44,22 @@
   until: minio_edge_lb_vip_health.rc == 0
   changed_when: false
 
+- name: Wait for MinIO S3 API to be initialized (root endpoint must not be 503)
+  ansible.builtin.command:
+    argv:
+      - curl
+      - -sS
+      - -o
+      - /dev/null
+      - -w
+      - "%{http_code}"
+      - "https://{{ minio_edge_lb_lan_vip }}:{{ minio_edge_lb_s3_port }}/"
+  register: minio_edge_lb_s3_root_code
+  retries: 60
+  delay: 2
+  until: minio_edge_lb_s3_root_code.stdout != "503"
+  changed_when: false
+
 - name: Configure mc aliases (root + terraform user)
   ansible.builtin.command:
     argv:
@@ -75,7 +91,20 @@
     mode: "0600"
   changed_when: false
 
-- name: Ensure terraform state policy exists
+- name: Check if terraform state policy exists
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - admin
+      - policy
+      - info
+      - samakia-root
+      - tfstate-policy
+  register: minio_edge_lb_policy_info
+  failed_when: false
+  changed_when: false
+
+- name: Create terraform state policy if missing
   ansible.builtin.command:
     argv:
       - /usr/local/bin/mc
@@ -86,10 +115,23 @@
       - tfstate-policy
       - /root/tfstate-policy.json
   register: minio_edge_lb_policy_create
-  changed_when: "'created' in (minio_edge_lb_policy_create.stdout | lower)"
-  failed_when: false
+  when: minio_edge_lb_policy_info.rc != 0
+  changed_when: true
 
-- name: Ensure terraform user exists
+- name: Check if terraform user exists
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - admin
+      - user
+      - info
+      - samakia-root
+      - "{{ minio_edge_lb_tf_access_key }}"
+  register: minio_edge_lb_user_info
+  failed_when: false
+  changed_when: false
+
+- name: Create terraform user if missing
   ansible.builtin.command:
     argv:
       - /usr/local/bin/mc
@@ -101,10 +143,23 @@
       - "{{ minio_edge_lb_tf_secret_key }}"
   register: minio_edge_lb_user_add
   no_log: true
-  changed_when: "'added' in (minio_edge_lb_user_add.stdout | lower)"
-  failed_when: false
+  when: minio_edge_lb_user_info.rc != 0
+  changed_when: true
 
-- name: Ensure terraform policy is attached to terraform user
+- name: Check terraform user policy attachment
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/mc
+      - admin
+      - user
+      - info
+      - samakia-root
+      - "{{ minio_edge_lb_tf_access_key }}"
+  register: minio_edge_lb_user_info_after
+  failed_when: false
+  changed_when: false
+
+- name: Attach terraform policy to terraform user if missing
   ansible.builtin.command:
     argv:
       - /usr/local/bin/mc
@@ -116,8 +171,8 @@
       - --user
       - "{{ minio_edge_lb_tf_access_key }}"
   register: minio_edge_lb_policy_attach
-  changed_when: "'attached' in (minio_edge_lb_policy_attach.stdout | lower)"
-  failed_when: false
+  when: minio_edge_lb_user_info_after.stdout is not search('tfstate-policy')
+  changed_when: true
 
 - name: Verify terraform credentials can list the state bucket (no admin)
   ansible.builtin.command:

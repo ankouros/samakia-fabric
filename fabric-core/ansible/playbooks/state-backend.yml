@@ -6,7 +6,7 @@
     - role: minio_edge_lb
 
 - name: MinIO cluster nodes (distributed)
-  hosts: minio-*
+  hosts: minio-[0-9]*
   become: true
   roles:
     - role: minio_cluster

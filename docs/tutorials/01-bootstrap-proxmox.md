@@ -79,36 +79,91 @@ Terraform relies on API connectivity.
 
 ## Create Terraform Role (Proxmox 9 Safe)
 
-Create a dedicated role with minimum required privileges:
+Create a dedicated role for Terraform with **least-privilege**, but sufficient for:
+- LXC lifecycle (create/config/start/stop)
+- Storage allocation (templates + rootfs volumes)
+- SDN plane creation/validation (for `zonedns/vlandns` and `zminio/vminio`)
+- Read-only inspection needed for inventory + acceptance (e.g., tag reads)
+
+This role is designed to be **Proxmox 9 safe** and aligned with Samakia Fabric’s contracts:
+- API token auth (no root@pam)
+- strict TLS (no insecure flags)
+- IaC-managed SDN primitives (requires SDN privileges)
+
+Create the role:
 
 ```bash
+# NOTE: privileges MUST be comma-separated (otherwise Proxmox concatenates the lines).
 pveum role add TerraformProv -privs "\
-Datastore.AllocateSpace\
-Datastore.AllocateTemplate\
-Datastore.Audit\
-Pool.Allocate\
-Pool.Audit\
-Sys.Audit\
-Sys.Console\
-Sys.Modify\
-VM.Allocate\
-VM.Audit\
-VM.Clone\
-VM.Config.CDROM\
-VM.Config.Cloudinit\
-VM.Config.CPU\
-VM.Config.Disk\
-VM.Config.HWType\
-VM.Config.Memory\
-VM.Config.Network\
-VM.Config.Options\
-VM.Migrate\
-VM.PowerMgmt\
+Datastore.AllocateSpace,\
+Datastore.AllocateTemplate,\
+Datastore.Audit,\
+Pool.Allocate,\
+Pool.Audit,\
+Sys.Audit,\
+Sys.Console,\
+Sys.Modify,\
+VM.Allocate,\
+VM.Audit,\
+VM.Clone,\
+VM.Config.CDROM,\
+VM.Config.Cloudinit,\
+VM.Config.CPU,\
+VM.Config.Disk,\
+VM.Config.HWType,\
+VM.Config.Memory,\
+VM.Config.Network,\
+VM.Config.Options,\
+VM.Migrate,\
+VM.PowerMgmt,\
+SDN.Audit,\
+SDN.Allocate,\
 SDN.Use\
 "
 ```
 
 Do not grant `Administrator`.
+
+Notes:
+- The `telmate/proxmox` provider enforces a permission pre-check and requires:
+  - `Sys.Console`
+  - `Sys.Modify`
+  even if your Terraform does not explicitly use console actions.
+- `SDN.Allocate` is required for **one-command** DNS/MinIO bootstrap because Samakia Fabric creates/ensures SDN objects via `/cluster/sdn/*`.
+- If you intentionally want a Terraform token that cannot create SDN:
+  - you must pre-create the SDN planes (`zonedns/vlandns` and `zminio/vminio`) using an operator account that has `SDN.Allocate`, and
+  - the Terraform token still needs `SDN.Audit` to validate/read SDN primitives.
+
+If the user/role already exists and you need to update privileges:
+
+```bash
+pveum role modify TerraformProv -privs "\
+Datastore.AllocateSpace,\
+Datastore.AllocateTemplate,\
+Datastore.Audit,\
+Pool.Allocate,\
+Pool.Audit,\
+Sys.Audit,\
+Sys.Console,\
+Sys.Modify,\
+VM.Allocate,\
+VM.Audit,\
+VM.Clone,\
+VM.Config.CDROM,\
+VM.Config.Cloudinit,\
+VM.Config.CPU,\
+VM.Config.Disk,\
+VM.Config.HWType,\
+VM.Config.Memory,\
+VM.Config.Network,\
+VM.Config.Options,\
+VM.Migrate,\
+VM.PowerMgmt,\
+SDN.Audit,\
+SDN.Allocate,\
+SDN.Use\
+"
+```
 
 ---
 
@@ -116,10 +171,35 @@ Do not grant `Administrator`.
 
 ```bash
 pveum user add terraform-prov@pve
-pveum passwd terraform-prov@pve
 ```
 
-Assign role globally:
+You do not need a password for Terraform if you only use API tokens.
+If you want GUI login for this user, you may set a password separately.
+
+---
+
+## Assign ACLs (recommended: scoped, not global)
+
+For a minimal blast radius, prefer ACLs on the specific paths Terraform needs.
+
+Example (cluster-wide, but scoped by object type):
+
+```bash
+# LXC/VM lifecycle + config
+pveum aclmod /vms -user terraform-prov@pve -role TerraformProv
+
+# Storage used for rootfs and templates (adjust storage name)
+pveum aclmod /storage/pve-nfs -user terraform-prov@pve -role TerraformProv
+
+# SDN plane management (required for zminio/zonedns automation)
+pveum aclmod /sdn -user terraform-prov@pve -role TerraformProv
+```
+
+Important (Proxmox provider pre-check):
+- `Sys.Console` and `Sys.Modify` are Proxmox “system” privileges and are evaluated at broader scope.
+- If Terraform still reports missing `Sys.*` privileges after you add them to the role, attach the role at `/` for the **token** (especially with `privsep=1`), or create a dedicated sys-only role and bind that at `/`.
+
+If you explicitly want to grant the role globally (simpler, less safe):
 
 ```bash
 pveum aclmod / -user terraform-prov@pve -role TerraformProv
@@ -206,7 +286,14 @@ Verify:
 ip link show vmbr0
 ```
 
-Advanced SDN is optional and out of scope here.
+SDN note (Samakia Fabric usage):
+- DNS and MinIO environments use Proxmox SDN VLAN planes (IaC-managed):
+  - DNS: `zonedns` / `vlandns` (VLAN100, `10.10.100.0/24`)
+  - MinIO: `zminio` / `vminio` (VLAN140, `10.10.140.0/24`)
+- If your Terraform token lacks `SDN.Allocate`, you must pre-create these SDN objects manually (then automation will validate and proceed).
+- Proxmox SDN changes are **not active until applied** cluster-wide. Equivalent operator action:
+  - `pvesh set /cluster/sdn`
+  - Samakia Fabric automation performs this apply step when it creates/updates SDN primitives.
 
 ---
 

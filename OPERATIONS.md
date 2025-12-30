@@ -81,6 +81,16 @@ bash "$FABRIC_REPO_ROOT/ops/scripts/install-s3-backend-ca.sh"
 
 Samakia Fabric uses a remote S3-compatible backend (MinIO) for Terraform state and locking (`use_lockfile = true`).
 
+### LAN endpoint vs management IP policy (canonical)
+
+- **Service endpoints on LAN are VIP-only**:
+  - DNS VIP: `192.168.11.100`
+  - MinIO VIP: `192.168.11.101`
+- **Management IPs (ops-only; never service endpoints)**:
+  - MinIO edges: `minio-edge-1=192.168.11.102`, `minio-edge-2=192.168.11.103`
+  - DNS edges: `dns-edge-1=192.168.11.111`, `dns-edge-2=192.168.11.112`
+- **Collision rule**: `.100/.101/.102/.103` are reserved for DNS/MinIO VIP + MinIO edge mgmt only.
+
 One-command deployment (non-interactive; requires runner env for Proxmox token + bootstrap SSH key):
 
 ```bash
@@ -101,6 +111,8 @@ Invariant:
 Implementation detail (no manual steps):
 - The Makefile bootstraps Terraform from a runner-local workspace that copies the env files **excluding** `backend.tf` (backend remains in Git), because Terraform cannot `plan/apply` against an uninitialized `backend "s3"` block.
 - The Makefile exports `TF_VAR_fabric_repo_root` so Terraform `local-exec` can run repo scripts via absolute paths during bootstrap (no cwd/relative-path assumptions).
+- Proxmox SDN primitives are created/validated via token-auth API calls; if the SDN plane does not exist, the token must have `SDN.Allocate` or an operator must pre-create the SDN plane first. Proxmox SDN changes are **not usable until applied** cluster-wide (`PUT /cluster/sdn`); Samakia Fabric automation runs this apply step when needed (or when explicitly forced).
+  - Terraform `local-exec` SDN ensure hooks run with `--apply` so SDN changes become usable immediately after `terraform apply` (no manual `/cluster/sdn` apply step).
 
 Operational flow (non-interactive):
 - `make backend.configure`

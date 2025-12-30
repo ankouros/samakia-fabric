@@ -30,7 +30,8 @@
             if rec_name not in ("@", zone):
               continue
           else:
-            if rec_name != name:
+            # pdnsutil may print owner names as FQDNs. Treat both relative and FQDN as equivalent.
+            if rec_name != name and rec_name != f"{name}.{zone}":
               continue
 
           present.add((rec_ttl, rec_value))
@@ -44,7 +45,7 @@
       - "{{ dns_auth_powerdns_rrset.name }}"
       - "{{ dns_auth_powerdns_rrset.type }}"
       - "{{ dns_auth_powerdns_rrset.ttl }}"
-      - "{{ dns_auth_powerdns_rrset.values | to_json }}"
+      - "{{ dns_auth_powerdns_rrset['values'] | to_json }}"
     stdin: "{{ dns_auth_powerdns_zone_dump_text }}"
   register: dns_auth_powerdns_rrset_check
   changed_when: false
@@ -61,7 +62,7 @@
           dns_auth_powerdns_rrset.name,
           dns_auth_powerdns_rrset.type,
           (dns_auth_powerdns_rrset.ttl | string),
-        ] + (dns_auth_powerdns_rrset.values | list)
+        ] + (dns_auth_powerdns_rrset['values'] | list)
       }}
   when: dns_auth_powerdns_rrset_check.rc != 0
   changed_when: true

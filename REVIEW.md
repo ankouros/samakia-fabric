@@ -7,8 +7,8 @@ This document records what was implemented for the **Terraform remote state back
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`
   - Proxmox **SDN stateful VLAN plane** ensure step (zminio/vminio/VLAN140 + `10.10.140.0/24`, gw VIP `10.10.140.1`) via API-token-only script `ops/scripts/proxmox-sdn-ensure-stateful-plane.sh`.
   - Five LXCs with deterministic placement + static IPs:
-    - `minio-edge-1` (`proxmox1`): LAN `192.168.11.111`, VLAN `10.10.140.2`
-    - `minio-edge-2` (`proxmox2`): LAN `192.168.11.112`, VLAN `10.10.140.3`
+    - `minio-edge-1` (`proxmox1`): LAN `192.168.11.102`, VLAN `10.10.140.2`
+    - `minio-edge-2` (`proxmox2`): LAN `192.168.11.103`, VLAN `10.10.140.3`
     - `minio-1` (`proxmox1`): VLAN `10.10.140.11` (gw `10.10.140.1`)
     - `minio-2` (`proxmox2`): VLAN `10.10.140.12` (gw `10.10.140.1`)
     - `minio-3` (`proxmox3`): VLAN `10.10.140.13` (gw `10.10.140.1`)
@@ -115,8 +115,8 @@ Fix:
 - **Terraform env**: `fabric-core/terraform/envs/samakia-dns/`
   - Proxmox **SDN VLAN plane** ensure step (zonedns/vlandns/VLAN100 + `10.10.100.0/24`, gw VIP `10.10.100.1`) via API-token-only script `ops/scripts/proxmox-sdn-ensure-dns-plane.sh`.
   - Four LXCs with deterministic placement + static IPs:
-    - `dns-edge-1` (`proxmox1`): LAN `192.168.11.103`, VLAN `10.10.100.11`
-    - `dns-edge-2` (`proxmox2`): LAN `192.168.11.102`, VLAN `10.10.100.12`
+    - `dns-edge-1` (`proxmox1`): LAN `192.168.11.111`, VLAN `10.10.100.11`
+    - `dns-edge-2` (`proxmox2`): LAN `192.168.11.112`, VLAN `10.10.100.12`
     - `dns-auth-1` (`proxmox3`): VLAN `10.10.100.21`
     - `dns-auth-2` (`proxmox2`): VLAN `10.10.100.22`
   - Version-pinned template contract (no “latest”) and immutable rootfs naming.
@@ -160,12 +160,13 @@ make dns.accept
 - `pre-commit run --all-files`: **PASS**
 - `bash fabric-ci/scripts/lint.sh`: **PASS**
 - `bash fabric-ci/scripts/validate.sh`: **PASS**
-- `make minio.up ENV=samakia-minio`: **NOT EXECUTED** (requires reachable Proxmox API + runner env vars; runner host sudo NOPASSWD for CA install)
-- `make minio.accept`: **NOT EXECUTED** (requires live MinIO VIP + SSH connectivity to minio-edge nodes)
-- `make dns.up ENV=samakia-dns`: **NOT EXECUTED** (requires reachable Proxmox API + runner env vars)
-- `make dns.accept`: **NOT EXECUTED** (requires live DNS VIP + SSH connectivity to dns-edge nodes)
-- `terraform plan clean after apply`: **NOT EXECUTED** (depends on real Proxmox state)
-- `ansible idempotency`: **NOT EXECUTED** (validated by `ops/scripts/dns-accept.sh` when DNS infra is deployed)
+- `make minio.up ENV=samakia-minio`: **PASS** (includes SDN apply; strict TLS; token-only)
+- `make minio.accept`: **PASS**
+- `make minio.quorum.guard ENV=samakia-minio`: **PASS**
+- `make minio.backend.smoke ENV=samakia-minio`: **PASS**
+- `make minio.state.migrate ENV=samakia-minio`: **PASS** (non-interactive; `-force-copy`)
+- `make dns.up ENV=samakia-dns`: **PASS** (bootstraps edges first, then VLAN-only auth via ProxyJump; strict contracts)
+- `make dns.accept`: **PASS**
 
 ---
 

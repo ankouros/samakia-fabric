@@ -1,12 +1,12 @@
 ---
-- name: DNS Authoritative (PowerDNS)
-  hosts: dns-auth-*
-  become: true
-  roles:
-    - role: dns_auth_powerdns
-
 - name: DNS Edge (VRRP VIP + dnsdist + unbound + NAT)
   hosts: dns-edge-*
   become: true
   roles:
     - role: dns_edge_gateway
+
+- name: DNS Authoritative (PowerDNS)
+  hosts: dns-auth-*
+  become: true
+  roles:
+    - role: dns_auth_powerdns

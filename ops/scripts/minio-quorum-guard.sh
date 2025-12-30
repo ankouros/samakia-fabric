@@ -365,22 +365,15 @@ main() {
     fi
 
     check "mc admin info (root alias) signals (best-effort)"
-    admin_json="$(ssh_run "${active_edge}" "sudo -n /usr/local/bin/mc admin info samakia-root --json" 2>/dev/null || true)"
-    if [[ -z "${admin_json}" ]]; then
-      warn_reasons+=("mc admin info returned empty output (cannot confirm node/drive health)")
-      warn "mc admin info returned empty output (best-effort)"
-      md "- mc admin info: WARN (empty output; cannot confirm node/drive health)"
-    else
-      set +e
-      python3 - <<'PY' "${admin_json}" "${MINIO_SDN_SUBNET}"
+    set +e
+    admin_parse_out="$(
+      ssh_run "${active_edge}" "sudo -n /usr/local/bin/mc admin info samakia-root --json" 2>/dev/null | \
+        python3 -c '
 import json
-import re
 import sys
 
-raw = sys.argv[1]
-
 objs = []
-for line in raw.splitlines():
+for line in sys.stdin:
     line = line.strip()
     if not line.startswith("{"):
         continue
@@ -388,47 +381,67 @@ for line in raw.splitlines():
         objs.append(json.loads(line))
     except Exception:
         pass
+
 if not objs:
-    try:
-        objs = [json.loads(raw)]
-    except Exception as e:
-        print(f"PARSE_ERROR: {e}")
-        sys.exit(2)
-
-text = json.dumps(objs)
-bad = []
-for token in ("offline", "healing", "rebalancing"):
-    if re.search(rf"\\b{token}\\b", text, flags=re.IGNORECASE):
-        bad.append(token)
-
-ip_re = re.compile(r"(10\\.10\\.140\\.(11|12|13))")
-ips = sorted(set(m.group(1) for m in ip_re.finditer(text)))
-
-if bad:
-    print("BAD_SIGNALS:" + ",".join(sorted(set(bad))))
-    print("IPS:" + ",".join(ips))
+    print("PARSE_ERROR:no_json")
     sys.exit(2)
 
-if len(ips) != 3:
-    print("BAD_MEMBERSHIP:" + str(len(ips)))
-    print("IPS:" + ",".join(ips))
+o = objs[-1]
+info = o.get("info", {}) if isinstance(o, dict) else {}
+backend = info.get("backend", {}) if isinstance(info, dict) else {}
+servers = info.get("servers", []) if isinstance(info, dict) else []
+
+backend_type = str(backend.get("backendType", ""))
+online_disks = backend.get("onlineDisks")
+offline_disks = backend.get("offlineDisks")
+
+def _as_int(v):
+    if isinstance(v, int):
+        return v
+    if isinstance(v, str) and v.isdigit():
+        return int(v)
+    return None
+
+bad = []
+if backend_type.lower() != "erasure":
+    bad.append("backendType=" + (backend_type or "missing"))
+
+if not isinstance(servers, list) or len(servers) != 3:
+    bad.append("servers=" + (str(len(servers)) if isinstance(servers, list) else "missing"))
+else:
+    states = [str(s.get("state", "")) for s in servers if isinstance(s, dict)]
+    if len(states) != 3 or any(st.lower() != "online" for st in states):
+        bad.append("server_state")
+
+od = _as_int(online_disks)
+fd = _as_int(offline_disks)
+if od is None or od < 6:
+    bad.append(f"onlineDisks={online_disks!r}")
+if fd is None or fd != 0:
+    bad.append(f"offlineDisks={offline_disks!r}")
+
+if bad:
+    print("BAD_SIGNALS:" + ",".join(bad))
     sys.exit(2)
 
 print("OK")
 sys.exit(0)
-PY
-      rc=$?
-      set -e
-      if [[ "${rc}" -eq 0 ]]; then
-        ok "mc admin info indicates 3 nodes and no offline/healing/rebalancing signals"
-        md "- mc admin info: OK (3 nodes, no offline/healing/rebalancing signals)"
-        admin_ok=1
-      else
-        warn_reasons+=("mc admin info indicates degraded state or cannot be parsed (offline/healing/rebalancing/membership)")
-        warn "mc admin info indicates degraded state (WARN; blocks writes)"
-        md "- mc admin info: WARN (degraded signals or membership mismatch)"
-        admin_ok=0
-      fi
+        '
+    )"
+    rc=$?
+    set -e
+    if [[ -n "${admin_parse_out}" ]]; then
+      printf '%s\n' "${admin_parse_out}"
+    fi
+    if [[ "${rc}" -eq 0 ]]; then
+      ok "mc admin info indicates erasure mode, 3 online servers, 0 offline disks"
+      md "- mc admin info: OK (erasure, 3 online servers, 0 offline disks)"
+      admin_ok=1
+    else
+      warn_reasons+=("mc admin info indicates degraded/unparseable state (cannot confirm 3 online servers / 0 offline disks)")
+      warn "mc admin info indicates degraded/unparseable state (WARN; blocks writes)"
+      md "- mc admin info: WARN (degraded/unparseable)"
+      admin_ok=0
     fi
   else
     warn_reasons+=("cannot validate backend reachability/admin signals (edge HA not healthy)")

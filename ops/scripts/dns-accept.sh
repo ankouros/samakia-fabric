@@ -8,8 +8,8 @@ ENV_FILE="${HOME}/.config/samakia-fabric/env.sh"
 DNS_VIP="192.168.11.100"
 DNS_ZONE="infra.samakia.net"
 
-EDGE1_LAN="192.168.11.103"
-EDGE2_LAN="192.168.11.102"
+EDGE1_LAN="192.168.11.111"
+EDGE2_LAN="192.168.11.112"
 
 AUTH1_VLAN="10.10.100.21"
 AUTH2_VLAN="10.10.100.22"
@@ -239,10 +239,10 @@ if [[ "${ipf}" != "1" ]]; then
 fi
 pass "ip_forward=1 on active dns-edge"
 
-if ! ssh_run "${active_host}" "nft list ruleset | grep -q \"masquerade\""; then
+if ! ssh_run "${active_host}" "sudo nft list ruleset | grep -q \"masquerade\""; then
   fail "nftables masquerade rule missing on active dns-edge"
 fi
-if ! ssh_run "${active_host}" "nft list ruleset | grep -q \"${VLAN_CIDR}\""; then
+if ! ssh_run "${active_host}" "sudo nft list ruleset | grep -q \"${VLAN_CIDR}\""; then
   fail "nftables does not reference ${VLAN_CIDR} on active dns-edge"
 fi
 pass "nftables NAT masquerade configured for ${VLAN_CIDR}"

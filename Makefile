@@ -425,7 +425,7 @@ tf.apply: ## Terraform apply for ENV
 	@bash -euo pipefail -c '\
 				env_file="$(RUNNER_ENV_FILE)"; \
 				if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
-			ENV=samakia-minio $(MAKE) minio.backend.smoke; \
+			$(MAKE) minio.backend.smoke ENV=samakia-minio; \
 			$(MAKE) tf.backend.init; \
 			auto_approve=""; \
 			if [[ "$(CI)" = "1" ]]; then auto_approve="-auto-approve"; fi; \
@@ -444,6 +444,10 @@ ansible.inventory: ## Show resolved Ansible inventory
 	@bash -euo pipefail -c '\
 		env_file="$(RUNNER_ENV_FILE)"; \
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		if [[ "$(ENV)" = "samakia-minio" ]]; then \
+			candidate="$(MINIO_BOOTSTRAP_DIR)/terraform-output.json"; \
+			if [[ -f "$$candidate" ]]; then export TF_OUTPUT_PATH="$$candidate"; fi; \
+		fi; \
 		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
 			ansible-inventory -i "$(ANSIBLE_INVENTORY_PATH)" --list; \
 	'
@@ -458,6 +462,10 @@ inventory.check: ## Validate inventory parse + DHCP/MAC/IP sanity (no DNS)
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) runner.env.check; \
 		echo "Checking ansible-inventory parse..."; \
+		if [[ "$(ENV)" = "samakia-minio" ]]; then \
+			candidate="$(MINIO_BOOTSTRAP_DIR)/terraform-output.json"; \
+			if [[ -f "$$candidate" ]]; then export TF_OUTPUT_PATH="$$candidate"; fi; \
+		fi; \
 		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
 			ansible-inventory -i "$(ANSIBLE_INVENTORY_PATH)" --list >/dev/null; \
 		echo "Checking inventory sanity (DHCP/MAC/IP)..."; \
@@ -473,6 +481,10 @@ ansible.bootstrap: ## Phase-1 bootstrap (root-only)
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		keys_arg=(); \
 		if [[ -f "$(ANSIBLE_BOOTSTRAP_KEYS_PATH)" ]]; then keys_arg+=( -e @"$(ANSIBLE_BOOTSTRAP_KEYS_PATH)" ); fi; \
+		if [[ "$(ENV)" = "samakia-minio" ]]; then \
+			candidate="$(MINIO_BOOTSTRAP_DIR)/terraform-output.json"; \
+			if [[ -f "$$candidate" ]]; then export TF_OUTPUT_PATH="$$candidate"; fi; \
+		fi; \
 		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
 			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/bootstrap.yml" -u root "$${keys_arg[@]}" $(ANSIBLE_FLAGS); \
 	'
@@ -484,6 +496,10 @@ ansible.harden: ## Phase-2 hardening (runs as samakia)
 	@bash -euo pipefail -c '\
 		env_file="$(RUNNER_ENV_FILE)"; \
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		if [[ "$(ENV)" = "samakia-minio" ]]; then \
+			candidate="$(MINIO_BOOTSTRAP_DIR)/terraform-output.json"; \
+			if [[ -f "$$candidate" ]]; then export TF_OUTPUT_PATH="$$candidate"; fi; \
+		fi; \
 		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
 			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/harden.yml" -u "$(ANSIBLE_USER)" $(ANSIBLE_FLAGS); \
 	'
@@ -737,19 +753,27 @@ minio.tf.plan: ## MinIO Terraform plan (bootstrap-local; ENV=samakia-minio)
 			mkdir -p "$$work_dir"; \
 			rm -rf "$$work_dir/.terraform" || true; \
 			rm -f "$$work_dir"/*.tf "$$work_dir"/.terraform.lock.hcl 2>/dev/null || true; \
-			for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
-				base="$$(basename "$$f")"; \
-				if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
-				cp -f "$$f" "$$work_dir/"; \
-			done; \
-			if [[ -f "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
-			if [[ -f "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
-			terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
-			terraform -chdir="$$work_dir" validate; \
-			terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
-			if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
-			if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
-		'
+				for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
+					base="$$(basename "$$f")"; \
+					if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
+					cp -f "$$f" "$$work_dir/"; \
+				done; \
+				if [[ -s "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
+				if [[ -s "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
+				# If terraform.tfstate is empty/incomplete but a backup exists, prefer the backup.\n\
+				if [[ -s "$$work_dir/terraform.tfstate.backup" ]]; then \
+					if [[ ! -s "$$work_dir/terraform.tfstate" ]] || ! grep -q "\"type\": \"proxmox_lxc\"" "$$work_dir/terraform.tfstate" 2>/dev/null; then \
+						if grep -q "\"type\": \"proxmox_lxc\"" "$$work_dir/terraform.tfstate.backup" 2>/dev/null; then \
+							cp -f "$$work_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate"; \
+						fi; \
+					fi; \
+				fi; \
+				terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
+				terraform -chdir="$$work_dir" validate; \
+				terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
+				if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
+				if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
+			'
 
 .PHONY: minio.tf.apply
 minio.tf.apply: ## MinIO Terraform apply (bootstrap-local; ENV=samakia-minio)
@@ -765,25 +789,39 @@ minio.tf.apply: ## MinIO Terraform apply (bootstrap-local; ENV=samakia-minio)
 			mkdir -p "$$work_dir"; \
 			rm -rf "$$work_dir/.terraform" || true; \
 			rm -f "$$work_dir"/*.tf "$$work_dir"/.terraform.lock.hcl 2>/dev/null || true; \
-			for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
-				base="$$(basename "$$f")"; \
-				if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
-				cp -f "$$f" "$$work_dir/"; \
-			done; \
-			if [[ -f "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
-			if [[ -f "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
-			terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
-			terraform -chdir="$$work_dir" validate; \
-				if [[ "$(DRY_RUN)" = "1" ]]; then \
-					terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
-				else \
+				for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
+					base="$$(basename "$$f")"; \
+					if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
+					cp -f "$$f" "$$work_dir/"; \
+				done; \
+				if [[ -s "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
+				if [[ -s "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
+				# If terraform.tfstate is empty/incomplete but a backup exists, prefer the backup.\n\
+				if [[ -s "$$work_dir/terraform.tfstate.backup" ]]; then \
+					if [[ ! -s "$$work_dir/terraform.tfstate" ]] || ! grep -q "\"type\": \"proxmox_lxc\"" "$$work_dir/terraform.tfstate" 2>/dev/null; then \
+						if grep -q "\"type\": \"proxmox_lxc\"" "$$work_dir/terraform.tfstate.backup" 2>/dev/null; then \
+							cp -f "$$work_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate"; \
+						fi; \
+					fi; \
+				fi; \
+				terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
+				terraform -chdir="$$work_dir" validate; \
+					if [[ "$(DRY_RUN)" = "1" ]]; then \
+						terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
+					else \
 					auto_approve=""; \
 					if [[ "$(CI)" = "1" ]]; then auto_approve="-auto-approve"; fi; \
 					terraform -chdir="$$work_dir" apply -input=false -lock=false $$auto_approve $(TF_APPLY_FLAGS); \
 				fi; \
 				if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
 				if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
-			'
+				# Inventory consumption during bootstrap: generate outputs JSON without initializing the remote backend.\n\
+				# Write it both to the bootstrap workspace and to the env dir as a safe fallback.\n\
+				if [[ "$(DRY_RUN)" != "1" ]]; then \
+					terraform -chdir="$$work_dir" output -json > "$$work_dir/terraform-output.json"; \
+					cp -f "$$work_dir/terraform-output.json" "$$src_dir/terraform-output.json"; \
+				fi; \
+				'
 
 .PHONY: minio.tf.destroy
 minio.tf.destroy: ## MinIO Terraform destroy (bootstrap-local; guarded; CONFIRM=YES)
@@ -800,18 +838,26 @@ minio.tf.destroy: ## MinIO Terraform destroy (bootstrap-local; guarded; CONFIRM=
 			mkdir -p "$$work_dir"; \
 			rm -rf "$$work_dir/.terraform" || true; \
 			rm -f "$$work_dir"/*.tf "$$work_dir"/.terraform.lock.hcl 2>/dev/null || true; \
-			for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
-				base="$$(basename "$$f")"; \
-				if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
-				cp -f "$$f" "$$work_dir/"; \
-			done; \
-			if [[ -f "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
-			if [[ -f "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
-			terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
-			terraform -chdir="$$work_dir" destroy -input=false -lock=false; \
-			if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
-			if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
-		'
+				for f in "$$src_dir"/*.tf "$$src_dir"/.terraform.lock.hcl; do \
+					base="$$(basename "$$f")"; \
+					if [[ "$$base" = "backend.tf" ]]; then continue; fi; \
+					cp -f "$$f" "$$work_dir/"; \
+				done; \
+				if [[ -s "$$src_dir/terraform.tfstate" ]]; then cp -f "$$src_dir/terraform.tfstate" "$$work_dir/terraform.tfstate"; fi; \
+				if [[ -s "$$src_dir/terraform.tfstate.backup" ]]; then cp -f "$$src_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate.backup"; fi; \
+				# If terraform.tfstate is empty/incomplete but a backup exists, prefer the backup.\n\
+				if [[ -s "$$work_dir/terraform.tfstate.backup" ]]; then \
+					if [[ ! -s "$$work_dir/terraform.tfstate" ]] || ! grep -q "\"type\": \"proxmox_lxc\"" "$$work_dir/terraform.tfstate" 2>/dev/null; then \
+						if grep -q "\"type\": \"proxmox_lxc\"" "$$work_dir/terraform.tfstate.backup" 2>/dev/null; then \
+							cp -f "$$work_dir/terraform.tfstate.backup" "$$work_dir/terraform.tfstate"; \
+						fi; \
+					fi; \
+				fi; \
+				terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
+				terraform -chdir="$$work_dir" destroy -input=false -lock=false; \
+				if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
+				if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
+			'
 
 .PHONY: minio.ansible.apply
 minio.ansible.apply: ## MinIO Ansible apply (state-backend.yml; requires bootstrap already done)
@@ -821,6 +867,8 @@ minio.ansible.apply: ## MinIO Ansible apply (state-backend.yml; requires bootstr
 	@bash -euo pipefail -c '\
 		env_file="$(RUNNER_ENV_FILE)"; \
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		candidate="$(MINIO_BOOTSTRAP_DIR)/terraform-output.json"; \
+		if [[ -f "$$candidate" ]]; then export TF_OUTPUT_PATH="$$candidate"; fi; \
 		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
 			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/state-backend.yml" -u "$(ANSIBLE_USER)" $(ANSIBLE_FLAGS); \
 	'
@@ -878,6 +926,13 @@ minio.state.migrate: ## Migrate samakia-minio state to remote backend (requires 
 		$(MAKE) runner.env.check; \
 		$(MAKE) minio.backend.smoke ENV=samakia-minio; \
 		bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
+		# Canonical bootstrap invariant: bootstrap state lives in the runner-local workspace.\n\
+		# Before migrating to the remote backend, copy the bootstrap-local state into the env dir.\n\
+		# This avoids migrating an empty/placeholder state when the env dir is already backend-initialized.\n\
+		src_dir="$(TERRAFORM_ENV_DIR)"; \
+		work_dir="$(MINIO_BOOTSTRAP_DIR)"; \
+		if [[ -s "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
+		if [[ -s "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
 		bash "$(OPS_SCRIPTS_DIR)/tf-backend-init.sh" "$(ENV)" --migrate; \
 	'
 
@@ -894,15 +949,42 @@ minio.up: ## One-command MinIO backend deployment (tf apply -> bootstrap -> stat
 				$(MAKE) minio.tf.apply DRY_RUN=1 CI=1; \
 				exit 0; \
 			fi; \
+			# Proxmox SDN config must be applied before SDN-backed bridges are usable.\n\
+			# This is safe/idempotent and required for first bootstrap.\n\
+			bash "$(OPS_SCRIPTS_DIR)/proxmox-sdn-ensure-stateful-plane.sh" --apply; \
 			$(MAKE) backend.configure; \
 			$(MAKE) minio.tf.plan; \
 			$(MAKE) minio.tf.apply CI=1; \
-				$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+			bash "$(OPS_SCRIPTS_DIR)/proxmox-lxc-ensure-running.sh" "$(ENV)"; \
+			$(MAKE) inventory.check ENV="$(ENV)"; \
+			# Bootstrap must be staged for VLAN-only nodes behind jump hosts.\n\
+			# Phase 1: bootstrap edges (if root SSH still enabled).\n\
+			edges_bootstrap_needed=0; \
+			for ip in 192.168.11.102 192.168.11.103; do \
+				if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "root@$$ip" true >/dev/null 2>&1; then edges_bootstrap_needed=1; fi; \
+			done; \
+			if [[ "$$edges_bootstrap_needed" -eq 1 ]]; then \
+				ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit minio-edge-*" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+			fi; \
+			# Phase 2: bootstrap VLAN-only MinIO nodes via edge ProxyJump.\n\
+			# Use a reachable edge as jump host (root SSH may already be disabled on edges).\n\
+			jump=""; \
+			for ip in 192.168.11.102 192.168.11.103; do \
+				if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "samakia@$$ip" true >/dev/null 2>&1; then jump="samakia@$$ip"; break; fi; \
+			done; \
+			if [[ -z "$$jump" ]]; then echo "ERROR: cannot reach any MinIO edge as samakia (192.168.11.102/103); bootstrap cannot proceed" >&2; exit 1; fi; \
+			nodes_need_bootstrap=0; \
+			for ip in 10.10.140.11 10.10.140.12 10.10.140.13; do \
+				if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@$$ip" true >/dev/null 2>&1; then nodes_need_bootstrap=1; fi; \
+			done; \
+			if [[ "$$nodes_need_bootstrap" -eq 1 ]]; then \
+				ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit minio-1,minio-2,minio-3" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+			fi; \
 				$(MAKE) minio.ansible.apply; \
-				$(MAKE) minio.accept; \
-				bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
-					$(MAKE) minio.state.migrate; \
-				'
+					$(MAKE) minio.accept; \
+					bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
+						$(MAKE) minio.state.migrate; \
+					'
 
 .PHONY: minio.failure.sim
 minio.failure.sim: ## MinIO edge failure simulation (reversible; requires EDGE=minio-edge-1|minio-edge-2)
@@ -979,11 +1061,31 @@ dns.up: ## One-command DNS deployment (tf apply -> bootstrap -> dns -> acceptanc
 		env_file="$(RUNNER_ENV_FILE)"; \
 		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) runner.env.check; \
-		ENV=samakia-minio $(MAKE) minio.backend.smoke; \
+		$(MAKE) minio.backend.smoke ENV=samakia-minio; \
 		ENV=samakia-minio bash "$(OPS_SCRIPTS_DIR)/minio-quorum-guard.sh"; \
 		$(MAKE) dns.tf.plan; \
 		$(MAKE) dns.tf.apply; \
-		$(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		# Phase 1 bootstrap for LAN-reachable edges first, then VLAN-only auth via ProxyJump.\n\
+		edges_need_bootstrap=0; \
+		for ip in 192.168.11.111 192.168.11.112; do \
+			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "root@$$ip" true >/dev/null 2>&1; then edges_need_bootstrap=1; fi; \
+		done; \
+		if [[ "$$edges_need_bootstrap" -eq 1 ]]; then \
+			ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit dns-edge-*" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		fi; \
+		# Pick a reachable edge as jump host for VLAN-only auth nodes.\n\
+		jump=""; \
+		for ip in 192.168.11.111 192.168.11.112; do \
+			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "samakia@$$ip" true >/dev/null 2>&1; then jump="samakia@$$ip"; break; fi; \
+		done; \
+		if [[ -z "$$jump" ]]; then echo "ERROR: cannot reach any DNS edge as samakia (192.168.11.111/112); bootstrap cannot proceed" >&2; exit 1; fi; \
+		auth_need_bootstrap=0; \
+		for ip in 10.10.100.21 10.10.100.22; do \
+			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@$$ip" true >/dev/null 2>&1; then auth_need_bootstrap=1; fi; \
+		done; \
+		if [[ "$$auth_need_bootstrap" -eq 1 ]]; then \
+			ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit dns-auth-1,dns-auth-2" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		fi; \
 		$(MAKE) dns.ansible.apply; \
 		$(MAKE) dns.accept; \
 	'
