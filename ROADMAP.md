@@ -96,6 +96,8 @@ Outcome:
 
 Goal: Establish reusable infrastructure building blocks.
 
+Status: COMPLETED ✅
+
 ### Completed (canonical)
 - Proxmox SDN integration (guarded, applied after changes)
 - DNS infrastructure plane (SDN VLAN + VIP-based edge/gateway pattern)
@@ -113,6 +115,8 @@ Outcome:
 ## Phase 2.1 — Shared Control Plane Services
 
 Goal: Provide internal time, PKI, secrets, and observability as reusable primitives.
+
+Status: COMPLETED ✅
 
 ### Completed (canonical)
 - Shared services SDN plane (VLAN120, `zshared`/`vshared`, subnet `10.10.120.0/24`, GW VIP `10.10.120.1`)

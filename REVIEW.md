@@ -360,6 +360,13 @@ Verdict: **GO for production foundation**, με τα Short-term items ως requi
 Phase 2.1 (Shared Control Plane Services) has been accepted and locked via `acceptance/PHASE2_1_ACCEPTED.md`.
 No regressions were introduced to Phase 2 DNS/MinIO contracts or acceptance gates.
 
+## Phase Closure Summary
+
+Phase 2 (Networking & Platform Primitives) is completed and locked.
+Phase 2.1 (Shared Control Plane Services) is completed and locked.
+No regressions were introduced.
+Phase 3 remains NOT READY.
+
 ## Phase 3 Entry Status
 
 Phase 3 entry is **NOT READY** pending live readiness verification (see `acceptance/PHASE3_ENTRY_CHECKLIST.md`).
