@@ -135,6 +135,24 @@ Outcome:
 
 ---
 
+## Phase 2.2 — Control Plane Correctness & Invariants
+
+Goal: Enforce functional correctness for shared control-plane services beyond reachability.
+
+Status: COMPLETED ✅
+
+### Scope (canonical)
+- Loki ingestion must be verifiable (queryable series present).
+- Shared services must be active + enabled with restart safety (systemd readiness).
+- Acceptance scripts are binary PASS/FAIL (no SKIP).
+- Strict TLS and token-only Proxmox remain unchanged.
+- No DNS dependency for acceptance (VIP IPs only).
+
+Outcome:
+- Shared services are not just up; they are **functionally correct**.
+
+---
+
 ## Phase 3 — High Availability & Resilience
 
 Goal: Enable resilient, multi-node deployments with realistic failure semantics.

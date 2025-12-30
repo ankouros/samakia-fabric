@@ -15,6 +15,28 @@
     mode: "0644"
   notify: Restart chrony
 
+- name: Ensure chrony systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/chrony.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install chrony systemd restart policy override
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/chrony.service.d/override.conf
+    content: |
+      [Service]
+      Restart=on-failure
+      RestartSec=5s
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart chrony
+
 - name: Ensure chrony is enabled and started
   ansible.builtin.service:
     name: chrony

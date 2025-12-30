@@ -238,6 +238,28 @@
     mode: "0644"
   notify: Restart keepalived
 
+- name: Ensure keepalived systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/keepalived.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install keepalived systemd restart policy override
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/keepalived.service.d/override.conf
+    content: |
+      [Service]
+      Restart=on-failure
+      RestartSec=5s
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart keepalived
+
 - name: Ensure keepalived is enabled and started
   ansible.builtin.service:
     name: keepalived
@@ -252,6 +274,28 @@
     group: root
     mode: "0644"
   notify: Restart nftables
+
+- name: Ensure nftables systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/nftables.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install nftables systemd restart policy override
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/nftables.service.d/override.conf
+    content: |
+      [Service]
+      Restart=on-failure
+      RestartSec=5s
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart nftables
 
 - name: Ensure nftables is enabled and started
   ansible.builtin.service:

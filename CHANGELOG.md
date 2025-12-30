@@ -58,6 +58,13 @@ The format is inspired by:
 - Phase 2.1 acceptance marker: `acceptance/PHASE2_1_ACCEPTED.md` (read-only acceptance; no secrets)
 - Governance: Phase 2 and Phase 2.1 marked completed in ROADMAP/REVIEW
 - Phase 3 entry checklist: `acceptance/PHASE3_ENTRY_CHECKLIST.md` (status: NOT READY pending runtime verification)
+
+#### Control-plane correctness (Phase 2.2)
+- Observability ingestion acceptance: `ops/scripts/shared-obs-ingest-accept.sh` + `make shared.obs.ingest.accept` (Loki series must be queryable)
+- Runtime invariants acceptance: `ops/scripts/shared-runtime-invariants-accept.sh` + `make shared.runtime.invariants.accept` (systemd active + enabled + restart policy)
+- Phase 2.2 entry checklist: `acceptance/PHASE2_2_ENTRY_CHECKLIST.md`
+- Phase 2.2 aggregate acceptance: `make phase2.2.accept` (read-only; no DNS dependency)
+- Phase 2.2 acceptance marker: `acceptance/PHASE2_2_ACCEPTED.md` (read-only acceptance; no secrets)
 - Phase 1 operational hardening (remote state + runner bootstrapping + CI-safe orchestration)
 - Remote Terraform backend initialization for MinIO/S3 with lockfiles (`ops/scripts/tf-backend-init.sh`; no DynamoDB; strict TLS)
 - Runner host env management (`ops/scripts/runner-env-install.sh`, `ops/scripts/runner-env-check.sh`) with canonical env file `~/.config/samakia-fabric/env.sh` (chmod 600; presence-only output)
@@ -96,6 +103,8 @@ The format is inspired by:
 - MinIO bootstrap local-exec path invariant: local-exec provisioners use repo-root injection (`TF_VAR_fabric_repo_root`) and absolute script paths (no relative path assumptions)
 - Deterministic script invocation invariant: repo scripts call other repo scripts via explicit repo root (no `cwd`/relative-path assumptions), and affected ops scripts fail loudly when `FABRIC_REPO_ROOT` is unset
 - Makefile non-interactive apply invariant: Terraform `apply` uses `-auto-approve` when `CI=1` (prevents EOF failures in `make minio.up`/`make dns.up` and other non-interactive runs)
+- Shared SDN acceptance parsing now uses correct JSON ingestion and fails on missing CT wiring (no SKIP in acceptance)
+- Shared control-plane restart safety: `chrony`, `keepalived`, and `nftables` now enforce systemd restart policies via overrides
 
 ### Changed
 - Migrated Codex remediation log into `CHANGELOG.md` (retired `codex-changelog.md`)

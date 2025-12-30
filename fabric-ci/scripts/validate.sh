@@ -33,6 +33,12 @@ bash "$ROOT_DIR/ops/scripts/test-minio-quorum-guard.sh"
 # MinIO Terraform backend smoke parsing unit test (offline; no MinIO/Proxmox).
 bash "$ROOT_DIR/ops/scripts/test-minio-terraform-backend-smoke.sh"
 
+# Shared observability ingestion acceptance parsing (offline).
+bash "$ROOT_DIR/ops/scripts/test-shared-obs-ingest-accept.sh"
+
+# Shared runtime invariants evaluation (offline).
+bash "$ROOT_DIR/ops/scripts/test-shared-runtime-invariants-accept.sh"
+
 # DNS rrset check unit test (offline; no Proxmox/DNS needed).
 bash "$ROOT_DIR/ops/scripts/test-dns-rrset-check.sh"
 

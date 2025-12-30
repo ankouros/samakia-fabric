@@ -759,6 +759,14 @@ phase2.1.entry.check: ## Phase 2.1 entry checklist (writes acceptance/PHASE2_1_E
 phase2.1.accept: ## Run Phase 2.1 acceptance suite (read-only; shared control-plane services)
 	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase2-1-accept.sh"
 
+.PHONY: phase2.2.entry.check
+phase2.2.entry.check: ## Phase 2.2 entry checklist (writes acceptance/PHASE2_2_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase2-2-entry-check.sh"
+
+.PHONY: phase2.2.accept
+phase2.2.accept: ## Run Phase 2.2 acceptance suite (read-only; control-plane invariants)
+	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase2-2-accept.sh"
+
 .PHONY: phase0.accept
 phase0.accept: ## Run Phase 0 acceptance suite (static checks; no infra mutations)
 	bash "$(OPS_SCRIPTS_DIR)/phase0-accept.sh"
@@ -1175,6 +1183,16 @@ shared.pki.accept: ## Shared PKI acceptance (Vault PKI engine)
 shared.obs.accept: ## Shared observability acceptance (Grafana/Prometheus/Alertmanager/Loki)
 	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
 	@bash "$(OPS_SCRIPTS_DIR)/shared-obs-accept.sh"
+
+.PHONY: shared.obs.ingest.accept
+shared.obs.ingest.accept: ## Shared observability ingestion acceptance (Loki series)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OPS_SCRIPTS_DIR)/shared-obs-ingest-accept.sh"
+
+.PHONY: shared.runtime.invariants.accept
+shared.runtime.invariants.accept: ## Shared runtime invariants acceptance (systemd readiness)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OPS_SCRIPTS_DIR)/shared-runtime-invariants-accept.sh"
 
 .PHONY: shared.accept
 shared.accept: ## Shared services acceptance (SDN + NTP + Vault + PKI + Observability)

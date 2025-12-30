@@ -4,6 +4,10 @@
     argv: ["update-ca-certificates"]
   changed_when: false
 
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
 - name: Restart haproxy
   ansible.builtin.service:
     name: haproxy

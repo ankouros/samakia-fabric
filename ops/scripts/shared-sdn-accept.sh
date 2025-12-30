@@ -51,16 +51,15 @@ Usage:
 
 Read-only Shared SDN acceptance tests for Samakia Fabric.
 
-Validates (best-effort, non-destructive):
+Validates (read-only, non-destructive):
   A) Proxmox SDN primitives exist: zone/vnet/subnet/gateway
-  B) Shared CT network wiring (when CTs exist): VLAN-only nodes; dual-homed NTP/edge nodes
-  C) Gateway semantics (when edges exist and SSH is possible): exactly one VLAN GW VIP holder; NAT readiness
+  B) Shared CT network wiring: VLAN-only nodes; dual-homed NTP/edge nodes
+  C) Gateway semantics: exactly one VLAN GW VIP holder; NAT readiness
   D) Isolation signals (best-effort): VLAN nodes not reachable from LAN runner
   E) Collision signals (best-effort): VIP IPs are not assigned as static CT IPs
 
 Notes:
   - This script is deterministic and does not mutate Terraform state or Proxmox.
-  - If the expected CTs are not deployed yet, CT-level checks are reported as [SKIP].
 EOF
 }
 
@@ -87,9 +86,6 @@ fi
 
 ok() { echo "[OK] $*"; }
 fail() { echo "[FAIL] $*" >&2; exit 1; }
-skip() { echo "[SKIP] $*"; skipped=1; }
-
-skipped=0
 
 proxmox_api_url="${PM_API_URL:-${TF_VAR_pm_api_url:-}}"
 proxmox_token_id="${PM_API_TOKEN_ID:-${TF_VAR_pm_api_token_id:-}}"
@@ -211,23 +207,21 @@ print("")
 ' "${SDN_SUBNET}"
 }
 
-ct_config_or_skip() {
+ct_config_or_fail() {
   local node="$1"
   local vmid="$2"
   local payload
   if ! payload="$(get_ct_config_json "$node" "$vmid" 2>/dev/null)"; then
-    skip "CT config not found for ${node}/lxc/${vmid}"
-    return 1
+    fail "CT config not found for ${node}/lxc/${vmid}"
   fi
-  if ! echo "${payload}" | python3 -c 'import json,sys; json.load(sys.stdin)'; then
-    skip "CT config invalid JSON for ${node}/lxc/${vmid}"
-    return 1
+  if ! echo "${payload}" | python3 -c 'import json,sys; json.load(sys.stdin)' 2>/dev/null; then
+    fail "CT config invalid JSON for ${node}/lxc/${vmid}"
   fi
   printf '%s' "${payload}"
 }
 
 extract_ct_networks() {
-  python3 - <<'PY'
+  python3 -c '
 import json,sys
 payload=json.load(sys.stdin)
 data=payload.get("data",{})
@@ -235,7 +229,7 @@ for key, val in data.items():
     if not key.startswith("net"):
         continue
     print(f"{key}\t{val}")
-PY
+'
 }
 
 check_net_contains() {
@@ -296,12 +290,11 @@ ok "SDN subnet OK: ${SDN_SUBNET} (gw=${subnet_gw:-${SDN_GATEWAY_VIP}})"
 check_vlan_only_node() {
   local node="$1" vmid="$2" expect_ip="$3"
   local payload
-  if ! payload="$(ct_config_or_skip "$node" "$vmid")"; then return 0; fi
+  payload="$(ct_config_or_fail "$node" "$vmid")"
   local nets
   nets="$(echo "${payload}" | extract_ct_networks)"
   if [[ -z "${nets}" ]]; then
-    skip "no network config for ${node}/lxc/${vmid}"
-    return 0
+    fail "no network config for ${node}/lxc/${vmid}"
   fi
   local count
   count="$(echo "${nets}" | wc -l | tr -d ' ')"
@@ -318,12 +311,11 @@ check_vlan_only_node() {
 check_dual_homed_edge() {
   local node="$1" vmid="$2" expect_lan="$3" expect_vlan="$4"
   local payload
-  if ! payload="$(ct_config_or_skip "$node" "$vmid")"; then return 0; fi
+  payload="$(ct_config_or_fail "$node" "$vmid")"
   local nets
   nets="$(echo "${payload}" | extract_ct_networks)"
   if [[ -z "${nets}" ]]; then
-    skip "no network config for ${node}/lxc/${vmid}"
-    return 0
+    fail "no network config for ${node}/lxc/${vmid}"
   fi
   local count
   count="$(echo "${nets}" | wc -l | tr -d ' ')"
@@ -388,7 +380,7 @@ if ssh_run "${edge1_lan}" true >/dev/null 2>&1 && ssh_run "${edge2_lan}" true >/
   ssh_run "${active_edge}" "ping -c1 -W1 ${LAN_GW} >/dev/null" || fail "active edge cannot reach LAN gateway ${LAN_GW}"
   ok "active edge can reach LAN gateway ${LAN_GW}"
 else
-  skip "edge SSH not reachable from runner; skipping gateway/NAT checks"
+    fail "edge SSH not reachable from runner; cannot validate gateway/NAT checks"
 fi
 
 ###############################################################################
@@ -412,9 +404,5 @@ for ip in "${DNS_VIP}" "${MINIO_VIP}" "${NTP_VIP}" "${VAULT_VIP}" "${OBS_VIP}"; 
   fi
 done
 ok "no VIP collision signals detected (best-effort)"
-
-if [[ "${skipped}" -eq 1 ]]; then
-  echo "[WARN] Some checks were skipped due to missing CTs or unreachable edges."
-fi
 
 ok "Shared SDN acceptance completed"

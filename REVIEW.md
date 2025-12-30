@@ -360,10 +360,19 @@ Verdict: **GO for production foundation**, με τα Short-term items ως requi
 Phase 2.1 (Shared Control Plane Services) has been accepted and locked via `acceptance/PHASE2_1_ACCEPTED.md`.
 No regressions were introduced to Phase 2 DNS/MinIO contracts or acceptance gates.
 
+## Phase 2.2 Correctness Note
+
+Phase 2.2 hardens shared control-plane correctness beyond reachability:
+Loki ingestion is verified, and systemd readiness/restart policies are enforced.
+Acceptance remains read-only, strict TLS, and IP-only (no DNS dependency).
+
+Phase 2.2 (Control Plane Correctness & Invariants) has been accepted and locked via `acceptance/PHASE2_2_ACCEPTED.md`.
+
 ## Phase Closure Summary
 
 Phase 2 (Networking & Platform Primitives) is completed and locked.
 Phase 2.1 (Shared Control Plane Services) is completed and locked.
+Phase 2.2 (Control Plane Correctness & Invariants) is completed and locked.
 No regressions were introduced.
 Phase 3 remains NOT READY.
 

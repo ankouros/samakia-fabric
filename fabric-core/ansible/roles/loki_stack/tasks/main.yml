@@ -40,6 +40,13 @@
     state: present
     update_cache: true
 
+- name: Ensure promtail can read the systemd journal
+  ansible.builtin.user:
+    name: promtail
+    groups: systemd-journal
+    append: true
+  notify: Restart promtail
+
 - name: Install Loki configuration
   ansible.builtin.template:
     src: loki-config.yml.j2

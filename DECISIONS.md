@@ -595,6 +595,39 @@ PKI decision:
 - LAN VIPs are the only service endpoints; shared-edge LAN IPs are ops-only.
 - Shared edge HAProxy must terminate TLS using Vault PKI-issued certs.
 
+## ADR-0019 — Control Plane Correctness & Invariants (Phase 2.2)
+
+**Status:** Accepted
+**Date:** 2026-01-10
+
+### Decision
+
+Phase 2.2 formalizes **correctness invariants** for shared control-plane services.
+Acceptance must prove **functional readiness**, not just reachability.
+
+Canonical invariants:
+- Loki **ingestion** must be verifiable (queryable series present).
+- Shared services must be **active + enabled** and have **restart safety** (systemd `Restart` policy not `no`).
+- Acceptance scripts are **binary PASS/FAIL** (no SKIP).
+- Strict TLS and token-only Proxmox remain unchanged.
+- No DNS dependency for acceptance; VIP IPs are used directly.
+
+Canonical acceptance commands:
+- `make shared.obs.ingest.accept ENV=samakia-shared`
+- `make shared.runtime.invariants.accept ENV=samakia-shared`
+- `make phase2.2.accept ENV=samakia-shared`
+
+### Rationale
+
+- Service reachability alone can hide silent failures (e.g., log ingestion stopped).
+- Deterministic invariants provide reliable readiness signals before Phase 3.
+
+### Consequences
+
+- Observability acceptance now requires **ingestion evidence**.
+- Shared service acceptance requires **systemd readiness + restart policy** checks.
+- Phase 2.2 cannot be locked unless these invariants PASS.
+
 
 
 

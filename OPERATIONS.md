@@ -333,6 +333,33 @@ Notes:
 - SSH allowlist for shared edges is controlled via `FABRIC_ADMIN_CIDRS` (comma-separated CIDRs).
 - No DNS dependency for bootstrap or acceptance (use VIP IPs).
 
+### Phase 2.2 — Control Plane Correctness & Invariants
+
+Phase 2.2 tightens shared control-plane correctness beyond reachability.
+These checks are **read-only** and produce binary PASS/FAIL (no SKIP).
+
+Ingestion acceptance (Loki must show queryable series):
+
+```bash
+make shared.obs.ingest.accept ENV=samakia-shared
+```
+
+Runtime invariants (systemd active + enabled + restart policy):
+
+```bash
+make shared.runtime.invariants.accept ENV=samakia-shared
+```
+
+Aggregate Phase 2.2 gate:
+
+```bash
+make phase2.2.accept ENV=samakia-shared
+```
+
+Notes:
+- Runtime invariant checks require passwordless sudo for read-only systemd inspection.
+- Ingestion acceptance passes when **either** `systemd-journal` or `varlogs` series are present.
+
 ---
 
 ## Golden Image Operations (Packer)
