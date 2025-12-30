@@ -56,6 +56,7 @@ The format is inspired by:
 - Orchestration targets: `make shared.up`, `make shared.accept`, and `make phase2.1.accept`
 - Phase 2.1 entry checklist: `acceptance/PHASE2_1_ENTRY_CHECKLIST.md`
 - Phase 2.1 acceptance marker: `acceptance/PHASE2_1_ACCEPTED.md` (read-only acceptance; no secrets)
+- Phase 3 entry checklist: `acceptance/PHASE3_ENTRY_CHECKLIST.md` (status: NOT READY pending runtime verification)
 - Phase 1 operational hardening (remote state + runner bootstrapping + CI-safe orchestration)
 - Remote Terraform backend initialization for MinIO/S3 with lockfiles (`ops/scripts/tf-backend-init.sh`; no DynamoDB; strict TLS)
 - Runner host env management (`ops/scripts/runner-env-install.sh`, `ops/scripts/runner-env-check.sh`) with canonical env file `~/.config/samakia-fabric/env.sh` (chmod 600; presence-only output)
