@@ -67,6 +67,28 @@ evidence/images/vm/<image>/<version>/<UTC>/{build,validate}/
 
 Artifacts and evidence must never be committed to Git.
 
+## Running via Toolchain Container (optional)
+
+If you prefer a pinned toolchain, use the container wrapper:
+
+```bash
+IMAGE_BUILD=1 I_UNDERSTAND_BUILDS_TAKE_TIME=1 \
+ops/images/vm/toolchain-run.sh full --image ubuntu-24.04 --version v1
+```
+
+Validate a local qcow2 in the container:
+
+```bash
+QCOW2_FIXTURE_PATH=/path/to/ubuntu-24.04-v1.qcow2 \
+ops/images/vm/toolchain-run.sh validate --image ubuntu-24.04 --version v1 --qcow2 /path/to/ubuntu-24.04-v1.qcow2
+```
+
+Build the container (optional):
+
+```bash
+docker build -t samakia-fabric/image-toolchain:phase8-1.2 tools/image-toolchain
+```
+
 ## Failure modes (common)
 
 - **missing guestfish**

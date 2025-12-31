@@ -59,6 +59,11 @@ The format is inspired by:
 - Tooling prerequisite checks + evidence verification helper
 - Phase 8 Part 1.1 acceptance marker: `acceptance/PHASE8_PART1_1_ACCEPTED.md`
 
+#### VM golden images (Phase 8 Part 1.2)
+- Optional pinned toolchain container for builds/validation
+- Toolchain wrapper + guarded Make targets
+- Phase 8 Part 1.2 acceptance marker: `acceptance/PHASE8_PART1_2_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

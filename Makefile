@@ -308,9 +308,25 @@ image.local.validate: ## Local VM qcow2 validation (QCOW2=... IMAGE=... VERSION=
 image.local.evidence: ## Local VM validation evidence (QCOW2=... IMAGE=... VERSION=...)
 	@bash "$(REPO_ROOT)/ops/images/vm/local-run.sh" evidence --image "$(IMAGE)" --version "$(VERSION)" --qcow2 "$(QCOW2)"
 
+.PHONY: image.toolchain.build
+image.toolchain.build: ## Build VM image using toolchain container (guarded)
+	@bash "$(REPO_ROOT)/ops/images/vm/toolchain-run.sh" build --image "$(IMAGE)" --version "$(VERSION)"
+
+.PHONY: image.toolchain.validate
+image.toolchain.validate: ## Validate qcow2 using toolchain container
+	@bash "$(REPO_ROOT)/ops/images/vm/toolchain-run.sh" validate --image "$(IMAGE)" --version "$(VERSION)" --qcow2 "$(QCOW2)"
+
+.PHONY: image.toolchain.full
+image.toolchain.full: ## Build+validate using toolchain container (guarded)
+	@bash "$(REPO_ROOT)/ops/images/vm/toolchain-run.sh" full --image "$(IMAGE)" --version "$(VERSION)"
+
 .PHONY: phase8.part1.1.accept
 phase8.part1.1.accept: ## Phase 8 Part 1.1 acceptance (local runbook + wrappers)
 	@bash "$(OPS_SCRIPTS_DIR)/phase8-part1-1-accept.sh"
+
+.PHONY: phase8.part1.2.accept
+phase8.part1.2.accept: ## Phase 8 Part 1.2 acceptance (toolchain container)
+	@bash "$(OPS_SCRIPTS_DIR)/phase8-part1-2-accept.sh"
 
 
 .PHONY: image.list

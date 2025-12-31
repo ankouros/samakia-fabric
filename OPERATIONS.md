@@ -446,6 +446,17 @@ make phase8.part1.1.accept
 Runbook:
 - `docs/images/local-build-and-validate.md`
 
+Phase 8 Part 1.2 (optional toolchain container):
+
+```bash
+make image.toolchain.build IMAGE=ubuntu-24.04 VERSION=v1
+make image.toolchain.validate IMAGE=ubuntu-24.04 VERSION=v1 QCOW2=/path/to/image.qcow2
+make phase8.part1.2.accept
+```
+
+Toolchain definition:
+- `tools/image-toolchain/`
+
 Optional local artifact validation (requires a local qcow2 fixture):
 
 ```bash

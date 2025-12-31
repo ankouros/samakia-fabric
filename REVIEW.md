@@ -483,3 +483,8 @@ Phase 8 Part 1.1 makes the pipeline operator-repeatable locally (guarded builds)
 - Safe wrapper: `ops/images/vm/local-run.sh` with explicit build guards.
 - Evidence verification helper: `ops/images/vm/evidence/verify-evidence.sh`.
 - Acceptance marker: `acceptance/PHASE8_PART1_1_ACCEPTED.md`.
+
+Phase 8 Part 1.2 adds an optional pinned toolchain container:
+- Container definition: `tools/image-toolchain/`.
+- Wrapper: `ops/images/vm/toolchain-run.sh` (opt-in, guarded).
+- Acceptance marker: `acceptance/PHASE8_PART1_2_ACCEPTED.md`.
