@@ -12,6 +12,7 @@ This directory contains Samakia Fabric documentation.
 ## Usage
 
 - Start with `../ARCHITECTURE.md` and `../DECISIONS.md`
+- Review `../CONTRACTS.md` and `../SECURITY.md` for non-negotiables
 - Follow tutorials in order for first-time setup
 
 ## Status

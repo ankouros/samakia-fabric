@@ -132,6 +132,7 @@ Start here:
 - 🧠 `DECISIONS.md`
 - 🛠️ `OPERATIONS.md`
 - 🔐 `SECURITY.md`
+- 📜 `CONTRACTS.md`
 - 🎨 `STYLEGUIDE.md`
 - 🤝 `CONTRIBUTING.md`
 - 🤖 `AGENTS.md`
@@ -163,6 +164,7 @@ Samakia Fabric is explicitly designed to be:
 - Safe for AI-assisted workflows
 
 Rules for agents are defined in `AGENTS.md`.
+Shared ecosystem contract: `/home/aggelos/samakia-specs/specs/base/ecosystem.yaml`.
 
 ---
 
