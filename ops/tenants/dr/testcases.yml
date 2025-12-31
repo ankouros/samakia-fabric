@@ -1,0 +1,52 @@
+{
+  "testcases": [
+    {
+      "id": "node-loss",
+      "mode": "dry-run",
+      "description": "Validate tenant readiness for loss of a single node",
+      "evidence_required": ["inventory-snapshot", "ha-readiness"]
+    },
+    {
+      "id": "vip-failover",
+      "mode": "dry-run",
+      "description": "Validate VIP failover readiness for tenant endpoints",
+      "evidence_required": ["vip-ownership", "endpoint-availability"]
+    },
+    {
+      "id": "service-restart",
+      "mode": "dry-run",
+      "description": "Validate service restart readiness for tenant bindings",
+      "evidence_required": ["service-health", "endpoint-availability"]
+    },
+    {
+      "id": "storage-unavailable",
+      "mode": "dry-run",
+      "description": "Validate storage outage readiness and recovery expectations",
+      "evidence_required": ["storage-status", "restore-procedure"]
+    },
+    {
+      "id": "restore-from-backup",
+      "mode": "dry-run",
+      "description": "Validate restore from backup procedure exists and is documented",
+      "evidence_required": ["backup-target", "restore-steps"]
+    },
+    {
+      "id": "restore-point-in-time",
+      "mode": "dry-run",
+      "description": "Validate point-in-time recovery expectations and prerequisites",
+      "evidence_required": ["backup-target", "pitr-steps"]
+    },
+    {
+      "id": "gameday:vip-failover",
+      "mode": "safe-gameday",
+      "description": "Run a safe VIP failover GameDay",
+      "evidence_required": ["gameday-evidence"]
+    },
+    {
+      "id": "gameday:service-restart",
+      "mode": "safe-gameday",
+      "description": "Run a safe service restart GameDay",
+      "evidence_required": ["gameday-evidence"]
+    }
+  ]
+}

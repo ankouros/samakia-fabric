@@ -1005,6 +1005,34 @@ tenants.evidence: ## Generate tenant evidence packets (TENANT=all or id)
 tenants.doctor: ## Check tenant tooling and contract presence
 	@bash "$(REPO_ROOT)/ops/tenants/tenants.sh" doctor
 
+.PHONY: tenants.execute.policy.check
+tenants.execute.policy.check: ## Validate tenant execute policy (allowlists + guards)
+	@bash "$(REPO_ROOT)/ops/tenants/execute/validate-execute-policy.sh"
+
+.PHONY: tenants.plan
+tenants.plan: ## Dry-run tenant enablement plan (TENANT=<id> ENV=<env> EXECUTE_REASON=...)
+	@TENANT="$(TENANT)" ENV="$(ENV)" EXECUTE_REASON="$(EXECUTE_REASON)" \
+		bash "$(REPO_ROOT)/ops/tenants/execute/plan.sh" --tenant "$(TENANT)" --env "$(ENV)"
+
+.PHONY: tenants.apply
+tenants.apply: ## Apply tenant enablement (guarded) (TENANT=<id> ENV=<env>)
+	@TENANT="$(TENANT)" ENV="$(ENV)" \
+		bash "$(REPO_ROOT)/ops/tenants/execute/apply.sh" --tenant "$(TENANT)" --env "$(ENV)"
+
+.PHONY: tenants.creds.issue
+tenants.creds.issue: ## Issue tenant credentials (guarded) (TENANT=<id> CONSUMER=<name> ENDPOINT_REF=...)
+	@TENANT="$(TENANT)" CONSUMER="$(CONSUMER)" ENDPOINT_REF="$(ENDPOINT_REF)" \
+		bash "$(REPO_ROOT)/ops/tenants/creds/issue.sh" --tenant "$(TENANT)" --consumer "$(CONSUMER)" --endpoint "$(ENDPOINT_REF)"
+
+.PHONY: tenants.dr.validate
+tenants.dr.validate: ## Validate tenant DR testcases wiring
+	@bash "$(REPO_ROOT)/ops/tenants/dr/validate-dr.sh"
+
+.PHONY: tenants.dr.run
+tenants.dr.run: ## Run tenant DR harness (dry-run default) (TENANT=<id> ENV=<env> DR_MODE=execute)
+	@TENANT="$(TENANT)" ENV="$(ENV)" DR_MODE="$(DR_MODE)" \
+		bash "$(REPO_ROOT)/ops/tenants/dr/run.sh" --tenant "$(TENANT)" --mode "$${DR_MODE:-dry-run}"
+
 .PHONY: phase10.entry.check
 phase10.entry.check: ## Phase 10 entry checklist (writes acceptance/PHASE10_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase10-entry-check.sh"
@@ -1016,6 +1044,14 @@ phase10.part1.entry.check: ## Phase 10 Part 1 entry checklist (writes acceptance
 .PHONY: phase10.part1.accept
 phase10.part1.accept: ## Run Phase 10 Part 1 acceptance suite (read-only)
 	@bash "$(OPS_SCRIPTS_DIR)/phase10-part1-accept.sh"
+
+.PHONY: phase10.part2.entry.check
+phase10.part2.entry.check: ## Phase 10 Part 2 entry checklist (writes acceptance/PHASE10_PART2_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase10-part2-entry-check.sh"
+
+.PHONY: phase10.part2.accept
+phase10.part2.accept: ## Run Phase 10 Part 2 acceptance suite (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase10-part2-accept.sh"
 
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)

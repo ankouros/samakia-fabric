@@ -1,0 +1,23 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantConsumerBinding",
+  "metadata": {
+    "tenant_id": "project-birds",
+    "consumer": "database"
+  },
+  "spec": {
+    "consumer": "database",
+    "variant": "single",
+    "ha_ready": true,
+    "mode": "dry-run",
+    "endpoint_ref": "db-primary",
+    "secret_ref": "secrets/tenants/project-birds/db-primary",
+    "backup_target": "backup://project-birds/database",
+    "restore_testcases": ["restore-from-backup"],
+    "dr_testcases": ["gameday:vip-failover"],
+    "owner": {
+      "tenant_id": "project-birds",
+      "consumer": "database"
+    }
+  }
+}

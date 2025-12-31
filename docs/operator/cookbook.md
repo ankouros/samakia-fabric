@@ -263,6 +263,8 @@ Validate tenant (project) bindings against schema and semantics.
 #### Command
 ```bash
 make tenants.validate
+make tenants.execute.policy.check
+make tenants.dr.validate
 ```
 
 #### Expected result
@@ -330,6 +332,150 @@ Evidence packets created under `evidence/tenants/...`.
 #### Rollback / safe exit
 Fix contracts and re-run evidence.
 
+### Task: Issue tenant credentials (offline-first)
+
+#### Intent
+Create tenant credentials in an encrypted local store (no secrets in Git).
+
+#### Preconditions
+- Tenant endpoints declared
+- Passphrase set (`TENANT_CREDS_PASSPHRASE` or file)
+
+#### Command
+```bash
+TENANT_CREDS_ISSUE=1 \
+TENANT_CREDS_PASSPHRASE="change-me" \
+make tenants.creds.issue TENANT=project-birds CONSUMER=database ENDPOINT_REF=db-primary
+```
+
+#### Expected result
+Encrypted credentials stored under `~/.config/samakia-fabric/tenants/<tenant>/`.
+
+#### Evidence outputs
+`evidence/tenants/<tenant>/<UTC>/creds/...`
+
+#### Failure modes
+- Missing passphrase
+- Endpoint reference not found
+
+#### Rollback / safe exit
+Do not commit any generated evidence; remove local secrets if created in error.
+
+### Task: Plan tenant enablement (dry-run)
+
+#### Intent
+Validate enabled bindings and show the execute plan without mutation.
+
+#### Preconditions
+- Enabled bindings present (`consumers/<type>/enabled.yml`)
+- Execute policy allowlists tenant and env
+
+#### Command
+```bash
+ENV=samakia-dev EXECUTE_REASON="plan-only" \
+make tenants.plan TENANT=project-birds
+```
+
+#### Expected result
+Plan output lists enabled bindings and modes.
+
+#### Evidence outputs
+None by default.
+
+#### Failure modes
+- Tenant or env not allowlisted
+- Enabled bindings invalid
+
+#### Rollback / safe exit
+Fix bindings or policy allowlist; re-run plan.
+
+### Task: Apply tenant enablement (guarded)
+
+#### Intent
+Execute tenant enablement in a guarded, auditable way.
+
+#### Preconditions
+- Plan passes
+- Execute policy allowlists tenant and env
+- Explicit guards set
+- Prod requires change window + evidence signing
+
+#### Command
+```bash
+ENV=samakia-dev \
+TENANT_EXECUTE=1 I_UNDERSTAND_TENANT_MUTATION=1 \
+EXECUTE_REASON="enable tenant bindings" \
+make tenants.apply TENANT=project-birds
+```
+
+#### Expected result
+Credentials issued for bindings with `mode=execute`; evidence recorded.
+
+#### Evidence outputs
+`evidence/tenants/<tenant>/<UTC>/execute/...`
+
+#### Failure modes
+- Missing guards
+- Policy disallows env/tenant
+
+#### Rollback / safe exit
+Stop and remove local credentials if needed.
+
+### Task: Tenant DR dry-run
+
+#### Intent
+Validate DR testcases and readiness without mutation.
+
+#### Preconditions
+- Enabled bindings with DR expectations
+
+#### Command
+```bash
+ENV=samakia-dev make tenants.dr.run TENANT=project-birds
+```
+
+#### Expected result
+DR readiness evidence recorded (dry-run).
+
+#### Evidence outputs
+`evidence/tenants/<tenant>/<UTC>/dr/...`
+
+#### Failure modes
+- Missing DR testcases
+
+#### Rollback / safe exit
+Fix DR mappings and re-run.
+
+### Task: Tenant DR execute (guarded)
+
+#### Intent
+Run guarded DR execution for a tenant (optional, non-default).
+
+#### Preconditions
+- Execute policy allows tenant/env
+- DR execute guards set
+- Prod requires change window + evidence signing
+
+#### Command
+```bash
+ENV=samakia-dev DR_EXECUTE=1 \
+TENANT_EXECUTE=1 I_UNDERSTAND_TENANT_MUTATION=1 \
+EXECUTE_REASON="tenant DR execute" \
+make tenants.dr.run TENANT=project-birds DR_MODE=execute
+```
+
+#### Expected result
+DR execution evidence recorded with guards.
+
+#### Evidence outputs
+`evidence/tenants/<tenant>/<UTC>/dr/...`
+
+#### Failure modes
+- Missing guards or change window (prod)
+
+#### Rollback / safe exit
+Stop and review evidence before any further action.
+
 ### Task: Phase 10 Part 1 entry checklist
 
 #### Intent
@@ -380,6 +526,60 @@ Acceptance marker written under `acceptance/PHASE10_PART1_ACCEPTED.md`.
 #### Failure modes
 - Validation errors
 - Evidence generation errors
+
+#### Rollback / safe exit
+Stop and remediate validation issues.
+
+### Task: Phase 10 Part 2 entry checklist
+
+#### Intent
+Confirm Phase 10 Part 2 prerequisites are satisfied before acceptance.
+
+#### Preconditions
+- Phase 10 Part 1 accepted marker present
+- Tenant execute policy and tooling present
+
+#### Command
+```bash
+make phase10.part2.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE10_PART2_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE10_PART2_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing ADR-0028
+- Missing execute-policy or DR harness
+
+#### Rollback / safe exit
+Stop and restore missing artifacts.
+
+### Task: Phase 10 Part 2 acceptance (read-only)
+
+#### Intent
+Run the Phase 10 Part 2 acceptance suite (non-destructive).
+
+#### Preconditions
+- Phase 10 Part 2 entry checklist passes
+- Tenant execute policy validated
+
+#### Command
+```bash
+make phase10.part2.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE10_PART2_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE10_PART2_ACCEPTED.md`
+
+#### Failure modes
+- Execute policy validation fails
+- DR harness validation fails
 
 #### Rollback / safe exit
 Stop and remediate validation issues.

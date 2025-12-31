@@ -355,6 +355,28 @@ Non-scope:
 
 ---
 
+## Phase 10 Part 2 — Tenant Execute Mode (Guarded)
+
+Goal: Introduce guarded execute mode for tenant bindings while remaining
+offline-first and CI-safe.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Execute policy allowlists + validation (`make tenants.execute.policy.check`)
+- Guarded plan/apply flows (`make tenants.plan`, `make tenants.apply`)
+- Offline-first credentials issuance (`ops/tenants/creds/*`)
+- Tenant DR harness with dry-run/execute modes (`make tenants.dr.validate`, `make tenants.dr.run`)
+- Phase 10 Part 2 entry checklist: `acceptance/PHASE10_PART2_ENTRY_CHECKLIST.md`
+- Phase 10 Part 2 acceptance marker: `acceptance/PHASE10_PART2_ACCEPTED.md`
+
+Non-scope:
+- No provisioning of DB/MQ/Cache/Vector services
+- No secrets committed to Git
+- No CI execution of guarded apply paths
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

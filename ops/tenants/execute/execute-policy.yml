@@ -1,0 +1,9 @@
+{
+  "allowed_envs": ["samakia-dev", "samakia-staging"],
+  "allowed_tenants": ["samakia-internal-tools", "project-birds"],
+  "allowed_consumers": ["database", "message-queue", "cache", "vector", "kubernetes"],
+  "require_reason": true,
+  "require_change_window_for_prod": true,
+  "require_signing_for_prod": true,
+  "require_signing_for_shared": false
+}

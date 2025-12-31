@@ -103,8 +103,8 @@ ok = True
 for contract in contracts:
     filename = contract.name
     schema_name = None
-    if "consumers" in contract.parts and filename == "ready.yml":
-        schema_name = "consumer-binding.schema.json"
+    if "consumers" in contract.parts and filename in {"ready.yml", "enabled.yml"}:
+      schema_name = "consumer-binding.schema.json"
     else:
         schema_name = schema_map.get(filename)
     if not schema_name:

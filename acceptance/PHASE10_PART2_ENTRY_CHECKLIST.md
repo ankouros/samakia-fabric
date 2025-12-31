@@ -1,0 +1,89 @@
+# Phase 10 Part 2 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T22:58:30Z
+
+## Criteria
+- Phase 10 Part 1 accepted marker present
+  - Command: test -f acceptance/PHASE10_PART1_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- ADR-0028 present
+  - Command: rg -n "ADR-0028" DECISIONS.md
+  - Result: PASS
+- Makefile target present: docs.operator.check
+  - Command: rg -n "^docs\.operator\.check:" Makefile
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/execute/execute-policy.yml
+  - Command: test -f ops/tenants/execute/execute-policy.yml
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/execute/validate-execute-policy.sh
+  - Command: test -f ops/tenants/execute/validate-execute-policy.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/execute/plan.sh
+  - Command: test -f ops/tenants/execute/plan.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/execute/apply.sh
+  - Command: test -f ops/tenants/execute/apply.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/execute/change-window.sh
+  - Command: test -f ops/tenants/execute/change-window.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/execute/signer.sh
+  - Command: test -f ops/tenants/execute/signer.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/execute/doctor.sh
+  - Command: test -f ops/tenants/execute/doctor.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/creds/issue.sh
+  - Command: test -f ops/tenants/creds/issue.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/creds/rotate.sh
+  - Command: test -f ops/tenants/creds/rotate.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/creds/revoke.sh
+  - Command: test -f ops/tenants/creds/revoke.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/creds/inspect.sh
+  - Command: test -f ops/tenants/creds/inspect.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/creds/format.md
+  - Command: test -f ops/tenants/creds/format.md
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/dr/testcases.yml
+  - Command: test -f ops/tenants/dr/testcases.yml
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/dr/validate-dr.sh
+  - Command: test -f ops/tenants/dr/validate-dr.sh
+  - Result: PASS
+- Tenant Part 2 artifact present: ops/tenants/dr/run.sh
+  - Command: test -f ops/tenants/dr/run.sh
+  - Result: PASS
+- Tenant execute policy validates
+  - Command: bash /home/aggelos/samakia-fabric/ops/tenants/execute/validate-execute-policy.sh
+  - Result: PASS
+- Makefile target present: tenants.execute.policy.check
+  - Command: rg -n "^tenants\.execute\.policy\.check:" Makefile
+  - Result: PASS
+- Makefile target present: tenants.plan
+  - Command: rg -n "^tenants\.plan:" Makefile
+  - Result: PASS
+- Makefile target present: tenants.apply
+  - Command: rg -n "^tenants\.apply:" Makefile
+  - Result: PASS
+- Makefile target present: tenants.creds.issue
+  - Command: rg -n "^tenants\.creds\.issue:" Makefile
+  - Result: PASS
+- Makefile target present: tenants.dr.validate
+  - Command: rg -n "^tenants\.dr\.validate:" Makefile
+  - Result: PASS
+- Makefile target present: tenants.dr.run
+  - Command: rg -n "^tenants\.dr\.run:" Makefile
+  - Result: PASS
+- Makefile target present: phase10.part2.entry.check
+  - Command: rg -n "^phase10\.part2\.entry\.check:" Makefile
+  - Result: PASS
+- Makefile target present: phase10.part2.accept
+  - Command: rg -n "^phase10\.part2\.accept:" Makefile
+  - Result: PASS

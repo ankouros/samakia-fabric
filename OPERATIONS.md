@@ -46,6 +46,8 @@ Tenant binding workflows live in:
 - `docs/tenants/onboarding.md`
 - `docs/tenants/consumer-bindings.md`
 - Evidence packets (gitignored) are written under `evidence/tenants/<tenant>/<UTC>/`.
+- Execute mode is **guarded and opt-in**; see the operator cookbook for `tenants.plan`,
+  `tenants.apply`, and DR dry-run/execute flows.
 
 VM image workflows live in:
 

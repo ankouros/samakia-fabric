@@ -14,6 +14,42 @@
         "protocol": "tcp",
         "tls_required": true,
         "secret_ref": "secrets/tenants/<tenant-id>/db-primary"
+      },
+      {
+        "name": "mq-primary",
+        "consumer": "message-queue",
+        "host": "mq.<tenant-id>.internal",
+        "port": 5672,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/<tenant-id>/mq-primary"
+      },
+      {
+        "name": "cache-primary",
+        "consumer": "cache",
+        "host": "cache.<tenant-id>.internal",
+        "port": 6379,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/<tenant-id>/cache-primary"
+      },
+      {
+        "name": "vector-primary",
+        "consumer": "vector",
+        "host": "vector.<tenant-id>.internal",
+        "port": 6333,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/<tenant-id>/vector-primary"
+      },
+      {
+        "name": "k8s-control",
+        "consumer": "kubernetes",
+        "host": "k8s.<tenant-id>.internal",
+        "port": 6443,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/<tenant-id>/k8s-control"
       }
     ]
   }

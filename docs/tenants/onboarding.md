@@ -11,6 +11,12 @@ Follow the canonical operator cookbook tasks:
 - “Validate tenant contracts”
 - “Generate tenant evidence packet”
 - “Phase 10 entry checklist (design-only)”
+- “Phase 10 Part 2 entry checklist” and “Phase 10 Part 2 acceptance”
+
+Phase 10 Part 2 adds **guarded execute mode** for enabled bindings and
+credential issuance. These remain opt-in and offline-first.
+
+Phase 10 Part 2 acceptance is documented in the operator cookbook.
 
 All commands and guardrails live in:
 

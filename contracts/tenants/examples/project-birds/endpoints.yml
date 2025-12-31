@@ -14,6 +14,42 @@
         "protocol": "tcp",
         "tls_required": true,
         "secret_ref": "secrets/tenants/project-birds/db-primary"
+      },
+      {
+        "name": "mq-primary",
+        "consumer": "message-queue",
+        "host": "mq.project-birds.internal",
+        "port": 5672,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/project-birds/mq-primary"
+      },
+      {
+        "name": "cache-primary",
+        "consumer": "cache",
+        "host": "cache.project-birds.internal",
+        "port": 6379,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/project-birds/cache-primary"
+      },
+      {
+        "name": "vector-primary",
+        "consumer": "vector",
+        "host": "vector.project-birds.internal",
+        "port": 6333,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/project-birds/vector-primary"
+      },
+      {
+        "name": "k8s-control",
+        "consumer": "kubernetes",
+        "host": "k8s.project-birds.internal",
+        "port": 6443,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/project-birds/k8s-control"
       }
     ]
   }

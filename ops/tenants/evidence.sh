@@ -84,11 +84,11 @@ copy_inputs() {
     fi
   done
   if [[ -d "${src}/consumers" ]]; then
-    find "${src}/consumers" -type f -name "ready.yml" | sort | while read -r ready; do
-      "${FABRIC_REPO_ROOT}/ops/tenants/redaction.sh" "${ready}"
-      rel="${ready#"${src}"/consumers/}"
+    find "${src}/consumers" -type f \( -name "ready.yml" -o -name "enabled.yml" \) | sort | while read -r binding; do
+      "${FABRIC_REPO_ROOT}/ops/tenants/redaction.sh" "${binding}"
+      rel="${binding#"${src}"/consumers/}"
       mkdir -p "${dest}/inputs/consumers/$(dirname "${rel}")"
-      cp "${ready}" "${dest}/inputs/consumers/${rel}"
+      cp "${binding}" "${dest}/inputs/consumers/${rel}"
     done
   fi
 }

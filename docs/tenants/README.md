@@ -5,6 +5,8 @@ that consumes stateful substrate services (DB/MQ/Cache/Vector) via contracts.
 
 This directory documents the **design-only** Phase 10 model and how to
 author tenant contracts safely.
+Phase 10 Part 2 adds **guarded execute mode** for enabled bindings and
+offline-first credentials issuance.
 
 ## Docs
 

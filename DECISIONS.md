@@ -865,8 +865,32 @@ Phase 9 establishes operator UX as a **first-class contract**:
 ### Consequences
 
 - Tenant contracts must validate cleanly before any execution phase.
-- `enabled.yml` is forbidden in Phase 10.
+- `enabled.yml` is forbidden during **Phase 10 Part 1** (design-only).
 - Endpoints must be metadata only; secrets are references, never values.
+
+---
+
+## ADR-0028 — Tenant Execute Mode (Guarded, Offline-First)
+
+### Decision
+
+- Phase 10 Part 2 introduces **guarded execute mode** for tenant bindings.
+- `enabled.yml` is allowed only under strict policy allowlists and explicit guard flags.
+- Execution is **offline-first** and secrets are stored locally via the Phase 5 secrets interface.
+- Production execution requires a change window and evidence signing.
+- CI remains read-only and never runs execute mode.
+
+### Rationale
+
+- Enables tenants to become consumable while preserving safety and auditability.
+- Prevents accidental mutation through explicit guards and allowlists.
+- Aligns with Phase 5 security posture and Phase 9 operator UX.
+
+### Consequences
+
+- Execute mode is opt-in only; defaults remain dry-run.
+- Enabled bindings must be validated for DR and owner metadata.
+- Evidence packets are mandatory for execute runs.
 
 ---
 

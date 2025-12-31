@@ -24,9 +24,26 @@
         "consumer": {"enum": ["database", "message-queue", "cache", "vector", "kubernetes"]},
         "variant": {"enum": ["single", "cluster"]},
         "ha_ready": {"type": "boolean"},
+        "mode": {"enum": ["dry-run", "execute"]},
         "dr_testcases": {
           "type": "array",
           "items": {"type": "string"}
+        },
+        "restore_testcases": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "backup_target": {"type": "string"},
+        "endpoint_ref": {"type": "string"},
+        "secret_ref": {"type": "string"},
+        "owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tenant_id", "consumer"],
+          "properties": {
+            "tenant_id": {"type": "string"},
+            "consumer": {"enum": ["database", "message-queue", "cache", "vector", "kubernetes"]}
+          }
         },
         "slo_overrides": {
           "type": "object",

@@ -88,6 +88,14 @@ The format is inspired by:
 - Phase 10 Part 1 entry checklist: `acceptance/PHASE10_PART1_ENTRY_CHECKLIST.md`
 - Phase 10 Part 1 acceptance marker: `acceptance/PHASE10_PART1_ACCEPTED.md`
 
+#### Tenant binding (Phase 10 Part 2)
+- ADR-0028 locking guarded execute mode (offline-first, no CI execute)
+- Execute policy allowlists + guarded plan/apply (`make tenants.execute.policy.check`, `make tenants.plan`, `make tenants.apply`)
+- Offline-first credentials issuance under `ops/tenants/creds/`
+- Tenant DR harness (`make tenants.dr.validate`, `make tenants.dr.run`)
+- Phase 10 Part 2 entry checklist: `acceptance/PHASE10_PART2_ENTRY_CHECKLIST.md`
+- Phase 10 Part 2 acceptance marker: `acceptance/PHASE10_PART2_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

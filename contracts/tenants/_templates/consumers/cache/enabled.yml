@@ -1,0 +1,23 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantConsumerBinding",
+  "metadata": {
+    "tenant_id": "<tenant-id>",
+    "consumer": "cache"
+  },
+  "spec": {
+    "consumer": "cache",
+    "variant": "single",
+    "ha_ready": true,
+    "mode": "dry-run",
+    "endpoint_ref": "cache-primary",
+    "secret_ref": "secrets/tenants/<tenant-id>/cache-primary",
+    "backup_target": "backup://<tenant-id>/cache",
+    "restore_testcases": ["restore-from-backup"],
+    "dr_testcases": ["gameday:vip-failover"],
+    "owner": {
+      "tenant_id": "<tenant-id>",
+      "consumer": "cache"
+    }
+  }
+}

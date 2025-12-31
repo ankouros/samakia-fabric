@@ -61,7 +61,13 @@ case "${cmd}" in
       "${FABRIC_REPO_ROOT}/contracts/tenants/examples" \
       "${FABRIC_REPO_ROOT}/ops/tenants/validate.sh" \
       "${FABRIC_REPO_ROOT}/ops/tenants/validate-policies.sh" \
-      "${FABRIC_REPO_ROOT}/ops/tenants/validate-consumer-bindings.sh"
+      "${FABRIC_REPO_ROOT}/ops/tenants/validate-consumer-bindings.sh" \
+      "${FABRIC_REPO_ROOT}/ops/tenants/execute/execute-policy.yml" \
+      "${FABRIC_REPO_ROOT}/ops/tenants/execute/plan.sh" \
+      "${FABRIC_REPO_ROOT}/ops/tenants/execute/apply.sh" \
+      "${FABRIC_REPO_ROOT}/ops/tenants/execute/validate-execute-policy.sh" \
+      "${FABRIC_REPO_ROOT}/ops/tenants/creds/issue.sh" \
+      "${FABRIC_REPO_ROOT}/ops/tenants/dr/validate-dr.sh"
     do
       if [[ ! -e "${path}" ]]; then
         echo "MISSING: ${path}"

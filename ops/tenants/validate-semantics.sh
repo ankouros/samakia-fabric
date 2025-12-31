@@ -33,10 +33,6 @@ def load_json(path: Path):
         errors.append(f"{path}: invalid JSON ({exc})")
         return None
 
-# Enabled bindings must not exist in Phase 10
-for enabled in root.rglob("enabled.yml"):
-    errors.append(f"enabled.yml not allowed in Phase 10: {enabled}")
-
 # Tenant directories
 for tenant_file in root.rglob("tenant.yml"):
     tenant_dir = tenant_file.parent
@@ -108,6 +104,7 @@ for tenant_file in root.rglob("tenant.yml"):
 
     consumers_dir = tenant_dir / "consumers"
     ready_files = list(consumers_dir.rglob("ready.yml")) if consumers_dir.exists() else []
+    enabled_files = list(consumers_dir.rglob("enabled.yml")) if consumers_dir.exists() else []
     if not ready_files:
         errors.append(f"{tenant_dir}: no consumer ready.yml files found")
     for ready_file in ready_files:
@@ -131,6 +128,46 @@ for tenant_file in root.rglob("tenant.yml"):
         dr = spec.get("dr_testcases", [])
         if not isinstance(dr, list) or not dr:
             errors.append(f"{ready_file}: dr_testcases must be a non-empty list")
+
+    for enabled_file in enabled_files:
+        consumer_dir = enabled_file.parent.name
+        binding = load_json(enabled_file)
+        if not binding:
+            continue
+        spec = binding.get("spec", {})
+        consumer = spec.get("consumer", "")
+        if consumer != consumer_dir:
+            errors.append(f"{enabled_file}: spec.consumer '{consumer}' does not match folder '{consumer_dir}'")
+        if consumer not in allowed:
+            errors.append(f"{enabled_file}: consumer '{consumer}' not in allowed_consumers")
+        variant = spec.get("variant")
+        if variant not in {"single", "cluster"}:
+            errors.append(f"{enabled_file}: invalid variant '{variant}'")
+        if consumer in allowed_variants and variant not in allowed_variants.get(consumer, []):
+            errors.append(f"{enabled_file}: variant '{variant}' not allowed for consumer '{consumer}'")
+        if spec.get("ha_ready") is not True:
+            errors.append(f"{enabled_file}: ha_ready must be true")
+        mode = spec.get("mode")
+        if mode not in {"dry-run", "execute"}:
+            errors.append(f"{enabled_file}: mode must be dry-run or execute")
+        endpoint_ref = spec.get("endpoint_ref")
+        if not isinstance(endpoint_ref, str) or not endpoint_ref.strip():
+            errors.append(f"{enabled_file}: endpoint_ref must be a non-empty string")
+        secret_ref = spec.get("secret_ref")
+        if not isinstance(secret_ref, str) or not secret_ref.strip():
+            errors.append(f"{enabled_file}: secret_ref must be a non-empty string")
+        backup_target = spec.get("backup_target")
+        if not isinstance(backup_target, str) or not backup_target.strip():
+            errors.append(f"{enabled_file}: backup_target must be a non-empty string")
+        restore_tests = spec.get("restore_testcases", [])
+        if not isinstance(restore_tests, list) or not restore_tests:
+            errors.append(f"{enabled_file}: restore_testcases must be a non-empty list")
+        dr = spec.get("dr_testcases", [])
+        if not isinstance(dr, list) or not dr:
+            errors.append(f"{enabled_file}: dr_testcases must be a non-empty list")
+        owner = spec.get("owner", {})
+        if owner.get("tenant_id") != tenant_id or owner.get("consumer") != consumer:
+            errors.append(f"{enabled_file}: owner must match tenant_id and consumer")
 
 if errors:
     for err in errors:

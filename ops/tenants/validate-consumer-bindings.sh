@@ -41,6 +41,18 @@ if not isinstance(testcases, list) or not testcases:
     errors.append(f"{testcases_path}: invalid or empty testcase list")
     testcases = []
 
+
+def endpoint_refs(tenant_dir: Path):
+    endpoints_path = tenant_dir / "endpoints.yml"
+    if not endpoints_path.exists():
+        return set(), endpoints_path
+    data = load_json(endpoints_path)
+    if not data:
+        return set(), endpoints_path
+    refs = {ep.get("name") for ep in data.get("spec", {}).get("endpoints", []) if isinstance(ep, dict)}
+    return {ref for ref in refs if ref}, endpoints_path
+
+
 for ready in tenants_root.rglob("consumers/**/ready.yml"):
     binding = load_json(ready)
     if not binding:
@@ -56,6 +68,39 @@ for ready in tenants_root.rglob("consumers/**/ready.yml"):
         if unknown:
             errors.append(f"{ready}: unknown dr_testcases {unknown}")
 
+for enabled in tenants_root.rglob("consumers/**/enabled.yml"):
+    binding = load_json(enabled)
+    if not binding:
+        continue
+    spec = binding.get("spec", {})
+    if spec.get("ha_ready") is not True:
+        errors.append(f"{enabled}: ha_ready must be true")
+    mode = spec.get("mode")
+    if mode not in {"dry-run", "execute"}:
+        errors.append(f"{enabled}: mode must be dry-run or execute")
+    dr = spec.get("dr_testcases", [])
+    if not isinstance(dr, list) or not dr:
+        errors.append(f"{enabled}: dr_testcases must be a non-empty list")
+    else:
+        unknown = [case for case in dr if case not in testcases]
+        if unknown:
+            errors.append(f"{enabled}: unknown dr_testcases {unknown}")
+    restore_tests = spec.get("restore_testcases", [])
+    if not isinstance(restore_tests, list) or not restore_tests:
+        errors.append(f"{enabled}: restore_testcases must be a non-empty list")
+    else:
+        unknown = [case for case in restore_tests if case not in testcases]
+        if unknown:
+            errors.append(f"{enabled}: unknown restore_testcases {unknown}")
+
+    endpoint_ref = spec.get("endpoint_ref")
+    if not endpoint_ref:
+        errors.append(f"{enabled}: endpoint_ref is required")
+    tenant_dir = enabled.parents[2] if "consumers" in enabled.parts else enabled.parent
+    refs, endpoints_path = endpoint_refs(tenant_dir)
+    if endpoint_ref and endpoint_ref not in refs:
+        errors.append(f"{enabled}: endpoint_ref '{endpoint_ref}' not found in {endpoints_path}")
+
 if errors:
     for err in errors:
         print(f"FAIL bindings: {err}")
@@ -63,4 +108,6 @@ if errors:
 
 for ready in tenants_root.rglob("consumers/**/ready.yml"):
     print(f"PASS bindings: {ready}")
+for enabled in tenants_root.rglob("consumers/**/enabled.yml"):
+    print(f"PASS bindings: {enabled}")
 PY

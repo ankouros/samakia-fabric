@@ -14,6 +14,42 @@
         "protocol": "tcp",
         "tls_required": true,
         "secret_ref": "secrets/tenants/samakia-internal-tools/db-primary"
+      },
+      {
+        "name": "mq-primary",
+        "consumer": "message-queue",
+        "host": "mq.samakia-internal-tools.internal",
+        "port": 5672,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/samakia-internal-tools/mq-primary"
+      },
+      {
+        "name": "cache-primary",
+        "consumer": "cache",
+        "host": "cache.samakia-internal-tools.internal",
+        "port": 6379,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/samakia-internal-tools/cache-primary"
+      },
+      {
+        "name": "vector-primary",
+        "consumer": "vector",
+        "host": "vector.samakia-internal-tools.internal",
+        "port": 6333,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/samakia-internal-tools/vector-primary"
+      },
+      {
+        "name": "k8s-control",
+        "consumer": "kubernetes",
+        "host": "k8s.samakia-internal-tools.internal",
+        "port": 6443,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/samakia-internal-tools/k8s-control"
       }
     ]
   }

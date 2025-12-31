@@ -3,6 +3,8 @@
   "vip-failover",
   "service-restart",
   "storage-unavailable",
+  "restore-from-backup",
+  "restore-point-in-time",
   "gameday:vip-failover",
   "gameday:service-restart"
 ]

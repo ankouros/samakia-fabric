@@ -518,4 +518,9 @@ Phase 10 Part 1 adds non-destructive enforcement and evidence:
 - Policy/quotas and consumer binding validation (`make tenants.validate`).
 - Deterministic evidence packets under `evidence/tenants/...`.
 - Acceptance marker: `acceptance/PHASE10_PART1_ACCEPTED.md`.
+Phase 10 Part 2 adds guarded execute mode and DR harness:
+- ADR-0028 locking execute-mode guardrails (offline-first, no CI execute).
+- Execute policy allowlists + guarded plan/apply (`make tenants.plan`, `make tenants.apply`).
+- Offline-first credential issuance under `ops/tenants/creds/`.
+- Tenant DR dry-run/execute harness (`make tenants.dr.run`).
 No infrastructure is deployed in Phase 10.

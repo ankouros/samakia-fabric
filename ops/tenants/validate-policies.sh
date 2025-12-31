@@ -40,6 +40,7 @@ for tenant_dir in tenants_root.rglob("tenant.yml"):
     policies_path = base / "policies.yml"
     quotas_path = base / "quotas.yml"
     endpoints_path = base / "endpoints.yml"
+    consumers_dir = base / "consumers"
 
     if not policies_path.exists():
         errors.append(f"{base}: missing policies.yml")
@@ -95,6 +96,16 @@ for tenant_dir in tenants_root.rglob("tenant.yml"):
                         errors.append(f"{endpoints_path}: endpoint field '{key}' contains secret-like value")
     else:
         errors.append(f"{base}: missing endpoints.yml")
+
+    if consumers_dir.exists():
+        bindings = list(consumers_dir.rglob("ready.yml")) + list(consumers_dir.rglob("enabled.yml"))
+        for binding_path in bindings:
+            binding = load_json(binding_path)
+            if not binding:
+                continue
+            consumer = binding.get("spec", {}).get("consumer")
+            if consumer and consumer not in allowed:
+                errors.append(f"{binding_path}: consumer '{consumer}' not in allowed_consumers")
 
 if errors:
     for err in errors:

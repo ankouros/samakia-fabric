@@ -1,0 +1,23 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantConsumerBinding",
+  "metadata": {
+    "tenant_id": "samakia-internal-tools",
+    "consumer": "vector"
+  },
+  "spec": {
+    "consumer": "vector",
+    "variant": "single",
+    "ha_ready": true,
+    "mode": "dry-run",
+    "endpoint_ref": "vector-primary",
+    "secret_ref": "secrets/tenants/samakia-internal-tools/vector-primary",
+    "backup_target": "backup://samakia-internal-tools/vector",
+    "restore_testcases": ["restore-from-backup"],
+    "dr_testcases": ["gameday:vip-failover"],
+    "owner": {
+      "tenant_id": "samakia-internal-tools",
+      "consumer": "vector"
+    }
+  }
+}
