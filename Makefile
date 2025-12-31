@@ -269,6 +269,10 @@ images.vm.validate.contracts: ## Validate VM image contracts (schema + semantics
 	@bash "$(VM_VALIDATE_DIR)/validate-image-schema.sh"
 	@bash "$(VM_VALIDATE_DIR)/validate-image-semantics.sh"
 
+.PHONY: image.tools.check
+image.tools.check: ## Check local VM image tooling prerequisites
+	@bash "$(VM_VALIDATE_DIR)/tools-check.sh"
+
 .PHONY: image.validate
 image.validate: ## Validate a local VM qcow2 artifact (QCOW2=... IMAGE=... VERSION=...)
 	@test -n "$(QCOW2)" || (echo "ERROR: QCOW2 is required"; exit 2)
@@ -291,6 +295,22 @@ image.evidence.validate: ## Generate VM image validation evidence (QCOW2=... IMA
 .PHONY: phase8.part1.accept
 phase8.part1.accept: ## Phase 8 Part 1 acceptance (validate-only; no builds)
 	@bash "$(OPS_SCRIPTS_DIR)/phase8-part1-accept.sh"
+
+.PHONY: image.local.full
+image.local.full: ## Local VM build+validate+evidence (requires IMAGE_BUILD=1 I_UNDERSTAND_BUILDS_TAKE_TIME=1)
+	@bash "$(REPO_ROOT)/ops/images/vm/local-run.sh" full --image "$(IMAGE)" --version "$(VERSION)"
+
+.PHONY: image.local.validate
+image.local.validate: ## Local VM qcow2 validation (QCOW2=... IMAGE=... VERSION=...)
+	@bash "$(REPO_ROOT)/ops/images/vm/local-run.sh" validate --image "$(IMAGE)" --version "$(VERSION)" --qcow2 "$(QCOW2)"
+
+.PHONY: image.local.evidence
+image.local.evidence: ## Local VM validation evidence (QCOW2=... IMAGE=... VERSION=...)
+	@bash "$(REPO_ROOT)/ops/images/vm/local-run.sh" evidence --image "$(IMAGE)" --version "$(VERSION)" --qcow2 "$(QCOW2)"
+
+.PHONY: phase8.part1.1.accept
+phase8.part1.1.accept: ## Phase 8 Part 1.1 acceptance (local runbook + wrappers)
+	@bash "$(OPS_SCRIPTS_DIR)/phase8-part1-1-accept.sh"
 
 
 .PHONY: image.list

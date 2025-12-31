@@ -434,6 +434,18 @@ make images.vm.validate.contracts
 CI=1 make phase8.part1.accept
 ```
 
+Phase 8 Part 1.1 (local operator runbook + safe wrappers):
+
+```bash
+make image.tools.check
+make image.local.validate IMAGE=ubuntu-24.04 VERSION=v1 QCOW2=/path/to/image.qcow2
+make image.local.evidence IMAGE=ubuntu-24.04 VERSION=v1 QCOW2=/path/to/image.qcow2
+make phase8.part1.1.accept
+```
+
+Runbook:
+- `docs/images/local-build-and-validate.md`
+
 Optional local artifact validation (requires a local qcow2 fixture):
 
 ```bash

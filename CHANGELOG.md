@@ -54,6 +54,11 @@ The format is inspired by:
 - VM image evidence packet scripts (build + validate)
 - Phase 8 Part 1 acceptance marker: `acceptance/PHASE8_PART1_ACCEPTED.md`
 
+#### VM golden images (Phase 8 Part 1.1)
+- Local operator runbook + guarded wrapper for build/validate
+- Tooling prerequisite checks + evidence verification helper
+- Phase 8 Part 1.1 acceptance marker: `acceptance/PHASE8_PART1_1_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

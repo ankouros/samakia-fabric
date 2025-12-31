@@ -275,6 +275,11 @@ Goal: Introduce VM golden image contracts as immutable artifacts (no VM lifecycl
 - Evidence packet scripts (build + validate)
 - Acceptance marker: `acceptance/PHASE8_PART1_ACCEPTED.md`
 
+### Part 1.1 (COMPLETED ✅)
+- Local operator runbook for build/validate
+- Safe wrapper scripts + tooling checks
+- Acceptance marker: `acceptance/PHASE8_PART1_1_ACCEPTED.md`
+
 ### Planned (next)
 - Optional Proxmox template registration (guarded, later phase)
 

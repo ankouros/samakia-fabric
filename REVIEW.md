@@ -477,3 +477,9 @@ Phase 8 Part 1 adds a validate-only pipeline for VM artifacts (no Proxmox, no VM
 - Offline qcow2 validators (cloud-init, SSH posture, pkg manifest, build metadata).
 - Evidence packets for build/validate under `evidence/images/vm/`.
 - Acceptance marker: `acceptance/PHASE8_PART1_ACCEPTED.md` (validate-only).
+
+Phase 8 Part 1.1 makes the pipeline operator-repeatable locally (guarded builds):
+- Local runbook: `docs/images/local-build-and-validate.md`.
+- Safe wrapper: `ops/images/vm/local-run.sh` with explicit build guards.
+- Evidence verification helper: `ops/images/vm/evidence/verify-evidence.sh`.
+- Acceptance marker: `acceptance/PHASE8_PART1_1_ACCEPTED.md`.

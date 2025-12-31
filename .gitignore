@@ -122,6 +122,8 @@ evidence/
 artifacts/
 !ops/consumers/evidence/
 !ops/consumers/evidence/consumer-readiness.sh
+!ops/images/vm/evidence/
+!ops/images/vm/evidence/*.sh
 evidence/images/
 artifacts/images/
 compliance/
