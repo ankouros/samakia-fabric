@@ -1,0 +1,29 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantQuotas",
+  "metadata": {
+    "tenant_id": "project-birds"
+  },
+  "spec": {
+    "database": {
+      "instances": 1,
+      "clusters": 0
+    },
+    "message-queue": {
+      "instances": 0,
+      "clusters": 0
+    },
+    "cache": {
+      "instances": 1,
+      "clusters": 0
+    },
+    "vector": {
+      "instances": 0,
+      "clusters": 0
+    },
+    "kubernetes": {
+      "instances": 2,
+      "clusters": 1
+    }
+  }
+}

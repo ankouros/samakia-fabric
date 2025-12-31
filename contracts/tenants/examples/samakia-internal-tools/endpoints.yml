@@ -1,0 +1,20 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantEndpoints",
+  "metadata": {
+    "tenant_id": "samakia-internal-tools"
+  },
+  "spec": {
+    "endpoints": [
+      {
+        "name": "db-primary",
+        "consumer": "database",
+        "host": "db.samakia-internal-tools.internal",
+        "port": 5432,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/samakia-internal-tools/db-primary"
+      }
+    ]
+  }
+}

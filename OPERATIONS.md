@@ -40,6 +40,12 @@ Consumer workflows live in:
 - `docs/consumers/quickstart.md`
 - `docs/consumers/variants.md`
 
+Tenant binding workflows live in:
+
+- `docs/tenants/README.md`
+- `docs/tenants/onboarding.md`
+- `docs/tenants/consumer-bindings.md`
+
 VM image workflows live in:
 
 - `docs/images/README.md`

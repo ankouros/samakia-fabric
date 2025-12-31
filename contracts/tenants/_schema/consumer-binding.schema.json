@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TenantConsumerBinding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "TenantConsumerBinding"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant_id", "consumer"],
+      "properties": {
+        "tenant_id": {"type": "string"},
+        "consumer": {"enum": ["database", "message-queue", "cache", "vector", "kubernetes"]}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumer", "variant", "ha_ready", "dr_testcases"],
+      "properties": {
+        "consumer": {"enum": ["database", "message-queue", "cache", "vector", "kubernetes"]},
+        "variant": {"enum": ["single", "cluster"]},
+        "ha_ready": {"type": "boolean"},
+        "dr_testcases": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "slo_overrides": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "availability": {"type": "number"}
+          }
+        }
+      }
+    }
+  }
+}

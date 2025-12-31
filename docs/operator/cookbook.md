@@ -220,6 +220,62 @@ Stop; fix bundle outputs.
 
 ---
 
+## Tenant bindings (design validation)
+
+### Task: Validate tenant contracts
+
+#### Intent
+Validate tenant (project) bindings against schema and semantics.
+
+#### Preconditions
+- Tenant contracts present under `contracts/tenants/`
+
+#### Command
+```bash
+make tenants.validate
+```
+
+#### Expected result
+Schema and semantics checks PASS.
+
+#### Evidence outputs
+None by default.
+
+#### Failure modes
+- Schema mismatch
+- Semantics violations (unknown consumers, missing quotas)
+
+#### Rollback / safe exit
+Stop and fix tenant contracts.
+
+### Task: Phase 10 entry checklist (design-only)
+
+#### Intent
+Confirm Phase 10 design entry conditions are satisfied.
+
+#### Preconditions
+- Prior phase acceptance markers present
+
+#### Command
+```bash
+make phase10.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE10_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE10_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing contracts or schemas
+- Docs/CI gates not wired
+
+#### Rollback / safe exit
+Stop and remediate missing artifacts.
+
+---
+
 ## VM golden images
 
 ### Task: Validate VM image contracts
@@ -424,6 +480,7 @@ make phase8.part1.2.accept
 make phase8.part2.accept
 make phase9.entry.check
 make phase9.accept
+make phase10.entry.check
 make policy.check
 make docs.operator.check
 make docs.cookbook.lint
@@ -434,6 +491,9 @@ make shared.pki.accept
 make shared.runtime.invariants.accept
 make shared.sdn.accept
 make shared.vault.accept
+make tenants.schema.validate
+make tenants.semantics.validate
+make tenants.validate
 make tf.apply
 make tf.backend.init
 make tf.init

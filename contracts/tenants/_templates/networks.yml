@@ -1,0 +1,11 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantNetworks",
+  "metadata": {
+    "tenant_id": "<tenant-id>"
+  },
+  "spec": {
+    "segments": ["tenant-<tenant-id>-segment"],
+    "cross_tenant_access": false
+  }
+}

@@ -315,6 +315,27 @@ Non-scope:
 
 ---
 
+## Phase 10 — Tenant = Project Binding (Design)
+
+Goal: Contract-first tenant model so projects consume stateful primitives
+without embedding stateful lifecycle into their own Kubernetes.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- ADR-0027 locking tenant = project binding model
+- Tenant contract schemas + templates + examples under `contracts/tenants/`
+- Tenant documentation skeleton under `docs/tenants/`
+- Validation tooling + CI gate (`make tenants.validate`)
+- Phase 10 entry checklist: `acceptance/PHASE10_ENTRY_CHECKLIST.md`
+- Acceptance plan: `acceptance/PHASE10_ACCEPTANCE_PLAN.md`
+
+Non-scope:
+- No provisioning or apply paths
+- No secrets creation or infra mutation
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

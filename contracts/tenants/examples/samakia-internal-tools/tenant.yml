@@ -1,0 +1,27 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "Tenant",
+  "metadata": {
+    "id": "samakia-internal-tools",
+    "name": "Samakia Internal Tools"
+  },
+  "spec": {
+    "owner": "platform-ops",
+    "environments": {
+      "dev": true,
+      "shared": true,
+      "prod": false
+    },
+    "isolation": {
+      "level": "strong"
+    },
+    "slo": {
+      "availability": 99.9
+    },
+    "dr": {
+      "rpo": "4h",
+      "rto": "24h",
+      "required_testcases": ["gameday:vip-failover", "gameday:service-restart"]
+    }
+  }
+}

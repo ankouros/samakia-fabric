@@ -1,0 +1,17 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantConsumerBinding",
+  "metadata": {
+    "tenant_id": "<tenant-id>",
+    "consumer": "database"
+  },
+  "spec": {
+    "consumer": "database",
+    "variant": "single",
+    "ha_ready": true,
+    "dr_testcases": ["gameday:vip-failover"],
+    "slo_overrides": {
+      "availability": 99.9
+    }
+  }
+}

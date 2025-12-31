@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TenantQuotas",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "TenantQuotas"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant_id"],
+      "properties": {
+        "tenant_id": {"type": "string"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "database": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["instances"],
+          "properties": {
+            "instances": {"type": "integer", "minimum": 0},
+            "clusters": {"type": "integer", "minimum": 0}
+          }
+        },
+        "message-queue": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["instances"],
+          "properties": {
+            "instances": {"type": "integer", "minimum": 0},
+            "clusters": {"type": "integer", "minimum": 0}
+          }
+        },
+        "cache": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["instances"],
+          "properties": {
+            "instances": {"type": "integer", "minimum": 0},
+            "clusters": {"type": "integer", "minimum": 0}
+          }
+        },
+        "vector": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["instances"],
+          "properties": {
+            "instances": {"type": "integer", "minimum": 0},
+            "clusters": {"type": "integer", "minimum": 0}
+          }
+        },
+        "kubernetes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["instances"],
+          "properties": {
+            "instances": {"type": "integer", "minimum": 0},
+            "clusters": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    }
+  }
+}

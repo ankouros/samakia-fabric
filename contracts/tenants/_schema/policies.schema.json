@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TenantPolicies",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "TenantPolicies"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant_id"],
+      "properties": {
+        "tenant_id": {"type": "string"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_consumers", "allowed_variants", "security_profile", "prod_requirements", "execute_guards"],
+      "properties": {
+        "allowed_consumers": {
+          "type": "array",
+          "items": {"enum": ["database", "message-queue", "cache", "vector", "kubernetes"]}
+        },
+        "allowed_variants": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "database": {"type": "array", "items": {"enum": ["single", "cluster"]}},
+            "message-queue": {"type": "array", "items": {"enum": ["single", "cluster"]}},
+            "cache": {"type": "array", "items": {"enum": ["single", "cluster"]}},
+            "vector": {"type": "array", "items": {"enum": ["single", "cluster"]}},
+            "kubernetes": {"type": "array", "items": {"enum": ["single", "cluster"]}}
+          }
+        },
+        "security_profile": {"enum": ["baseline", "hardened"]},
+        "prod_requirements": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["require_change_window", "require_evidence_signing"],
+          "properties": {
+            "require_change_window": {"type": "boolean"},
+            "require_evidence_signing": {"type": "boolean"}
+          }
+        },
+        "execute_guards": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["require_reason"],
+          "properties": {
+            "require_reason": {"type": "boolean"}
+          }
+        }
+      }
+    }
+  }
+}

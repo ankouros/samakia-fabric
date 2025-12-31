@@ -1,0 +1,11 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantNetworks",
+  "metadata": {
+    "tenant_id": "project-birds"
+  },
+  "spec": {
+    "segments": ["tenant-project-birds-segment"],
+    "cross_tenant_access": false
+  }
+}

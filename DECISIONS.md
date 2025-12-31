@@ -843,6 +843,33 @@ Phase 9 establishes operator UX as a **first-class contract**:
 
 ---
 
+## ADR-0027 — Tenant = Project Binding (Design-Only)
+
+### Decision
+
+- A tenant is a **project**; projects are stateless compute clusters (separate Kubernetes).
+- Samakia Fabric provides stateful substrate via **contract-first tenant bindings**.
+- Every consumer binding uses a two-variant model:
+  - `ready.yml` (intent, design-time only)
+  - `enabled.yml` (execution intent, not used in Phase 10).
+- Per-tenant envelope includes policies, quotas, endpoints, and networks with **no secrets**.
+- Evidence packets are required in future execution phases.
+- CI validates schema and semantics only; no apply in Phase 10.
+
+### Rationale
+
+- Keeps tenants decoupled from infrastructure lifecycle.
+- Enforces explicit, auditable intent before any execution.
+- Aligns with Phase 6 consumer contracts and Phase 9 operator UX.
+
+### Consequences
+
+- Tenant contracts must validate cleanly before any execution phase.
+- `enabled.yml` is forbidden in Phase 10.
+- Endpoints must be metadata only; secrets are references, never values.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

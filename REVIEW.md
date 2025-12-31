@@ -504,3 +504,14 @@ Phase 9 makes operator UX a product surface:
 - Consumer catalog + guided flows under `docs/consumers/`.
 - Anti-drift doc checks (`make docs.operator.check`) wired into PR validation.
 - Acceptance marker: `acceptance/PHASE9_ACCEPTED.md`.
+
+---
+
+## Phase 10 — Tenant = Project Binding (Design)
+
+Phase 10 introduces design-only tenant contracts:
+- ADR-0027 locking tenant = project binding model.
+- Tenant schemas, templates, and examples under `contracts/tenants/`.
+- Tenant docs skeleton under `docs/tenants/`.
+- Validation gates: `make tenants.validate` and `make phase10.entry.check`.
+No infrastructure is deployed in Phase 10.

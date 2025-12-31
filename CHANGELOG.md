@@ -75,6 +75,13 @@ The format is inspired by:
 - Anti-drift doc tooling + CI gate (`make docs.operator.check`)
 - Phase 9 acceptance marker: `acceptance/PHASE9_ACCEPTED.md`
 
+#### Tenant binding (Phase 10 design)
+- ADR-0027 locking tenant = project binding model (design-only)
+- Tenant contract schemas + templates + examples under `contracts/tenants/`
+- Tenant docs skeleton under `docs/tenants/`
+- Tenant validation tooling + CI gate (`make tenants.validate`)
+- Phase 10 entry checklist + acceptance plan (design-only)
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

@@ -1,0 +1,152 @@
+# Phase 10 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T21:37:11Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE0_ACCEPTED.md
+  - Command: test -f acceptance/PHASE0_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE5_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE7_ACCEPTED.md
+  - Command: test -f acceptance/PHASE7_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE9_ACCEPTED.md
+  - Command: test -f acceptance/PHASE9_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- ADR-0027 present
+  - Command: rg -n "ADR-0027" DECISIONS.md
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/tenant.schema.json
+  - Command: test -f contracts/tenants/_schema/tenant.schema.json
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/policies.schema.json
+  - Command: test -f contracts/tenants/_schema/policies.schema.json
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/quotas.schema.json
+  - Command: test -f contracts/tenants/_schema/quotas.schema.json
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/endpoints.schema.json
+  - Command: test -f contracts/tenants/_schema/endpoints.schema.json
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/networks.schema.json
+  - Command: test -f contracts/tenants/_schema/networks.schema.json
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/consumer-binding.schema.json
+  - Command: test -f contracts/tenants/_schema/consumer-binding.schema.json
+  - Result: PASS
+- Template present: contracts/tenants/_templates/tenant.yml
+  - Command: test -f contracts/tenants/_templates/tenant.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/policies.yml
+  - Command: test -f contracts/tenants/_templates/policies.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/quotas.yml
+  - Command: test -f contracts/tenants/_templates/quotas.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/endpoints.yml
+  - Command: test -f contracts/tenants/_templates/endpoints.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/networks.yml
+  - Command: test -f contracts/tenants/_templates/networks.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/database/ready.yml
+  - Command: test -f contracts/tenants/_templates/consumers/database/ready.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/message-queue/ready.yml
+  - Command: test -f contracts/tenants/_templates/consumers/message-queue/ready.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/cache/ready.yml
+  - Command: test -f contracts/tenants/_templates/consumers/cache/ready.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/vector/ready.yml
+  - Command: test -f contracts/tenants/_templates/consumers/vector/ready.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/kubernetes/ready.yml
+  - Command: test -f contracts/tenants/_templates/consumers/kubernetes/ready.yml
+  - Result: PASS
+- Example tenant present: contracts/tenants/examples/samakia-internal-tools
+  - Command: test -f contracts/tenants/examples/samakia-internal-tools/tenant.yml
+  - Result: PASS
+- Example tenant present: contracts/tenants/examples/project-birds
+  - Command: test -f contracts/tenants/examples/project-birds/tenant.yml
+  - Result: PASS
+- Makefile target present: tenants.validate
+  - Command: rg -n "^tenants\.validate:" Makefile
+  - Result: PASS
+- Makefile target present: phase10.entry.check
+  - Command: rg -n "^phase10\.entry\.check:" Makefile
+  - Result: PASS
+- PR validation runs tenants.validate
+  - Command: rg -n "tenants\.validate" .github/workflows/pr-validate.yml
+  - Result: PASS
+- Tenant doc present: docs/tenants/README.md
+  - Command: test -f docs/tenants/README.md
+  - Result: PASS
+- Tenant doc present: docs/tenants/onboarding.md
+  - Command: test -f docs/tenants/onboarding.md
+  - Result: PASS
+- Tenant doc present: docs/tenants/isolation-model.md
+  - Command: test -f docs/tenants/isolation-model.md
+  - Result: PASS
+- Tenant doc present: docs/tenants/policies-and-quotas.md
+  - Command: test -f docs/tenants/policies-and-quotas.md
+  - Result: PASS
+- Tenant doc present: docs/tenants/credentials-and-endpoints.md
+  - Command: test -f docs/tenants/credentials-and-endpoints.md
+  - Result: PASS
+- Tenant doc present: docs/tenants/consumer-bindings.md
+  - Command: test -f docs/tenants/consumer-bindings.md
+  - Result: PASS
+- Acceptance plan present: acceptance/PHASE10_ACCEPTANCE_PLAN.md
+  - Command: test -f acceptance/PHASE10_ACCEPTANCE_PLAN.md
+  - Result: PASS

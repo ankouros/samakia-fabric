@@ -1,0 +1,25 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantPolicies",
+  "metadata": {
+    "tenant_id": "<tenant-id>"
+  },
+  "spec": {
+    "allowed_consumers": ["database", "message-queue", "cache", "vector", "kubernetes"],
+    "allowed_variants": {
+      "database": ["single", "cluster"],
+      "message-queue": ["single", "cluster"],
+      "cache": ["single", "cluster"],
+      "vector": ["single", "cluster"],
+      "kubernetes": ["single", "cluster"]
+    },
+    "security_profile": "baseline",
+    "prod_requirements": {
+      "require_change_window": true,
+      "require_evidence_signing": true
+    },
+    "execute_guards": {
+      "require_reason": true
+    }
+  }
+}

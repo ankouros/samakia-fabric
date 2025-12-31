@@ -1,0 +1,27 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "Tenant",
+  "metadata": {
+    "id": "<tenant-id>",
+    "name": "<Tenant Name>"
+  },
+  "spec": {
+    "owner": "<owner-team>",
+    "environments": {
+      "dev": true,
+      "shared": true,
+      "prod": false
+    },
+    "isolation": {
+      "level": "soft"
+    },
+    "slo": {
+      "availability": 99.9
+    },
+    "dr": {
+      "rpo": "4h",
+      "rto": "24h",
+      "required_testcases": ["gameday:vip-failover"]
+    }
+  }
+}

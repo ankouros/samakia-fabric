@@ -6,3 +6,4 @@
 - **Operator-visible target**: A Make target intended for human or AI operators.
 - **VIP**: Virtual IP; service endpoints are VIP-only by policy.
 - **Read-only**: No infrastructure mutation (no apply, no config changes).
+- **Tenant (project)**: A contract-defined consumer of the substrate; binding is intent-only in Phase 10.

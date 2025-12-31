@@ -985,6 +985,22 @@ phase5.accept: ## Run Phase 5 acceptance suite (read-only)
 phase6.entry.check: ## Phase 6 entry checklist (writes acceptance/PHASE6_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase6-entry-check.sh"
 
+.PHONY: tenants.schema.validate
+tenants.schema.validate: ## Validate tenant contracts (schema only)
+	@bash "$(REPO_ROOT)/ops/tenants/validate-schema.sh"
+
+.PHONY: tenants.semantics.validate
+tenants.semantics.validate: ## Validate tenant contracts (semantics only)
+	@bash "$(REPO_ROOT)/ops/tenants/validate-semantics.sh"
+
+.PHONY: tenants.validate
+tenants.validate: ## Validate tenant contracts (schema + semantics)
+	@bash "$(REPO_ROOT)/ops/tenants/validate.sh"
+
+.PHONY: phase10.entry.check
+phase10.entry.check: ## Phase 10 entry checklist (writes acceptance/PHASE10_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase10-entry-check.sh"
+
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)
 	@bash "$(REPO_ROOT)/ops/consumers/validate/validate-consumers.sh"

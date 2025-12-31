@@ -1,0 +1,29 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantQuotas",
+  "metadata": {
+    "tenant_id": "samakia-internal-tools"
+  },
+  "spec": {
+    "database": {
+      "instances": 2,
+      "clusters": 1
+    },
+    "message-queue": {
+      "instances": 2,
+      "clusters": 1
+    },
+    "cache": {
+      "instances": 3,
+      "clusters": 1
+    },
+    "vector": {
+      "instances": 2,
+      "clusters": 1
+    },
+    "kubernetes": {
+      "instances": 3,
+      "clusters": 1
+    }
+  }
+}

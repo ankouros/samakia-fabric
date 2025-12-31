@@ -1,0 +1,27 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "Tenant",
+  "metadata": {
+    "id": "project-birds",
+    "name": "Project Birds"
+  },
+  "spec": {
+    "owner": "team-birds",
+    "environments": {
+      "dev": true,
+      "shared": false,
+      "prod": false
+    },
+    "isolation": {
+      "level": "soft"
+    },
+    "slo": {
+      "availability": 99.5
+    },
+    "dr": {
+      "rpo": "24h",
+      "rto": "48h",
+      "required_testcases": ["gameday:vip-failover"]
+    }
+  }
+}

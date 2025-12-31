@@ -78,6 +78,9 @@ jobs:
           make consumers.gameday.mapping.check
           make consumers.gameday.execute.policy.check
 
+      - name: Tenant contract checks
+        run: make tenants.validate
+
       - name: Consumer readiness packets
         run: |
           make consumers.evidence
