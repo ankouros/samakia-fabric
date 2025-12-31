@@ -49,6 +49,12 @@ vault.json
 *.vault
 *.secrets
 secrets/
+ops/secrets/*.enc
+ops/secrets/*.key
+ops/secrets/*.pass
+ops/security/ssh/*.key
+ops/security/ssh/*.pem
+ops/security/ssh/*.pub
 fabric-security/secrets/**/*
 !fabric-security/secrets/**/README.md
 
@@ -117,6 +123,13 @@ compliance/
 forensics/
 correlation/
 release-readiness/
+
+# Keep compliance profiles and mapping tracked
+!compliance/
+!compliance/profiles/
+!compliance/profiles/*.yml
+!compliance/mapping.yml
+compliance/sample/
 
 ###############################################################################
 # OS / Editor / Tooling noise

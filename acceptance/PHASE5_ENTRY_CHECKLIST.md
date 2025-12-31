@@ -1,0 +1,98 @@
+# Phase 5 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T14:21:41Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE0_ACCEPTED.md
+  - Command: test -f acceptance/PHASE0_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE4_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- COMPLIANCE_CONTROLS.md present
+  - Command: test -f COMPLIANCE_CONTROLS.md
+  - Result: PASS
+- COMPLIANCE_CONTROLS.md parsable
+  - Command: rg -n "APP-" COMPLIANCE_CONTROLS.md
+  - Result: PASS
+- No secret files tracked
+  - Command: git ls-files | rg -n <secret patterns>
+  - Result: PASS
+- Script executable: ops/secrets/secrets.sh
+  - Command: test -x ops/secrets/secrets.sh
+  - Result: PASS
+- Script executable: ops/secrets/secrets-file.sh
+  - Command: test -x ops/secrets/secrets-file.sh
+  - Result: PASS
+- Script executable: ops/secrets/secrets-vault.sh
+  - Command: test -x ops/secrets/secrets-vault.sh
+  - Result: PASS
+- Script executable: ops/security/ssh/ssh-keys-generate.sh
+  - Command: test -x ops/security/ssh/ssh-keys-generate.sh
+  - Result: PASS
+- Script executable: ops/security/ssh/ssh-keys-rotate.sh
+  - Command: test -x ops/security/ssh/ssh-keys-rotate.sh
+  - Result: PASS
+- Script executable: ops/security/ssh/ssh-keys-dryrun.sh
+  - Command: test -x ops/security/ssh/ssh-keys-dryrun.sh
+  - Result: PASS
+- Script executable: ops/security/firewall/firewall-apply.sh
+  - Command: test -x ops/security/firewall/firewall-apply.sh
+  - Result: PASS
+- Script executable: ops/security/firewall/firewall-check.sh
+  - Command: test -x ops/security/firewall/firewall-check.sh
+  - Result: PASS
+- Script executable: ops/security/firewall/firewall-dryrun.sh
+  - Command: test -x ops/security/firewall/firewall-dryrun.sh
+  - Result: PASS
+- Script executable: ops/scripts/compliance-eval.sh
+  - Command: test -x ops/scripts/compliance-eval.sh
+  - Result: PASS
+- Script executable: ops/policy/policy-security.sh
+  - Command: test -x ops/policy/policy-security.sh
+  - Result: PASS
+- Workflow present: .github/workflows/pr-validate.yml
+  - Command: test -f .github/workflows/pr-validate.yml
+  - Result: PASS
+- Workflow present: .github/workflows/pr-tf-plan.yml
+  - Command: test -f .github/workflows/pr-tf-plan.yml
+  - Result: PASS
+- Workflow present: .github/workflows/apply-nonprod.yml
+  - Command: test -f .github/workflows/apply-nonprod.yml
+  - Result: PASS
+- Workflow present: .github/workflows/drift-detect.yml
+  - Command: test -f .github/workflows/drift-detect.yml
+  - Result: PASS
+- Workflow present: .github/workflows/app-compliance.yml
+  - Command: test -f .github/workflows/app-compliance.yml
+  - Result: PASS
+- Workflow present: .github/workflows/release-readiness.yml
+  - Command: test -f .github/workflows/release-readiness.yml
+  - Result: PASS
+- Policy gates pass
+  - Command: make policy.check
+  - Result: PASS

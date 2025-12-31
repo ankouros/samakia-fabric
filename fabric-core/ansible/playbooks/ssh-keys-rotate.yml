@@ -1,0 +1,47 @@
+---
+- name: Rotate operator and break-glass SSH keys
+  hosts: all
+  become: true
+  vars:
+    operator_keys_file: ""
+    break_glass_keys_file: ""
+    use_break_glass: false
+  tasks:
+    - name: Load operator public keys
+      ansible.builtin.set_fact:
+        operator_keys: >-
+          {{ lookup('file', operator_keys_file).splitlines()
+             | select('match', '^ssh-') | list }}
+
+    - name: Load break-glass public keys (optional)
+      when: use_break_glass | bool
+      ansible.builtin.set_fact:
+        break_glass_keys: >-
+          {{ lookup('file', break_glass_keys_file).splitlines()
+             | select('match', '^ssh-') | list }}
+
+    - name: Combine operator and break-glass keys
+      ansible.builtin.set_fact:
+        combined_keys: "{{ operator_keys + (break_glass_keys | default([])) }}"
+
+    - name: Ensure at least one key is present
+      ansible.builtin.assert:
+        that:
+          - combined_keys | length > 0
+        fail_msg: "No SSH keys provided; refusing to update authorized_keys"
+
+    - name: Ensure samakia .ssh directory exists
+      ansible.builtin.file:
+        path: /home/samakia/.ssh
+        state: directory
+        owner: samakia
+        group: samakia
+        mode: "0700"
+
+    - name: Write authorized_keys for samakia (exclusive)
+      ansible.builtin.copy:
+        dest: /home/samakia/.ssh/authorized_keys
+        content: "{{ combined_keys | join('\n') }}\n"
+        owner: samakia
+        group: samakia
+        mode: "0600"

@@ -747,6 +747,38 @@ phase1.accept: ## Run Phase 1 acceptance suite (ENV=...; CI-safe; no prompts)
 policy.check: ## Run policy-as-code gates (terraform + secrets + HA + docs)
 	@bash "$(POLICY_DIR)/policy.sh"
 
+.PHONY: secrets.doctor
+secrets.doctor: ## Show secrets backend configuration (no secrets)
+	@bash "$(REPO_ROOT)/ops/secrets/secrets.sh" doctor
+
+.PHONY: ssh.keys.generate
+ssh.keys.generate: ## Generate a new local SSH keypair (NAME=... optional)
+	@bash "$(REPO_ROOT)/ops/security/ssh/ssh-keys-generate.sh" --name "$(NAME)"
+
+.PHONY: ssh.keys.dryrun
+ssh.keys.dryrun: ## SSH key rotation dry-run (read-only)
+	@bash "$(REPO_ROOT)/ops/security/ssh/ssh-keys-dryrun.sh"
+
+.PHONY: ssh.keys.rotate
+ssh.keys.rotate: ## SSH key rotation (requires ROTATE_EXECUTE=1; BREAK_GLASS/I_UNDERSTAND optional)
+	@bash "$(REPO_ROOT)/ops/security/ssh/ssh-keys-rotate.sh" --execute
+
+.PHONY: firewall.check
+firewall.check: ## Firewall profile integrity check (default-off)
+	@bash "$(REPO_ROOT)/ops/security/firewall/firewall-check.sh"
+
+.PHONY: firewall.dryrun
+firewall.dryrun: ## Firewall profile dry-run (syntax check)
+	@bash "$(REPO_ROOT)/ops/security/firewall/firewall-dryrun.sh"
+
+.PHONY: firewall.apply
+firewall.apply: ## Apply firewall profile (requires FIREWALL_ENABLE=1 FIREWALL_EXECUTE=1)
+	@bash "$(REPO_ROOT)/ops/security/firewall/firewall-apply.sh"
+
+.PHONY: compliance.eval
+compliance.eval: ## Evaluate compliance profile (PROFILE=baseline|hardened)
+	@bash "$(REPO_ROOT)/ops/scripts/compliance-eval.sh" --profile "$(PROFILE)"
+
 .PHONY: phase2.accept
 phase2.accept: ## Run Phase 2 acceptance suite (read-only; DNS + MinIO planes)
 	@bash -euo pipefail -c '\
@@ -765,6 +797,14 @@ phase2.accept: ## Run Phase 2 acceptance suite (read-only; DNS + MinIO planes)
 .PHONY: phase2.1.entry.check
 phase2.1.entry.check: ## Phase 2.1 entry checklist (writes acceptance/PHASE2_1_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase2-1-entry-check.sh"
+
+.PHONY: phase5.entry.check
+phase5.entry.check: ## Phase 5 entry checklist (writes acceptance/PHASE5_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase5-entry-check.sh"
+
+.PHONY: phase5.accept
+phase5.accept: ## Run Phase 5 acceptance suite (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase5-accept.sh"
 
 .PHONY: phase2.1.accept
 phase2.1.accept: ## Run Phase 2.1 acceptance suite (read-only; shared control-plane services)

@@ -417,3 +417,15 @@ Phase 4 integrates infrastructure lifecycle with **read-only-first CI** and **po
 - Drift, app compliance, and release readiness packets are produced as artifacts.
 
 Phase 2.x and Phase 3 behavior remain unchanged; Phase 4 adds governance and evidence automation only.
+
+---
+
+## Phase 5 — Advanced Security & Compliance
+
+Phase 5 strengthens security posture while preserving offline operability:
+- Offline-first secrets interface (encrypted file), with optional Vault read-only mode.
+- Guarded SSH key rotation workflows (operator + break-glass) with evidence packets.
+- Default-off firewall profiles with explicit apply guards and read-only validation.
+- Compliance profile evaluation mapped to the control catalog (baseline/hardened).
+
+Phase 2.x, Phase 3 enforcement, and Phase 4 CI gates remain unchanged; Phase 5 adds policy-guarded security workflows only.

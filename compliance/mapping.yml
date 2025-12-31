@@ -1,0 +1,24 @@
+{
+  "controls": [
+    {"id": "APP-IAM-001", "check": "file_exists", "target": "OPERATIONS_APPLICATION_COMPLIANCE.md", "allow_na": false},
+    {"id": "APP-IAM-002", "check": "manual", "allow_na": true},
+    {"id": "APP-IAM-003", "check": "manual", "allow_na": true},
+    {"id": "APP-SEC-001", "check": "manual", "allow_na": true},
+    {"id": "APP-SEC-002", "check": "manual", "allow_na": true},
+    {"id": "APP-TLS-001", "check": "manual", "allow_na": true},
+    {"id": "APP-TLS-002", "check": "manual", "allow_na": true},
+    {"id": "APP-DATA-001", "check": "manual", "allow_na": true},
+    {"id": "APP-LOG-001", "check": "file_exists", "target": "OPERATIONS_COMPLIANCE_AUDIT.md", "allow_na": false},
+    {"id": "APP-LOG-002", "check": "file_exists", "target": "OPERATIONS_POST_INCIDENT_FORENSICS.md", "allow_na": false},
+    {"id": "APP-VULN-001", "check": "manual", "allow_na": true},
+    {"id": "APP-VULN-002", "check": "manual", "allow_na": true},
+    {"id": "APP-BACKUP-001", "check": "manual", "allow_na": true},
+    {"id": "APP-BACKUP-002", "check": "manual", "allow_na": true},
+    {"id": "APP-CHANGE-001", "check": "file_exists", "target": "OPERATIONS_PROMOTION_FLOW.md", "allow_na": false},
+    {"id": "APP-CHANGE-002", "check": "file_exists", "target": "OPERATIONS_PRE_RELEASE_READINESS.md", "allow_na": false},
+    {"id": "APP-IR-001", "check": "file_exists", "target": "OPERATIONS_BREAK_GLASS.md", "allow_na": false},
+    {"id": "APP-DATA-RET-001", "check": "file_exists", "target": "OPERATIONS_LEGAL_HOLD_RETENTION.md", "allow_na": false},
+    {"id": "APP-SC-001", "check": "file_exists", "target": "SECURITY.md", "allow_na": false},
+    {"id": "APP-ENV-001", "check": "file_exists", "target": "OPERATIONS.md", "allow_na": false}
+  ]
+}

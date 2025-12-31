@@ -167,10 +167,38 @@ Ansible MUST NOT:
 - Security groups / iptables are explicit concerns
 
 Network openness must be justified, not assumed.
+Firewall profiles in Phase 5 are **default-off** and require explicit enable/execute flags.
 
 ---
 
-## 11. Incident Response
+## 11. Audit Logging Baseline
+
+Minimum viable audit trail (MUST be preserved):
+- SSH auth events: `/var/log/auth.log` or `journalctl -u ssh`
+- Privileged commands: `sudo` events via auth log / journal
+- Service logs: systemd journals per service unit
+
+Retention guidance (minimum):
+- 7 days local retention for active troubleshooting
+- 30 days exported evidence for audit review (signed if required)
+
+Evidence handling:
+- Do NOT store secrets in logs or evidence packets.
+- Export logs using read-only commands and store under `evidence/` with manifests.
+- Use existing compliance snapshot signing workflows for integrity.
+
+---
+
+## 12. Secrets Handling (offline-first)
+
+- Default secrets backend is an **encrypted local file** on the runner.
+- Vault integration is **optional** and **read-only**; never required for bootstrap.
+- Secrets are never committed to Git and never printed in logs.
+- Passphrases are provided via environment or local passphrase files.
+
+---
+
+## 13. Incident Response
 
 ### 11.1 Suspected Compromise
 
@@ -193,7 +221,7 @@ Network openness must be justified, not assumed.
 
 ---
 
-## 12. Supported Security Posture
+## 14. Supported Security Posture
 
 Samakia Fabric officially supports:
 - Key-only SSH
@@ -205,7 +233,7 @@ Any deviation must be documented and justified.
 
 ---
 
-## 13. Responsible Disclosure
+## 15. Responsible Disclosure
 
 If you discover a security vulnerability:
 
@@ -219,7 +247,7 @@ Instead:
 
 ---
 
-## 14. Out of Scope
+## 16. Out of Scope
 
 The following are out of scope:
 - Application-level vulnerabilities

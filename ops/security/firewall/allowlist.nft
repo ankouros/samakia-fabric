@@ -1,0 +1,3 @@
+# Custom service allowlist
+# Add explicit nftables rules here, for example:
+# tcp dport 443 accept

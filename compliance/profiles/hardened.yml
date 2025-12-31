@@ -1,0 +1,25 @@
+{
+  "profile": "hardened",
+  "controls": [
+    "APP-IAM-001",
+    "APP-IAM-002",
+    "APP-IAM-003",
+    "APP-SEC-001",
+    "APP-SEC-002",
+    "APP-TLS-001",
+    "APP-TLS-002",
+    "APP-DATA-001",
+    "APP-LOG-001",
+    "APP-LOG-002",
+    "APP-VULN-001",
+    "APP-VULN-002",
+    "APP-BACKUP-001",
+    "APP-BACKUP-002",
+    "APP-CHANGE-001",
+    "APP-CHANGE-002",
+    "APP-IR-001",
+    "APP-DATA-RET-001",
+    "APP-SC-001",
+    "APP-ENV-001"
+  ]
+}

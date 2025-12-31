@@ -201,11 +201,11 @@ Outcome:
 
 ---
 
-## Phase 5 — Advanced Security & Compliance
+## Phase 5 — Advanced Security & Compliance (COMPLETED ✅)
 
 Goal: Strengthen security posture without sacrificing operability.
 
-### Planned
+### Completed (canonical)
 - Secrets manager integration (optional; must preserve offline operability)
 - SSH key rotation workflows (operator keys + break-glass policy)
 - Host firewall patterns (container-safe, default-off unless explicitly enabled)

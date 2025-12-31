@@ -697,6 +697,36 @@ Canonical rules:
 
 ---
 
+## ADR-0022 — Phase 5 Security Posture (Offline-First Secrets, Guarded Rotation, Default-Off Firewall)
+
+**Status:** Accepted
+**Date:** 2026-01-16
+
+### Decision
+
+Phase 5 introduces security hardening that **preserves offline operability**:
+
+- Secrets interface defaults to **offline encrypted file**.
+- Optional Vault integration is **read-only** and **opt-in**.
+- SSH key rotation is **guarded** (dry-run default; explicit execute flags).
+- Firewall profiles are **default-off** and require explicit enable/execute flags.
+- Compliance profiles map to the control catalog with deterministic evaluation outputs.
+
+### Rationale
+
+- Operators must be able to run the control plane without external dependencies.
+- Guarded rotation prevents accidental lockout.
+- Default-off firewall avoids unexpected connectivity loss in LXC environments.
+- Compliance evaluation must be auditable and secrets-safe.
+
+### Consequences
+
+- Vault is never required for bootstrap or core operations.
+- Evidence packets are generated locally and are never committed.
+- Policy gates enforce guardrails in CI and local validation.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

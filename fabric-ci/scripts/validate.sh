@@ -41,6 +41,9 @@ bash "$ROOT_DIR/ops/scripts/test-shared-obs-ingest-accept.sh"
 # Shared runtime invariants evaluation (offline).
 bash "$ROOT_DIR/ops/scripts/test-shared-runtime-invariants-accept.sh"
 
+# Compliance evaluation (offline; no secrets).
+bash "$ROOT_DIR/ops/scripts/test-compliance-eval.sh"
+
 # DNS rrset check unit test (offline; no Proxmox/DNS needed).
 bash "$ROOT_DIR/ops/scripts/test-dns-rrset-check.sh"
 
@@ -77,5 +80,6 @@ ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/dns-auth.yml" --syntax-ch
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/minio.yml" --syntax-check
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/minio-edge.yml" --syntax-check
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/state-backend.yml" --syntax-check
+ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/ssh-keys-rotate.yml" --syntax-check
 
 echo "Validation checks completed"

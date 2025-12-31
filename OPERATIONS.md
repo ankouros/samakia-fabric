@@ -781,6 +781,109 @@ All destructive actions should be traceable via:
 - Terraform state history
 - Proxmox task logs
 
+Minimum audit trail guidance:
+- SSH auth events via `/var/log/auth.log` or `journalctl -u ssh`
+- Privileged commands via `sudo` entries in auth logs
+- Service unit logs via `journalctl -u <service>`
+
+See `OPERATIONS_AUDIT_LOGGING.md` for retention guidance and evidence export.
+
+---
+
+## Secrets Interface (offline-first)
+
+Default backend is **offline encrypted file** (runner-local). Optional Vault is supported but never required.
+
+Commands:
+```bash
+# Show configuration (no secrets)
+make secrets.doctor
+
+# Fetch a value (offline default)
+SECRETS_PASSPHRASE_FILE=~/.config/samakia-fabric/secrets.pass \
+  ops/secrets/secrets.sh get <key> [field]
+```
+
+Encrypted file format:
+- AES-256-CBC with PBKDF2
+- JSON object (keys at top-level)
+- Stored under `~/.config/samakia-fabric/secrets.enc`
+
+Vault mode (optional):
+```bash
+SECRETS_BACKEND=vault VAULT_ADDR=https://vault.example \
+  VAULT_TOKEN=... ops/secrets/secrets.sh list
+```
+
+---
+
+## SSH Key Rotation (operator + break-glass)
+
+Dry-run (read-only):
+```bash
+make ssh.keys.dryrun
+```
+
+By default this is **local/offline** and computes diffs using files only.
+If no operator keys file is configured, the dry-run uses a temporary sample key
+and reports this in the output. For real rotation, set `OPERATOR_KEYS_FILE`.
+
+Optional remote inspection (requires inventory access and strict host key trust):
+```bash
+SSH_DRYRUN_MODE=remote make ssh.keys.dryrun
+```
+
+Execute (guarded):
+```bash
+ROTATE_EXECUTE=1 make ssh.keys.rotate
+```
+
+Break-glass rotation requires explicit acknowledgement:
+```bash
+ROTATE_EXECUTE=1 BREAK_GLASS=1 I_UNDERSTAND=1 make ssh.keys.rotate
+```
+
+Evidence packets are written under:
+`evidence/security/ssh-rotation/<UTC>/`
+
+Rollback guidance:
+- Restore the previous `authorized_keys` file on the runner.
+- Re-run rotation with `ROTATE_EXECUTE=1` to re-apply.
+
+Policy reference:
+- `ops/security/ssh/break-glass-policy.md`
+
+---
+
+## Firewall Profiles (default-off)
+
+Profiles:
+- `baseline` (minimal safe allowlist)
+- `hardened` (stricter allowlist)
+
+Dry-run (syntax only):
+```bash
+make firewall.dryrun FIREWALL_PROFILE=baseline
+```
+
+Apply (guarded, default-off):
+```bash
+FIREWALL_ENABLE=1 FIREWALL_EXECUTE=1 make firewall.apply FIREWALL_PROFILE=baseline
+```
+
+---
+
+## Compliance Profile Evaluation
+
+Evaluate baseline or hardened profile (read-only):
+```bash
+make compliance.eval PROFILE=baseline
+make compliance.eval PROFILE=hardened
+```
+
+Evidence packets are written under:
+`evidence/compliance/<profile>/<UTC>/`
+
 ---
 
 ## Change Management
@@ -849,6 +952,15 @@ make minio.sdn.accept ENV=samakia-minio
 make minio.converged.accept ENV=samakia-minio
 make minio.quorum.guard ENV=samakia-minio
 make minio.backend.smoke ENV=samakia-minio
+```
+
+## Acceptance & Verification (Phase 5)
+
+Phase 5 acceptance validates security guardrails and compliance evaluation (read-only):
+
+```bash
+make phase5.entry.check
+make phase5.accept
 ```
 
 ---
