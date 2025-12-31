@@ -64,6 +64,22 @@ if spec.get("evidence", {}).get("required_packets"):
 if spec.get("secrets", {}).get("required"):
     report_lines.append("- secrets required (symbolic): " + ", ".join(spec["secrets"]["required"]))
 
+gameday_root = Path(os.environ["FABRIC_REPO_ROOT"]) / "evidence" / "consumers" / "gameday" / name
+latest_gameday = None
+if gameday_root.exists():
+    for testcase_dir in gameday_root.iterdir():
+        if not testcase_dir.is_dir():
+            continue
+        for stamp_dir in testcase_dir.iterdir():
+            if not stamp_dir.is_dir():
+                continue
+            if (stamp_dir / "report.md").exists():
+                if latest_gameday is None or stamp_dir.name > latest_gameday.name:
+                    latest_gameday = stamp_dir
+
+if latest_gameday:
+    report_lines.append(f"- latest gameday evidence: {latest_gameday}")
+
 report_path.write_text("\n".join(report_lines) + "\n")
 
 metadata = {

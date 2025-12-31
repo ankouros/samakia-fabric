@@ -31,12 +31,20 @@ The format is inspired by:
 - CI PR validation extended with consumer checks + readiness/bundle artifacts
 - Phase 6 Part 2 acceptance marker: `acceptance/PHASE6_PART2_ACCEPTED.md`
 
+#### Platform consumers (Phase 6 Part 3)
+- Controlled execute policy (allowlisted envs/actions; prod blocked; maintenance windows enforced)
+- Consumer GameDay execute mode with guardrails + optional signed evidence
+- Execute policy validation target + acceptance marker: `acceptance/PHASE6_PART3_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets
 - Firewall profiles (default-off) with guarded apply and read-only checks
 - Compliance profile evaluation mapped to control catalog (baseline/hardened)
 - Phase 5 entry checklist and acceptance marker (self-hash; no secrets)
+
+#### Ecosystem alignment
+- Added repo-level contracts synced from samakia-specs and shared ecosystem baseline.
 
 #### GitOps & CI workflows (Phase 4)
 - GitHub Actions workflows for PR validation, PR plan evidence, drift detection, app compliance, release readiness, and gated non-prod apply

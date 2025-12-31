@@ -98,3 +98,46 @@ This runs:
 - All commands are **read-only** unless `GAMEDAY_EXECUTE=1` is set.
 - No nftables changes are performed in SAFE mode.
 - Destructive actions are not part of Phase 3 Part 2 acceptance.
+
+## Consumer GameDay Execute Mode (Phase 6 Part 3)
+
+Consumer GameDays can be executed **only** when the execution policy allows it.
+The policy lives at:
+
+`ops/consumers/disaster/execute-policy.yml`
+
+### Guardrails (execute mode)
+
+Execution requires all of:
+
+- `GAMEDAY_EXECUTE=1`
+- `I_UNDERSTAND_MUTATION=1`
+- `ENV` is allowlisted (dev/staging only; **never prod**)
+- `MAINT_WINDOW_START` and `MAINT_WINDOW_END` (UTC ISO)
+- `GAMEDAY_REASON` (minimum length enforced)
+- Signing enabled if required by policy (`EVIDENCE_SIGN=1` + `EVIDENCE_SIGN_KEY`)
+
+Optional governance: require a second operator approval before setting
+`GAMEDAY_EXECUTE=1` (documented policy; not automated).
+
+### Example (SAFE execute)
+
+```bash
+ENV=samakia-staging \
+GAMEDAY_EXECUTE=1 \
+I_UNDERSTAND_MUTATION=1 \
+MAINT_WINDOW_START=2025-01-01T00:00:00Z \
+MAINT_WINDOW_END=2025-01-01T00:30:00Z \
+GAMEDAY_REASON="VIP failover validation during maintenance" \
+EVIDENCE_SIGN=1 \
+EVIDENCE_SIGN_KEY=<fingerprint> \
+bash ops/consumers/disaster/consumer-gameday.sh \
+  --consumer contracts/consumers/kubernetes/ready.yml \
+  --testcase gameday:vip-failover --execute
+```
+
+### Evidence
+
+Execute-mode evidence is written to:
+
+`evidence/consumers/gameday/<consumer>/<testcase>/<UTC>/`

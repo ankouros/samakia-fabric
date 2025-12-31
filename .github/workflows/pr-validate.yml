@@ -70,6 +70,7 @@ jobs:
           make consumers.ha.check
           make consumers.disaster.check
           make consumers.gameday.mapping.check
+          make consumers.gameday.execute.policy.check
 
       - name: Consumer readiness packets
         run: |

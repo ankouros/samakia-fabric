@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "allowlist": {
+    "envs": ["samakia-dev", "samakia-staging"],
+    "actions": ["vip-failover", "service-restart"],
+    "consumer_types": ["kubernetes", "database", "message-queue", "cache"],
+    "vip_groups": ["shared"]
+  },
+  "maintenance_window": {
+    "max_minutes": 60
+  },
+  "reason_min_length": 12,
+  "signing": {
+    "require_execute_signing": true,
+    "allow_unsigned_execute": false
+  }
+}

@@ -234,12 +234,14 @@ Goal: Make Samakia Fabric consumable by higher-level platforms.
 - CI PR validation includes consumer checks + readiness/bundle artifacts
 - Acceptance marker: `acceptance/PHASE6_PART2_ACCEPTED.md`
 
-### Planned
-- Kubernetes-ready primitives (explicitly optional and guarded)
-- Database service patterns
-- Message queue patterns
-- Observability stack foundations
-- Consumer-facing platform documentation
+### Part 3 — Controlled Execute Mode (COMPLETED ✅)
+- Execute allowlists (dev/staging only; prod blocked)
+- Maintenance window enforcement + operator reason
+- Optional signing for execute-mode evidence
+- Acceptance marker: `acceptance/PHASE6_PART3_ACCEPTED.md`
+
+Phase 6 is **complete**. Additional consumer patterns (ready/enabled variants)
+are tracked as future roadmap items and must not expand Phase 6 scope.
 
 Outcome:
 - Samakia Fabric as a substrate, not a destination

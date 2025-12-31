@@ -75,6 +75,7 @@ if [[ -z "${CONSUMER_PATH}" || -z "${TESTCASE}" ]]; then
 fi
 
 registry_path="${FABRIC_REPO_ROOT}/ops/consumers/disaster/disaster-testcases.yml"
+policy_path="${FABRIC_REPO_ROOT}/ops/consumers/disaster/execute-policy.yml"
 if [[ ! -f "${registry_path}" ]]; then
   echo "ERROR: disaster testcases registry not found: ${registry_path}" >&2
   exit 1
@@ -84,6 +85,37 @@ if [[ ! -f "${CONSUMER_PATH}" ]]; then
   echo "ERROR: consumer contract not found: ${CONSUMER_PATH}" >&2
   exit 1
 fi
+
+if [[ ! -f "${policy_path}" ]]; then
+  echo "ERROR: execute policy not found: ${policy_path}" >&2
+  exit 1
+fi
+
+policy_env="$(POLICY_PATH="${policy_path}" python3 - <<'PY'
+import json
+import os
+import shlex
+from pathlib import Path
+
+policy = json.loads(Path(os.environ["POLICY_PATH"]).read_text())
+allowlist = policy.get("allowlist", {})
+
+def emit(key, value):
+    print(f"{key}={shlex.quote(str(value))}")
+
+emit("POLICY_ENVS", ",".join(allowlist.get("envs", [])))
+emit("POLICY_ACTIONS", ",".join(allowlist.get("actions", [])))
+emit("POLICY_TYPES", ",".join(allowlist.get("consumer_types", [])))
+emit("POLICY_VIP_GROUPS", ",".join(allowlist.get("vip_groups", [])))
+emit("POLICY_MAX_MINUTES", policy.get("maintenance_window", {}).get("max_minutes", 60))
+emit("POLICY_REASON_MIN", policy.get("reason_min_length", 12))
+signing = policy.get("signing", {})
+emit("POLICY_REQUIRE_SIGN", int(signing.get("require_execute_signing", False)))
+emit("POLICY_ALLOW_UNSIGNED", int(signing.get("allow_unsigned_execute", False)))
+PY
+)" || exit 1
+
+eval "${policy_env}"
 
 info_env="$(CONSUMER_PATH="${CONSUMER_PATH}" TESTCASE="${TESTCASE}" REGISTRY_PATH="${registry_path}" python3 - <<'PY'
 import json
@@ -142,6 +174,36 @@ SERVICE="${SERVICE_OVERRIDE:-${DEFAULT_SERVICE:-}}"
 TARGET="${TARGET_OVERRIDE:-${DEFAULT_TARGET:-}}"
 CHECK_URL="${CHECK_URL_OVERRIDE:-${DEFAULT_CHECK_URL:-}}"
 
+env_allowed="false"
+action_allowed="false"
+type_allowed="false"
+vip_group_allowed="true"
+
+if [[ -n "${ENV:-}" ]]; then
+  if [[ ",${POLICY_ENVS}," == *",${ENV},"* ]]; then
+    env_allowed="true"
+  fi
+fi
+
+if [[ -n "${GAMEDAY_ACTION:-}" ]]; then
+  if [[ ",${POLICY_ACTIONS}," == *",${GAMEDAY_ACTION},"* ]]; then
+    action_allowed="true"
+  fi
+fi
+
+if [[ -n "${CONSUMER_TYPE:-}" ]]; then
+  if [[ ",${POLICY_TYPES}," == *",${CONSUMER_TYPE},"* ]]; then
+    type_allowed="true"
+  fi
+fi
+
+if [[ -n "${POLICY_VIP_GROUPS:-}" && -n "${VIP_GROUP:-}" ]]; then
+  vip_group_allowed="false"
+  if [[ ",${POLICY_VIP_GROUPS}," == *",${VIP_GROUP},"* ]]; then
+    vip_group_allowed="true"
+  fi
+fi
+
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 
 evidence_dir="${FABRIC_REPO_ROOT}/evidence/consumers/gameday/${CONSUMER_NAME}/${TESTCASE}/${stamp}"
@@ -159,19 +221,68 @@ baseline_report="dry-run (skipped)"
 post_report="dry-run (skipped)"
 
 if [[ "${MODE}" == "execute" ]]; then
+  if [[ "${GAMEDAY_EXECUTE:-}" != "1" ]]; then
+    echo "ERROR: execution requires GAMEDAY_EXECUTE=1" >&2
+    exit 1
+  fi
+  if [[ "${I_UNDERSTAND_MUTATION:-}" != "1" ]]; then
+    echo "ERROR: execution requires I_UNDERSTAND_MUTATION=1" >&2
+    exit 1
+  fi
+  if [[ -z "${ENV:-}" ]]; then
+    echo "ERROR: execution requires ENV to be set" >&2
+    exit 1
+  fi
+  if [[ "${TESTCASE_MODE}" != "safe-gameday" ]]; then
+    echo "ERROR: execute mode is only allowed for safe-gameday testcases" >&2
+    exit 1
+  fi
+  if [[ "${env_allowed}" != "true" ]]; then
+    echo "ERROR: ENV ${ENV} not allowlisted for execute mode" >&2
+    exit 1
+  fi
+  if [[ "${action_allowed}" != "true" ]]; then
+    echo "ERROR: action ${GAMEDAY_ACTION} not allowlisted for execute mode" >&2
+    exit 1
+  fi
+  if [[ "${type_allowed}" != "true" ]]; then
+    echo "ERROR: consumer type ${CONSUMER_TYPE} not allowlisted for execute mode" >&2
+    exit 1
+  fi
+  if [[ "${vip_group_allowed}" != "true" ]]; then
+    echo "ERROR: VIP_GROUP ${VIP_GROUP} not allowlisted for execute mode" >&2
+    exit 1
+  fi
+  if [[ -z "${GAMEDAY_REASON:-}" ]]; then
+    echo "ERROR: execution requires GAMEDAY_REASON" >&2
+    exit 1
+  fi
+  if [[ ${#GAMEDAY_REASON} -lt ${POLICY_REASON_MIN} ]]; then
+    echo "ERROR: GAMEDAY_REASON must be at least ${POLICY_REASON_MIN} characters" >&2
+    exit 1
+  fi
+  if [[ -z "${MAINT_WINDOW_START:-}" || -z "${MAINT_WINDOW_END:-}" ]]; then
+    echo "ERROR: execution requires MAINT_WINDOW_START and MAINT_WINDOW_END" >&2
+    exit 1
+  fi
+  bash "${FABRIC_REPO_ROOT}/ops/scripts/maint-window.sh" \
+    --start "${MAINT_WINDOW_START}" \
+    --end "${MAINT_WINDOW_END}" \
+    --max-minutes "${POLICY_MAX_MINUTES}"
+
+  if [[ "${POLICY_REQUIRE_SIGN}" == "1" && "${POLICY_ALLOW_UNSIGNED}" != "1" ]]; then
+    if [[ "${EVIDENCE_SIGN:-0}" != "1" || -z "${EVIDENCE_SIGN_KEY:-}" ]]; then
+      echo "ERROR: execution requires EVIDENCE_SIGN=1 and EVIDENCE_SIGN_KEY" >&2
+      exit 1
+    fi
+  fi
+
   baseline_report="$(bash "${FABRIC_REPO_ROOT}/ops/scripts/gameday/gameday-evidence.sh" --id "${gameday_id}" --tag baseline)"
 fi
 
 action_summary="read-only"
 
 if [[ "${TESTCASE_MODE}" == "safe-gameday" ]]; then
-  if [[ "${MODE}" == "execute" ]]; then
-    if [[ "${GAMEDAY_EXECUTE:-}" != "1" ]]; then
-      echo "ERROR: execution requires GAMEDAY_EXECUTE=1" >&2
-      exit 1
-    fi
-  fi
-
   case "${GAMEDAY_ACTION}" in
     vip-failover)
       if [[ -z "${VIP_GROUP}" ]]; then
@@ -215,6 +326,13 @@ if [[ "${MODE}" == "execute" ]]; then
   bash "${FABRIC_REPO_ROOT}/ops/scripts/gameday/gameday-postcheck.sh"
 fi
 
+reason_preview=""
+reason_len="0"
+if [[ -n "${GAMEDAY_REASON:-}" ]]; then
+  reason_preview="${GAMEDAY_REASON:0:64}"
+  reason_len="${#GAMEDAY_REASON}"
+fi
+
 cat <<REPORT > "${report_path}"
 # Consumer GameDay Report
 
@@ -229,6 +347,16 @@ cat <<REPORT > "${report_path}"
 ## Evidence
 - baseline: ${baseline_report}
 - post: ${post_report}
+
+## Policy decision
+- env: ${ENV:-}
+- allowlist env: ${env_allowed}
+- allowlist action: ${action_allowed}
+- allowlist type: ${type_allowed}
+- allowlist VIP group: ${vip_group_allowed}
+- maintenance window: ${MAINT_WINDOW_START:-} -> ${MAINT_WINDOW_END:-}
+- reason length: ${reason_len}
+- reason preview: ${reason_preview}
 
 ## Inputs
 - VIP_GROUP: ${VIP_GROUP:-}
@@ -245,6 +373,8 @@ cat <<META > "${metadata_path}"
   "testcase": "${TESTCASE}",
   "mode": "${TESTCASE_MODE}",
   "action": "${GAMEDAY_ACTION}",
+  "execute_env": "${ENV:-}",
+  "execute": "${MODE}",
   "timestamp_utc": "${stamp}"
 }
 META
@@ -256,5 +386,17 @@ cat <<MANIFEST > "${manifest_path}"
 ${sha_report}  report.md
 ${sha_meta}  metadata.json
 MANIFEST
+
+if [[ "${EVIDENCE_SIGN:-0}" -eq 1 ]]; then
+  if ! command -v gpg >/dev/null 2>&1; then
+    echo "ERROR: gpg not found (required for EVIDENCE_SIGN=1)" >&2
+    exit 1
+  fi
+  gpg_args=(--batch --yes --detach-sign)
+  if [[ -n "${EVIDENCE_SIGN_KEY:-}" ]]; then
+    gpg_args+=(--local-user "${EVIDENCE_SIGN_KEY}")
+  fi
+  gpg "${gpg_args[@]}" --output "${manifest_path}.asc" "${manifest_path}"
+fi
 
 printf "OK: gameday evidence -> %s\n" "${evidence_dir}"

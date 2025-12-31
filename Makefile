@@ -830,6 +830,10 @@ consumers.evidence: ## Generate consumer readiness evidence packets (read-only)
 consumers.gameday.mapping.check: ## Validate GameDay mapping for consumer testcases
 	@bash "$(REPO_ROOT)/ops/consumers/disaster/validate-gameday-mapping.sh"
 
+.PHONY: consumers.gameday.execute.policy.check
+consumers.gameday.execute.policy.check: ## Validate execute-mode GameDay policy (allowlists + signing)
+	@bash "$(REPO_ROOT)/ops/consumers/disaster/validate-execute-policy.sh"
+
 .PHONY: consumers.gameday.dryrun
 consumers.gameday.dryrun: ## Dry-run a deterministic GameDay per consumer type
 	@bash "$(REPO_ROOT)/ops/consumers/disaster/consumer-gameday.sh" \
@@ -860,6 +864,10 @@ phase6.part1.accept: ## Run Phase 6 Part 1 acceptance (read-only consumer contra
 .PHONY: phase6.part2.accept
 phase6.part2.accept: ## Run Phase 6 Part 2 acceptance (read-only, dry-run gamedays)
 	@bash "$(OPS_SCRIPTS_DIR)/phase6-part2-accept.sh"
+
+.PHONY: phase6.part3.accept
+phase6.part3.accept: ## Run Phase 6 Part 3 acceptance (read-only; validate execute guards)
+	@bash "$(OPS_SCRIPTS_DIR)/phase6-part3-accept.sh"
 
 .PHONY: phase2.1.accept
 phase2.1.accept: ## Run Phase 2.1 acceptance suite (read-only; shared control-plane services)
