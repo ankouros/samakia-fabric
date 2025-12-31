@@ -65,6 +65,14 @@ The format is inspired by:
 - Phase 2.2 entry checklist: `acceptance/PHASE2_2_ENTRY_CHECKLIST.md`
 - Phase 2.2 aggregate acceptance: `make phase2.2.accept` (read-only; no DNS dependency)
 - Phase 2.2 acceptance marker: `acceptance/PHASE2_2_ACCEPTED.md` (read-only acceptance; no secrets)
+#### HA semantics & failure domains (Phase 3 Part 1)
+- HA semantics taxonomy and failure domain model: `OPERATIONS_HA_SEMANTICS.md`
+- Placement policy source of truth: `fabric-core/ha/placement-policy.yml`
+- Placement validator: `ops/scripts/ha/placement-validate.sh` + `make ha.placement.validate`
+- Proxmox HA audit: `ops/scripts/ha/proxmox-ha-audit.sh` + `make ha.proxmox.audit`
+- HA evidence snapshot: `ops/scripts/ha/evidence-snapshot.sh` + `make ha.evidence.snapshot`
+- Phase 3 Part 1 acceptance: `make phase3.part1.accept`
+- Phase 3 Part 1 acceptance marker: `acceptance/PHASE3_PART1_ACCEPTED.md`
 - Phase 1 operational hardening (remote state + runner bootstrapping + CI-safe orchestration)
 - Remote Terraform backend initialization for MinIO/S3 with lockfiles (`ops/scripts/tf-backend-init.sh`; no DynamoDB; strict TLS)
 - Runner host env management (`ops/scripts/runner-env-install.sh`, `ops/scripts/runner-env-check.sh`) with canonical env file `~/.config/samakia-fabric/env.sh` (chmod 600; presence-only output)

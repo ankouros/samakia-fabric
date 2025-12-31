@@ -379,3 +379,13 @@ Phase 3 entry is READY.
 ## Phase 3 Entry Status
 
 Phase 3 entry is **READY** based on live readiness verification (see `acceptance/PHASE3_ENTRY_CHECKLIST.md`).
+
+## Phase 3 Part 1 — HA Semantics
+
+Phase 3 Part 1 establishes deterministic HA semantics and failure-domain validation:
+
+- HA tiers and failure-domain model defined in `OPERATIONS_HA_SEMANTICS.md`.
+- Placement policy enforced by `fabric-core/ha/placement-policy.yml` and `make ha.placement.validate`.
+- Proxmox HA audit guardrails via `make ha.proxmox.audit`.
+- Read-only evidence snapshots via `make ha.evidence.snapshot`.
+- Acceptance marker: `acceptance/PHASE3_PART1_ACCEPTED.md`.

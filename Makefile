@@ -767,6 +767,31 @@ phase2.2.entry.check: ## Phase 2.2 entry checklist (writes acceptance/PHASE2_2_E
 phase2.2.accept: ## Run Phase 2.2 acceptance suite (read-only; control-plane invariants)
 	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase2-2-accept.sh"
 
+.PHONY: ha.placement.validate
+ha.placement.validate: ## HA placement validation (read-only; uses placement policy + inventory)
+	@if [[ -n "$(ENV)" ]]; then \
+		FABRIC_TERRAFORM_ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/ha/placement-validate.sh" --env "$(ENV)"; \
+	else \
+		bash "$(OPS_SCRIPTS_DIR)/ha/placement-validate.sh" --all; \
+	fi
+
+.PHONY: ha.proxmox.audit
+ha.proxmox.audit: ## Proxmox HA audit (read-only; ensures policy alignment)
+	@bash "$(OPS_SCRIPTS_DIR)/ha/proxmox-ha-audit.sh"
+
+.PHONY: ha.evidence.snapshot
+ha.evidence.snapshot: ## HA evidence snapshot (read-only; writes artifacts/ha-evidence/<UTC>/report.md)
+	@bash "$(OPS_SCRIPTS_DIR)/ha/evidence-snapshot.sh"
+
+.PHONY: phase3.part1.accept
+phase3.part1.accept: ## Run Phase 3 Part 1 acceptance (HA semantics + failure domains)
+	@pre-commit run --all-files
+	@bash "fabric-ci/scripts/lint.sh"
+	@bash "fabric-ci/scripts/validate.sh"
+	@$(MAKE) ha.placement.validate ENV="$(ENV)"
+	@$(MAKE) ha.proxmox.audit
+	@$(MAKE) ha.evidence.snapshot
+
 .PHONY: phase0.accept
 phase0.accept: ## Run Phase 0 acceptance suite (static checks; no infra mutations)
 	bash "$(OPS_SCRIPTS_DIR)/phase0-accept.sh"

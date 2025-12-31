@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "failure_domains": {
+    "nodes": ["proxmox1", "proxmox2", "proxmox3"]
+  },
+  "tiers": {
+    "tier0": {
+      "description": "Control-plane critical edge/gateway workloads (VIP holders).",
+      "ha_semantics": "VIP redundancy with strict anti-affinity across nodes",
+      "expected_recovery": "seconds"
+    },
+    "tier1": {
+      "description": "Stateful core services (storage, secrets, auth).",
+      "ha_semantics": "Service-level HA across nodes; no single-node placement",
+      "expected_recovery": "minutes"
+    },
+    "tier2": {
+      "description": "Non-critical tooling and supporting services.",
+      "ha_semantics": "Best-effort placement; downtime acceptable",
+      "expected_recovery": "hours"
+    }
+  },
+  "envs": {
+    "samakia-dns": {
+      "proxmox_ha_expected": false,
+      "workloads": [
+        {
+          "name": "dns-edge",
+          "tier": "tier0",
+          "ha_mode": "vip",
+          "replicas": 2,
+          "anti_affinity": true,
+          "hosts": ["dns-edge-1", "dns-edge-2"]
+        },
+        {
+          "name": "dns-auth",
+          "tier": "tier1",
+          "ha_mode": "app",
+          "replicas": 2,
+          "anti_affinity": true,
+          "hosts": ["dns-auth-1", "dns-auth-2"]
+        }
+      ]
+    },
+    "samakia-minio": {
+      "proxmox_ha_expected": false,
+      "workloads": [
+        {
+          "name": "minio-edge",
+          "tier": "tier0",
+          "ha_mode": "vip",
+          "replicas": 2,
+          "anti_affinity": true,
+          "hosts": ["minio-edge-1", "minio-edge-2"]
+        },
+        {
+          "name": "minio",
+          "tier": "tier1",
+          "ha_mode": "app",
+          "replicas": 3,
+          "anti_affinity": true,
+          "hosts": ["minio-1", "minio-2", "minio-3"]
+        }
+      ]
+    },
+    "samakia-shared": {
+      "proxmox_ha_expected": false,
+      "workloads": [
+        {
+          "name": "shared-edge",
+          "tier": "tier0",
+          "ha_mode": "vip",
+          "replicas": 2,
+          "anti_affinity": true,
+          "hosts": ["ntp-1", "ntp-2"]
+        },
+        {
+          "name": "vault",
+          "tier": "tier1",
+          "ha_mode": "app",
+          "replicas": 2,
+          "anti_affinity": true,
+          "hosts": ["vault-1", "vault-2"]
+        },
+        {
+          "name": "observability",
+          "tier": "tier1",
+          "ha_mode": "app",
+          "replicas": 1,
+          "anti_affinity": false,
+          "hosts": ["obs-1"]
+        }
+      ]
+    },
+    "samakia-prod": {
+      "proxmox_ha_expected": false,
+      "workloads": [
+        {
+          "name": "monitoring",
+          "tier": "tier2",
+          "ha_mode": "none",
+          "replicas": 1,
+          "anti_affinity": false,
+          "hosts": ["monitoring-1"]
+        }
+      ]
+    },
+    "samakia-dev": {
+      "proxmox_ha_expected": false,
+      "workloads": [
+        {
+          "name": "monitoring-dev",
+          "tier": "tier2",
+          "ha_mode": "none",
+          "replicas": 1,
+          "anti_affinity": false,
+          "hosts": ["monitoring-dev-1"]
+        }
+      ]
+    },
+    "samakia-staging": {
+      "proxmox_ha_expected": false,
+      "workloads": [
+        {
+          "name": "monitoring-staging",
+          "tier": "tier2",
+          "ha_mode": "none",
+          "replicas": 1,
+          "anti_affinity": false,
+          "hosts": ["monitoring-staging-1"]
+        }
+      ]
+    }
+  }
+}

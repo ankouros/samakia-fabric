@@ -157,12 +157,17 @@ Outcome:
 
 Goal: Enable resilient, multi-node deployments with realistic failure semantics.
 
+### Part 1 — HA Semantics & Failure Domains (COMPLETED)
+- HA tiers and failure domain taxonomy documented
+- Placement policy + validation (anti-affinity, explicit replicas)
+- Proxmox HA audit guardrails (policy-aligned)
+- Read-only evidence snapshot tooling (cluster/VIP/service readiness)
+
 ### Planned
-- Proxmox HA-aware patterns (workload classification: HA vs non-HA)
-- Multi-node placement strategies + anti-affinity
+- Proxmox HA enablement per workload (explicit HA groups; no defaults)
 - Storage abstraction patterns (NFS today, Ceph-ready)
-- Failure-domain aware placement policy
 - Routine GameDays (failure simulation) with evidence capture
+- Continuous HA validation across environments
 
 Outcome:
 - Controlled redundancy

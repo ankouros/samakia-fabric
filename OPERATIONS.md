@@ -545,6 +545,18 @@ Proxmox HA is enabled deliberately per workload, with explicit placement/failure
 
 - `OPERATIONS_HA_FAILURE_DOMAINS.md`
 - `OPERATIONS_HA_FAILURE_SIMULATION.md` (GameDays / failure simulation runbook)
+- `OPERATIONS_HA_SEMANTICS.md` (HA tiers, failure-domain model, Proxmox HA vs VIP HA)
+
+Read-only validation and evidence:
+
+- `make ha.placement.validate` (placement policy vs inventory; anti-affinity checks)
+- `make ha.proxmox.audit` (Proxmox HA resources vs policy expectation)
+- `make ha.evidence.snapshot` (cluster status, VIP ownership, service readiness, SDN pending)
+- `make phase3.part1.accept` (aggregated Phase 3 Part 1 acceptance gate)
+
+Placement policy source of truth:
+
+- `fabric-core/ha/placement-policy.yml`
 
 ---
 
