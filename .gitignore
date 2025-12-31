@@ -119,6 +119,7 @@ temp/
 .cache/
 audit/
 evidence/
+artifacts/
 !ops/consumers/evidence/
 !ops/consumers/evidence/consumer-readiness.sh
 compliance/

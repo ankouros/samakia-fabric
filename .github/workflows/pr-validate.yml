@@ -64,5 +64,27 @@ jobs:
       - name: Validate
         run: bash fabric-ci/scripts/validate.sh
 
+      - name: Consumer contract checks
+        run: |
+          make consumers.validate
+          make consumers.ha.check
+          make consumers.disaster.check
+          make consumers.gameday.mapping.check
+
+      - name: Consumer readiness packets
+        run: |
+          make consumers.evidence
+          make consumers.bundle
+          make consumers.bundle.check
+
+      - name: Upload consumer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: consumer-readiness-and-bundles
+          path: |
+            evidence/consumers/**
+            artifacts/consumer-bundles/**
+          if-no-files-found: error
+
       - name: HA enforcement gate
         run: make ha.enforce.check ENV=samakia-prod

@@ -895,8 +895,13 @@ Phase 6 provides consumer contracts and **read-only** validation (no deployments
 - Contract validation: `make consumers.validate`
 - HA readiness check: `make consumers.ha.check`
 - Disaster wiring check: `make consumers.disaster.check`
+- GameDay mapping check: `make consumers.gameday.mapping.check`
+- GameDay dry-run (safe): `make consumers.gameday.dryrun`
 - Readiness evidence: `make consumers.evidence`
+- Bundle generation: `make consumers.bundle`
+- Bundle validation: `make consumers.bundle.check`
 - Acceptance gate: `make phase6.part1.accept`
+- Phase 6 Part 2 acceptance: `make phase6.part2.accept`
 
 Evidence packets are written under:
 `evidence/consumers/<type>/<variant>/<UTC>/`

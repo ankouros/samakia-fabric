@@ -826,9 +826,40 @@ consumers.disaster.check: ## Validate consumer disaster coverage wiring
 consumers.evidence: ## Generate consumer readiness evidence packets (read-only)
 	@bash "$(REPO_ROOT)/ops/consumers/evidence/consumer-readiness.sh"
 
+.PHONY: consumers.gameday.mapping.check
+consumers.gameday.mapping.check: ## Validate GameDay mapping for consumer testcases
+	@bash "$(REPO_ROOT)/ops/consumers/disaster/validate-gameday-mapping.sh"
+
+.PHONY: consumers.gameday.dryrun
+consumers.gameday.dryrun: ## Dry-run a deterministic GameDay per consumer type
+	@bash "$(REPO_ROOT)/ops/consumers/disaster/consumer-gameday.sh" \
+		--consumer "$(REPO_ROOT)/contracts/consumers/kubernetes/ready.yml" \
+		--testcase "gameday:vip-failover" --dry-run
+	@bash "$(REPO_ROOT)/ops/consumers/disaster/consumer-gameday.sh" \
+		--consumer "$(REPO_ROOT)/contracts/consumers/database/ready.yml" \
+		--testcase "gameday:service-restart" --dry-run
+	@bash "$(REPO_ROOT)/ops/consumers/disaster/consumer-gameday.sh" \
+		--consumer "$(REPO_ROOT)/contracts/consumers/message-queue/ready.yml" \
+		--testcase "gameday:vip-failover" --dry-run
+	@bash "$(REPO_ROOT)/ops/consumers/disaster/consumer-gameday.sh" \
+		--consumer "$(REPO_ROOT)/contracts/consumers/cache/ready.yml" \
+		--testcase "gameday:service-restart" --dry-run
+
+.PHONY: consumers.bundle
+consumers.bundle: ## Generate consumer bundle outputs (read-only)
+	@bash "$(REPO_ROOT)/ops/consumers/provision/consumer-bundle.sh"
+
+.PHONY: consumers.bundle.check
+consumers.bundle.check: ## Validate consumer bundle outputs
+	@bash "$(REPO_ROOT)/ops/consumers/provision/consumer-bundle-validate.sh"
+
 .PHONY: phase6.part1.accept
 phase6.part1.accept: ## Run Phase 6 Part 1 acceptance (read-only consumer contracts)
 	@bash "$(OPS_SCRIPTS_DIR)/phase6-part1-accept.sh"
+
+.PHONY: phase6.part2.accept
+phase6.part2.accept: ## Run Phase 6 Part 2 acceptance (read-only, dry-run gamedays)
+	@bash "$(OPS_SCRIPTS_DIR)/phase6-part2-accept.sh"
 
 .PHONY: phase2.1.accept
 phase2.1.accept: ## Run Phase 2.1 acceptance suite (read-only; shared control-plane services)

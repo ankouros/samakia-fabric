@@ -228,6 +228,12 @@ Goal: Make Samakia Fabric consumable by higher-level platforms.
 - Consumer readiness evidence packets (read-only)
 - Acceptance marker: `acceptance/PHASE6_PART1_ACCEPTED.md`
 
+### Part 2 — GameDay Wiring & Bundles (COMPLETED ✅)
+- SAFE GameDay wiring (dry-run only) mapped to consumer testcases
+- Consumer bundles (ports, storage, firewall intents, observability labels)
+- CI PR validation includes consumer checks + readiness/bundle artifacts
+- Acceptance marker: `acceptance/PHASE6_PART2_ACCEPTED.md`
+
 ### Planned
 - Kubernetes-ready primitives (explicitly optional and guarded)
 - Database service patterns

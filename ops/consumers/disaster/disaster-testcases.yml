@@ -3,36 +3,61 @@
     "node-loss": {
       "description": "One node in a failure domain is lost.",
       "expected_outcome": "Service remains available or degrades per tier.",
+      "mode": "read-only",
+      "gameday_action": "",
+      "default_inputs": {},
       "evidence_required": ["ha-evidence", "service-readiness"],
       "gameday_safe": true
     },
     "gameday:vip-failover": {
       "description": "VIP ownership moves between peers.",
       "expected_outcome": "VIP remains reachable; failover within SLO.",
+      "mode": "safe-gameday",
+      "gameday_action": "vip-failover",
+      "default_inputs": {
+        "VIP_GROUP": "shared",
+        "CHECK_URL": "https://192.168.11.122:3000/"
+      },
       "evidence_required": ["vip-ownership", "service-readiness"],
       "gameday_safe": true
     },
     "vip-failover": {
       "description": "VIP ownership moves between peers.",
       "expected_outcome": "VIP remains reachable; failover within SLO.",
+      "mode": "read-only",
+      "gameday_action": "",
+      "default_inputs": {},
       "evidence_required": ["vip-ownership", "service-readiness"],
       "gameday_safe": true
     },
     "storage-unavailable": {
       "description": "Storage backend becomes unavailable.",
       "expected_outcome": "Writes fail fast; recovery procedures invoked.",
+      "mode": "destructive",
+      "gameday_action": "",
+      "default_inputs": {},
       "evidence_required": ["storage-health"],
       "gameday_safe": false
     },
     "gameday:service-restart": {
       "description": "Service process restarts on a node.",
       "expected_outcome": "Readiness returns and no data loss occurs.",
+      "mode": "safe-gameday",
+      "gameday_action": "service-restart",
+      "default_inputs": {
+        "SERVICE": "grafana-server",
+        "TARGET": "192.168.11.122",
+        "CHECK_URL": "https://192.168.11.122:3000/"
+      },
       "evidence_required": ["service-readiness"],
       "gameday_safe": true
     },
     "service-restart": {
       "description": "Service process restarts on a node.",
       "expected_outcome": "Readiness returns and no data loss occurs.",
+      "mode": "read-only",
+      "gameday_action": "",
+      "default_inputs": {},
       "evidence_required": ["service-readiness"],
       "gameday_safe": true
     }

@@ -25,6 +25,12 @@ The format is inspired by:
 - Consumer readiness evidence packets under `evidence/consumers/<type>/<variant>/<UTC>/`
 - Phase 6 Part 1 acceptance marker: `acceptance/PHASE6_PART1_ACCEPTED.md`
 
+#### Platform consumers (Phase 6 Part 2)
+- Safe GameDay wiring (dry-run only) mapped to consumer disaster testcases
+- Consumer bundle generation + validation (ports, firewall intents, storage, observability)
+- CI PR validation extended with consumer checks + readiness/bundle artifacts
+- Phase 6 Part 2 acceptance marker: `acceptance/PHASE6_PART2_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

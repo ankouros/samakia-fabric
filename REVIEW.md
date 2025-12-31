@@ -432,10 +432,15 @@ Phase 2.x, Phase 3 enforcement, and Phase 4 CI gates remain unchanged; Phase 5 a
 
 ---
 
-## Phase 6 — Platform Consumers (Part 1)
+## Phase 6 — Platform Consumers (Parts 1–2)
 
 Phase 6 Part 1 turns consumer contracts into enforced, testable mechanics (no deployments):
 - Contract validation (schema + semantics) for `ready`/`enabled` variants.
 - HA readiness checks and disaster wiring validation (read-only).
 - Consumer readiness evidence packets under `evidence/consumers/`.
 - Acceptance marker: `acceptance/PHASE6_PART1_ACCEPTED.md`.
+
+Phase 6 Part 2 adds safe GameDay wiring and bundle outputs (dry-run only):
+- Consumer GameDay mapping validation + dry-run execution (no mutation).
+- Consumer bundles for ports, firewall intents, storage, and observability labels.
+- Acceptance marker: `acceptance/PHASE6_PART2_ACCEPTED.md`.
