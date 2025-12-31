@@ -1,0 +1,77 @@
+name: App Compliance Packet
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "Target environment"
+        required: true
+      service_name:
+        description: "Service name"
+        required: true
+      service_root:
+        description: "Service root directory (relative to repo or absolute)"
+        required: true
+      config_list:
+        description: "Optional config list file (relative path)"
+        required: false
+      profile:
+        description: "Optional compliance profile path"
+        required: false
+      version:
+        description: "Optional service version"
+        required: false
+      sign:
+        description: "Sign evidence packet (0 or 1)"
+        required: false
+        default: "0"
+      gpg_key:
+        description: "GPG fingerprint (optional)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  app-compliance:
+    runs-on: self-hosted
+    env:
+      CI: "1"
+      TF_IN_AUTOMATION: "1"
+      FABRIC_REPO_ROOT: ${{ github.workspace }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate packet
+        id: packet
+        run: |
+          set -euo pipefail
+          args=()
+          if [[ -n "${{ inputs.config_list }}" ]]; then
+            args+=("--config" "${{ inputs.config_list }}")
+          fi
+          if [[ -n "${{ inputs.profile }}" ]]; then
+            args+=("--profile" "${{ inputs.profile }}")
+          fi
+          if [[ -n "${{ inputs.version }}" ]]; then
+            args+=("--version" "${{ inputs.version }}")
+          fi
+          export EVIDENCE_SIGN="${{ inputs.sign }}"
+          export EVIDENCE_GPG_KEY="${{ inputs.gpg_key }}"
+          output="$(bash ops/scripts/app-compliance-packet.sh "${{ inputs.env }}" "${{ inputs.service_name }}" "${{ inputs.service_root }}" "${args[@]}" 2>&1)"
+          packet_dir="$(printf '%s\n' "${output}" | awk -F': ' '/^OK: wrote application evidence bundle:/{print $2; exit}')"
+          if [[ -z "${packet_dir}" ]]; then
+            echo "ERROR: unable to determine packet directory" >&2
+            printf '%s\n' "${output}" >&2
+            exit 1
+          fi
+          echo "packet_dir=${packet_dir}" >>"$GITHUB_OUTPUT"
+
+      - name: Upload packet
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-compliance-${{ inputs.env }}-${{ inputs.service_name }}
+          path: ${{ steps.packet.outputs.packet_dir }}

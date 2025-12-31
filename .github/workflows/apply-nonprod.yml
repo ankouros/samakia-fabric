@@ -1,0 +1,140 @@
+name: Apply Non-Prod (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "Target environment (non-prod only)"
+        type: choice
+        required: true
+        options:
+          - samakia-dev
+          - samakia-staging
+      confirm:
+        description: "Type I_UNDERSTAND_APPLY_IS_MUTATING to proceed"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: self-hosted
+    env:
+      CI: "1"
+      TF_IN_AUTOMATION: "1"
+      FABRIC_REPO_ROOT: ${{ github.workspace }}
+      TF_VAR_pm_api_url: ${{ secrets.PM_API_URL }}
+      TF_VAR_pm_api_token_id: ${{ secrets.PM_API_TOKEN_ID }}
+      TF_VAR_pm_api_token_secret: ${{ secrets.PM_API_TOKEN_SECRET }}
+      TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
+      TF_BACKEND_S3_BUCKET: ${{ secrets.TF_BACKEND_S3_BUCKET }}
+      TF_BACKEND_S3_REGION: ${{ secrets.TF_BACKEND_S3_REGION }}
+      TF_BACKEND_S3_KEY_PREFIX: ${{ secrets.TF_BACKEND_S3_KEY_PREFIX }}
+      TF_BACKEND_S3_CA_REQUIRED: "1"
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_BACKEND_S3_CA_SRC: ${{ secrets.TF_BACKEND_S3_CA_SRC }}
+      TF_VAR_ssh_public_keys: ${{ secrets.TF_VAR_SSH_PUBLIC_KEYS }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Confirm apply intent
+        run: |
+          if [[ "${{ inputs.confirm }}" != "I_UNDERSTAND_APPLY_IS_MUTATING" ]]; then
+            echo "ERROR: confirmation phrase mismatch" >&2
+            exit 1
+          fi
+
+      - name: Install base dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-venv unzip ripgrep
+          python3 -m pip install --user pre-commit ansible
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.0"
+
+      - name: Trust Proxmox CA
+        run: |
+          sudo cp ops/ca/proxmox-root-ca.crt /usr/local/share/ca-certificates/proxmox-root-ca.crt
+          sudo update-ca-certificates
+
+      - name: Trust S3 backend CA (if provided)
+        run: |
+          if [[ -n "${TF_BACKEND_S3_CA_SRC:-}" ]]; then
+            bash ops/scripts/install-s3-backend-ca.sh
+          fi
+
+      - name: Policy gates
+        run: make policy.check
+
+      - name: Pre-commit
+        run: pre-commit run --all-files
+
+      - name: Lint
+        run: bash fabric-ci/scripts/lint.sh
+
+      - name: Validate
+        run: bash fabric-ci/scripts/validate.sh
+
+      - name: HA enforcement gate
+        run: make ha.enforce.check ENV="${{ inputs.env }}"
+
+      - name: Terraform plan
+        run: make tf.plan ENV="${{ inputs.env }}"
+
+      - name: Terraform apply (non-prod)
+        run: make tf.apply ENV="${{ inputs.env }}"
+
+      - name: Post-apply acceptance (read-only)
+        run: |
+          set -euo pipefail
+          env_name="${{ inputs.env }}"
+          ts="$(date -u +%Y%m%dT%H%M%SZ)"
+          out_dir="evidence/ci/apply/${env_name}/${ts}"
+          mkdir -p "${out_dir}"
+          redactor() {
+            sed -E \
+              -e 's/(AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|AWS_SESSION_TOKEN)=([^[:space:]]+)/\1=<redacted>/g' \
+              -e 's/(TF_VAR_pm_api_token_secret|PM_API_TOKEN_SECRET)=([^[:space:]]+)/\1=<redacted>/g' \
+              -e 's/(TF_VAR_pm_api_token_id|PM_API_TOKEN_ID)=([^[:space:]]+)/\1=<redacted>/g'
+          }
+          make tf.plan ENV="${env_name}" 2>&1 | redactor >"${out_dir}/post-apply-plan.txt"
+          make inventory.check ENV="${env_name}" 2>&1 | redactor >"${out_dir}/post-apply-acceptance.txt"
+          python3 - "${out_dir}/metadata.json" "${env_name}" "${ts}" "${GITHUB_SHA}" "${GITHUB_RUN_ID}" <<'PY'
+          import json
+          import sys
+
+          out, env_name, ts, sha, run_id = sys.argv[1:6]
+
+          doc = {
+            "environment": env_name,
+            "timestamp_utc": ts,
+            "git_commit": sha,
+            "workflow_run_id": run_id,
+            "type": "apply-nonprod",
+          }
+
+          with open(out, "w", encoding="utf-8") as fh:
+            json.dump(doc, fh, indent=2, sort_keys=True)
+            fh.write("\n")
+          PY
+          (
+            cd "${out_dir}"
+            find . -type f ! -name 'manifest.sha256' -print0 \
+              | LC_ALL=C sort -z \
+              | xargs -0 sha256sum >"${out_dir}/manifest.sha256"
+          )
+
+      - name: Upload apply evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: apply-nonprod-${{ inputs.env }}
+          path: evidence/ci/apply/${{ inputs.env }}

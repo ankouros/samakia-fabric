@@ -406,3 +406,14 @@ Phase 3 Part 3 turns HA semantics into **hard enforcement**:
 - Proxmox HA declarations are audited in enforcement mode (`--enforce`).
 - Explicit overrides require `HA_OVERRIDE=1` and `HA_OVERRIDE_REASON`.
 - Acceptance gate: `make phase3.part3.accept`.
+
+## Phase 4 — GitOps & CI Workflows
+
+Phase 4 integrates infrastructure lifecycle with **read-only-first CI** and **policy gates**:
+
+- PR validation runs `policy.check`, pre-commit, lint, validate, and HA enforcement.
+- PR plan workflows produce **evidence packets** with manifests (no secrets).
+- Non-prod apply is manual and gated (explicit confirmation phrase; dev/staging only).
+- Drift, app compliance, and release readiness packets are produced as artifacts.
+
+Phase 2.x and Phase 3 behavior remain unchanged; Phase 4 adds governance and evidence automation only.

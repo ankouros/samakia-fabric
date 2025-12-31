@@ -184,7 +184,7 @@ Outcome:
 
 Goal: Integrate infrastructure lifecycle with Git workflows safely.
 
-### Planned
+### Completed ✅
 - Terraform plan via CI (read-only first) with human gatekeeping
 - Policy-as-code checks (guardrails as mandatory gates)
 - Pre-merge validation (fmt, validate, lint, security checks)
@@ -193,6 +193,7 @@ Goal: Integrate infrastructure lifecycle with Git workflows safely.
   - substrate drift packets
   - app compliance packets
   - release readiness packets
+- Acceptance marker: `acceptance/PHASE4_ACCEPTED.md`
 
 Outcome:
 - Safer change management

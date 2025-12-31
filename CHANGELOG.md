@@ -15,6 +15,16 @@ The format is inspired by:
 ## [Unreleased]
 
 ### Added
+#### GitOps & CI workflows (Phase 4)
+- GitHub Actions workflows for PR validation, PR plan evidence, drift detection, app compliance, release readiness, and gated non-prod apply
+- Policy-as-code gates (`ops/policy/*`) with `make policy.check` (terraform rules, secrets scanning, HA enforcement, docs updates)
+- Evidence packet scripts:
+  - `ops/scripts/drift-packet.sh`
+  - `ops/scripts/app-compliance-packet.sh`
+  - `ops/scripts/release-readiness-packet.sh`
+- Phase 4 entry checklist: `acceptance/PHASE4_ENTRY_CHECKLIST.md`
+- Phase 4 acceptance marker: `acceptance/PHASE4_ACCEPTED.md` (self-hash; no secrets)
+
 #### Proxmox UI metadata
 - Deterministic Proxmox tags for all Terraform-managed LXCs (semicolon-separated; prefix-encoded key/value schema)
   - Tag schema: `golden-vN;plane-<plane>;env-<env>;role-<role>` (Terraform-managed; no manual UI edits)

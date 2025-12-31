@@ -1,0 +1,93 @@
+name: Drift Detection
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - samakia-dev
+          - samakia-staging
+          - samakia-prod
+          - samakia-dns
+          - samakia-minio
+          - samakia-shared
+    env:
+      CI: "1"
+      TF_IN_AUTOMATION: "1"
+      FABRIC_REPO_ROOT: ${{ github.workspace }}
+      TF_VAR_pm_api_url: ${{ secrets.PM_API_URL }}
+      TF_VAR_pm_api_token_id: ${{ secrets.PM_API_TOKEN_ID }}
+      TF_VAR_pm_api_token_secret: ${{ secrets.PM_API_TOKEN_SECRET }}
+      TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
+      TF_BACKEND_S3_BUCKET: ${{ secrets.TF_BACKEND_S3_BUCKET }}
+      TF_BACKEND_S3_REGION: ${{ secrets.TF_BACKEND_S3_REGION }}
+      TF_BACKEND_S3_KEY_PREFIX: ${{ secrets.TF_BACKEND_S3_KEY_PREFIX }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_BACKEND_S3_CA_SRC: ${{ secrets.TF_BACKEND_S3_CA_SRC }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install base dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-venv unzip ripgrep
+          python3 -m pip install --user ansible
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.0"
+
+      - name: Trust Proxmox CA
+        run: |
+          sudo cp ops/ca/proxmox-root-ca.crt /usr/local/share/ca-certificates/proxmox-root-ca.crt
+          sudo update-ca-certificates
+
+      - name: Trust S3 backend CA (if provided)
+        run: |
+          if [[ -n "${TF_BACKEND_S3_CA_SRC:-}" ]]; then
+            bash ops/scripts/install-s3-backend-ca.sh
+          fi
+
+      - name: Drift packet
+        id: drift
+        continue-on-error: true
+        run: |
+          set +e
+          env_name="${{ matrix.env }}"
+          ts="$(date -u +%Y%m%dT%H%M%SZ)"
+          AUDIT_TIMESTAMP_UTC="${ts}" bash ops/scripts/drift-packet.sh "${env_name}"
+          rc=$?
+          echo "exit_code=${rc}" >>"$GITHUB_OUTPUT"
+          echo "out_dir=evidence/drift/${env_name}/${ts}" >>"$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload drift evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-${{ matrix.env }}
+          path: ${{ steps.drift.outputs.out_dir }}
+
+      - name: Fail on drift or error
+        if: always()
+        run: |
+          rc="${{ steps.drift.outputs.exit_code }}"
+          if [[ -n "${rc}" && "${rc}" != "0" ]]; then
+            exit "${rc}"
+          fi

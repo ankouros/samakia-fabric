@@ -112,6 +112,7 @@ tmp/
 temp/
 .cache/
 audit/
+evidence/
 compliance/
 forensics/
 correlation/

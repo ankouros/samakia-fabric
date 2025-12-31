@@ -23,7 +23,7 @@ Samakia Fabric operations cover:
 This document does NOT cover:
 - Application operations
 - Kubernetes workloads
-- CI/CD pipelines
+- CI/CD pipelines beyond the GitOps workflows described in Phase 4
 - Observability stacks
 
 ### TLS policy
@@ -629,6 +629,70 @@ sudo -i
 ```
 
 Failure to enforce this model is considered a security incident.
+
+---
+
+## GitOps / CI Workflows (Phase 4)
+
+Samakia Fabric integrates infrastructure lifecycle with Git workflows using **read-only-first** CI and **manual, gated apply** for non-prod.
+
+### PR validation (read-only)
+
+Workflow: `.github/workflows/pr-validate.yml`
+
+Runs:
+- `make policy.check`
+- `pre-commit run --all-files`
+- `bash fabric-ci/scripts/lint.sh`
+- `bash fabric-ci/scripts/validate.sh`
+- `make ha.enforce.check ENV=samakia-prod`
+
+### PR plan evidence (read-only)
+
+Workflow: `.github/workflows/pr-tf-plan.yml`
+
+Runs per env and uploads plan artifacts:
+- `make tf.plan ENV=<env>` (or `make minio.tf.plan` for `samakia-minio`)
+- Evidence packet: `evidence/ci/plan/<env>/<UTC>/` with `metadata.json`, `terraform-plan.txt`, `manifest.sha256`
+
+### Non-prod apply (manual, gated)
+
+Workflow: `.github/workflows/apply-nonprod.yml` (workflow_dispatch only)
+
+Rules:
+- Env allowlist: `samakia-dev`, `samakia-staging` only
+- Confirmation phrase required: `I_UNDERSTAND_APPLY_IS_MUTATING`
+- Re-runs validation + enforcement before apply
+- Produces evidence under `evidence/ci/apply/<env>/<UTC>/`
+
+### Drift detection (read-only)
+
+Workflow: `.github/workflows/drift-detect.yml` (scheduled + manual)
+
+Local equivalent:
+
+```bash
+bash ops/scripts/drift-packet.sh samakia-prod
+```
+
+Evidence packet output:
+- `evidence/drift/<env>/<UTC>/` with `metadata.json`, `terraform-plan.txt`, `ansible-check.txt`, `manifest.sha256`
+- Optional signing via `EVIDENCE_SIGN=1 EVIDENCE_GPG_KEY=<fingerprint>`
+
+### App compliance + release readiness packets (manual)
+
+Workflows:
+- `.github/workflows/app-compliance.yml`
+- `.github/workflows/release-readiness.yml`
+
+Local equivalents:
+
+```bash
+bash ops/scripts/app-compliance-packet.sh <env> <service> <service_root> --config <paths.txt>
+bash ops/scripts/release-readiness-packet.sh <release-id> <env>
+```
+
+Evidence outputs are artifacts only (not committed).
 
 ---
 

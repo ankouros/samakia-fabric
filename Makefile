@@ -40,6 +40,7 @@ TERRAFORM_ENV_DIR := $(REPO_ROOT)/fabric-core/terraform/envs/$(ENV)
 ANSIBLE_DIR := $(REPO_ROOT)/fabric-core/ansible
 
 OPS_SCRIPTS_DIR := $(REPO_ROOT)/ops/scripts
+POLICY_DIR := $(REPO_ROOT)/ops/policy
 FABRIC_CI_DIR := $(REPO_ROOT)/fabric-ci/scripts
 
 # Runner host env file (canonical)
@@ -742,6 +743,10 @@ ops.bluegreen.plan: ## Runbook pointer: blue/green CT replacement (no auto-apply
 phase1.accept: ## Run Phase 1 acceptance suite (ENV=...; CI-safe; no prompts)
 	ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase1-accept.sh"
 
+.PHONY: policy.check
+policy.check: ## Run policy-as-code gates (terraform + secrets + HA + docs)
+	@bash "$(POLICY_DIR)/policy.sh"
+
 .PHONY: phase2.accept
 phase2.accept: ## Run Phase 2 acceptance suite (read-only; DNS + MinIO planes)
 	@bash -euo pipefail -c '\
@@ -772,6 +777,14 @@ phase2.2.entry.check: ## Phase 2.2 entry checklist (writes acceptance/PHASE2_2_E
 .PHONY: phase2.2.accept
 phase2.2.accept: ## Run Phase 2.2 acceptance suite (read-only; control-plane invariants)
 	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase2-2-accept.sh"
+
+.PHONY: phase4.entry.check
+phase4.entry.check: ## Phase 4 entry checklist (writes acceptance/PHASE4_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase4-entry-check.sh"
+
+.PHONY: phase4.accept
+phase4.accept: ## Run Phase 4 acceptance suite (policy + CI parity + evidence packets)
+	@bash "$(OPS_SCRIPTS_DIR)/phase4-accept.sh"
 
 .PHONY: ha.placement.validate
 ha.placement.validate: ## HA placement validation (read-only; uses placement policy + inventory)
