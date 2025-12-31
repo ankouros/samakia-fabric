@@ -1,7 +1,8 @@
 # VM Image Lifecycle
 
 Phase 8 Part 1 provides a **guarded local build pipeline** and validate-only acceptance.
-No Proxmox registration or VM provisioning occurs in this phase.
+Phase 8 Part 2 adds **guarded template registration** (token-only; explicit opt-in).
+Operator commands live in `../operator/cookbook.md`.
 
 ## Steps (design)
 
@@ -10,6 +11,7 @@ No Proxmox registration or VM provisioning occurs in this phase.
 3. Compute `sha256`
 4. Update contract with `storage_path` + `sha256`
 5. Generate evidence packet (not committed)
+6. Optional: register as Proxmox template (guarded; token-only; evidence required)
 
 ## Evidence packets
 

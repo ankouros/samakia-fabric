@@ -1,0 +1,107 @@
+# Phase 9 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T21:03:33Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE0_ACCEPTED.md
+  - Command: test -f acceptance/PHASE0_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE5_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE7_ACCEPTED.md
+  - Command: test -f acceptance/PHASE7_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART2_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- ADR-0026 present
+  - Command: rg -n "ADR-0026" DECISIONS.md
+  - Result: PASS
+- Operator doc present: docs/operator/README.md
+  - Command: test -f docs/operator/README.md
+  - Result: PASS
+- Operator doc present: docs/operator/cookbook.md
+  - Command: test -f docs/operator/cookbook.md
+  - Result: PASS
+- Operator doc present: docs/operator/safety-model.md
+  - Command: test -f docs/operator/safety-model.md
+  - Result: PASS
+- Operator doc present: docs/operator/glossary.md
+  - Command: test -f docs/operator/glossary.md
+  - Result: PASS
+- Operator doc present: docs/operator/evidence-and-artifacts.md
+  - Command: test -f docs/operator/evidence-and-artifacts.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/catalog.md
+  - Command: test -f docs/consumers/catalog.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/quickstart.md
+  - Command: test -f docs/consumers/quickstart.md
+  - Result: PASS
+- Anti-drift tooling present: ops/docs/operator-inventory.sh
+  - Command: test -f ops/docs/operator-inventory.sh
+  - Result: PASS
+- Anti-drift tooling present: ops/docs/cookbook-lint.sh
+  - Command: test -f ops/docs/cookbook-lint.sh
+  - Result: PASS
+- Anti-drift tooling present: ops/docs/docs-antidrift-check.sh
+  - Command: test -f ops/docs/docs-antidrift-check.sh
+  - Result: PASS
+- Anti-drift tooling present: ops/docs/waivers.yml
+  - Command: test -f ops/docs/waivers.yml
+  - Result: PASS
+- Makefile target present: docs.operator.check
+  - Command: rg -n "^docs\.operator\.check:" Makefile
+  - Result: PASS
+- PR validation runs docs.operator.check
+  - Command: rg -n "docs\.operator\.check" .github/workflows/pr-validate.yml
+  - Result: PASS
+- No secrets in operator/consumer docs
+  - Command: rg -n <secret patterns> docs/operator docs/consumers
+  - Result: PASS

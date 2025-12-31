@@ -488,3 +488,19 @@ Phase 8 Part 1.2 adds an optional pinned toolchain container:
 - Container definition: `tools/image-toolchain/`.
 - Wrapper: `ops/images/vm/toolchain-run.sh` (opt-in, guarded).
 - Acceptance marker: `acceptance/PHASE8_PART1_2_ACCEPTED.md`.
+
+Phase 8 Part 2 adds guarded Proxmox template registration:
+- Token-only API registration with strict TLS and allowlisted environments.
+- Deterministic evidence packets for register/verify under `evidence/images/vm/`.
+- Acceptance marker: `acceptance/PHASE8_PART2_ACCEPTED.md` (read-only acceptance).
+
+---
+
+## Phase 9 — Operator UX & Doc Governance
+
+Phase 9 makes operator UX a product surface:
+- Canonical operator cookbook: `docs/operator/cookbook.md`.
+- Safety model + evidence guidance under `docs/operator/`.
+- Consumer catalog + guided flows under `docs/consumers/`.
+- Anti-drift doc checks (`make docs.operator.check`) wired into PR validation.
+- Acceptance marker: `acceptance/PHASE9_ACCEPTED.md`.

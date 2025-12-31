@@ -1,5 +1,7 @@
 # Database Consumer
 
+Guided flows: `catalog.md` and `quickstart.md`.
+
 Variants:
 - `ready`: substrate pattern only; no cluster deployed.
 - `enabled`: database cluster exists externally; Fabric enforces contract.

@@ -11,6 +11,9 @@ Core model:
 - HA-ready patterns are the default; overrides require explicit guardrails.
 
 Start here:
+- `catalog.md`
+- `quickstart.md`
+- `variants.md`
 - `onboarding.md`
 - `slo-failure-semantics.md`
 - `disaster-recovery.md`

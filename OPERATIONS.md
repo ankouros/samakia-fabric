@@ -26,6 +26,24 @@ This document does NOT cover:
 - CI/CD pipelines beyond the GitOps workflows described in Phase 4
 - Observability stacks
 
+## Operator UX (canonical)
+
+Operator commands and task flows are defined in:
+
+- `docs/operator/cookbook.md` (canonical command cookbook)
+- `docs/operator/safety-model.md`
+- `docs/operator/evidence-and-artifacts.md`
+
+Consumer workflows live in:
+
+- `docs/consumers/catalog.md`
+- `docs/consumers/quickstart.md`
+- `docs/consumers/variants.md`
+
+VM image workflows live in:
+
+- `docs/images/README.md`
+
 ### TLS policy
 - Default: strict verification
 - Proxmox internal CA: install CA into the runner host trust store (no insecure flags)
@@ -420,6 +438,7 @@ Docs:
 - `docs/images/vm-golden-images.md`
 - `docs/images/image-lifecycle.md`
 - `docs/images/image-security.md`
+- `docs/images/proxmox-template-registration.md`
 
 Entry check (design validation only):
 
@@ -456,6 +475,26 @@ make phase8.part1.2.accept
 
 Toolchain definition:
 - `tools/image-toolchain/`
+
+Phase 8 Part 2 (guarded Proxmox template registration):
+
+```bash
+make images.vm.register.policy.check
+
+IMAGE_REGISTER=1 I_UNDERSTAND_TEMPLATE_MUTATION=1 \
+REGISTER_REASON="initial vm template register" \
+ENV=samakia-dev TEMPLATE_NODE=proxmox1 TEMPLATE_STORAGE=pve-nfs TEMPLATE_VM_ID=9001 \
+QCOW2=/path/to/ubuntu-24.04.qcow2 \
+make image.template.register IMAGE=ubuntu-24.04 VERSION=v1
+
+ENV=samakia-dev TEMPLATE_NODE=proxmox1 TEMPLATE_STORAGE=pve-nfs TEMPLATE_VM_ID=9001 \
+make image.template.verify IMAGE=ubuntu-24.04 VERSION=v1
+
+CI=1 make phase8.part2.accept
+```
+
+Runbook:
+- `docs/images/proxmox-template-registration.md`
 
 Optional local artifact validation (requires a local qcow2 fixture):
 

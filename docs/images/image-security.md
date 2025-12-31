@@ -8,6 +8,8 @@ VM golden images must adhere to the platform security model:
 - Minimal package footprint
 - Cloud-init enabled with deterministic datasource
 
+Operator commands live in `../operator/cookbook.md`.
+
 Validate-only acceptance checks (offline) confirm:
 - qcow2 format and size sanity
 - cloud-init presence and enabled status

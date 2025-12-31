@@ -1,0 +1,12 @@
+{
+  "allow": {
+    "envs": ["samakia-dev", "samakia-staging"],
+    "api_hosts": ["proxmox1", "proxmox2", "proxmox3"],
+    "storage_ids": ["pve-nfs"],
+    "tag_prefixes": ["golden", "image", "version", "env"]
+  },
+  "require": {
+    "template_name_prefix": "gi-",
+    "tags": ["golden", "image", "version", "env"]
+  }
+}

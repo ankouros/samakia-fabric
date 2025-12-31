@@ -285,12 +285,33 @@ Goal: Introduce VM golden image contracts as immutable artifacts (no VM lifecycl
 - Toolchain wrapper + guarded Make targets
 - Acceptance marker: `acceptance/PHASE8_PART1_2_ACCEPTED.md`
 
-### Planned (next)
-- Optional Proxmox template registration (guarded, later phase)
+### Part 2 (COMPLETED ✅)
+- Guarded Proxmox template registration tooling (token-only; allowlisted envs)
+- Read-only template verification + evidence packets
+- Acceptance marker: `acceptance/PHASE8_PART2_ACCEPTED.md`
 
 Non-scope:
 - No VM provisioning or scaling
 - No infrastructure mutation
+
+---
+
+## Phase 9 — Operator UX & Doc Governance
+
+Goal: Provide a canonical operator UX layer with anti-drift documentation gates.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Operator command cookbook (`docs/operator/cookbook.md`) as canonical source
+- Operator safety model + evidence guidance docs
+- Consumer UX catalog + quickstart + variants
+- Anti-drift doc tooling + CI gate (`make docs.operator.check`)
+- Phase 9 acceptance marker: `acceptance/PHASE9_ACCEPTED.md`
+
+Non-scope:
+- No infrastructure deployment or mutation
+- No provisioning or lifecycle changes
 
 ---
 

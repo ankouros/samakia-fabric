@@ -42,6 +42,7 @@ VM_PACKER_COMMON ?= $(VM_PACKER_ROOT)/common
 VM_ANSIBLE_PLAYBOOK ?= $(REPO_ROOT)/images/ansible/playbooks/golden-base.yml
 VM_VALIDATE_DIR ?= $(REPO_ROOT)/ops/images/vm/validate
 VM_EVIDENCE_DIR ?= $(REPO_ROOT)/ops/images/vm/evidence
+VM_REGISTER_DIR ?= $(REPO_ROOT)/ops/images/vm/register
 
 TERRAFORM_ENV_DIR := $(REPO_ROOT)/fabric-core/terraform/envs/$(ENV)
 ANSIBLE_DIR := $(REPO_ROOT)/fabric-core/ansible
@@ -58,6 +59,11 @@ MINIO_BOOTSTRAP_DIR ?= $(HOME)/.cache/samakia-fabric/tf-bootstrap/samakia-minio
 
 # Optional inputs
 IMAGE ?=
+VERSION ?=
+QCOW2 ?=
+TEMPLATE_STORAGE ?=
+TEMPLATE_VM_ID ?=
+TEMPLATE_NODE ?= $(PM_NODE)
 RELEASE_ID ?=
 SNAPSHOT_DIR ?=
 EVIDENCE_DIR ?=
@@ -292,6 +298,40 @@ image.evidence.validate: ## Generate VM image validation evidence (QCOW2=... IMA
 	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required"; exit 2)
 	@bash "$(VM_EVIDENCE_DIR)/image-validate-evidence.sh" --qcow2 "$(QCOW2)" --image "$(IMAGE)" --version "$(VERSION)"
 
+.PHONY: images.vm.register.policy.check
+images.vm.register.policy.check: ## Validate VM template registration policy
+	@bash "$(VM_REGISTER_DIR)/validate-register-policy.sh"
+
+.PHONY: image.template.register
+image.template.register: ## Register VM template in Proxmox (guarded; requires IMAGE_REGISTER=1)
+	@test -n "$(IMAGE)" || (echo "ERROR: IMAGE is required"; exit 2)
+	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required"; exit 2)
+	@test -n "$(QCOW2)" || (echo "ERROR: QCOW2 is required"; exit 2)
+	@test -n "$(TEMPLATE_STORAGE)" || (echo "ERROR: TEMPLATE_STORAGE is required"; exit 2)
+	@test -n "$(TEMPLATE_VM_ID)" || (echo "ERROR: TEMPLATE_VM_ID is required"; exit 2)
+	@test -n "$(TEMPLATE_NODE)" || (echo "ERROR: TEMPLATE_NODE is required"; exit 2)
+	@bash "$(VM_REGISTER_DIR)/register-template.sh" \
+		--contract "$(REPO_ROOT)/contracts/images/vm/$(IMAGE)/$(VERSION)/image.yml" \
+		--qcow2 "$(QCOW2)" \
+		--env "$(ENV)" \
+		--storage "$(TEMPLATE_STORAGE)" \
+		--vmid "$(TEMPLATE_VM_ID)" \
+		--node "$(TEMPLATE_NODE)"
+
+.PHONY: image.template.verify
+image.template.verify: ## Verify VM template in Proxmox (read-only)
+	@test -n "$(IMAGE)" || (echo "ERROR: IMAGE is required"; exit 2)
+	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required"; exit 2)
+	@test -n "$(TEMPLATE_STORAGE)" || (echo "ERROR: TEMPLATE_STORAGE is required"; exit 2)
+	@test -n "$(TEMPLATE_VM_ID)" || (echo "ERROR: TEMPLATE_VM_ID is required"; exit 2)
+	@test -n "$(TEMPLATE_NODE)" || (echo "ERROR: TEMPLATE_NODE is required"; exit 2)
+	@bash "$(VM_REGISTER_DIR)/verify-template.sh" \
+		--contract "$(REPO_ROOT)/contracts/images/vm/$(IMAGE)/$(VERSION)/image.yml" \
+		--env "$(ENV)" \
+		--storage "$(TEMPLATE_STORAGE)" \
+		--vmid "$(TEMPLATE_VM_ID)" \
+		--node "$(TEMPLATE_NODE)"
+
 .PHONY: phase8.part1.accept
 phase8.part1.accept: ## Phase 8 Part 1 acceptance (validate-only; no builds)
 	@bash "$(OPS_SCRIPTS_DIR)/phase8-part1-accept.sh"
@@ -327,6 +367,10 @@ phase8.part1.1.accept: ## Phase 8 Part 1.1 acceptance (local runbook + wrappers)
 .PHONY: phase8.part1.2.accept
 phase8.part1.2.accept: ## Phase 8 Part 1.2 acceptance (toolchain container)
 	@bash "$(OPS_SCRIPTS_DIR)/phase8-part1-2-accept.sh"
+
+.PHONY: phase8.part2.accept
+phase8.part2.accept: ## Phase 8 Part 2 acceptance (template registration; read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase8-part2-accept.sh"
 
 
 .PHONY: image.list
@@ -1594,6 +1638,26 @@ shared.up: ## One-command shared services deployment (tf apply -> bootstrap -> s
 		$(MAKE) shared.ansible.apply ENV="$(ENV)"; \
 		$(MAKE) shared.accept ENV="$(ENV)"; \
 	'
+
+###############################################################################
+# Operator UX (Phase 9)
+###############################################################################
+
+.PHONY: docs.operator.check
+docs.operator.check: ## Operator docs anti-drift check (cookbook + targets)
+	@bash "$(REPO_ROOT)/ops/docs/docs-antidrift-check.sh"
+
+.PHONY: docs.cookbook.lint
+docs.cookbook.lint: ## Operator cookbook lint (structure + targets)
+	@bash "$(REPO_ROOT)/ops/docs/cookbook-lint.sh"
+
+.PHONY: phase9.entry.check
+phase9.entry.check: ## Phase 9 entry checklist (docs/governance only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase9-entry-check.sh"
+
+.PHONY: phase9.accept
+phase9.accept: ## Phase 9 acceptance (docs/governance only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase9-accept.sh"
 
 ###############################################################################
 # END

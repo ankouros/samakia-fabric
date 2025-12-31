@@ -814,6 +814,35 @@ Phase 8 introduces **VM golden image contracts** as immutable artifacts:
 
 ---
 
+## ADR-0026 — Operator UX as Canonical Product Surface
+
+**Status:** Accepted
+**Date:** 2026-01-18
+
+### Decision
+
+Phase 9 establishes operator UX as a **first-class contract**:
+
+- `docs/operator/cookbook.md` is the canonical command source.
+- Operator-visible Make targets must be documented in the cookbook or explicitly waived.
+- Docs consolidation is link-first; duplication is minimized.
+- Consumer UX uses a front-door catalog + guided flows.
+- Anti-drift doc checks are mandatory in CI.
+
+### Rationale
+
+- Ensures operators and AI agents follow a single, consistent command surface.
+- Prevents drift between Make targets and documentation.
+- Reduces cognitive load during incidents and routine operations.
+
+### Consequences
+
+- Any new operator-visible command must be documented or waived with reason.
+- CI gates fail when documentation drifts from operator surfaces.
+- OPERATIONS.md becomes a navigation hub rather than a command dump.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

@@ -6,6 +6,7 @@ This directory contains Samakia Fabric documentation.
 
 - `concepts/`: design and architecture concepts
 - `tutorials/`: step-by-step guides
+- `operator/`: canonical operator UX and cookbook
 - `glossary.md`: canonical terminology
 - `PRINCIPLES.md`: non-negotiable principles
 

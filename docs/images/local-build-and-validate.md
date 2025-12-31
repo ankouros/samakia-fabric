@@ -4,6 +4,8 @@ This runbook provides a strict, copy/paste local workflow to build and validate
 VM golden images as **immutable artifacts**. It does **not** register templates
 or provision VMs.
 
+Operator command index: `../operator/cookbook.md`.
+
 ## Prerequisites
 
 - `packer` (HCL2 support)

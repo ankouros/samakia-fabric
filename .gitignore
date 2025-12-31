@@ -126,6 +126,7 @@ artifacts/
 !ops/images/vm/evidence/*.sh
 evidence/images/
 artifacts/images/
+ops/docs/operator-targets.json
 compliance/
 forensics/
 correlation/

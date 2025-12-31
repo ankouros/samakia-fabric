@@ -1,5 +1,7 @@
 # Consumer Disaster Recovery
 
+Guided flows: `catalog.md` and `quickstart.md`.
+
 Every consumer contract must declare:
 - disaster scenarios
 - recovery expectations

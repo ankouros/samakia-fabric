@@ -64,6 +64,17 @@ The format is inspired by:
 - Toolchain wrapper + guarded Make targets
 - Phase 8 Part 1.2 acceptance marker: `acceptance/PHASE8_PART1_2_ACCEPTED.md`
 
+#### VM golden images (Phase 8 Part 2)
+- Guarded Proxmox template registration tooling (token-only, allowlisted envs)
+- Read-only template verification + evidence packets (register/verify)
+- Phase 8 Part 2 acceptance marker: `acceptance/PHASE8_PART2_ACCEPTED.md`
+
+#### Operator UX & doc governance (Phase 9)
+- Operator command cookbook and safety model (`docs/operator/*`)
+- Consumer catalog + guided flows (`docs/consumers/catalog.md`, `quickstart.md`, `variants.md`)
+- Anti-drift doc tooling + CI gate (`make docs.operator.check`)
+- Phase 9 acceptance marker: `acceptance/PHASE9_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

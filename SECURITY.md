@@ -25,6 +25,8 @@ Samakia Fabric follows these principles:
 
 Security is enforced **by architecture**, not by convention.
 
+Operator safety model: `docs/operator/safety-model.md`.
+
 ---
 
 ## 2. Threat Model (Assumptions)

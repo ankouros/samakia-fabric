@@ -2,6 +2,8 @@
 
 This guide explains how a platform declares intent to consume Samakia Fabric.
 
+See `catalog.md` and `quickstart.md` for guided flows.
+
 1) Choose a consumer type and variant:
 - `ready` (default): no service deployed; substrate only.
 - `enabled` (opt-in): service exists; contract enforcement applies.

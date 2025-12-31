@@ -55,6 +55,9 @@ jobs:
       - name: Policy gates
         run: make policy.check
 
+      - name: Docs anti-drift checks
+        run: make docs.operator.check
+
       - name: Pre-commit
         run: pre-commit run --all-files
 
