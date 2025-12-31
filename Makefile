@@ -58,6 +58,10 @@ AUDIT_SOURCES ?=
 INCIDENT_SOURCES ?=
 INCIDENT_ID ?= incident-$(shell date -u +%Y%m%d-%H%M%S)
 CORRELATION_ID ?= corr-$(shell date -u +%Y%m%d-%H%M%S)
+VIP_GROUP ?= minio
+SERVICE ?= keepalived
+TARGET ?= 192.168.11.111
+CHECK_URL ?= https://192.168.11.122:3000/
 PACK_NAME ?= compliance-pack-$(shell date -u +%Y%m%d-%H%M%S)
 AUDIT_EXPORT_ID ?= audit-export-$(shell date -u +%Y%m%d-%H%M%S)
 LEGAL_HOLD_ACTION ?= list
@@ -791,6 +795,38 @@ phase3.part1.accept: ## Run Phase 3 Part 1 acceptance (HA semantics + failure do
 	@$(MAKE) ha.placement.validate ENV="$(ENV)"
 	@$(MAKE) ha.proxmox.audit
 	@$(MAKE) ha.evidence.snapshot
+
+.PHONY: gameday.precheck
+gameday.precheck: ## GameDay precheck (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/gameday/gameday-precheck.sh"
+
+.PHONY: gameday.evidence
+gameday.evidence: ## GameDay evidence snapshot (baseline)
+	@bash "$(OPS_SCRIPTS_DIR)/gameday/gameday-evidence.sh" --id "$(GAMEDAY_ID)" --tag baseline
+
+.PHONY: gameday.vip.failover.dry
+gameday.vip.failover.dry: ## GameDay VIP failover dry-run (no execution)
+	@VIP_GROUP="$(VIP_GROUP)" bash "$(OPS_SCRIPTS_DIR)/gameday/gameday-vip-failover.sh" --vip-group "$(VIP_GROUP)" --dry-run
+
+.PHONY: gameday.service.restart.dry
+gameday.service.restart.dry: ## GameDay service restart dry-run (no execution)
+	@SERVICE="$(SERVICE)" TARGET="$(TARGET)" CHECK_URL="$(CHECK_URL)" bash "$(OPS_SCRIPTS_DIR)/gameday/gameday-service-restart.sh" --service "$(SERVICE)" --target "$(TARGET)" --check-url "$(CHECK_URL)" --dry-run
+
+.PHONY: gameday.postcheck
+gameday.postcheck: ## GameDay postcheck (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/gameday/gameday-postcheck.sh" --id "$(GAMEDAY_ID)"
+
+.PHONY: phase3.part2.accept
+phase3.part2.accept: ## Run Phase 3 Part 2 acceptance (GameDay framework, dry-run only)
+	@pre-commit run --all-files
+	@bash "fabric-ci/scripts/lint.sh"
+	@bash "fabric-ci/scripts/validate.sh"
+	@GAMEDAY_ID="phase3-part2-$$(date -u +%Y%m%dT%H%M%SZ)"; \
+		$(MAKE) gameday.precheck; \
+		$(MAKE) gameday.evidence GAMEDAY_ID="$$GAMEDAY_ID"; \
+		$(MAKE) gameday.vip.failover.dry VIP_GROUP="$(VIP_GROUP)"; \
+		$(MAKE) gameday.service.restart.dry SERVICE="$(SERVICE)" TARGET="$(TARGET)" CHECK_URL="$(CHECK_URL)"; \
+		$(MAKE) gameday.postcheck GAMEDAY_ID="$$GAMEDAY_ID"
 
 .PHONY: phase0.accept
 phase0.accept: ## Run Phase 0 acceptance suite (static checks; no infra mutations)

@@ -73,6 +73,12 @@ The format is inspired by:
 - HA evidence snapshot: `ops/scripts/ha/evidence-snapshot.sh` + `make ha.evidence.snapshot`
 - Phase 3 Part 1 acceptance: `make phase3.part1.accept`
 - Phase 3 Part 1 acceptance marker: `acceptance/PHASE3_PART1_ACCEPTED.md`
+#### GameDays & failure simulation (Phase 3 Part 2)
+- GameDay framework scripts under `ops/scripts/gameday/` (precheck, evidence, postcheck)
+- VIP failover simulation (dry-run by default; guarded execute)
+- Service restart simulation (dry-run by default; guarded execute)
+- GameDay runbook: `OPERATIONS_GAMEDAYS.md`
+- Phase 3 Part 2 acceptance: `make phase3.part2.accept`
 - Phase 1 operational hardening (remote state + runner bootstrapping + CI-safe orchestration)
 - Remote Terraform backend initialization for MinIO/S3 with lockfiles (`ops/scripts/tf-backend-init.sh`; no DynamoDB; strict TLS)
 - Runner host env management (`ops/scripts/runner-env-install.sh`, `ops/scripts/runner-env-check.sh`) with canonical env file `~/.config/samakia-fabric/env.sh` (chmod 600; presence-only output)

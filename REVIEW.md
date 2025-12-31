@@ -389,3 +389,11 @@ Phase 3 Part 1 establishes deterministic HA semantics and failure-domain validat
 - Proxmox HA audit guardrails via `make ha.proxmox.audit`.
 - Read-only evidence snapshots via `make ha.evidence.snapshot`.
 - Acceptance marker: `acceptance/PHASE3_PART1_ACCEPTED.md`.
+
+## Phase 3 Part 2 — GameDay Framework
+
+Phase 3 Part 2 adds a safe GameDay workflow and dry-run acceptance:
+
+- GameDay precheck + evidence snapshot + postcheck tooling under `ops/scripts/gameday/`.
+- VIP failover and service restart simulations are guarded and dry-run by default.
+- Acceptance gate: `make phase3.part2.accept`.

@@ -546,6 +546,7 @@ Proxmox HA is enabled deliberately per workload, with explicit placement/failure
 - `OPERATIONS_HA_FAILURE_DOMAINS.md`
 - `OPERATIONS_HA_FAILURE_SIMULATION.md` (GameDays / failure simulation runbook)
 - `OPERATIONS_HA_SEMANTICS.md` (HA tiers, failure-domain model, Proxmox HA vs VIP HA)
+- `OPERATIONS_GAMEDAYS.md` (Phase 3 Part 2 GameDay framework and procedures)
 
 Read-only validation and evidence:
 

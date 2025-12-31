@@ -163,6 +163,12 @@ Goal: Enable resilient, multi-node deployments with realistic failure semantics.
 - Proxmox HA audit guardrails (policy-aligned)
 - Read-only evidence snapshot tooling (cluster/VIP/service readiness)
 
+### Part 2 — GameDays & Failure Simulation (COMPLETED)
+- GameDay framework (precheck → evidence → action → postcheck)
+- VIP failover simulation (guarded, safe by default)
+- Service restart simulation (guarded, safe by default)
+- Dry-run acceptance gate (`make phase3.part2.accept`)
+
 ### Planned
 - Proxmox HA enablement per workload (explicit HA groups; no defaults)
 - Storage abstraction patterns (NFS today, Ceph-ready)
