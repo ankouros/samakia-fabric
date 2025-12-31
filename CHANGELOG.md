@@ -45,6 +45,8 @@ The format is inspired by:
 
 #### Ecosystem alignment
 - Added repo-level contracts synced from samakia-specs and shared ecosystem baseline.
+- Added home-directory Codex memory pointer in AGENTS.md.
+- Added Session Log reminder in AGENTS.md.
 
 #### GitOps & CI workflows (Phase 4)
 - GitHub Actions workflows for PR validation, PR plan evidence, drift detection, app compliance, release readiness, and gated non-prod apply
