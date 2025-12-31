@@ -417,6 +417,7 @@ tf.plan: ## Terraform plan for ENV
 			env_file="$(RUNNER_ENV_FILE)"; \
 			if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 		$(MAKE) tf.backend.init; \
+		$(MAKE) ha.enforce.check ENV="$(ENV)"; \
 		terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
 		terraform -chdir="$(TERRAFORM_ENV_DIR)" plan -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $(TF_PLAN_FLAGS); \
 	'
@@ -431,6 +432,7 @@ tf.apply: ## Terraform apply for ENV
 				if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
 			$(MAKE) minio.backend.smoke ENV=samakia-minio; \
 			$(MAKE) tf.backend.init; \
+			$(MAKE) ha.enforce.check ENV="$(ENV)"; \
 			auto_approve=""; \
 			if [[ "$(CI)" = "1" ]]; then auto_approve="-auto-approve"; fi; \
 			terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
@@ -783,6 +785,11 @@ ha.placement.validate: ## HA placement validation (read-only; uses placement pol
 ha.proxmox.audit: ## Proxmox HA audit (read-only; ensures policy alignment)
 	@bash "$(OPS_SCRIPTS_DIR)/ha/proxmox-ha-audit.sh"
 
+.PHONY: ha.enforce.check
+ha.enforce.check: ## HA enforcement check (placement + Proxmox HA; blocks on violations unless overridden)
+	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/ha/enforce-placement.sh" --env "$(ENV)"
+	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/ha/proxmox-ha-audit.sh" --enforce --env "$(ENV)"
+
 .PHONY: ha.evidence.snapshot
 ha.evidence.snapshot: ## HA evidence snapshot (read-only; writes artifacts/ha-evidence/<UTC>/report.md)
 	@bash "$(OPS_SCRIPTS_DIR)/ha/evidence-snapshot.sh"
@@ -795,6 +802,14 @@ phase3.part1.accept: ## Run Phase 3 Part 1 acceptance (HA semantics + failure do
 	@$(MAKE) ha.placement.validate ENV="$(ENV)"
 	@$(MAKE) ha.proxmox.audit
 	@$(MAKE) ha.evidence.snapshot
+
+.PHONY: phase3.part3.accept
+phase3.part3.accept: ## Run Phase 3 Part 3 acceptance (HA enforcement)
+	@pre-commit run --all-files
+	@bash "fabric-ci/scripts/lint.sh"
+	@bash "fabric-ci/scripts/validate.sh"
+	@$(MAKE) ha.enforce.check ENV="$(ENV)"
+	@bash "$(OPS_SCRIPTS_DIR)/ha/test-enforce-placement.sh"
 
 .PHONY: gameday.precheck
 gameday.precheck: ## GameDay precheck (read-only)
@@ -867,6 +882,7 @@ minio.tf.plan: ## MinIO Terraform plan (bootstrap-local; ENV=samakia-minio)
 				fi; \
 				terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
 				terraform -chdir="$$work_dir" validate; \
+				$(MAKE) ha.enforce.check ENV="$(ENV)"; \
 				terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
 				if [[ -f "$$work_dir/terraform.tfstate" ]]; then cp -f "$$work_dir/terraform.tfstate" "$$src_dir/terraform.tfstate"; fi; \
 				if [[ -f "$$work_dir/terraform.tfstate.backup" ]]; then cp -f "$$work_dir/terraform.tfstate.backup" "$$src_dir/terraform.tfstate.backup"; fi; \
@@ -903,6 +919,7 @@ minio.tf.apply: ## MinIO Terraform apply (bootstrap-local; ENV=samakia-minio)
 				fi; \
 				terraform -chdir="$$work_dir" init -input=false -backend=false -reconfigure >/dev/null; \
 				terraform -chdir="$$work_dir" validate; \
+				$(MAKE) ha.enforce.check ENV="$(ENV)"; \
 					if [[ "$(DRY_RUN)" = "1" ]]; then \
 						terraform -chdir="$$work_dir" plan -input=false -lock=false $(TF_PLAN_FLAGS); \
 					else \

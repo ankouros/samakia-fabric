@@ -552,8 +552,18 @@ Read-only validation and evidence:
 
 - `make ha.placement.validate` (placement policy vs inventory; anti-affinity checks)
 - `make ha.proxmox.audit` (Proxmox HA resources vs policy expectation)
+- `make ha.enforce.check ENV=<env>` (hard gate; blocks plan/apply on violations)
 - `make ha.evidence.snapshot` (cluster status, VIP ownership, service readiness, SDN pending)
 - `make phase3.part1.accept` (aggregated Phase 3 Part 1 acceptance gate)
+- `make phase3.part3.accept` (Phase 3 Part 3 enforcement acceptance gate)
+
+Enforcement overrides (explicit, auditable only):
+
+- `HA_OVERRIDE=1`
+- `HA_OVERRIDE_REASON="<text>"`
+
+Overrides are required to proceed with known violations (e.g., single-replica tier1).
+They are logged in enforcement output and should be recorded in operational notes.
 
 Placement policy source of truth:
 

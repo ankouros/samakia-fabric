@@ -153,7 +153,7 @@ Outcome:
 
 ---
 
-## Phase 3 — High Availability & Resilience
+## Phase 3 — High Availability & Resilience (COMPLETED ✅)
 
 Goal: Enable resilient, multi-node deployments with realistic failure semantics.
 
@@ -169,11 +169,10 @@ Goal: Enable resilient, multi-node deployments with realistic failure semantics.
 - Service restart simulation (guarded, safe by default)
 - Dry-run acceptance gate (`make phase3.part2.accept`)
 
-### Planned
-- Proxmox HA enablement per workload (explicit HA groups; no defaults)
-- Storage abstraction patterns (NFS today, Ceph-ready)
-- Routine GameDays (failure simulation) with evidence capture
-- Continuous HA validation across environments
+### Part 3 — HA Enforcement (COMPLETED)
+- Placement policy enforcement before Terraform plan/apply (`make ha.enforce.check`)
+- Proxmox HA enforcement mode with explicit override guardrails
+- Phase 3 Part 3 acceptance gate (`make phase3.part3.accept`)
 
 Outcome:
 - Controlled redundancy

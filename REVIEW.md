@@ -397,3 +397,12 @@ Phase 3 Part 2 adds a safe GameDay workflow and dry-run acceptance:
 - GameDay precheck + evidence snapshot + postcheck tooling under `ops/scripts/gameday/`.
 - VIP failover and service restart simulations are guarded and dry-run by default.
 - Acceptance gate: `make phase3.part2.accept`.
+
+## Phase 3 Part 3 — HA Enforcement
+
+Phase 3 Part 3 turns HA semantics into **hard enforcement**:
+
+- Placement policy is enforced before Terraform plan/apply (`make ha.enforce.check`).
+- Proxmox HA declarations are audited in enforcement mode (`--enforce`).
+- Explicit overrides require `HA_OVERRIDE=1` and `HA_OVERRIDE_REASON`.
+- Acceptance gate: `make phase3.part3.accept`.

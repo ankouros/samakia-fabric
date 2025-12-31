@@ -80,7 +80,24 @@ The snapshot records:
 - Loki ingestion quick check
 - SDN pending/apply status
 
-## 6) Non-Goals
+## 6) HA Enforcement (Phase 3 Part 3)
+
+HA enforcement turns the placement policy into a **hard gate** for operations.
+It must PASS before any Terraform plan/apply runs.
+
+Commands:
+- `make ha.enforce.check ENV=<env>`
+- `make phase3.part3.accept`
+
+Override (explicit, auditable only):
+- `HA_OVERRIDE=1`
+- `HA_OVERRIDE_REASON="<text>"`
+
+If an override is used, the enforcement output will show `FAIL-OVERRIDDEN` and
+the reason. Overrides are intended only for known, documented exceptions
+(for example: single-replica tier1 services pending scale-out).
+
+## 7) Non-Goals
 
 Phase 3 Part 1 **does not**:
 

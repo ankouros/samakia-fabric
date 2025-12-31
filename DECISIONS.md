@@ -628,6 +628,37 @@ Canonical acceptance commands:
 - Shared service acceptance requires **systemd readiness + restart policy** checks.
 - Phase 2.2 cannot be locked unless these invariants PASS.
 
+---
+
+## ADR-0020 — HA Enforcement and Explicit Override
+
+**Status:** Accepted
+**Date:** 2025-12-31
+
+### Decision
+
+HA placement policy is **enforced** (not just validated) before Terraform
+plan/apply. Violations **block** operations unless an explicit override is
+provided.
+
+Overrides require:
+- `HA_OVERRIDE=1`
+- `HA_OVERRIDE_REASON="<text>"`
+
+Overrides are **auditable** and surfaced in acceptance output.
+
+### Rationale
+
+- Prevents invalid HA states from being deployed.
+- Forces explicit operator intent when known gaps exist (e.g., single-replica tier1).
+- Keeps enforcement deterministic and non-interactive.
+
+### Consequences
+
+- `make tf.plan`, `make tf.apply`, and `make <env>.up` will fail on violations.
+- Operators must supply explicit overrides to proceed when policy cannot be met.
+- Placement policy is now authoritative; undocumented workloads are rejected.
+
 
 
 

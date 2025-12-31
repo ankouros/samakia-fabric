@@ -10,6 +10,8 @@ export ANSIBLE_CONFIG="$REPO_ROOT/fabric-core/ansible/ansible.cfg"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TERRAFORM_ENVS_DIR="$ROOT_DIR/fabric-core/terraform/envs"
 ANSIBLE_DIR="$ROOT_DIR/fabric-core/ansible"
+export FABRIC_REPO_ROOT="$ROOT_DIR"
+export TF_VAR_fabric_repo_root="$ROOT_DIR"
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -41,6 +43,9 @@ bash "$ROOT_DIR/ops/scripts/test-shared-runtime-invariants-accept.sh"
 
 # DNS rrset check unit test (offline; no Proxmox/DNS needed).
 bash "$ROOT_DIR/ops/scripts/test-dns-rrset-check.sh"
+
+# HA enforcement override test (offline; no Proxmox needed).
+bash "$ROOT_DIR/ops/scripts/ha/test-enforce-placement.sh"
 
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 

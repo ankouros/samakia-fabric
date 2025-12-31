@@ -79,6 +79,12 @@ The format is inspired by:
 - Service restart simulation (dry-run by default; guarded execute)
 - GameDay runbook: `OPERATIONS_GAMEDAYS.md`
 - Phase 3 Part 2 acceptance: `make phase3.part2.accept`
+#### HA enforcement (Phase 3 Part 3)
+- Placement enforcement hook: `ops/scripts/ha/enforce-placement.sh` + `make ha.enforce.check`
+- Proxmox HA enforcement mode: `ops/scripts/ha/proxmox-ha-audit.sh --enforce`
+- Enforcement unit test: `ops/scripts/ha/test-enforce-placement.sh` (offline, deterministic)
+- Phase 3 Part 3 acceptance: `make phase3.part3.accept`
+- Phase 3 Part 3 acceptance marker: `acceptance/PHASE3_PART3_ACCEPTED.md`
 - Phase 1 operational hardening (remote state + runner bootstrapping + CI-safe orchestration)
 - Remote Terraform backend initialization for MinIO/S3 with lockfiles (`ops/scripts/tf-backend-init.sh`; no DynamoDB; strict TLS)
 - Runner host env management (`ops/scripts/runner-env-install.sh`, `ops/scripts/runner-env-check.sh`) with canonical env file `~/.config/samakia-fabric/env.sh` (chmod 600; presence-only output)
