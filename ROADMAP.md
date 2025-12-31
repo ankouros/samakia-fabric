@@ -265,15 +265,18 @@ Outcome:
 
 ---
 
-## Phase 8 — VM Golden Image Contracts (PLANNED)
+## Phase 8 — VM Golden Image Contracts
 
-Goal: Introduce VM golden image contracts as immutable artifacts (design-only).
+Goal: Introduce VM golden image contracts as immutable artifacts (no VM lifecycle).
 
-### Planned (canonical)
-- ADR locking scope and boundaries (artifact-first, no VM lifecycle)
-- VM image contract schema + example contracts
-- Entry checklist + entry check script/target
-- Documentation skeleton and acceptance plan
+### Part 1 (COMPLETED ✅)
+- Packer templates + Ansible hardening playbook for Ubuntu 24.04 and Debian 12
+- Validate-only qcow2 checks (cloud-init, SSH posture, pkg manifest, build metadata)
+- Evidence packet scripts (build + validate)
+- Acceptance marker: `acceptance/PHASE8_PART1_ACCEPTED.md`
+
+### Planned (next)
+- Optional Proxmox template registration (guarded, later phase)
 
 Non-scope:
 - No VM provisioning or scaling

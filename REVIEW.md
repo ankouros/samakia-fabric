@@ -471,3 +471,9 @@ Phase 8 introduces VM golden image contracts as immutable artifacts (design-only
 - VM image contract schema and example contracts (Ubuntu 24.04, Debian 12).
 - Entry checklist and acceptance plan for design validation (no builds).
 - Docs skeleton under `docs/images/` for operator guidance.
+
+Phase 8 Part 1 adds a validate-only pipeline for VM artifacts (no Proxmox, no VM provisioning):
+- Packer templates + Ansible hardening playbook for Ubuntu 24.04 and Debian 12.
+- Offline qcow2 validators (cloud-init, SSH posture, pkg manifest, build metadata).
+- Evidence packets for build/validate under `evidence/images/vm/`.
+- Acceptance marker: `acceptance/PHASE8_PART1_ACCEPTED.md` (validate-only).

@@ -1,0 +1,6 @@
+---
+- name: Samakia VM golden base
+  hosts: all
+  become: true
+  roles:
+    - golden_base

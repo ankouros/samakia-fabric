@@ -48,6 +48,12 @@ The format is inspired by:
 - Phase 8 entry checklist + acceptance plan (design-only; no builds)
 - VM image docs skeleton under `docs/images/`
 
+#### VM golden images (Phase 8 Part 1)
+- Packer templates + Ansible hardening playbook for VM artifacts (Ubuntu 24.04, Debian 12)
+- Validate-only qcow2 checks (cloud-init, SSH posture, pkg manifest, build metadata)
+- VM image evidence packet scripts (build + validate)
+- Phase 8 Part 1 acceptance marker: `acceptance/PHASE8_PART1_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

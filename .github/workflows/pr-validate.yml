@@ -64,6 +64,9 @@ jobs:
       - name: Validate
         run: bash fabric-ci/scripts/validate.sh
 
+      - name: VM image contract checks
+        run: make images.vm.validate.contracts
+
       - name: Consumer contract checks
         run: |
           make consumers.validate

@@ -1,0 +1,60 @@
+---
+- name: Ensure minimal packages
+  ansible.builtin.package:
+    name: "{{ golden_base_minimal_packages }}"
+    state: present
+
+- name: Ensure image metadata directory
+  ansible.builtin.file:
+    path: "{{ golden_base_image_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Write image id
+  ansible.builtin.copy:
+    dest: "{{ golden_base_image_dir }}/image-id"
+    content: "{{ golden_base_image_id }}\n"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Write build info
+  ansible.builtin.template:
+    src: build-info.json.j2
+    dest: "{{ golden_base_image_dir }}/build-info.json"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure journald persistent storage
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^Storage='
+    line: 'Storage=persistent'
+    create: true
+    mode: "0644"
+
+- name: Harden SSH daemon
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+    create: true
+    mode: "0644"
+  loop:
+    - { key: "PasswordAuthentication", value: "no" }
+    - { key: "PermitRootLogin", value: "prohibit-password" }
+    - { key: "PubkeyAuthentication", value: "yes" }
+  notify: Restart ssh
+
+- name: Enable cloud-init services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+  loop:
+    - cloud-init
+    - cloud-config
+    - cloud-final
+  failed_when: false

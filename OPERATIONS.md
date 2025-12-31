@@ -427,6 +427,25 @@ Entry check (design validation only):
 make phase8.entry.check
 ```
 
+Phase 8 Part 1 (validate-only, no Proxmox registration):
+
+```bash
+make images.vm.validate.contracts
+CI=1 make phase8.part1.accept
+```
+
+Optional local artifact validation (requires a local qcow2 fixture):
+
+```bash
+QCOW2_FIXTURE_PATH=/path/to/image.qcow2 make phase8.part1.accept
+```
+
+Local builds are guarded:
+
+```bash
+IMAGE_BUILD=1 make image.build IMAGE=ubuntu-24.04 VERSION=v1
+```
+
 ---
 
 ## Terraform Operations

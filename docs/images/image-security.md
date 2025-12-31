@@ -8,9 +8,11 @@ VM golden images must adhere to the platform security model:
 - Minimal package footprint
 - Cloud-init enabled with deterministic datasource
 
-Acceptance tests validate:
-- boot success
-- cloud-init completion
-- SSH reachability (key-only)
-- logging availability
-- package pinning where applicable
+Validate-only acceptance checks (offline) confirm:
+- qcow2 format and size sanity
+- cloud-init presence and enabled status
+- SSH key-only posture in `sshd_config`
+- build metadata and package manifest presence
+
+Runtime boot/SSH/logging validation is deferred to a later phase that performs
+controlled VM boot checks.

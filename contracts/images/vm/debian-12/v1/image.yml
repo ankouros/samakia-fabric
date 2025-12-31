@@ -12,8 +12,8 @@
       "source": "iso://<debian-12.iso>"
     },
     "build": {
-      "packer_template_path": "fabric-core/packer/vm/debian-12/packer.pkr.hcl",
-      "ansible_playbook_path": "fabric-core/ansible/playbooks/harden.yml",
+      "packer_template_path": "images/packer/debian-12/v1/image.pkr.hcl",
+      "ansible_playbook_path": "images/ansible/playbooks/golden-base.yml",
       "pinned_versions": "packer>=1.10, ansible>=2.16"
     },
     "artifact": {
@@ -35,7 +35,7 @@
       "syslog": "enabled"
     },
     "acceptance": {
-      "testcases": ["boot", "cloud-init", "ssh", "logging", "package-pinning"],
+      "testcases": ["qcow2", "cloud-init", "ssh-posture", "pkg-manifest", "build-metadata"],
       "evidence": ["build-manifest", "sha256", "boot-log"]
     },
     "overrides": {

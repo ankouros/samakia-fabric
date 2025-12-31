@@ -1,0 +1,13 @@
+---
+golden_base_image_id: "unknown"
+golden_base_image_version: "v0"
+golden_base_build_time: "unknown"
+golden_base_image_dir: "/etc/samakia-image"
+
+golden_base_minimal_packages:
+  - cloud-init
+  - qemu-guest-agent
+  - ca-certificates
+  - openssh-server
+
+golden_base_sshd_service: "ssh"

@@ -4,10 +4,11 @@ Phase 8 is design-only. No VM builds or registrations occur.
 
 ## Read-only validation gates
 
-- Contract schema validation
+- Contract schema + semantics validation
 - Example contract validation
 - Documentation presence
 - Evidence paths are gitignored
+- Optional qcow2 validation (local fixture only; CI is tool-only)
 
 ## Optional build gate (future phase)
 

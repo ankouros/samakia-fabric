@@ -36,6 +36,13 @@ PACKER_ARTIFACT_GLOB ?= ubuntu-24.04-lxc-rootfs-v*.tar.gz
 PACKER_ARTIFACT_PREFIX ?= ubuntu-24.04-lxc-rootfs-v
 PACKER_NEXT_VERSION_SCRIPT ?= $(OPS_SCRIPTS_DIR)/image-next-version.sh
 
+# VM image build/validation (Phase 8 Part 1)
+VM_PACKER_ROOT ?= $(REPO_ROOT)/images/packer
+VM_PACKER_COMMON ?= $(VM_PACKER_ROOT)/common
+VM_ANSIBLE_PLAYBOOK ?= $(REPO_ROOT)/images/ansible/playbooks/golden-base.yml
+VM_VALIDATE_DIR ?= $(REPO_ROOT)/ops/images/vm/validate
+VM_EVIDENCE_DIR ?= $(REPO_ROOT)/ops/images/vm/evidence
+
 TERRAFORM_ENV_DIR := $(REPO_ROOT)/fabric-core/terraform/envs/$(ENV)
 ANSIBLE_DIR := $(REPO_ROOT)/fabric-core/ansible
 
@@ -134,6 +141,20 @@ precommit: ## Run all pre-commit hooks (must pass before commit)
 
 .PHONY: image.build
 image.build: ## Build golden LXC image (VERSION=N optional; default: next)
+	@bash -euo pipefail -c '\
+		if [[ -n "$(IMAGE)" ]]; then \
+			case "$(IMAGE)" in \
+				ubuntu-24.04|debian-12) \
+					$(MAKE) image.vm.build IMAGE="$(IMAGE)" VERSION="$(VERSION)"; \
+					exit $$?; \
+					;; \
+				*) \
+					echo "ERROR: unknown VM IMAGE=$(IMAGE) (expected ubuntu-24.04|debian-12)" >&2; \
+					exit 2; \
+					;; \
+			esac; \
+		fi \
+	'
 	@test -d "$(PACKER_IMAGE_DIR)" || (echo "ERROR: PACKER_IMAGE_DIR not found: $(PACKER_IMAGE_DIR)"; exit 1)
 	@command -v packer >/dev/null 2>&1 || (echo "ERROR: packer not found in PATH"; exit 1)
 	@bash -euo pipefail -c '\
@@ -196,6 +217,80 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 .PHONY: image.version.test
 image.version.test: ## Unit test image version resolver (no packer, no Proxmox)
 	bash "$(OPS_SCRIPTS_DIR)/test-image-next-version.sh"
+
+.PHONY: image.vm.build
+image.vm.build: ## Build VM golden image (IMAGE=ubuntu-24.04|debian-12 VERSION=v1; requires IMAGE_BUILD=1)
+	@bash -euo pipefail -c '\
+		if [[ "$(IMAGE_BUILD)" != "1" ]]; then \
+			echo "ERROR: set IMAGE_BUILD=1 to run VM image builds" >&2; \
+			exit 2; \
+		fi; \
+		if [[ -z "$(IMAGE)" || -z "$(VERSION)" ]]; then \
+			echo "ERROR: IMAGE and VERSION are required (e.g., IMAGE=ubuntu-24.04 VERSION=v1)" >&2; \
+			exit 2; \
+		fi; \
+		case "$(IMAGE)" in \
+			ubuntu-24.04) vars_file="ubuntu24.pkrvars.hcl" ;; \
+			debian-12) vars_file="debian12.pkrvars.hcl" ;; \
+			*) echo "ERROR: unsupported IMAGE=$(IMAGE)" >&2; exit 2 ;; \
+		esac; \
+		common_dir="$(VM_PACKER_COMMON)"; \
+		vm_dir="$(VM_PACKER_ROOT)/$(IMAGE)/$(VERSION)"; \
+		if [[ ! -d "$$common_dir" ]]; then echo "ERROR: missing VM packer common dir: $$common_dir" >&2; exit 1; fi; \
+		if [[ ! -d "$$vm_dir" ]]; then echo "ERROR: missing VM packer dir: $$vm_dir" >&2; exit 1; fi; \
+		command -v packer >/dev/null 2>&1 || (echo "ERROR: packer not found in PATH" >&2; exit 1); \
+		out_dir="$(REPO_ROOT)/artifacts/images/vm/$(IMAGE)/$(VERSION)"; \
+		if [[ -d "$$out_dir" && -n "$$(ls -A "$$out_dir" 2>/dev/null)" ]]; then \
+			echo "ERROR: output dir not empty (refusing to overwrite): $$out_dir" >&2; \
+			exit 1; \
+		fi; \
+		tmp_dir="$(REPO_ROOT)/artifacts/packer-vm/$(IMAGE)-$(VERSION)"; \
+		rm -rf "$$tmp_dir"; \
+		mkdir -p "$$tmp_dir"; \
+		cp -a "$$common_dir/"*.pkr.hcl "$$tmp_dir/"; \
+		cp -a "$$common_dir/scripts" "$$tmp_dir/"; \
+		cp -a "$$vm_dir/"*.pkr.hcl "$$tmp_dir/"; \
+		cp -a "$$vm_dir/$$vars_file" "$$tmp_dir/"; \
+		packer init "$$tmp_dir"; \
+		packer build \
+			-var-file "$$tmp_dir/$$vars_file" \
+			-var "ansible_playbook_path=$(VM_ANSIBLE_PLAYBOOK)" \
+			-var "output_dir=$$out_dir" \
+			-var "vm_name=$(IMAGE)-$(VERSION)" \
+			-var "image_id=$(IMAGE)" \
+			-var "image_version=$(VERSION)" \
+			-var "build_time=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+			"$$tmp_dir"; \
+		echo "$$out_dir" \
+	'
+
+.PHONY: images.vm.validate.contracts
+images.vm.validate.contracts: ## Validate VM image contracts (schema + semantics)
+	@bash "$(VM_VALIDATE_DIR)/validate-image-schema.sh"
+	@bash "$(VM_VALIDATE_DIR)/validate-image-semantics.sh"
+
+.PHONY: image.validate
+image.validate: ## Validate a local VM qcow2 artifact (QCOW2=... IMAGE=... VERSION=...)
+	@test -n "$(QCOW2)" || (echo "ERROR: QCOW2 is required"; exit 2)
+	@bash "$(VM_VALIDATE_DIR)/validate-image.sh" --qcow2 "$(QCOW2)"
+
+.PHONY: image.evidence.build
+image.evidence.build: ## Generate VM image build evidence (QCOW2=... IMAGE=... VERSION=...)
+	@test -n "$(QCOW2)" || (echo "ERROR: QCOW2 is required"; exit 2)
+	@test -n "$(IMAGE)" || (echo "ERROR: IMAGE is required"; exit 2)
+	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required"; exit 2)
+	@bash "$(VM_EVIDENCE_DIR)/image-build-evidence.sh" --qcow2 "$(QCOW2)" --image "$(IMAGE)" --version "$(VERSION)"
+
+.PHONY: image.evidence.validate
+image.evidence.validate: ## Generate VM image validation evidence (QCOW2=... IMAGE=... VERSION=...)
+	@test -n "$(QCOW2)" || (echo "ERROR: QCOW2 is required"; exit 2)
+	@test -n "$(IMAGE)" || (echo "ERROR: IMAGE is required"; exit 2)
+	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required"; exit 2)
+	@bash "$(VM_EVIDENCE_DIR)/image-validate-evidence.sh" --qcow2 "$(QCOW2)" --image "$(IMAGE)" --version "$(VERSION)"
+
+.PHONY: phase8.part1.accept
+phase8.part1.accept: ## Phase 8 Part 1 acceptance (validate-only; no builds)
+	@bash "$(OPS_SCRIPTS_DIR)/phase8-part1-accept.sh"
 
 
 .PHONY: image.list
