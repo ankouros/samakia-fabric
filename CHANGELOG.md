@@ -82,6 +82,7 @@ The format is inspired by:
 - Phase 2 acceptance marker: `acceptance/PHASE2_ACCEPTED.md` (self-hash included; no secrets)
 - `OPERATIONS_LXC_LIFECYCLE.md` (replace-in-place vs blue/green runbook; DHCP/MAC determinism and SSH trust workflow)
 - Future improvements tracked in `ROADMAP.md`
+- Phase 3 entry runtime verification completed — READY (see `acceptance/PHASE3_ENTRY_CHECKLIST.md`)
 - `INCIDENT_SEVERITY_TAXONOMY.md` (S0–S4) with evidence depth + signing/dual-control/TSA requirements
 - `OPERATIONS_POST_INCIDENT_FORENSICS.md` severity-driven evidence collection flow (proportional, authorization-first)
 - `ops/scripts/forensics-severity-guide.sh` (read-only helper that prints evidence/signing requirements by severity)

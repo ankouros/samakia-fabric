@@ -1,7 +1,7 @@
 # Phase 3 Entry Checklist — High Availability & Resilience
 
-Timestamp (UTC): 2025-12-30T22:23:02Z
-Commit: f637914d31d4dd24b4dce86869291ed535710af2
+Timestamp (UTC): 2025-12-31T00:03:43Z
+Commit: e11fee89452ca6b08861f726b829f617c12056db
 Source: ROADMAP.md (Phase 3)
 
 Scope confirmation (from ROADMAP.md):
@@ -35,7 +35,7 @@ C. Observability Baseline
 - Prometheus scraping infra nodes: PASS — `curl https://192.168.11.122:9090/api/v1/targets` @ 2025-12-30T22:42:56Z (targets_total=1, targets_up=1)
 - Alertmanager operational: PASS — `curl https://192.168.11.122:9093/-/ready` @ 2025-12-30T22:42:56Z (http_code=200)
 - Grafana reachable (read-only): PASS — `curl https://192.168.11.122:3000/` @ 2025-12-30T22:42:56Z (http_code=302)
-- Loki logs flowing: FAIL — `curl https://192.168.11.122:3100/loki/api/v1/series?match[]={job=\"varlogs\"}` @ 2025-12-30T22:42:56Z (series_count=0)
+- Loki logs flowing: PASS — `ENV=samakia-shared make shared.obs.ingest.accept` @ 2025-12-31T00:03:43Z
 
 D. Operational Safety
 - Backup strategy documented: PASS — OPERATIONS.md references backup/restore notes
@@ -50,8 +50,8 @@ E. Governance
 - No automation yet — checklist only: PASS
 
 Entry Decision:
-- Phase 3 entry status: NOT READY
-- Blocking gaps: Loki log ingestion not observed via VIP (series_count=0)
+- Phase 3 entry status: READY
+- Blocking gaps: none
 
 Evidence placeholders (to be filled when checks are executed):
 - Proxmox cluster health: `curl $PM_API_URL/cluster/status` @ 2025-12-30T22:42:56Z

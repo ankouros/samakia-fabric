@@ -374,8 +374,8 @@ Phase 2 (Networking & Platform Primitives) is completed and locked.
 Phase 2.1 (Shared Control Plane Services) is completed and locked.
 Phase 2.2 (Control Plane Correctness & Invariants) is completed and locked.
 No regressions were introduced.
-Phase 3 remains NOT READY.
+Phase 3 entry is READY.
 
 ## Phase 3 Entry Status
 
-Phase 3 entry is **NOT READY** pending live readiness verification (see `acceptance/PHASE3_ENTRY_CHECKLIST.md`).
+Phase 3 entry is **READY** based on live readiness verification (see `acceptance/PHASE3_ENTRY_CHECKLIST.md`).
