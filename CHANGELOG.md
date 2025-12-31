@@ -42,6 +42,12 @@ The format is inspired by:
 - Safe-run allowlist with evidence wrapper packets
 - Phase 7 acceptance marker: `acceptance/PHASE7_ACCEPTED.md`
 
+#### VM golden images (Phase 8 design)
+- ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
+- VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)
+- Phase 8 entry checklist + acceptance plan (design-only; no builds)
+- VM image docs skeleton under `docs/images/`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

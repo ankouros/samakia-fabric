@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VmImageContract",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "VmImageContract"},
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "base",
+        "build",
+        "artifact",
+        "cloud_init",
+        "security",
+        "observability",
+        "acceptance",
+        "overrides"
+      ],
+      "properties": {
+        "base": {
+          "type": "object",
+          "required": ["distro", "release", "source"],
+          "properties": {
+            "distro": {"type": "string"},
+            "release": {"type": "string"},
+            "source": {"type": "string"}
+          }
+        },
+        "build": {
+          "type": "object",
+          "required": ["packer_template_path", "ansible_playbook_path", "pinned_versions"],
+          "properties": {
+            "packer_template_path": {"type": "string"},
+            "ansible_playbook_path": {"type": "string"},
+            "pinned_versions": {"type": "string"}
+          }
+        },
+        "artifact": {
+          "type": "object",
+          "required": ["storage_path", "sha256", "format"],
+          "properties": {
+            "storage_path": {"type": "string"},
+            "sha256": {"type": "string"},
+            "format": {"const": "qcow2"}
+          }
+        },
+        "cloud_init": {
+          "type": "object",
+          "required": ["enabled", "datasource"],
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "datasource": {"type": "string"}
+          }
+        },
+        "security": {
+          "type": "object",
+          "required": ["ssh_posture", "logging", "minimal_packages"],
+          "properties": {
+            "ssh_posture": {"type": "string"},
+            "logging": {"type": "string"},
+            "minimal_packages": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "observability": {
+          "type": "object",
+          "required": ["journald", "syslog"],
+          "properties": {
+            "journald": {"type": "string"},
+            "syslog": {"type": "string"}
+          }
+        },
+        "acceptance": {
+          "type": "object",
+          "required": ["testcases", "evidence"],
+          "properties": {
+            "testcases": {"type": "array", "items": {"type": "string"}},
+            "evidence": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "overrides": {
+          "type": "object",
+          "required": ["allowed", "reason_required"],
+          "properties": {
+            "allowed": {"type": "array", "items": {"type": "string"}},
+            "reason_required": {"type": "boolean"}
+          }
+        }
+      }
+    }
+  }
+}

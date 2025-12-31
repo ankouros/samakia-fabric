@@ -410,6 +410,25 @@ Rules:
 
 ---
 
+## VM Golden Image Contracts (Design)
+
+VM golden images are managed as immutable **contracts** (design-only in Phase 8).
+Fabric validates contracts and provenance; it does **not** manage VM lifecycle.
+
+Docs:
+- `docs/images/README.md`
+- `docs/images/vm-golden-images.md`
+- `docs/images/image-lifecycle.md`
+- `docs/images/image-security.md`
+
+Entry check (design validation only):
+
+```bash
+make phase8.entry.check
+```
+
+---
+
 ## Terraform Operations
 
 ### Where Terraform Is Run

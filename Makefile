@@ -885,6 +885,10 @@ ai.safe.index.check: ## Validate 03:00-safe allowlist index (read-only)
 phase7.entry.check: ## Phase 7 entry checklist (writes acceptance/PHASE7_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase7-entry-check.sh"
 
+.PHONY: phase8.entry.check
+phase8.entry.check: ## Phase 8 entry checklist (writes acceptance/PHASE8_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase8-entry-check.sh"
+
 .PHONY: phase7.accept
 phase7.accept: ## Run Phase 7 acceptance suite (read-only)
 	@bash "$(OPS_SCRIPTS_DIR)/phase7-accept.sh"

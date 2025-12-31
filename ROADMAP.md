@@ -265,6 +265,22 @@ Outcome:
 
 ---
 
+## Phase 8 — VM Golden Image Contracts (PLANNED)
+
+Goal: Introduce VM golden image contracts as immutable artifacts (design-only).
+
+### Planned (canonical)
+- ADR locking scope and boundaries (artifact-first, no VM lifecycle)
+- VM image contract schema + example contracts
+- Entry checklist + entry check script/target
+- Documentation skeleton and acceptance plan
+
+Non-scope:
+- No VM provisioning or scaling
+- No infrastructure mutation
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

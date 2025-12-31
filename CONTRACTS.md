@@ -55,3 +55,4 @@ Any change that violates a contract must be redesigned before merging.
 - SSH is key-only; root SSH is temporary for bootstrap only.
 - Phase acceptance requires `make phase<N>.accept` (or phase-equivalent), evidence recording, and acceptance markers.
 - AI operations are read-only by default; any remediation requires explicit guards and evidence packets.
+- VM golden images are contract-governed; canonical reference is storage_path + sha256; Fabric does not manage VM lifecycle.

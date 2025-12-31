@@ -1,0 +1,46 @@
+{
+  "apiVersion": "v1",
+  "kind": "VmImageContract",
+  "metadata": {
+    "name": "ubuntu-24.04",
+    "version": "v1"
+  },
+  "spec": {
+    "base": {
+      "distro": "ubuntu",
+      "release": "24.04",
+      "source": "iso://<ubuntu-24.04-server.iso>"
+    },
+    "build": {
+      "packer_template_path": "fabric-core/packer/vm/ubuntu-24.04/packer.pkr.hcl",
+      "ansible_playbook_path": "fabric-core/ansible/playbooks/harden.yml",
+      "pinned_versions": "packer>=1.10, ansible>=2.16"
+    },
+    "artifact": {
+      "storage_path": "storage://<proxmox-storage>/vm-images/ubuntu-24.04/v1/ubuntu-24.04.qcow2",
+      "sha256": "sha256:<REPLACE_WITH_SHA256>",
+      "format": "qcow2"
+    },
+    "cloud_init": {
+      "enabled": true,
+      "datasource": "nocloud"
+    },
+    "security": {
+      "ssh_posture": "key-only",
+      "logging": "enabled",
+      "minimal_packages": ["cloud-init", "qemu-guest-agent"]
+    },
+    "observability": {
+      "journald": "enabled",
+      "syslog": "enabled"
+    },
+    "acceptance": {
+      "testcases": ["boot", "cloud-init", "ssh", "logging", "package-pinning"],
+      "evidence": ["build-manifest", "sha256", "boot-log"]
+    },
+    "overrides": {
+      "allowed": ["base.source", "build.pinned_versions"],
+      "reason_required": true
+    }
+  }
+}

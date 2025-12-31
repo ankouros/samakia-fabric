@@ -461,3 +461,13 @@ Phase 7 adds bounded AI participation with explicit guardrails:
 - Phase 7 acceptance marker: `acceptance/PHASE7_ACCEPTED.md`.
 
 Phase 2.x, Phase 3 enforcement, Phase 4 CI gates, Phase 5 security posture, and Phase 6 consumer model remain unchanged.
+
+---
+
+## Phase 8 — VM Golden Image Contracts (Design)
+
+Phase 8 introduces VM golden image contracts as immutable artifacts (design-only):
+- ADR-0025 locks artifact-first scope (storage path + sha256; no VM lifecycle).
+- VM image contract schema and example contracts (Ubuntu 24.04, Debian 12).
+- Entry checklist and acceptance plan for design validation (no builds).
+- Docs skeleton under `docs/images/` for operator guidance.

@@ -1,0 +1,86 @@
+# Phase 8 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T17:42:10Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE0_ACCEPTED.md
+  - Command: test -f acceptance/PHASE0_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE5_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE7_ACCEPTED.md
+  - Command: test -f acceptance/PHASE7_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- ADR-0025 present
+  - Command: rg -n "ADR-0025" DECISIONS.md
+  - Result: PASS
+- VM image contract schema present
+  - Command: test -f contracts/images/vm/_schema/vm-image-contract.schema.json
+  - Result: PASS
+- Contract present: contracts/images/vm/ubuntu-24.04/v1/image.yml
+  - Command: test -f contracts/images/vm/ubuntu-24.04/v1/image.yml
+  - Result: PASS
+- Contract present: contracts/images/vm/debian-12/v1/image.yml
+  - Command: test -f contracts/images/vm/debian-12/v1/image.yml
+  - Result: PASS
+- Contracts validate against schema
+  - Command: python3 (schema validation)
+  - Result: PASS
+- Image doc present: docs/images/README.md
+  - Command: test -f docs/images/README.md
+  - Result: PASS
+- Image doc present: docs/images/vm-golden-images.md
+  - Command: test -f docs/images/vm-golden-images.md
+  - Result: PASS
+- Image doc present: docs/images/image-lifecycle.md
+  - Command: test -f docs/images/image-lifecycle.md
+  - Result: PASS
+- Image doc present: docs/images/image-security.md
+  - Command: test -f docs/images/image-security.md
+  - Result: PASS
+- evidence/images is gitignored
+  - Command: rg -n "^evidence/images/" .gitignore
+  - Result: PASS
+- artifacts/images is gitignored
+  - Command: rg -n "^artifacts/images/" .gitignore
+  - Result: PASS
+- No secrets in image contracts/docs
+  - Command: rg -n <secret patterns> contracts/images docs/images
+  - Result: PASS

@@ -786,6 +786,34 @@ AI participation in operations is **read-only by default** and **guarded** for a
 
 ---
 
+## ADR-0025 — VM Golden Image Contracts (Artifact-First, No VM Lifecycle)
+
+**Status:** Accepted
+**Date:** 2026-01-18
+
+### Decision
+
+Phase 8 introduces **VM golden image contracts** as immutable artifacts:
+
+- Canonical reference is `storage_path` + `sha256`.
+- Packer builds are reproducible; Ansible hardening is idempotent.
+- Validation is default; build/registration is optional and guarded in later phases.
+- Fabric manages contracts and validation, **not VM lifecycle**.
+
+### Rationale
+
+- Separates image provenance from VM lifecycle operations.
+- Enables auditability and reproducible build validation.
+- Preserves strict TLS and offline operability.
+
+### Consequences
+
+- No VM provisioning or scaling in Phase 8.
+- Evidence packets are mandatory for build/validation and are gitignored.
+- Image contracts become the source of truth for VM image provenance.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

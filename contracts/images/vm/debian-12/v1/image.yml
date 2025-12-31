@@ -1,0 +1,46 @@
+{
+  "apiVersion": "v1",
+  "kind": "VmImageContract",
+  "metadata": {
+    "name": "debian-12",
+    "version": "v1"
+  },
+  "spec": {
+    "base": {
+      "distro": "debian",
+      "release": "12",
+      "source": "iso://<debian-12.iso>"
+    },
+    "build": {
+      "packer_template_path": "fabric-core/packer/vm/debian-12/packer.pkr.hcl",
+      "ansible_playbook_path": "fabric-core/ansible/playbooks/harden.yml",
+      "pinned_versions": "packer>=1.10, ansible>=2.16"
+    },
+    "artifact": {
+      "storage_path": "storage://<proxmox-storage>/vm-images/debian-12/v1/debian-12.qcow2",
+      "sha256": "sha256:<REPLACE_WITH_SHA256>",
+      "format": "qcow2"
+    },
+    "cloud_init": {
+      "enabled": true,
+      "datasource": "nocloud"
+    },
+    "security": {
+      "ssh_posture": "key-only",
+      "logging": "enabled",
+      "minimal_packages": ["cloud-init", "qemu-guest-agent"]
+    },
+    "observability": {
+      "journald": "enabled",
+      "syslog": "enabled"
+    },
+    "acceptance": {
+      "testcases": ["boot", "cloud-init", "ssh", "logging", "package-pinning"],
+      "evidence": ["build-manifest", "sha256", "boot-log"]
+    },
+    "overrides": {
+      "allowed": ["base.source", "build.pinned_versions"],
+      "reason_required": true
+    }
+  }
+}
