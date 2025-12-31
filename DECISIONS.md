@@ -758,6 +758,34 @@ Phase 6 defines **consumer contracts** that make Samakia Fabric a substrate:
 
 ---
 
+## ADR-0024 — AI Operations Policy (Read-Only Default, Guarded Remediation)
+
+**Status:** Accepted
+**Date:** 2026-01-18
+
+### Decision
+
+AI participation in operations is **read-only by default** and **guarded** for any execution:
+
+- AI agents may analyze plans, generate evidence packets, and update documentation.
+- Any remediation must be opt-in with explicit guards and evidence output.
+- AI scripts must be allowlisted as **03:00-safe** and executed via a wrapper.
+- CI workflows must remain non-mutating and never enable execute flags.
+
+### Rationale
+
+- Prevents accidental infrastructure mutation from automation.
+- Ensures auditability and accountability of any changes.
+- Maintains offline operability and strict TLS constraints.
+
+### Consequences
+
+- Remediation requires explicit operator confirmation and maintenance windows.
+- Evidence packets are mandatory for any execution path.
+- Policy gates enforce the presence and behavior of AI workflows.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

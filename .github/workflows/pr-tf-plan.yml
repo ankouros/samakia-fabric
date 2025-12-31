@@ -65,6 +65,7 @@ jobs:
           fi
 
       - name: Terraform plan (evidence packet)
+        id: plan
         run: |
           set -euo pipefail
           env_name="${{ matrix.env }}"
@@ -106,9 +107,24 @@ jobs:
               | LC_ALL=C sort -z \
               | xargs -0 sha256sum >"${out_dir}/manifest.sha256"
           )
+          echo "plan_dir=${out_dir}" >> "${GITHUB_OUTPUT}"
+
+      - name: Plan review (AI read-only)
+        run: |
+          set -euo pipefail
+          plan_dir="${{ steps.plan.outputs.plan_dir }}"
+          env_name="${{ matrix.env }}"
+          plan_file="${plan_dir}/terraform-plan.txt"
+          bash ops/ai/plan-review/plan-review.sh --plan "${plan_file}" --env "${env_name}"
 
       - name: Upload plan evidence
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan-${{ matrix.env }}
           path: evidence/ci/plan/${{ matrix.env }}
+
+      - name: Upload plan review evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: plan-review-${{ matrix.env }}
+          path: evidence/ai/plan-review/${{ matrix.env }}

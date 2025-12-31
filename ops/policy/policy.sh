@@ -17,6 +17,7 @@ scripts=(
   "policy-ha.sh"
   "policy-docs.sh"
   "policy-security.sh"
+  "policy-ai-ops.sh"
 )
 
 for script in "${scripts[@]}"; do

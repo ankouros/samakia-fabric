@@ -449,3 +449,15 @@ Phase 6 Part 3 enables **controlled execute mode** for SAFE GameDays:
 - Execute allowlists (dev/staging only), maintenance windows, and operator reason guards.
 - Optional signing of execute-mode evidence packets (no secrets).
 - Acceptance marker: `acceptance/PHASE6_PART3_ACCEPTED.md`.
+
+---
+
+## Phase 7 — AI Operations Safety
+
+Phase 7 adds bounded AI participation with explicit guardrails:
+- AI operations policy and ADR (read-only default, guarded remediation).
+- Plan review packets from Terraform plan artifacts (read-only).
+- Safe-run allowlist with evidence wrapper packets.
+- Phase 7 acceptance marker: `acceptance/PHASE7_ACCEPTED.md`.
+
+Phase 2.x, Phase 3 enforcement, Phase 4 CI gates, Phase 5 security posture, and Phase 6 consumer model remain unchanged.

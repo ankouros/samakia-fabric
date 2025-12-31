@@ -1,0 +1,8 @@
+Terraform will perform the following actions:
+
+  # null_resource.example will be created
+  + resource "null_resource" "example" {
+      + id = (known after apply)
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.

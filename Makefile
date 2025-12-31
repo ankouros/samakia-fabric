@@ -869,6 +869,30 @@ phase6.part2.accept: ## Run Phase 6 Part 2 acceptance (read-only, dry-run gameda
 phase6.part3.accept: ## Run Phase 6 Part 3 acceptance (read-only; validate execute guards)
 	@bash "$(OPS_SCRIPTS_DIR)/phase6-part3-accept.sh"
 
+.PHONY: ai.plan.review
+ai.plan.review: ## Run AI plan review packet (read-only; PLAN_PATH required)
+	@ENV="$(ENV)" bash "$(REPO_ROOT)/ops/ai/plan-review/plan-review.sh" --plan "$(PLAN_PATH)" --env "$(ENV)"
+
+.PHONY: ai.runbook.check
+ai.runbook.check: ## Validate AI runbook formatting (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/ai-runbook-check.sh"
+
+.PHONY: ai.safe.index.check
+ai.safe.index.check: ## Validate 03:00-safe allowlist index (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/ai-safe-index-check.sh"
+
+.PHONY: phase7.entry.check
+phase7.entry.check: ## Phase 7 entry checklist (writes acceptance/PHASE7_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase7-entry-check.sh"
+
+.PHONY: phase7.accept
+phase7.accept: ## Run Phase 7 acceptance suite (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase7-accept.sh"
+
+.PHONY: ai.accept
+ai.accept: ## Run Phase 7 acceptance suite (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase7-accept.sh"
+
 .PHONY: phase2.1.accept
 phase2.1.accept: ## Run Phase 2.1 acceptance suite (read-only; shared control-plane services)
 	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase2-1-accept.sh"

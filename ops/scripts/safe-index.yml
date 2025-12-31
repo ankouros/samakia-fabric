@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "allowlist": [
+    {
+      "name": "policy.check",
+      "type": "read-only",
+      "command": "make policy.check",
+      "description": "Run all policy gates (read-only).",
+      "inputs": ["repo"],
+      "outputs": ["stdout"],
+      "evidence": ["evidence/ai/safe-run/<name>/<UTC>/"]
+    },
+    {
+      "name": "ai.runbook.check",
+      "type": "read-only",
+      "command": "make ai.runbook.check",
+      "description": "Validate AI runbook formatting (read-only).",
+      "inputs": ["ops/runbooks/ai/*"],
+      "outputs": ["stdout"],
+      "evidence": ["evidence/ai/safe-run/<name>/<UTC>/"]
+    },
+    {
+      "name": "ai.safe.index.check",
+      "type": "read-only",
+      "command": "make ai.safe.index.check",
+      "description": "Validate safe-index allowlist structure (read-only).",
+      "inputs": ["ops/scripts/safe-index.yml"],
+      "outputs": ["stdout"],
+      "evidence": ["evidence/ai/safe-run/<name>/<UTC>/"]
+    },
+    {
+      "name": "phase7.entry.check",
+      "type": "read-only",
+      "command": "make phase7.entry.check",
+      "description": "Phase 7 entry checklist (read-only).",
+      "inputs": ["acceptance markers"],
+      "outputs": ["acceptance/PHASE7_ENTRY_CHECKLIST.md"],
+      "evidence": ["evidence/ai/safe-run/<name>/<UTC>/"]
+    }
+  ]
+}

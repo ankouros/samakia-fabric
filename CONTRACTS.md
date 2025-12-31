@@ -54,3 +54,4 @@ Any change that violates a contract must be redesigned before merging.
 - LXC feature flags are immutable post-creation; storage selection is explicit.
 - SSH is key-only; root SSH is temporary for bootstrap only.
 - Phase acceptance requires `make phase<N>.accept` (or phase-equivalent), evidence recording, and acceptance markers.
+- AI operations are read-only by default; any remediation requires explicit guards and evidence packets.

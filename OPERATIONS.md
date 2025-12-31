@@ -993,6 +993,58 @@ make phase5.accept
 
 ---
 
+## AI Operations (Phase 7)
+
+AI participation is **read-only by default** and must follow the allowlist and guardrails.
+
+### Plan review packets (read-only)
+
+```bash
+PLAN_PATH=/path/to/terraform-plan.txt ENV=samakia-prod make ai.plan.review
+```
+
+Outputs are written under:
+`evidence/ai/plan-review/<env>/<UTC>/`
+
+### 03:00-safe allowlist and runbook checks
+
+```bash
+make ai.safe.index.check
+make ai.runbook.check
+```
+
+### Safe-run wrapper (read-only default)
+
+```bash
+bash ops/scripts/safe-run.sh policy.check --dry-run
+```
+
+### Controlled remediation (opt-in, guarded)
+
+Remediation requires explicit guards and maintenance windows:
+
+```bash
+AI_REMEDIATE=1 \
+AI_REMEDIATE_REASON="ticket-1234: safe rollback" \
+ENV=samakia-staging \
+MAINT_WINDOW_START=2026-01-20T02:00:00Z \
+MAINT_WINDOW_END=2026-01-20T03:00:00Z \
+I_UNDERSTAND_MUTATION=1 \
+bash ops/ai/remediate/remediate.sh --target policy.check --execute
+```
+
+Evidence is written under:
+`evidence/ai/remediation/<env>/<UTC>/`
+
+### Phase 7 acceptance (read-only)
+
+```bash
+make phase7.entry.check
+make phase7.accept
+```
+
+---
+
 ## Operational Philosophy
 
 Samakia Fabric follows a rebuild-over-repair philosophy.

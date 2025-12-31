@@ -248,16 +248,16 @@ Outcome:
 
 ---
 
-## Phase 7 — AI-Assisted Operations
+## Phase 7 — AI-Assisted Operations (COMPLETED ✅)
 
 Goal: Enable safe, bounded AI participation.
 
-### Planned
-- Explicit agent task boundaries & refusal rules
-- Automated plan review workflows (read-only by default)
-- Controlled remediation (explicit opt-in, always audited)
-- Decision enforcement via ADRs / runbooks / policy checks
-- AI-readable runbooks + “03:00-safe” operational scripts
+### Completed (canonical)
+- AI operations policy + ADR (read-only default, guarded remediation)
+- Plan review packets from Terraform plan artifacts (read-only)
+- Safe-run allowlist with evidence wrapper packets
+- AI-readable runbooks and format validation
+- Phase 7 acceptance marker: `acceptance/PHASE7_ACCEPTED.md`
 
 Outcome:
 - Reduced cognitive load

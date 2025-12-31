@@ -36,6 +36,12 @@ The format is inspired by:
 - Consumer GameDay execute mode with guardrails + optional signed evidence
 - Execute policy validation target + acceptance marker: `acceptance/PHASE6_PART3_ACCEPTED.md`
 
+#### AI operations safety (Phase 7)
+- AI operations policy + ADR (read-only default; guarded remediation)
+- Plan review packets from Terraform plan artifacts (read-only)
+- Safe-run allowlist with evidence wrapper packets
+- Phase 7 acceptance marker: `acceptance/PHASE7_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

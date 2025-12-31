@@ -1,0 +1,104 @@
+# Phase 7 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T17:24:57Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE0_ACCEPTED.md
+  - Command: test -f acceptance/PHASE0_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE5_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART3_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- ADR-0024 present
+  - Command: rg -n "ADR-0024" DECISIONS.md
+  - Result: PASS
+- AI operations policy present
+  - Command: test -f AI_OPERATIONS_POLICY.md
+  - Result: PASS
+- Required file present: ops/ai/plan-review/plan-review.sh
+  - Command: test -f ops/ai/plan-review/plan-review.sh
+  - Result: PASS
+- Required file present: ops/ai/remediate/remediate.sh
+  - Command: test -f ops/ai/remediate/remediate.sh
+  - Result: PASS
+- Required file present: ops/policy/policy-ai-ops.sh
+  - Command: test -f ops/policy/policy-ai-ops.sh
+  - Result: PASS
+- Required file present: ops/scripts/safe-index.yml
+  - Command: test -f ops/scripts/safe-index.yml
+  - Result: PASS
+- Required file present: ops/scripts/safe-run.sh
+  - Command: test -f ops/scripts/safe-run.sh
+  - Result: PASS
+- Required file present: ops/scripts/ai-runbook-check.sh
+  - Command: test -f ops/scripts/ai-runbook-check.sh
+  - Result: PASS
+- Required file present: ops/scripts/ai-safe-index-check.sh
+  - Command: test -f ops/scripts/ai-safe-index-check.sh
+  - Result: PASS
+- AI runbook present: ops/runbooks/ai/format.md
+  - Command: test -f ops/runbooks/ai/format.md
+  - Result: PASS
+- AI runbook present: ops/runbooks/ai/incident-triage.md
+  - Command: test -f ops/runbooks/ai/incident-triage.md
+  - Result: PASS
+- AI runbook present: ops/runbooks/ai/drift-triage.md
+  - Command: test -f ops/runbooks/ai/drift-triage.md
+  - Result: PASS
+- AI runbook present: ops/runbooks/ai/consumer-readiness-triage.md
+  - Command: test -f ops/runbooks/ai/consumer-readiness-triage.md
+  - Result: PASS
+- AI runbook present: ops/runbooks/ai/observability-triage.md
+  - Command: test -f ops/runbooks/ai/observability-triage.md
+  - Result: PASS
+- evidence/ is gitignored
+  - Command: rg -n "^evidence/" .gitignore
+  - Result: PASS
+- artifacts/ is gitignored
+  - Command: rg -n "^artifacts/" .gitignore
+  - Result: PASS
+- CI workflows do not enable execute flags
+  - Command: rg -n <execute flags> .github/workflows
+  - Result: PASS
+- policy-ai-ops wired into policy.check
+  - Command: rg -n policy-ai-ops.sh ops/policy/policy.sh
+  - Result: PASS
+- Policy gates pass
+  - Command: make policy.check
+  - Result: PASS
