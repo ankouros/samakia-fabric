@@ -1,0 +1,64 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "ConsumerContract",
+  "metadata": {
+    "name": "message-queue-ready",
+    "description": "HA-ready substrate for external message queue."
+  },
+  "spec": {
+    "type": "message-queue",
+    "variant": "ready",
+    "ha": {
+      "tier": "tier1",
+      "replicas_min": 2,
+      "anti_affinity": true,
+      "failure_domains": ["proxmox1", "proxmox2", "proxmox3"]
+    },
+    "network": {
+      "planes": [
+        {"name": "broker-plane", "vlan_ref": "consumer-plane", "purpose": "mq-traffic"}
+      ],
+      "vip": {"name": "mq-vip", "purpose": "broker-endpoint", "required": false},
+      "ports": [
+        {"name": "amqp", "port": 5672, "protocol": "tcp"},
+        {"name": "mgmt", "port": 15672, "protocol": "tcp"}
+      ]
+    },
+    "storage": {
+      "backend": "nfs",
+      "class": "baseline",
+      "backup_hooks": ["snapshot:daily", "restore:test-monthly"]
+    },
+    "firewall": {
+      "default_off": true,
+      "profile": "baseline",
+      "enable_guard": ["FIREWALL_ENABLE", "FIREWALL_EXECUTE"]
+    },
+    "observability": {
+      "metrics": [
+        {"name": "mq-metrics", "port": 15692, "path": "/metrics"}
+      ],
+      "logs": {
+        "labels": ["plane=consumer", "type=message-queue", "variant=ready"]
+      },
+      "evidence_packets": ["substrate-drift", "consumer-readiness"]
+    },
+    "disaster": {
+      "scenarios": [
+        {
+          "name": "broker-loss",
+          "expectation": "Cluster remains writable with remaining brokers.",
+          "testcases": ["gameday:vip-failover", "gameday:service-restart"]
+        }
+      ]
+    },
+    "overrides": {
+      "allowed": [
+        {"id": "HA_OVERRIDE", "requires_reason": true, "env_guard": ["HA_OVERRIDE", "HA_OVERRIDE_REASON"]}
+      ]
+    },
+    "evidence": {
+      "required_packets": ["substrate-drift", "consumer-readiness", "release-readiness"]
+    }
+  }
+}

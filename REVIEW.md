@@ -429,3 +429,12 @@ Phase 5 strengthens security posture while preserving offline operability:
 - Compliance profile evaluation mapped to the control catalog (baseline/hardened).
 
 Phase 2.x, Phase 3 enforcement, and Phase 4 CI gates remain unchanged; Phase 5 adds policy-guarded security workflows only.
+
+---
+
+## Phase 6 — Platform Consumers (Design)
+
+Phase 6 defines consumer contracts and documentation only:
+- Two-variant contract model (`ready`/`enabled`) per consumer type.
+- Manifest-only enabled declarations; no managed installs in this phase.
+- HA-ready defaults with explicit override guardrails.

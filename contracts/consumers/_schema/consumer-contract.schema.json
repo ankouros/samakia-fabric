@@ -1,0 +1,185 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Samakia Fabric Consumer Contract",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "ConsumerContract"},
+    "metadata": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {"type": "string"},
+        "description": {"type": "string"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "type",
+        "variant",
+        "ha",
+        "network",
+        "storage",
+        "firewall",
+        "observability",
+        "disaster",
+        "overrides",
+        "evidence"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["kubernetes", "database", "message-queue", "cache", "custom"]
+        },
+        "variant": {
+          "type": "string",
+          "enum": ["ready", "enabled"]
+        },
+        "ha": {
+          "type": "object",
+          "required": ["tier", "replicas_min", "anti_affinity", "failure_domains"],
+          "properties": {
+            "tier": {"type": "string", "enum": ["tier0", "tier1", "tier2"]},
+            "replicas_min": {"type": "integer", "minimum": 1},
+            "anti_affinity": {"type": "boolean"},
+            "failure_domains": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "network": {
+          "type": "object",
+          "required": ["planes", "ports"],
+          "properties": {
+            "planes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "vlan_ref"],
+                "properties": {
+                  "name": {"type": "string"},
+                  "vlan_ref": {"type": "string"},
+                  "purpose": {"type": "string"}
+                }
+              }
+            },
+            "vip": {
+              "type": "object",
+              "required": ["name", "purpose", "required"],
+              "properties": {
+                "name": {"type": "string"},
+                "purpose": {"type": "string"},
+                "required": {"type": "boolean"}
+              }
+            },
+            "ports": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "port", "protocol"],
+                "properties": {
+                  "name": {"type": "string"},
+                  "port": {"type": "integer"},
+                  "protocol": {"type": "string", "enum": ["tcp", "udp"]}
+                }
+              }
+            }
+          }
+        },
+        "storage": {
+          "type": "object",
+          "required": ["backend", "class", "backup_hooks"],
+          "properties": {
+            "backend": {"type": "string", "enum": ["nfs"]},
+            "class": {"type": "string", "enum": ["baseline", "hardened"]},
+            "backup_hooks": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "firewall": {
+          "type": "object",
+          "required": ["default_off", "profile", "enable_guard"],
+          "properties": {
+            "default_off": {"type": "boolean"},
+            "profile": {"type": "string", "enum": ["baseline", "hardened"]},
+            "enable_guard": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "observability": {
+          "type": "object",
+          "required": ["metrics", "logs", "evidence_packets"],
+          "properties": {
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "port", "path"],
+                "properties": {
+                  "name": {"type": "string"},
+                  "port": {"type": "integer"},
+                  "path": {"type": "string"}
+                }
+              }
+            },
+            "logs": {
+              "type": "object",
+              "required": ["labels"],
+              "properties": {
+                "labels": {"type": "array", "items": {"type": "string"}}
+              }
+            },
+            "evidence_packets": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "disaster": {
+          "type": "object",
+          "required": ["scenarios"],
+          "properties": {
+            "scenarios": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "expectation", "testcases"],
+                "properties": {
+                  "name": {"type": "string"},
+                  "expectation": {"type": "string"},
+                  "testcases": {"type": "array", "items": {"type": "string"}}
+                }
+              }
+            }
+          }
+        },
+        "overrides": {
+          "type": "object",
+          "required": ["allowed"],
+          "properties": {
+            "allowed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "requires_reason", "env_guard"],
+                "properties": {
+                  "id": {"type": "string"},
+                  "requires_reason": {"type": "boolean"},
+                  "env_guard": {"type": "array", "items": {"type": "string"}}
+                }
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "required": ["required_packets"],
+          "properties": {
+            "required_packets": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "secrets": {
+          "type": "object",
+          "properties": {
+            "required": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    }
+  }
+}

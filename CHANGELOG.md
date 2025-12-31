@@ -15,6 +15,11 @@ The format is inspired by:
 ## [Unreleased]
 
 ### Added
+#### Platform consumers (Phase 6 design)
+- Consumer contract schema + ready/enabled manifests for kubernetes/database/message-queue/cache
+- Phase 6 entry checklist + acceptance plan (design-only; no deployments)
+- Consumer documentation skeleton under `docs/consumers/`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

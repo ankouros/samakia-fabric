@@ -1,0 +1,67 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "ConsumerContract",
+  "metadata": {
+    "name": "kubernetes-enabled",
+    "description": "Externally managed Kubernetes cluster is present; Fabric enforces contract."
+  },
+  "spec": {
+    "type": "kubernetes",
+    "variant": "enabled",
+    "ha": {
+      "tier": "tier1",
+      "replicas_min": 3,
+      "anti_affinity": true,
+      "failure_domains": ["proxmox1", "proxmox2", "proxmox3"]
+    },
+    "network": {
+      "planes": [
+        {"name": "workload-plane", "vlan_ref": "consumer-plane", "purpose": "node-traffic"}
+      ],
+      "vip": {"name": "k8s-api-vip", "purpose": "api-server", "required": true},
+      "ports": [
+        {"name": "apiserver", "port": 6443, "protocol": "tcp"},
+        {"name": "kubelet", "port": 10250, "protocol": "tcp"}
+      ]
+    },
+    "storage": {
+      "backend": "nfs",
+      "class": "hardened",
+      "backup_hooks": ["snapshot:hourly", "restore:test-monthly"]
+    },
+    "firewall": {
+      "default_off": true,
+      "profile": "hardened",
+      "enable_guard": ["FIREWALL_ENABLE", "FIREWALL_EXECUTE"]
+    },
+    "observability": {
+      "metrics": [
+        {"name": "apiserver-metrics", "port": 6443, "path": "/metrics"}
+      ],
+      "logs": {
+        "labels": ["plane=consumer", "type=kubernetes", "variant=enabled"]
+      },
+      "evidence_packets": ["substrate-drift", "consumer-readiness", "compliance"]
+    },
+    "disaster": {
+      "scenarios": [
+        {
+          "name": "control-plane-loss",
+          "expectation": "API VIP remains reachable with quorum maintained.",
+          "testcases": ["gameday:vip-failover", "gameday:service-restart"]
+        }
+      ]
+    },
+    "overrides": {
+      "allowed": [
+        {"id": "HA_OVERRIDE", "requires_reason": true, "env_guard": ["HA_OVERRIDE", "HA_OVERRIDE_REASON"]}
+      ]
+    },
+    "evidence": {
+      "required_packets": ["substrate-drift", "consumer-readiness", "compliance", "release-readiness"]
+    },
+    "secrets": {
+      "required": ["k8s-bootstrap-token", "k8s-ca-key"]
+    }
+  }
+}

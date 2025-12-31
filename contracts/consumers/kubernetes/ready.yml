@@ -1,0 +1,63 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "ConsumerContract",
+  "metadata": {
+    "name": "kubernetes-ready",
+    "description": "HA-ready substrate for an external Kubernetes control plane."
+  },
+  "spec": {
+    "type": "kubernetes",
+    "variant": "ready",
+    "ha": {
+      "tier": "tier1",
+      "replicas_min": 2,
+      "anti_affinity": true,
+      "failure_domains": ["proxmox1", "proxmox2", "proxmox3"]
+    },
+    "network": {
+      "planes": [
+        {"name": "workload-plane", "vlan_ref": "consumer-plane", "purpose": "node-traffic"}
+      ],
+      "vip": {"name": "k8s-api-vip", "purpose": "api-server", "required": false},
+      "ports": [
+        {"name": "kubelet", "port": 10250, "protocol": "tcp"}
+      ]
+    },
+    "storage": {
+      "backend": "nfs",
+      "class": "baseline",
+      "backup_hooks": ["snapshot:daily", "restore:test-monthly"]
+    },
+    "firewall": {
+      "default_off": true,
+      "profile": "baseline",
+      "enable_guard": ["FIREWALL_ENABLE", "FIREWALL_EXECUTE"]
+    },
+    "observability": {
+      "metrics": [
+        {"name": "node-metrics", "port": 9100, "path": "/metrics"}
+      ],
+      "logs": {
+        "labels": ["plane=consumer", "type=kubernetes", "variant=ready"]
+      },
+      "evidence_packets": ["substrate-drift", "consumer-readiness"]
+    },
+    "disaster": {
+      "scenarios": [
+        {
+          "name": "node-loss",
+          "expectation": "Replicas remain scheduled on distinct nodes; API remains reachable.",
+          "testcases": ["gameday:vip-failover", "gameday:service-restart"]
+        }
+      ]
+    },
+    "overrides": {
+      "allowed": [
+        {"id": "HA_OVERRIDE", "requires_reason": true, "env_guard": ["HA_OVERRIDE", "HA_OVERRIDE_REASON"]}
+      ]
+    },
+    "evidence": {
+      "required_packets": ["substrate-drift", "consumer-readiness", "release-readiness"]
+    }
+  }
+}

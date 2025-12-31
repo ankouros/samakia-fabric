@@ -727,6 +727,37 @@ Phase 5 introduces security hardening that **preserves offline operability**:
 
 ---
 
+## ADR-0023 — Phase 6 Consumer Contracts (Ready/Enabled, Manifest-Only, HA-Ready)
+
+**Status:** Accepted
+**Date:** 2026-01-17
+
+### Decision
+
+Phase 6 defines **consumer contracts** that make Samakia Fabric a substrate:
+
+- Every consumer type has exactly two variants:
+  - `ready` (default): no service deployed; substrate + contract only.
+  - `enabled` (opt-in): service exists externally; Fabric enforces the contract.
+- Enabled variant is **manifest-only** and must be declared explicitly.
+- HA-ready patterns are the default; overrides require explicit guardrails.
+- Disaster/recovery expectations are mandatory and map to read-only acceptance.
+- Phase 6 does **not** manage consumer service installs.
+
+### Rationale
+
+- Separates substrate from consumer lifecycle to avoid hidden coupling.
+- Makes readiness deterministic and auditable before any platform adoption.
+- Keeps Phase 3 HA enforcement semantics consistent across consumers.
+
+### Consequences
+
+- Consumer platforms must supply their own lifecycle tooling.
+- Acceptance is evidence-driven and read-only by default.
+- Contracts become the single source of truth for consumption intent.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

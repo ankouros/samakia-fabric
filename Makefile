@@ -806,6 +806,10 @@ phase5.entry.check: ## Phase 5 entry checklist (writes acceptance/PHASE5_ENTRY_C
 phase5.accept: ## Run Phase 5 acceptance suite (read-only)
 	@bash "$(OPS_SCRIPTS_DIR)/phase5-accept.sh"
 
+.PHONY: phase6.entry.check
+phase6.entry.check: ## Phase 6 entry checklist (writes acceptance/PHASE6_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase6-entry-check.sh"
+
 .PHONY: phase2.1.accept
 phase2.1.accept: ## Run Phase 2.1 acceptance suite (read-only; shared control-plane services)
 	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase2-1-accept.sh"

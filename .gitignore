@@ -123,6 +123,7 @@ compliance/
 forensics/
 correlation/
 release-readiness/
+contracts/_local/
 
 # Keep compliance profiles and mapping tracked
 !compliance/

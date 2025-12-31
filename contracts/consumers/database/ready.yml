@@ -1,0 +1,63 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "ConsumerContract",
+  "metadata": {
+    "name": "database-ready",
+    "description": "HA-ready substrate for external database cluster."
+  },
+  "spec": {
+    "type": "database",
+    "variant": "ready",
+    "ha": {
+      "tier": "tier1",
+      "replicas_min": 2,
+      "anti_affinity": true,
+      "failure_domains": ["proxmox1", "proxmox2", "proxmox3"]
+    },
+    "network": {
+      "planes": [
+        {"name": "data-plane", "vlan_ref": "consumer-plane", "purpose": "db-traffic"}
+      ],
+      "vip": {"name": "db-vip", "purpose": "primary-endpoint", "required": false},
+      "ports": [
+        {"name": "db-port", "port": 5432, "protocol": "tcp"}
+      ]
+    },
+    "storage": {
+      "backend": "nfs",
+      "class": "baseline",
+      "backup_hooks": ["snapshot:daily", "restore:test-monthly"]
+    },
+    "firewall": {
+      "default_off": true,
+      "profile": "baseline",
+      "enable_guard": ["FIREWALL_ENABLE", "FIREWALL_EXECUTE"]
+    },
+    "observability": {
+      "metrics": [
+        {"name": "db-metrics", "port": 9187, "path": "/metrics"}
+      ],
+      "logs": {
+        "labels": ["plane=consumer", "type=database", "variant=ready"]
+      },
+      "evidence_packets": ["substrate-drift", "consumer-readiness"]
+    },
+    "disaster": {
+      "scenarios": [
+        {
+          "name": "primary-loss",
+          "expectation": "Replica promotion within SLO; endpoint remains reachable.",
+          "testcases": ["gameday:vip-failover", "gameday:service-restart"]
+        }
+      ]
+    },
+    "overrides": {
+      "allowed": [
+        {"id": "HA_OVERRIDE", "requires_reason": true, "env_guard": ["HA_OVERRIDE", "HA_OVERRIDE_REASON"]}
+      ]
+    },
+    "evidence": {
+      "required_packets": ["substrate-drift", "consumer-readiness", "release-readiness"]
+    }
+  }
+}

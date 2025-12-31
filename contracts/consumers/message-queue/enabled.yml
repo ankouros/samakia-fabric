@@ -1,0 +1,67 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "ConsumerContract",
+  "metadata": {
+    "name": "message-queue-enabled",
+    "description": "Externally managed message queue is present; Fabric enforces contract."
+  },
+  "spec": {
+    "type": "message-queue",
+    "variant": "enabled",
+    "ha": {
+      "tier": "tier1",
+      "replicas_min": 3,
+      "anti_affinity": true,
+      "failure_domains": ["proxmox1", "proxmox2", "proxmox3"]
+    },
+    "network": {
+      "planes": [
+        {"name": "broker-plane", "vlan_ref": "consumer-plane", "purpose": "mq-traffic"}
+      ],
+      "vip": {"name": "mq-vip", "purpose": "broker-endpoint", "required": true},
+      "ports": [
+        {"name": "amqp", "port": 5672, "protocol": "tcp"},
+        {"name": "mgmt", "port": 15672, "protocol": "tcp"}
+      ]
+    },
+    "storage": {
+      "backend": "nfs",
+      "class": "hardened",
+      "backup_hooks": ["snapshot:hourly", "restore:test-monthly"]
+    },
+    "firewall": {
+      "default_off": true,
+      "profile": "hardened",
+      "enable_guard": ["FIREWALL_ENABLE", "FIREWALL_EXECUTE"]
+    },
+    "observability": {
+      "metrics": [
+        {"name": "mq-metrics", "port": 15692, "path": "/metrics"}
+      ],
+      "logs": {
+        "labels": ["plane=consumer", "type=message-queue", "variant=enabled"]
+      },
+      "evidence_packets": ["substrate-drift", "consumer-readiness", "compliance"]
+    },
+    "disaster": {
+      "scenarios": [
+        {
+          "name": "broker-partition",
+          "expectation": "Cluster remains available with quorum; degraded state is detected.",
+          "testcases": ["gameday:vip-failover", "gameday:service-restart"]
+        }
+      ]
+    },
+    "overrides": {
+      "allowed": [
+        {"id": "HA_OVERRIDE", "requires_reason": true, "env_guard": ["HA_OVERRIDE", "HA_OVERRIDE_REASON"]}
+      ]
+    },
+    "evidence": {
+      "required_packets": ["substrate-drift", "consumer-readiness", "compliance", "release-readiness"]
+    },
+    "secrets": {
+      "required": ["mq-admin-password", "mq-cluster-cookie"]
+    }
+  }
+}

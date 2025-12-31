@@ -1,0 +1,104 @@
+# Phase 6 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T14:45:07Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE0_ACCEPTED.md
+  - Command: test -f acceptance/PHASE0_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE5_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- ADR-0023 present
+  - Command: rg -n "ADR-0023" DECISIONS.md
+  - Result: PASS
+- Consumer contract schema present
+  - Command: test -f contracts/consumers/_schema/consumer-contract.schema.json
+  - Result: PASS
+- Contract present: contracts/consumers/kubernetes/ready.yml
+  - Command: test -f contracts/consumers/kubernetes/ready.yml
+  - Result: PASS
+- Contract present: contracts/consumers/kubernetes/enabled.yml
+  - Command: test -f contracts/consumers/kubernetes/enabled.yml
+  - Result: PASS
+- Contract present: contracts/consumers/database/ready.yml
+  - Command: test -f contracts/consumers/database/ready.yml
+  - Result: PASS
+- Contract present: contracts/consumers/database/enabled.yml
+  - Command: test -f contracts/consumers/database/enabled.yml
+  - Result: PASS
+- Contract present: contracts/consumers/message-queue/ready.yml
+  - Command: test -f contracts/consumers/message-queue/ready.yml
+  - Result: PASS
+- Contract present: contracts/consumers/message-queue/enabled.yml
+  - Command: test -f contracts/consumers/message-queue/enabled.yml
+  - Result: PASS
+- Contract present: contracts/consumers/cache/ready.yml
+  - Command: test -f contracts/consumers/cache/ready.yml
+  - Result: PASS
+- Contract present: contracts/consumers/cache/enabled.yml
+  - Command: test -f contracts/consumers/cache/enabled.yml
+  - Result: PASS
+- Contracts validate against schema
+  - Command: python3 (schema validation)
+  - Result: PASS
+- No secrets in contracts or docs
+  - Command: rg -n <secret patterns> contracts docs/consumers
+  - Result: PASS
+- Local contract artifacts ignored
+  - Command: rg -n "contracts/_local/" .gitignore
+  - Result: PASS
+- Consumer doc present: docs/consumers/README.md
+  - Command: test -f docs/consumers/README.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/onboarding.md
+  - Command: test -f docs/consumers/onboarding.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/kubernetes.md
+  - Command: test -f docs/consumers/kubernetes.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/database.md
+  - Command: test -f docs/consumers/database.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/message-queue.md
+  - Command: test -f docs/consumers/message-queue.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/cache.md
+  - Command: test -f docs/consumers/cache.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/disaster-recovery.md
+  - Command: test -f docs/consumers/disaster-recovery.md
+  - Result: PASS
+- Consumer doc present: docs/consumers/slo-failure-semantics.md
+  - Command: test -f docs/consumers/slo-failure-semantics.md
+  - Result: PASS
+- Policy gates pass
+  - Command: make policy.check
+  - Result: PASS

@@ -1,0 +1,63 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "ConsumerContract",
+  "metadata": {
+    "name": "cache-ready",
+    "description": "HA-ready substrate for external cache cluster."
+  },
+  "spec": {
+    "type": "cache",
+    "variant": "ready",
+    "ha": {
+      "tier": "tier2",
+      "replicas_min": 2,
+      "anti_affinity": true,
+      "failure_domains": ["proxmox1", "proxmox2", "proxmox3"]
+    },
+    "network": {
+      "planes": [
+        {"name": "cache-plane", "vlan_ref": "consumer-plane", "purpose": "cache-traffic"}
+      ],
+      "vip": {"name": "cache-vip", "purpose": "cache-endpoint", "required": false},
+      "ports": [
+        {"name": "cache", "port": 6379, "protocol": "tcp"}
+      ]
+    },
+    "storage": {
+      "backend": "nfs",
+      "class": "baseline",
+      "backup_hooks": ["snapshot:daily"]
+    },
+    "firewall": {
+      "default_off": true,
+      "profile": "baseline",
+      "enable_guard": ["FIREWALL_ENABLE", "FIREWALL_EXECUTE"]
+    },
+    "observability": {
+      "metrics": [
+        {"name": "cache-metrics", "port": 9121, "path": "/metrics"}
+      ],
+      "logs": {
+        "labels": ["plane=consumer", "type=cache", "variant=ready"]
+      },
+      "evidence_packets": ["substrate-drift", "consumer-readiness"]
+    },
+    "disaster": {
+      "scenarios": [
+        {
+          "name": "node-loss",
+          "expectation": "Remaining replicas serve traffic; cache rebuild acceptable.",
+          "testcases": ["gameday:vip-failover", "gameday:service-restart"]
+        }
+      ]
+    },
+    "overrides": {
+      "allowed": [
+        {"id": "HA_OVERRIDE", "requires_reason": true, "env_guard": ["HA_OVERRIDE", "HA_OVERRIDE_REASON"]}
+      ]
+    },
+    "evidence": {
+      "required_packets": ["substrate-drift", "consumer-readiness"]
+    }
+  }
+}

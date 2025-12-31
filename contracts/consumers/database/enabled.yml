@@ -1,0 +1,66 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "ConsumerContract",
+  "metadata": {
+    "name": "database-enabled",
+    "description": "Externally managed database cluster is present; Fabric enforces contract."
+  },
+  "spec": {
+    "type": "database",
+    "variant": "enabled",
+    "ha": {
+      "tier": "tier1",
+      "replicas_min": 3,
+      "anti_affinity": true,
+      "failure_domains": ["proxmox1", "proxmox2", "proxmox3"]
+    },
+    "network": {
+      "planes": [
+        {"name": "data-plane", "vlan_ref": "consumer-plane", "purpose": "db-traffic"}
+      ],
+      "vip": {"name": "db-vip", "purpose": "primary-endpoint", "required": true},
+      "ports": [
+        {"name": "db-port", "port": 5432, "protocol": "tcp"}
+      ]
+    },
+    "storage": {
+      "backend": "nfs",
+      "class": "hardened",
+      "backup_hooks": ["snapshot:hourly", "restore:test-monthly"]
+    },
+    "firewall": {
+      "default_off": true,
+      "profile": "hardened",
+      "enable_guard": ["FIREWALL_ENABLE", "FIREWALL_EXECUTE"]
+    },
+    "observability": {
+      "metrics": [
+        {"name": "db-metrics", "port": 9187, "path": "/metrics"}
+      ],
+      "logs": {
+        "labels": ["plane=consumer", "type=database", "variant=enabled"]
+      },
+      "evidence_packets": ["substrate-drift", "consumer-readiness", "compliance"]
+    },
+    "disaster": {
+      "scenarios": [
+        {
+          "name": "replica-loss",
+          "expectation": "Remaining replicas serve traffic; restore from backup within RPO.",
+          "testcases": ["gameday:vip-failover", "gameday:service-restart"]
+        }
+      ]
+    },
+    "overrides": {
+      "allowed": [
+        {"id": "HA_OVERRIDE", "requires_reason": true, "env_guard": ["HA_OVERRIDE", "HA_OVERRIDE_REASON"]}
+      ]
+    },
+    "evidence": {
+      "required_packets": ["substrate-drift", "consumer-readiness", "compliance", "release-readiness"]
+    },
+    "secrets": {
+      "required": ["db-admin-password", "db-replication-key"]
+    }
+  }
+}
