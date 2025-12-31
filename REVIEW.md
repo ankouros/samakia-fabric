@@ -432,9 +432,10 @@ Phase 2.x, Phase 3 enforcement, and Phase 4 CI gates remain unchanged; Phase 5 a
 
 ---
 
-## Phase 6 — Platform Consumers (Design)
+## Phase 6 — Platform Consumers (Part 1)
 
-Phase 6 defines consumer contracts and documentation only:
-- Two-variant contract model (`ready`/`enabled`) per consumer type.
-- Manifest-only enabled declarations; no managed installs in this phase.
-- HA-ready defaults with explicit override guardrails.
+Phase 6 Part 1 turns consumer contracts into enforced, testable mechanics (no deployments):
+- Contract validation (schema + semantics) for `ready`/`enabled` variants.
+- HA readiness checks and disaster wiring validation (read-only).
+- Consumer readiness evidence packets under `evidence/consumers/`.
+- Acceptance marker: `acceptance/PHASE6_PART1_ACCEPTED.md`.

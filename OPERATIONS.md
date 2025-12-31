@@ -886,12 +886,20 @@ Evidence packets are written under:
 
 ---
 
-## Platform Consumers (Phase 6 Design)
+## Platform Consumers (Phase 6 — Contracts + Validation)
 
-Phase 6 defines consumer contracts and documentation only (no deployments):
+Phase 6 provides consumer contracts and **read-only** validation (no deployments):
 - Contracts: `contracts/consumers/`
 - Docs: `docs/consumers/README.md`
 - Entry check: `make phase6.entry.check`
+- Contract validation: `make consumers.validate`
+- HA readiness check: `make consumers.ha.check`
+- Disaster wiring check: `make consumers.disaster.check`
+- Readiness evidence: `make consumers.evidence`
+- Acceptance gate: `make phase6.part1.accept`
+
+Evidence packets are written under:
+`evidence/consumers/<type>/<variant>/<UTC>/`
 
 ---
 

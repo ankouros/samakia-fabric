@@ -222,6 +222,12 @@ Outcome:
 
 Goal: Make Samakia Fabric consumable by higher-level platforms.
 
+### Part 1 — Consumer Contracts & Validation (COMPLETED ✅)
+- Contract schema + ready/enabled manifests for kubernetes/database/message-queue/cache
+- Contract validation (schema + semantics) with HA readiness + disaster wiring checks
+- Consumer readiness evidence packets (read-only)
+- Acceptance marker: `acceptance/PHASE6_PART1_ACCEPTED.md`
+
 ### Planned
 - Kubernetes-ready primitives (explicitly optional and guarded)
 - Database service patterns

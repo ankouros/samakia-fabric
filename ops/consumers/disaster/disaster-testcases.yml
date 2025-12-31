@@ -1,0 +1,40 @@
+{
+  "testcases": {
+    "node-loss": {
+      "description": "One node in a failure domain is lost.",
+      "expected_outcome": "Service remains available or degrades per tier.",
+      "evidence_required": ["ha-evidence", "service-readiness"],
+      "gameday_safe": true
+    },
+    "gameday:vip-failover": {
+      "description": "VIP ownership moves between peers.",
+      "expected_outcome": "VIP remains reachable; failover within SLO.",
+      "evidence_required": ["vip-ownership", "service-readiness"],
+      "gameday_safe": true
+    },
+    "vip-failover": {
+      "description": "VIP ownership moves between peers.",
+      "expected_outcome": "VIP remains reachable; failover within SLO.",
+      "evidence_required": ["vip-ownership", "service-readiness"],
+      "gameday_safe": true
+    },
+    "storage-unavailable": {
+      "description": "Storage backend becomes unavailable.",
+      "expected_outcome": "Writes fail fast; recovery procedures invoked.",
+      "evidence_required": ["storage-health"],
+      "gameday_safe": false
+    },
+    "gameday:service-restart": {
+      "description": "Service process restarts on a node.",
+      "expected_outcome": "Readiness returns and no data loss occurs.",
+      "evidence_required": ["service-readiness"],
+      "gameday_safe": true
+    },
+    "service-restart": {
+      "description": "Service process restarts on a node.",
+      "expected_outcome": "Readiness returns and no data loss occurs.",
+      "evidence_required": ["service-readiness"],
+      "gameday_safe": true
+    }
+  }
+}

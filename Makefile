@@ -810,6 +810,26 @@ phase5.accept: ## Run Phase 5 acceptance suite (read-only)
 phase6.entry.check: ## Phase 6 entry checklist (writes acceptance/PHASE6_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase6-entry-check.sh"
 
+.PHONY: consumers.validate
+consumers.validate: ## Validate consumer contracts (schema + semantics)
+	@bash "$(REPO_ROOT)/ops/consumers/validate/validate-consumers.sh"
+
+.PHONY: consumers.ha.check
+consumers.ha.check: ## Validate consumer HA readiness (contract-level)
+	@bash "$(REPO_ROOT)/ops/consumers/validate/validate-ha-ready.sh"
+
+.PHONY: consumers.disaster.check
+consumers.disaster.check: ## Validate consumer disaster coverage wiring
+	@bash "$(REPO_ROOT)/ops/consumers/disaster/validate-disaster-coverage.sh"
+
+.PHONY: consumers.evidence
+consumers.evidence: ## Generate consumer readiness evidence packets (read-only)
+	@bash "$(REPO_ROOT)/ops/consumers/evidence/consumer-readiness.sh"
+
+.PHONY: phase6.part1.accept
+phase6.part1.accept: ## Run Phase 6 Part 1 acceptance (read-only consumer contracts)
+	@bash "$(OPS_SCRIPTS_DIR)/phase6-part1-accept.sh"
+
 .PHONY: phase2.1.accept
 phase2.1.accept: ## Run Phase 2.1 acceptance suite (read-only; shared control-plane services)
 	@ENV="$(ENV)" bash "$(OPS_SCRIPTS_DIR)/phase2-1-accept.sh"

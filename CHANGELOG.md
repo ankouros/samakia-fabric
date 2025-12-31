@@ -20,6 +20,11 @@ The format is inspired by:
 - Phase 6 entry checklist + acceptance plan (design-only; no deployments)
 - Consumer documentation skeleton under `docs/consumers/`
 
+#### Platform consumers (Phase 6 Part 1)
+- Read-only consumer validation suite (schema + semantics + HA readiness + disaster wiring)
+- Consumer readiness evidence packets under `evidence/consumers/<type>/<variant>/<UTC>/`
+- Phase 6 Part 1 acceptance marker: `acceptance/PHASE6_PART1_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets
