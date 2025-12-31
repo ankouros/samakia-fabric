@@ -336,6 +336,25 @@ Non-scope:
 
 ---
 
+## Phase 10 Part 1 — Tenant Contract Operations
+
+Goal: Enforce tenant contracts and produce deterministic evidence packets
+without provisioning any runtime services.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Policy/quotas and consumer binding validation
+- Evidence packet generation for tenant contracts
+- Phase 10 Part 1 entry checklist: `acceptance/PHASE10_PART1_ENTRY_CHECKLIST.md`
+- Phase 10 Part 1 acceptance marker: `acceptance/PHASE10_PART1_ACCEPTED.md`
+
+Non-scope:
+- No provisioning or apply paths
+- No secrets issuance or infrastructure mutation
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

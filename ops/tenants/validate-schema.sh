@@ -11,7 +11,7 @@ if [[ ! -d "${schema_dir}" ]]; then
   exit 1
 fi
 
-mapfile -t contracts < <(find "${contracts_root}" -type f -name "*.yml" -print | sort)
+mapfile -t contracts < <(find "${contracts_root}" -type f -name "*.yml" ! -path "*/_schema/*" -print | sort)
 
 if [[ ${#contracts[@]} -eq 0 ]]; then
   echo "ERROR: no tenant contracts found under ${contracts_root}" >&2

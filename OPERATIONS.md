@@ -45,6 +45,7 @@ Tenant binding workflows live in:
 - `docs/tenants/README.md`
 - `docs/tenants/onboarding.md`
 - `docs/tenants/consumer-bindings.md`
+- Evidence packets (gitignored) are written under `evidence/tenants/<tenant>/<UTC>/`.
 
 VM image workflows live in:
 

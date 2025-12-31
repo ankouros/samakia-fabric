@@ -82,6 +82,12 @@ The format is inspired by:
 - Tenant validation tooling + CI gate (`make tenants.validate`)
 - Phase 10 entry checklist + acceptance plan (design-only)
 
+#### Tenant binding (Phase 10 Part 1)
+- Policy/quotas + consumer binding validation for tenant contracts
+- Deterministic, redacted tenant evidence packets (`evidence/tenants/...`)
+- Phase 10 Part 1 entry checklist: `acceptance/PHASE10_PART1_ENTRY_CHECKLIST.md`
+- Phase 10 Part 1 acceptance marker: `acceptance/PHASE10_PART1_ACCEPTED.md`
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

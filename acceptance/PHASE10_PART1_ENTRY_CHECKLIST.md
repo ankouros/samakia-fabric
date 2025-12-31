@@ -1,0 +1,74 @@
+# Phase 10 Part 1 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T22:00:25Z
+
+## Criteria
+- Phase 9 accepted marker present
+  - Command: test -f acceptance/PHASE9_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- ADR-0027 present
+  - Command: rg -n "ADR-0027" DECISIONS.md
+  - Result: PASS
+- Makefile target present: docs.operator.check
+  - Command: rg -n "^docs\.operator\.check:" Makefile
+  - Result: PASS
+- Makefile target present: tenants.validate
+  - Command: rg -n "^tenants\.validate:" Makefile
+  - Result: PASS
+- Makefile target present: tenants.evidence
+  - Command: rg -n "^tenants\.evidence:" Makefile
+  - Result: PASS
+- Makefile target present: tenants.doctor
+  - Command: rg -n "^tenants\.doctor:" Makefile
+  - Result: PASS
+- Makefile target present: phase10.part1.entry.check
+  - Command: rg -n "^phase10\.part1\.entry\.check:" Makefile
+  - Result: PASS
+- Makefile target present: phase10.part1.accept
+  - Command: rg -n "^phase10\.part1\.accept:" Makefile
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_schema/tenant.schema.json
+  - Command: test -f contracts/tenants/_schema/tenant.schema.json
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_schema/policies.schema.json
+  - Command: test -f contracts/tenants/_schema/policies.schema.json
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_schema/quotas.schema.json
+  - Command: test -f contracts/tenants/_schema/quotas.schema.json
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_schema/endpoints.schema.json
+  - Command: test -f contracts/tenants/_schema/endpoints.schema.json
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_schema/networks.schema.json
+  - Command: test -f contracts/tenants/_schema/networks.schema.json
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_schema/consumer-binding.schema.json
+  - Command: test -f contracts/tenants/_schema/consumer-binding.schema.json
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_schema/dr-testcases.yml
+  - Command: test -f contracts/tenants/_schema/dr-testcases.yml
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_templates/tenant.yml
+  - Command: test -f contracts/tenants/_templates/tenant.yml
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_templates/policies.yml
+  - Command: test -f contracts/tenants/_templates/policies.yml
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_templates/quotas.yml
+  - Command: test -f contracts/tenants/_templates/quotas.yml
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_templates/endpoints.yml
+  - Command: test -f contracts/tenants/_templates/endpoints.yml
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/_templates/networks.yml
+  - Command: test -f contracts/tenants/_templates/networks.yml
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/examples/samakia-internal-tools/tenant.yml
+  - Command: test -f contracts/tenants/examples/samakia-internal-tools/tenant.yml
+  - Result: PASS
+- Tenant artifact present: contracts/tenants/examples/project-birds/tenant.yml
+  - Command: test -f contracts/tenants/examples/project-birds/tenant.yml
+  - Result: PASS

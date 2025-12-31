@@ -514,4 +514,8 @@ Phase 10 introduces design-only tenant contracts:
 - Tenant schemas, templates, and examples under `contracts/tenants/`.
 - Tenant docs skeleton under `docs/tenants/`.
 - Validation gates: `make tenants.validate` and `make phase10.entry.check`.
+Phase 10 Part 1 adds non-destructive enforcement and evidence:
+- Policy/quotas and consumer binding validation (`make tenants.validate`).
+- Deterministic evidence packets under `evidence/tenants/...`.
+- Acceptance marker: `acceptance/PHASE10_PART1_ACCEPTED.md`.
 No infrastructure is deployed in Phase 10.

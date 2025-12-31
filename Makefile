@@ -997,9 +997,25 @@ tenants.semantics.validate: ## Validate tenant contracts (semantics only)
 tenants.validate: ## Validate tenant contracts (schema + semantics)
 	@bash "$(REPO_ROOT)/ops/tenants/validate.sh"
 
+.PHONY: tenants.evidence
+tenants.evidence: ## Generate tenant evidence packets (TENANT=all or id)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/tenants/evidence.sh"
+
+.PHONY: tenants.doctor
+tenants.doctor: ## Check tenant tooling and contract presence
+	@bash "$(REPO_ROOT)/ops/tenants/tenants.sh" doctor
+
 .PHONY: phase10.entry.check
 phase10.entry.check: ## Phase 10 entry checklist (writes acceptance/PHASE10_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase10-entry-check.sh"
+
+.PHONY: phase10.part1.entry.check
+phase10.part1.entry.check: ## Phase 10 Part 1 entry checklist (writes acceptance/PHASE10_PART1_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase10-part1-entry-check.sh"
+
+.PHONY: phase10.part1.accept
+phase10.part1.accept: ## Run Phase 10 Part 1 acceptance suite (read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase10-part1-accept.sh"
 
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)

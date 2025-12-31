@@ -222,6 +222,36 @@ Stop; fix bundle outputs.
 
 ## Tenant bindings (design validation)
 
+### Task: Create a new tenant from templates
+
+#### Intent
+Scaffold a new tenant contract set from templates (design-only).
+
+#### Preconditions
+- Templates present under `contracts/tenants/_templates/`
+- Choose a DNS-safe tenant id
+
+#### Command
+```bash
+TENANT_ID="example-tenant"
+DEST="contracts/tenants/examples/${TENANT_ID}"
+mkdir -p "${DEST}"
+cp -r contracts/tenants/_templates/* "${DEST}/"
+```
+
+#### Expected result
+Tenant files copied to a new folder, ready for edits.
+
+#### Evidence outputs
+None.
+
+#### Failure modes
+- Missing templates
+- Invalid tenant id format
+
+#### Rollback / safe exit
+Delete the new folder if created in error.
+
 ### Task: Validate tenant contracts
 
 #### Intent
@@ -248,6 +278,112 @@ None by default.
 #### Rollback / safe exit
 Stop and fix tenant contracts.
 
+### Task: Tenant tooling doctor
+
+#### Intent
+Confirm tenant tooling and contract directories exist.
+
+#### Preconditions
+- Tenant tooling scripts present under `ops/tenants/`
+
+#### Command
+```bash
+make tenants.doctor
+```
+
+#### Expected result
+`PASS: tenant tooling present`.
+
+#### Evidence outputs
+None.
+
+#### Failure modes
+- Missing tenant schemas or templates
+- Missing validation scripts
+
+#### Rollback / safe exit
+Stop and restore missing files.
+
+### Task: Generate tenant evidence packet
+
+#### Intent
+Generate redacted, deterministic evidence for tenant contracts.
+
+#### Preconditions
+- Tenant contracts valid
+
+#### Command
+```bash
+TENANT=all make tenants.evidence
+```
+
+#### Expected result
+Evidence packets created under `evidence/tenants/...`.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/...`
+
+#### Failure modes
+- Validation failures
+- Secret-like values detected
+
+#### Rollback / safe exit
+Fix contracts and re-run evidence.
+
+### Task: Phase 10 Part 1 entry checklist
+
+#### Intent
+Confirm Phase 10 Part 1 prerequisites are satisfied before acceptance.
+
+#### Preconditions
+- Phase 9 accepted marker present
+- Tenant contracts and docs present
+
+#### Command
+```bash
+make phase10.part1.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE10_PART1_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE10_PART1_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing ADR-0027
+- Missing tenant contracts or tools
+
+#### Rollback / safe exit
+Stop and restore missing files.
+
+### Task: Phase 10 Part 1 acceptance (read-only)
+
+#### Intent
+Run the Phase 10 Part 1 acceptance suite (non-destructive).
+
+#### Preconditions
+- Phase 10 Part 1 entry checklist passes
+- Tenant contracts valid
+
+#### Command
+```bash
+make phase10.part1.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE10_PART1_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE10_PART1_ACCEPTED.md`
+
+#### Failure modes
+- Validation errors
+- Evidence generation errors
+
+#### Rollback / safe exit
+Stop and remediate validation issues.
+
 ### Task: Phase 10 entry checklist (design-only)
 
 #### Intent
@@ -273,6 +409,32 @@ Checklist written under `acceptance/PHASE10_ENTRY_CHECKLIST.md`.
 
 #### Rollback / safe exit
 Stop and remediate missing artifacts.
+
+### Task: Onboard a project to consume Fabric primitives (design-only)
+
+#### Intent
+Define intent-only bindings for a tenant; no provisioning or apply paths.
+
+#### Preconditions
+- Tenant contracts created from templates
+
+#### Command
+```bash
+make tenants.validate
+TENANT=all make tenants.evidence
+```
+
+#### Expected result
+Tenant contracts validated; evidence packet available for review.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/...`
+
+#### Failure modes
+- Contract validation failures
+
+#### Rollback / safe exit
+Revise contract files and re-run.
 
 ---
 
@@ -481,6 +643,8 @@ make phase8.part2.accept
 make phase9.entry.check
 make phase9.accept
 make phase10.entry.check
+make phase10.part1.entry.check
+make phase10.part1.accept
 make policy.check
 make docs.operator.check
 make docs.cookbook.lint
@@ -494,6 +658,8 @@ make shared.vault.accept
 make tenants.schema.validate
 make tenants.semantics.validate
 make tenants.validate
+make tenants.evidence
+make tenants.doctor
 make tf.apply
 make tf.backend.init
 make tf.init

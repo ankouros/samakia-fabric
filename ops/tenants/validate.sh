@@ -5,3 +5,5 @@ set -euo pipefail
 
 "${FABRIC_REPO_ROOT}/ops/tenants/validate-schema.sh"
 "${FABRIC_REPO_ROOT}/ops/tenants/validate-semantics.sh"
+"${FABRIC_REPO_ROOT}/ops/tenants/validate-policies.sh"
+"${FABRIC_REPO_ROOT}/ops/tenants/validate-consumer-bindings.sh"

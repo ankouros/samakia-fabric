@@ -1,0 +1,8 @@
+[
+  "node-loss",
+  "vip-failover",
+  "service-restart",
+  "storage-unavailable",
+  "gameday:vip-failover",
+  "gameday:service-restart"
+]
