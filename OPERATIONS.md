@@ -56,6 +56,8 @@ VM image workflows live in:
 Substrate executor design (Phase 11) lives in:
 
 - `docs/substrate/README.md`
+- `docs/substrate/capacity.md`
+- `docs/substrate/slo-failure-semantics.md`
 - `contracts/substrate/`
 - Plan-only executor workflow (read-only):
   - `make substrate.plan TENANT=all`

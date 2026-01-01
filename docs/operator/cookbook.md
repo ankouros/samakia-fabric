@@ -280,6 +280,114 @@ None by default.
 #### Rollback / safe exit
 Stop and fix tenant contracts.
 
+### Task: Define tenant capacity (capacity.yml)
+
+#### Intent
+Declare tenant-level capacity/quotas for substrate consumers.
+
+#### Preconditions
+- Tenant folder exists under `contracts/tenants/`
+- Templates available under `contracts/tenants/_templates/`
+
+#### Command
+```bash
+TENANT_ID="example-tenant"
+cp contracts/tenants/_templates/capacity.yml "contracts/tenants/${TENANT_ID}/capacity.yml"
+```
+
+#### Expected result
+`capacity.yml` exists for the tenant and is ready to edit.
+
+#### Evidence outputs
+None.
+
+#### Failure modes
+- Missing template
+- Tenant folder not found
+
+#### Rollback / safe exit
+Remove the file and re-copy if needed.
+
+### Task: Validate capacity + SLO semantics
+
+#### Intent
+Ensure capacity and SLO/failure semantics are declared and enforceable.
+
+#### Preconditions
+- Tenant `capacity.yml` present
+- Enabled contracts include SLO/failure semantics
+
+#### Command
+```bash
+make tenants.capacity.validate TENANT=all
+make substrate.contracts.validate
+```
+
+#### Expected result
+Capacity and enabled contracts validate cleanly.
+
+#### Evidence outputs
+None by default.
+
+#### Failure modes
+- Missing capacity.yml
+- SLO/failure semantics missing in enabled.yml
+
+#### Rollback / safe exit
+Fix the contracts and re-run.
+
+### Task: Run capacity guard (contract-only)
+
+#### Intent
+Evaluate declared consumption vs capacity limits before apply/DR execute.
+
+#### Preconditions
+- Tenant capacity files validated
+
+#### Command
+```bash
+make substrate.capacity.guard TENANT=all
+```
+
+#### Expected result
+Capacity guard PASS or WARN; FAIL blocks apply/DR execute.
+
+#### Evidence outputs
+None unless `substrate.capacity.evidence` is used.
+
+#### Failure modes
+- Limits exceeded (deny_on_exceed)
+- Missing capacity.yml
+
+#### Rollback / safe exit
+Adjust capacity or resources; re-run guard.
+
+### Task: Generate capacity evidence (read-only)
+
+#### Intent
+Write deterministic capacity evidence packets for auditability.
+
+#### Preconditions
+- Capacity guard passes or is warning-only
+
+#### Command
+```bash
+make substrate.capacity.evidence TENANT=all
+```
+
+#### Expected result
+Evidence written under `evidence/tenants/<tenant>/<UTC>/substrate-capacity/`.
+
+#### Evidence outputs
+`evidence/tenants/<tenant>/<UTC>/substrate-capacity/...`
+
+#### Failure modes
+- Missing capacity.yml
+- Schema/semantics errors
+
+#### Rollback / safe exit
+Fix contracts; re-run.
+
 ### Task: Validate substrate enabled contracts (design-only)
 
 #### Intent
@@ -420,6 +528,7 @@ Execute tenant substrate enablement for enabled contracts with explicit guards a
 - Enabled contracts are valid (`make substrate.contracts.validate`).
 - Secrets resolved via `secret_ref` are available locally (offline-first secrets).
 - Execute policy allowlists include the tenant/env/provider.
+- Capacity guard passes (`make substrate.capacity.guard`).
 
 #### Command
 ```bash
@@ -984,6 +1093,59 @@ Acceptance marker written under `acceptance/PHASE11_PART2_ACCEPTED.md`.
 #### Rollback / safe exit
 Stop and remediate validation issues.
 
+### Task: Phase 11 Part 3 entry checklist (capacity guardrails)
+
+#### Intent
+Confirm Phase 11 Part 3 entry conditions for capacity/quota guardrails.
+
+#### Preconditions
+- Phase 11 Part 2 accepted
+- Capacity schema + template present
+
+#### Command
+```bash
+make phase11.part3.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE11_PART3_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART3_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing capacity contracts or validators
+- CI gate not wired
+
+#### Rollback / safe exit
+Stop and restore missing files.
+
+### Task: Phase 11 Part 3 acceptance (capacity guardrails)
+
+#### Intent
+Run the Phase 11 Part 3 acceptance suite (non-destructive).
+
+#### Preconditions
+- Phase 11 Part 3 entry checklist passes
+
+#### Command
+```bash
+make phase11.part3.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE11_PART3_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART3_ACCEPTED.md`
+
+#### Failure modes
+- Capacity guard violations
+- Missing capacity files
+
+#### Rollback / safe exit
+Stop and remediate capacity contracts or overrides.
+
 ### Task: Onboard a project to consume Fabric primitives (design-only)
 
 #### Intent
@@ -1219,12 +1381,22 @@ make phase9.accept
 make phase10.entry.check
 make phase10.part1.entry.check
 make phase10.part1.accept
+make phase10.part2.entry.check
+make phase10.part2.accept
 make phase11.entry.check
 make phase11.accept
+make phase11.part1.entry.check
+make phase11.part1.accept
+make phase11.part2.entry.check
+make phase11.part2.accept
+make phase11.part3.entry.check
+make phase11.part3.accept
 make policy.check
 make docs.operator.check
 make docs.cookbook.lint
 make substrate.contracts.validate
+make substrate.capacity.guard
+make substrate.capacity.evidence
 make shared.ntp.accept
 make shared.obs.accept
 make shared.obs.ingest.accept
@@ -1235,8 +1407,13 @@ make shared.vault.accept
 make tenants.schema.validate
 make tenants.semantics.validate
 make tenants.validate
+make tenants.capacity.validate
 make tenants.evidence
 make tenants.doctor
+make tenants.execute.policy.check
+make tenants.dr.validate
+make tenants.plan
+make tenants.apply
 make tf.apply
 make tf.backend.init
 make tf.init

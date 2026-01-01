@@ -117,6 +117,14 @@ The format is inspired by:
 - Phase 11 Part 2 entry checklist: `acceptance/PHASE11_PART2_ENTRY_CHECKLIST.md`.
 - Phase 11 Part 2 acceptance marker: `acceptance/PHASE11_PART2_ACCEPTED.md`.
 
+#### Substrate executors (Phase 11 Part 3)
+- Tenant capacity contracts (`capacity.yml`) with schema/template/examples.
+- Capacity validation + guardrails with deterministic evidence packets.
+- Enabled contract SLO/failure semantics validation (single vs cluster).
+- New targets: `tenants.capacity.validate`, `substrate.capacity.guard`, `substrate.capacity.evidence`.
+- Phase 11 Part 3 entry checklist: `acceptance/PHASE11_PART3_ENTRY_CHECKLIST.md`.
+- Phase 11 Part 3 acceptance marker: `acceptance/PHASE11_PART3_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

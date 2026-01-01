@@ -1,0 +1,65 @@
+# Phase 11 Part 3 Entry Checklist
+
+Timestamp (UTC): 2026-01-01T12:04:38Z
+
+## Criteria
+- Phase 11 Part 2 accepted
+  - Command: test -f acceptance/PHASE11_PART2_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/tenants/_schema/capacity.schema.json
+  - Command: test -f contracts/tenants/_schema/capacity.schema.json
+  - Result: PASS
+- File present: contracts/tenants/_templates/capacity.yml
+  - Command: test -f contracts/tenants/_templates/capacity.yml
+  - Result: PASS
+- File present: contracts/tenants/examples/project-birds/capacity.yml
+  - Command: test -f contracts/tenants/examples/project-birds/capacity.yml
+  - Result: PASS
+- File present: contracts/tenants/examples/samakia-internal-tools/capacity.yml
+  - Command: test -f contracts/tenants/examples/samakia-internal-tools/capacity.yml
+  - Result: PASS
+- File present: ops/substrate/capacity/validate-capacity-schema.sh
+  - Command: test -f ops/substrate/capacity/validate-capacity-schema.sh
+  - Result: PASS
+- File present: ops/substrate/capacity/validate-capacity-semantics.sh
+  - Command: test -f ops/substrate/capacity/validate-capacity-semantics.sh
+  - Result: PASS
+- File present: ops/substrate/capacity/capacity-guard.sh
+  - Command: test -f ops/substrate/capacity/capacity-guard.sh
+  - Result: PASS
+- File present: ops/substrate/capacity/capacity-evidence.sh
+  - Command: test -f ops/substrate/capacity/capacity-evidence.sh
+  - Result: PASS
+- File present: docs/substrate/capacity.md
+  - Command: test -f docs/substrate/capacity.md
+  - Result: PASS
+- File present: docs/substrate/slo-failure-semantics.md
+  - Command: test -f docs/substrate/slo-failure-semantics.md
+  - Result: PASS
+- Makefile target present: tenants.capacity.validate
+  - Command: rg -n "tenants.capacity.validate" Makefile
+  - Result: PASS
+- Makefile target present: substrate.capacity.guard
+  - Command: rg -n "substrate.capacity.guard" Makefile
+  - Result: PASS
+- Makefile target present: substrate.capacity.evidence
+  - Command: rg -n "substrate.capacity.evidence" Makefile
+  - Result: PASS
+- Makefile target present: phase11.part3.entry.check
+  - Command: rg -n "phase11.part3.entry.check" Makefile
+  - Result: PASS
+- Makefile target present: phase11.part3.accept
+  - Command: rg -n "phase11.part3.accept" Makefile
+  - Result: PASS
+- PR validation includes tenants.capacity.validate
+  - Command: rg -n "tenants.capacity.validate" .github/workflows/pr-validate.yml
+  - Result: PASS
+- PR validation includes substrate.capacity.guard
+  - Command: rg -n "substrate.capacity.guard" .github/workflows/pr-validate.yml
+  - Result: PASS
+- Evidence paths gitignored
+  - Command: rg -n "evidence/" .gitignore
+  - Result: PASS

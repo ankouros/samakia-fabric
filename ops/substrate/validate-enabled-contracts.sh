@@ -104,6 +104,26 @@ for enabled in enabled_files:
     if not isinstance(plan_only, bool):
         errors.append(f"{enabled}: executor.plan_only must be boolean")
 
+    slo = binding.get("slo", {})
+    tier = slo.get("tier")
+    if not isinstance(tier, str) or not tier:
+        errors.append(f"{enabled}: slo.tier must be a non-empty string")
+    else:
+        if variant == "single" and tier in {"gold", "tier0"}:
+            errors.append(f"{enabled}: single variant cannot use tier '{tier}' without override")
+
+    failure = binding.get("failure_semantics", {})
+    mode = failure.get("mode")
+    expectations = failure.get("expectations")
+    if not isinstance(mode, str) or not mode:
+        errors.append(f"{enabled}: failure_semantics.mode must be a non-empty string")
+    if not isinstance(expectations, str) or not expectations.strip():
+        errors.append(f"{enabled}: failure_semantics.expectations must be a non-empty string")
+    if variant == "single" and mode != "spof":
+        errors.append(f"{enabled}: failure_semantics.mode must be spof for single variant")
+    if variant == "cluster" and mode != "failover":
+        errors.append(f"{enabled}: failure_semantics.mode must be failover for cluster variant")
+
     dr = binding.get("dr", {})
     required = dr.get("required_testcases", [])
     if not isinstance(required, list) or not required:
@@ -113,6 +133,10 @@ for enabled in enabled_files:
         unknown = [case for case in required if case not in allowed]
         if unknown:
             errors.append(f"{enabled}: unknown dr.required_testcases {unknown}")
+    if not isinstance(dr.get("rpo_target"), str) or not dr.get("rpo_target"):
+        errors.append(f"{enabled}: dr.rpo_target must be a non-empty string")
+    if not isinstance(dr.get("rto_target"), str) or not dr.get("rto_target"):
+        errors.append(f"{enabled}: dr.rto_target must be a non-empty string")
 
     endpoints = binding.get("endpoints", {})
     host = endpoints.get("host")

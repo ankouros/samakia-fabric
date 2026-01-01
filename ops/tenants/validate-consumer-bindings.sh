@@ -129,6 +129,22 @@ for enabled in tenants_root.rglob("consumers/**/enabled.yml"):
     else:
         if binding.get("ha_ready") is not True:
             errors.append(f"{enabled}: ha_ready must be true")
+        slo = binding.get("slo", {})
+        tier = slo.get("tier")
+        if not isinstance(tier, str) or not tier:
+            errors.append(f"{enabled}: slo.tier must be a non-empty string")
+        failure = binding.get("failure_semantics", {})
+        mode = failure.get("mode")
+        expectations = failure.get("expectations")
+        if not isinstance(mode, str) or not mode:
+            errors.append(f"{enabled}: failure_semantics.mode must be a non-empty string")
+        if not isinstance(expectations, str) or not expectations.strip():
+            errors.append(f"{enabled}: failure_semantics.expectations must be a non-empty string")
+        variant = binding.get("variant")
+        if variant == "single" and mode != "spof":
+            errors.append(f"{enabled}: failure_semantics.mode must be spof for single variant")
+        if variant == "cluster" and mode != "failover":
+            errors.append(f"{enabled}: failure_semantics.mode must be failover for cluster variant")
         executor = binding.get("executor", {})
         if executor.get("mode") not in {"dry-run", "execute"}:
             errors.append(f"{enabled}: executor.mode must be dry-run or execute")
@@ -139,6 +155,11 @@ for enabled in tenants_root.rglob("consumers/**/enabled.yml"):
             unknown = [case for case in dr if case not in substrate_cases]
             if unknown:
                 errors.append(f"{enabled}: unknown dr.required_testcases {unknown}")
+        dr_root = binding.get("dr", {})
+        if not isinstance(dr_root.get("rpo_target"), str) or not dr_root.get("rpo_target"):
+            errors.append(f"{enabled}: dr.rpo_target must be a non-empty string")
+        if not isinstance(dr_root.get("rto_target"), str) or not dr_root.get("rto_target"):
+            errors.append(f"{enabled}: dr.rto_target must be a non-empty string")
         endpoints = binding.get("endpoints", {})
         host = endpoints.get("host")
         port = endpoints.get("port")

@@ -1037,6 +1037,19 @@ tenants.dr.run: ## Run tenant DR harness (dry-run default) (TENANT=<id> ENV=<env
 substrate.contracts.validate: ## Validate substrate enabled contracts (design-only)
 	@bash "$(REPO_ROOT)/ops/substrate/validate.sh"
 
+.PHONY: tenants.capacity.validate
+tenants.capacity.validate: ## Validate tenant capacity contracts (schema + semantics)
+	@bash "$(REPO_ROOT)/ops/substrate/capacity/validate-capacity-schema.sh"
+	@bash "$(REPO_ROOT)/ops/substrate/capacity/validate-capacity-semantics.sh"
+
+.PHONY: substrate.capacity.guard
+substrate.capacity.guard: ## Evaluate capacity guard (contract-only) (TENANT=<id|all>)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/capacity/capacity-guard.sh"
+
+.PHONY: substrate.capacity.evidence
+substrate.capacity.evidence: ## Generate capacity guard evidence (TENANT=<id|all>)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/capacity/capacity-evidence.sh"
+
 .PHONY: substrate.plan
 substrate.plan: ## Generate tenant substrate plan (read-only) (TENANT=<id|all>)
 	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/substrate.sh" plan "TENANT=$${TENANT:-all}"
@@ -1108,6 +1121,14 @@ phase11.part2.entry.check: ## Phase 11 Part 2 entry checklist (writes acceptance
 .PHONY: phase11.part2.accept
 phase11.part2.accept: ## Run Phase 11 Part 2 acceptance suite (guarded, read-only in CI)
 	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part2-accept.sh"
+
+.PHONY: phase11.part3.entry.check
+phase11.part3.entry.check: ## Phase 11 Part 3 entry checklist (writes acceptance/PHASE11_PART3_ENTRY_CHECKLIST.md)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part3-entry-check.sh"
+
+.PHONY: phase11.part3.accept
+phase11.part3.accept: ## Run Phase 11 Part 3 acceptance suite (capacity guardrails, read-only)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part3-accept.sh"
 
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)

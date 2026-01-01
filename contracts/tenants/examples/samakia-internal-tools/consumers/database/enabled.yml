@@ -7,8 +7,18 @@
     "mode": "dry-run",
     "plan_only": true
   },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Single instance; DR required for recovery"
+  },
   "dr": {
     "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
     "backup": {
       "schedule": "<placeholder>",
       "retention": "<placeholder>"
@@ -18,11 +28,20 @@
     }
   },
   "endpoints": {
-    "host": "db.samakia-internal-tools.internal",
+    "host": "db.internal-tools.internal",
     "port": 5432,
     "protocol": "tcp",
     "tls_required": true
   },
   "secret_ref": "tenants/samakia-internal-tools/database/primary",
-  "resources": {}
+  "resources": {
+    "database": "internal_tools",
+    "user": "tools_app",
+    "schema": "internal",
+    "max_connections": {"soft": 40, "hard": 80},
+    "max_storage_gb": 20,
+    "max_cpu": 4,
+    "max_memory_gb": 8,
+    "statement_timeout_ms": 30000
+  }
 }

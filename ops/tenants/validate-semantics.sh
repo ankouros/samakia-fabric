@@ -148,6 +148,17 @@ for tenant_file in root.rglob("tenant.yml"):
                 errors.append(f"{enabled_file}: variant '{variant}' not allowed for consumer '{consumer}'")
             if spec.get("ha_ready") is not True:
                 errors.append(f"{enabled_file}: ha_ready must be true")
+            slo = spec.get("slo", {})
+            tier = slo.get("tier")
+            if not isinstance(tier, str) or not tier:
+                errors.append(f"{enabled_file}: slo.tier must be a non-empty string")
+            failure = spec.get("failure_semantics", {})
+            mode_fs = failure.get("mode")
+            expectations = failure.get("expectations")
+            if not isinstance(mode_fs, str) or not mode_fs:
+                errors.append(f"{enabled_file}: failure_semantics.mode must be a non-empty string")
+            if not isinstance(expectations, str) or not expectations.strip():
+                errors.append(f"{enabled_file}: failure_semantics.expectations must be a non-empty string")
             mode = spec.get("mode")
             if mode not in {"dry-run", "execute"}:
                 errors.append(f"{enabled_file}: mode must be dry-run or execute")
@@ -166,6 +177,12 @@ for tenant_file in root.rglob("tenant.yml"):
             dr = spec.get("dr_testcases", [])
             if not isinstance(dr, list) or not dr:
                 errors.append(f"{enabled_file}: dr_testcases must be a non-empty list")
+            rpo_target = spec.get("rpo_target")
+            rto_target = spec.get("rto_target")
+            if not isinstance(rpo_target, str) or not rpo_target.strip():
+                errors.append(f"{enabled_file}: rpo_target must be a non-empty string")
+            if not isinstance(rto_target, str) or not rto_target.strip():
+                errors.append(f"{enabled_file}: rto_target must be a non-empty string")
             owner = spec.get("owner", {})
             if owner.get("tenant_id") != tenant_id or owner.get("consumer") != consumer:
                 errors.append(f"{enabled_file}: owner must match tenant_id and consumer")
@@ -182,6 +199,17 @@ for tenant_file in root.rglob("tenant.yml"):
                 errors.append(f"{enabled_file}: variant '{variant}' not allowed for consumer '{consumer}'")
             if binding.get("ha_ready") is not True:
                 errors.append(f"{enabled_file}: ha_ready must be true")
+            slo = binding.get("slo", {})
+            tier = slo.get("tier")
+            if not isinstance(tier, str) or not tier:
+                errors.append(f"{enabled_file}: slo.tier must be a non-empty string")
+            failure = binding.get("failure_semantics", {})
+            mode_fs = failure.get("mode")
+            expectations = failure.get("expectations")
+            if not isinstance(mode_fs, str) or not mode_fs:
+                errors.append(f"{enabled_file}: failure_semantics.mode must be a non-empty string")
+            if not isinstance(expectations, str) or not expectations.strip():
+                errors.append(f"{enabled_file}: failure_semantics.expectations must be a non-empty string")
             executor = binding.get("executor", {})
             mode = executor.get("mode")
             if mode not in {"dry-run", "execute"}:
@@ -193,6 +221,10 @@ for tenant_file in root.rglob("tenant.yml"):
             required = dr.get("required_testcases", [])
             if not isinstance(required, list) or not required:
                 errors.append(f"{enabled_file}: dr.required_testcases must be a non-empty list")
+            if not isinstance(dr.get("rpo_target"), str) or not dr.get("rpo_target"):
+                errors.append(f"{enabled_file}: dr.rpo_target must be a non-empty string")
+            if not isinstance(dr.get("rto_target"), str) or not dr.get("rto_target"):
+                errors.append(f"{enabled_file}: dr.rto_target must be a non-empty string")
             backup = dr.get("backup", {})
             if not isinstance(backup.get("schedule"), str) or not backup.get("schedule"):
                 errors.append(f"{enabled_file}: dr.backup.schedule must be a non-empty string")

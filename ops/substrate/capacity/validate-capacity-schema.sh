@@ -3,38 +3,29 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
-schema_dir="${FABRIC_REPO_ROOT}/contracts/tenants/_schema"
+schema_path="${FABRIC_REPO_ROOT}/contracts/tenants/_schema/capacity.schema.json"
 contracts_root="${FABRIC_REPO_ROOT}/contracts/tenants"
 
-if [[ ! -d "${schema_dir}" ]]; then
-  echo "ERROR: schema directory not found: ${schema_dir}" >&2
+if [[ ! -f "${schema_path}" ]]; then
+  echo "ERROR: capacity schema missing: ${schema_path}" >&2
   exit 1
 fi
 
-mapfile -t contracts < <(find "${contracts_root}" -type f -name "*.yml" ! -path "*/_schema/*" -print | sort)
+mapfile -t capacity_files < <(find "${contracts_root}" -type f -name "capacity.yml" -print | sort)
 
-if [[ ${#contracts[@]} -eq 0 ]]; then
-  echo "ERROR: no tenant contracts found under ${contracts_root}" >&2
+if [[ ${#capacity_files[@]} -eq 0 ]]; then
+  echo "ERROR: no capacity.yml files found under ${contracts_root}" >&2
   exit 1
 fi
 
-SCHEMA_DIR="${schema_dir}" CONTRACTS_LIST="$(printf '%s\n' "${contracts[@]}")" python3 - <<'PY'
+SCHEMA_PATH="${schema_path}" CAPACITY_LIST="$(printf '%s\n' "${capacity_files[@]}")" python3 - <<'PY'
 import json
 import os
 import sys
 from pathlib import Path
 
-schema_dir = Path(os.environ["SCHEMA_DIR"])
-contracts = [Path(p) for p in os.environ["CONTRACTS_LIST"].splitlines() if p]
-
-schema_map = {
-    "tenant.yml": "tenant.schema.json",
-    "policies.yml": "policies.schema.json",
-    "quotas.yml": "quotas.schema.json",
-    "endpoints.yml": "endpoints.schema.json",
-    "networks.yml": "networks.schema.json",
-    "capacity.yml": "capacity.schema.json",
-}
+schema_path = Path(os.environ["SCHEMA_PATH"])
+capacity_files = [Path(p) for p in os.environ["CAPACITY_LIST"].splitlines() if p]
 
 errors = []
 
@@ -100,47 +91,30 @@ def validate(data, schema_obj, path="$"):
                     return False
     return True
 
+try:
+    schema = json.loads(schema_path.read_text())
+except json.JSONDecodeError as exc:
+    print(f"FAIL capacity schema: {schema_path} invalid JSON ({exc})")
+    sys.exit(1)
+
 ok = True
-for contract in contracts:
-    filename = contract.name
-    schema_name = None
-    if "consumers" in contract.parts and filename == "ready.yml":
-      schema_name = "consumer-binding.schema.json"
-    elif "consumers" in contract.parts and filename == "enabled.yml":
-      schema_name = "enabled-binding.schema.json"
-    else:
-        schema_name = schema_map.get(filename)
-    if not schema_name:
-        errors.append(f"{contract}: no schema mapping")
-        ok = False
-        continue
-    schema_path = schema_dir / schema_name
-    if not schema_path.exists():
-        errors.append(f"{contract}: schema missing {schema_path}")
-        ok = False
-        continue
+for capacity in capacity_files:
     try:
-        schema = json.loads(schema_path.read_text())
+        data = json.loads(capacity.read_text())
     except json.JSONDecodeError as exc:
-        errors.append(f"{schema_path}: invalid JSON ({exc})")
+        errors.append(f"{capacity}: invalid JSON ({exc})")
         ok = False
         continue
-    try:
-        data = json.loads(contract.read_text())
-    except json.JSONDecodeError as exc:
-        errors.append(f"{contract}: invalid JSON ({exc})")
-        ok = False
-        continue
-    if not validate(data, schema, contract.name):
+    if not validate(data, schema, capacity.name):
         ok = False
 
 if ok:
-    for contract in contracts:
-        print(f"PASS schema: {contract}")
+    for capacity in capacity_files:
+        print(f"PASS capacity schema: {capacity}")
     sys.exit(0)
 
 for err in errors:
-    print(f"FAIL schema: {err}")
+    print(f"FAIL capacity schema: {err}")
 
 sys.exit(1)
 PY

@@ -7,8 +7,18 @@
     "mode": "dry-run",
     "plan_only": true
   },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Binding-only; workload HA is upstream"
+  },
   "dr": {
     "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
     "backup": {
       "schedule": "<placeholder>",
       "retention": "<placeholder>"
@@ -24,5 +34,9 @@
     "tls_required": true
   },
   "secret_ref": "tenants/<tenant>/kubernetes/<name>",
-  "resources": {}
+  "resources": {
+    "cluster_ref": "<cluster>",
+    "namespace_prefix": "<prefix>",
+    "max_namespaces": 10
+  }
 }

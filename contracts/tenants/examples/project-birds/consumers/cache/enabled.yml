@@ -7,8 +7,18 @@
     "mode": "dry-run",
     "plan_only": true
   },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Single instance; DR required for recovery"
+  },
   "dr": {
     "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
     "backup": {
       "schedule": "<placeholder>",
       "retention": "<placeholder>"
@@ -24,5 +34,11 @@
     "tls_required": true
   },
   "secret_ref": "tenants/project-birds/cache/primary",
-  "resources": {}
+  "resources": {
+    "max_memory_mb": 512,
+    "eviction_policy": "allkeys-lru",
+    "max_clients": 250,
+    "require_prefix": true,
+    "tenant_key_prefix": "tenant:project-birds:"
+  }
 }

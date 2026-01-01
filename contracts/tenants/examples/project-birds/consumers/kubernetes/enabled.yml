@@ -7,8 +7,18 @@
     "mode": "dry-run",
     "plan_only": true
   },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Binding-only; workload HA is upstream"
+  },
   "dr": {
     "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
     "backup": {
       "schedule": "<placeholder>",
       "retention": "<placeholder>"
@@ -18,11 +28,15 @@
     }
   },
   "endpoints": {
-    "host": "k8s.project-birds.internal",
+    "host": "kube.project-birds.internal",
     "port": 6443,
     "protocol": "https",
     "tls_required": true
   },
-  "secret_ref": "tenants/project-birds/kubernetes/cluster",
-  "resources": {}
+  "secret_ref": "tenants/project-birds/kubernetes/primary",
+  "resources": {
+    "cluster_ref": "birds-cluster",
+    "namespace_prefix": "birds",
+    "max_namespaces": 10
+  }
 }

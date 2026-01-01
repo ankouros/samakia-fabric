@@ -1,0 +1,114 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantCapacity",
+  "metadata": {
+    "tenant_id": "<tenant-id>"
+  },
+  "spec": {
+    "tenant": "<tenant-id>",
+    "budget_class": "dev",
+    "defaults": {
+      "enforce": true,
+      "mode": "deny_on_exceed"
+    },
+    "database": {
+      "postgres": {
+        "single": {
+          "max_databases": 2,
+          "max_users": 5,
+          "max_connections": {"soft": 20, "hard": 40},
+          "max_storage_gb": 20,
+          "max_cpu": 2,
+          "max_memory_gb": 4
+        },
+        "cluster": {
+          "max_databases": 4,
+          "max_users": 10,
+          "max_connections": {"soft": 50, "hard": 100},
+          "max_storage_gb": 100,
+          "max_cpu": 4,
+          "max_memory_gb": 8
+        }
+      },
+      "mariadb": {
+        "single": {
+          "max_databases": 2,
+          "max_users": 5,
+          "max_connections": {"soft": 20, "hard": 40},
+          "max_storage_gb": 20,
+          "max_cpu": 2,
+          "max_memory_gb": 4
+        },
+        "cluster": {
+          "max_databases": 4,
+          "max_users": 10,
+          "max_connections": {"soft": 50, "hard": 100},
+          "max_storage_gb": 100,
+          "max_cpu": 4,
+          "max_memory_gb": 8
+        }
+      }
+    },
+    "message-queue": {
+      "rabbitmq": {
+        "single": {
+          "max_vhosts": 2,
+          "max_users": 5,
+          "max_connections": 200,
+          "max_queues": 500,
+          "max_message_bytes": 1048576,
+          "policy_defaults": {
+            "queue_type": "classic",
+            "ha_mode": "none"
+          }
+        },
+        "cluster": {
+          "max_vhosts": 4,
+          "max_users": 10,
+          "max_connections": 800,
+          "max_queues": 2000,
+          "max_message_bytes": 1048576,
+          "policy_defaults": {
+            "queue_type": "quorum",
+            "ha_mode": "all"
+          }
+        }
+      }
+    },
+    "cache": {
+      "dragonfly": {
+        "single": {
+          "max_memory_mb": 2048,
+          "eviction_policy": "allkeys-lru",
+          "max_clients": 500,
+          "require_prefix": true,
+          "tenant_key_prefix": "tenant:<tenant-id>:"
+        },
+        "cluster": {
+          "max_memory_mb": 4096,
+          "eviction_policy": "allkeys-lru",
+          "max_clients": 2000,
+          "require_prefix": true,
+          "tenant_key_prefix": "tenant:<tenant-id>:"
+        }
+      }
+    },
+    "vector": {
+      "qdrant": {
+        "single": {
+          "max_collections": 5,
+          "max_points": 100000,
+          "max_storage_gb": 20,
+          "replication_factor": 1
+        },
+        "cluster": {
+          "max_collections": 10,
+          "max_points": 500000,
+          "max_storage_gb": 100,
+          "replication_factor": 2
+        }
+      }
+    },
+    "overrides": []
+  }
+}

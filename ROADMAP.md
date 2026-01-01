@@ -438,6 +438,27 @@ Non-scope:
 
 ---
 
+## Phase 11 Part 3 — Capacity Guardrails
+
+Goal: Add tenant capacity contracts, SLO/failure semantics validation, and
+noisy-neighbor guardrails with deterministic evidence.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Tenant `capacity.yml` contracts with schema/template/examples.
+- Capacity validation + guardrails with evidence packets.
+- Enabled contract SLO/failure semantics validation (single vs cluster).
+- Make targets: `tenants.capacity.validate`, `substrate.capacity.guard`, `substrate.capacity.evidence`.
+- Phase 11 Part 3 entry checklist + acceptance marker.
+
+Non-scope:
+- No apply or DR execute during acceptance
+- No secrets committed to Git
+- CI remains read-only
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

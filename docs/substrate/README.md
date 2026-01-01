@@ -20,5 +20,7 @@ See provider-specific notes:
 - `docs/substrate/vector.md`
 - `docs/substrate/ha-semantics.md`
 - `docs/substrate/dr.md`
+- `docs/substrate/capacity.md`
+- `docs/substrate/slo-failure-semantics.md`
 
 Operator commands live in `docs/operator/cookbook.md` (plan + DR dry-run + guarded execute).

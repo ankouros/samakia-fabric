@@ -1,0 +1,220 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TenantCapacity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "TenantCapacity"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant_id"],
+      "properties": {
+        "tenant_id": {"type": "string"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenant",
+        "budget_class",
+        "defaults",
+        "database",
+        "message-queue",
+        "cache",
+        "vector"
+      ],
+      "properties": {
+        "tenant": {"type": "string"},
+        "budget_class": {"enum": ["dev", "shared", "prod"]},
+        "defaults": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enforce", "mode"],
+          "properties": {
+            "enforce": {"type": "boolean"},
+            "mode": {"enum": ["deny_on_exceed", "warn_on_exceed"]}
+          }
+        },
+        "database": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["postgres", "mariadb"],
+          "properties": {
+            "postgres": {"$ref": "#/definitions/databaseProvider"},
+            "mariadb": {"$ref": "#/definitions/databaseProvider"}
+          }
+        },
+        "message-queue": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rabbitmq"],
+          "properties": {
+            "rabbitmq": {"$ref": "#/definitions/rabbitmqProvider"}
+          }
+        },
+        "cache": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dragonfly"],
+          "properties": {
+            "dragonfly": {"$ref": "#/definitions/dragonflyProvider"}
+          }
+        },
+        "vector": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["qdrant"],
+          "properties": {
+            "qdrant": {"$ref": "#/definitions/qdrantProvider"}
+          }
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["consumer_ref", "reason"],
+            "properties": {
+              "consumer_ref": {"type": "string"},
+              "reason": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "connectionLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["soft", "hard"],
+      "properties": {
+        "soft": {"type": "integer", "minimum": 0},
+        "hard": {"type": "integer", "minimum": 0}
+      }
+    },
+    "databaseLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_databases",
+        "max_users",
+        "max_connections",
+        "max_storage_gb",
+        "max_cpu",
+        "max_memory_gb"
+      ],
+      "properties": {
+        "max_databases": {"type": "integer", "minimum": 0},
+        "max_users": {"type": "integer", "minimum": 0},
+        "max_connections": {"$ref": "#/definitions/connectionLimits"},
+        "max_storage_gb": {"type": "number", "minimum": 0},
+        "max_cpu": {"type": "number", "minimum": 0},
+        "max_memory_gb": {"type": "number", "minimum": 0}
+      }
+    },
+    "databaseProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["single", "cluster"],
+      "properties": {
+        "single": {"$ref": "#/definitions/databaseLimits"},
+        "cluster": {"$ref": "#/definitions/databaseLimits"}
+      }
+    },
+    "rabbitmqPolicyDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["queue_type", "ha_mode"],
+      "properties": {
+        "queue_type": {"type": "string"},
+        "ha_mode": {"type": "string"}
+      }
+    },
+    "rabbitmqLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_vhosts",
+        "max_users",
+        "max_connections",
+        "max_queues",
+        "max_message_bytes",
+        "policy_defaults"
+      ],
+      "properties": {
+        "max_vhosts": {"type": "integer", "minimum": 0},
+        "max_users": {"type": "integer", "minimum": 0},
+        "max_connections": {"type": "integer", "minimum": 0},
+        "max_queues": {"type": "integer", "minimum": 0},
+        "max_message_bytes": {"type": "integer", "minimum": 0},
+        "policy_defaults": {"$ref": "#/definitions/rabbitmqPolicyDefaults"}
+      }
+    },
+    "rabbitmqProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["single", "cluster"],
+      "properties": {
+        "single": {"$ref": "#/definitions/rabbitmqLimits"},
+        "cluster": {"$ref": "#/definitions/rabbitmqLimits"}
+      }
+    },
+    "dragonflyLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_memory_mb",
+        "eviction_policy",
+        "max_clients",
+        "require_prefix",
+        "tenant_key_prefix"
+      ],
+      "properties": {
+        "max_memory_mb": {"type": "integer", "minimum": 0},
+        "eviction_policy": {"type": "string"},
+        "max_clients": {"type": "integer", "minimum": 0},
+        "require_prefix": {"type": "boolean"},
+        "tenant_key_prefix": {"type": "string"}
+      }
+    },
+    "dragonflyProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["single", "cluster"],
+      "properties": {
+        "single": {"$ref": "#/definitions/dragonflyLimits"},
+        "cluster": {"$ref": "#/definitions/dragonflyLimits"}
+      }
+    },
+    "qdrantLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_collections",
+        "max_points",
+        "max_storage_gb",
+        "replication_factor"
+      ],
+      "properties": {
+        "max_collections": {"type": "integer", "minimum": 0},
+        "max_points": {"type": "integer", "minimum": 0},
+        "max_storage_gb": {"type": "number", "minimum": 0},
+        "replication_factor": {"type": "integer", "minimum": 1}
+      }
+    },
+    "qdrantProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["single", "cluster"],
+      "properties": {
+        "single": {"$ref": "#/definitions/qdrantLimits"},
+        "cluster": {"$ref": "#/definitions/qdrantLimits"}
+      }
+    }
+  }
+}

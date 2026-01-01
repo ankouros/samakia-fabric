@@ -71,6 +71,10 @@ run_for_tenant() {
   fi
 
   if [[ "${cmd}" == "apply" ]]; then
+    if [[ -n "${stamp}" ]]; then
+      CAPACITY_EVIDENCE_ROOT="${EVIDENCE_ROOT}" CAPACITY_STAMP="${stamp}" TENANT="${tenant_id}" \
+        bash "${FABRIC_REPO_ROOT}/ops/substrate/capacity/capacity-guard.sh"
+    fi
     local contracts_json providers
     contracts_json="$(list_enabled_contracts "${tenant_dir}" "${provider_filter}")"
     providers="$(echo "${contracts_json}" | jq -r '.[].provider' | sort -u)"
@@ -141,11 +145,13 @@ case "${cmd}" in
     "${FABRIC_REPO_ROOT}/ops/tenants/validate-consumer-bindings.sh"
     "${FABRIC_REPO_ROOT}/ops/substrate/validate-enabled-contracts.sh"
 
+    stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
     if [[ "${TENANT}" == "all" ]]; then
       for tenant_dir in "${TENANTS_ROOT}"/*; do
         [[ -d "${tenant_dir}" ]] || continue
         tenant_id="$(basename "${tenant_dir}")"
-        run_for_tenant "${tenant_dir}" "${tenant_id}" ""
+        run_for_tenant "${tenant_dir}" "${tenant_id}" "${stamp}"
       done
     else
       tenant_dir="${TENANTS_ROOT}/${TENANT}"
@@ -153,7 +159,7 @@ case "${cmd}" in
         echo "ERROR: tenant not found: ${TENANT}" >&2
         exit 1
       fi
-      run_for_tenant "${tenant_dir}" "${TENANT}" ""
+      run_for_tenant "${tenant_dir}" "${TENANT}" "${stamp}"
     fi
     ;;
   dr-execute)

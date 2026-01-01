@@ -1,0 +1,114 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantCapacity",
+  "metadata": {
+    "tenant_id": "samakia-internal-tools"
+  },
+  "spec": {
+    "tenant": "samakia-internal-tools",
+    "budget_class": "shared",
+    "defaults": {
+      "enforce": true,
+      "mode": "deny_on_exceed"
+    },
+    "database": {
+      "postgres": {
+        "single": {
+          "max_databases": 4,
+          "max_users": 8,
+          "max_connections": {"soft": 50, "hard": 100},
+          "max_storage_gb": 50,
+          "max_cpu": 4,
+          "max_memory_gb": 8
+        },
+        "cluster": {
+          "max_databases": 6,
+          "max_users": 12,
+          "max_connections": {"soft": 100, "hard": 200},
+          "max_storage_gb": 200,
+          "max_cpu": 8,
+          "max_memory_gb": 16
+        }
+      },
+      "mariadb": {
+        "single": {
+          "max_databases": 3,
+          "max_users": 6,
+          "max_connections": {"soft": 40, "hard": 80},
+          "max_storage_gb": 40,
+          "max_cpu": 4,
+          "max_memory_gb": 8
+        },
+        "cluster": {
+          "max_databases": 5,
+          "max_users": 10,
+          "max_connections": {"soft": 80, "hard": 160},
+          "max_storage_gb": 150,
+          "max_cpu": 8,
+          "max_memory_gb": 16
+        }
+      }
+    },
+    "message-queue": {
+      "rabbitmq": {
+        "single": {
+          "max_vhosts": 4,
+          "max_users": 10,
+          "max_connections": 800,
+          "max_queues": 2000,
+          "max_message_bytes": 1048576,
+          "policy_defaults": {
+            "queue_type": "classic",
+            "ha_mode": "none"
+          }
+        },
+        "cluster": {
+          "max_vhosts": 6,
+          "max_users": 16,
+          "max_connections": 2000,
+          "max_queues": 5000,
+          "max_message_bytes": 1048576,
+          "policy_defaults": {
+            "queue_type": "quorum",
+            "ha_mode": "all"
+          }
+        }
+      }
+    },
+    "cache": {
+      "dragonfly": {
+        "single": {
+          "max_memory_mb": 4096,
+          "eviction_policy": "allkeys-lru",
+          "max_clients": 1500,
+          "require_prefix": true,
+          "tenant_key_prefix": "tenant:samakia-internal-tools:"
+        },
+        "cluster": {
+          "max_memory_mb": 8192,
+          "eviction_policy": "allkeys-lru",
+          "max_clients": 3000,
+          "require_prefix": true,
+          "tenant_key_prefix": "tenant:samakia-internal-tools:"
+        }
+      }
+    },
+    "vector": {
+      "qdrant": {
+        "single": {
+          "max_collections": 8,
+          "max_points": 250000,
+          "max_storage_gb": 50,
+          "replication_factor": 1
+        },
+        "cluster": {
+          "max_collections": 15,
+          "max_points": 1000000,
+          "max_storage_gb": 200,
+          "replication_factor": 2
+        }
+      }
+    },
+    "overrides": []
+  }
+}

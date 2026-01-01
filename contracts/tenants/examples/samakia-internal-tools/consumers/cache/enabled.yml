@@ -7,8 +7,18 @@
     "mode": "dry-run",
     "plan_only": true
   },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Single instance; DR required for recovery"
+  },
   "dr": {
     "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
     "backup": {
       "schedule": "<placeholder>",
       "retention": "<placeholder>"
@@ -18,11 +28,17 @@
     }
   },
   "endpoints": {
-    "host": "cache.samakia-internal-tools.internal",
+    "host": "cache.internal-tools.internal",
     "port": 6379,
     "protocol": "tcp",
     "tls_required": true
   },
   "secret_ref": "tenants/samakia-internal-tools/cache/primary",
-  "resources": {}
+  "resources": {
+    "max_memory_mb": 1024,
+    "eviction_policy": "allkeys-lru",
+    "max_clients": 1500,
+    "require_prefix": true,
+    "tenant_key_prefix": "tenant:samakia-internal-tools:"
+  }
 }

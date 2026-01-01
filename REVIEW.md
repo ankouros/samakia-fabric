@@ -559,3 +559,15 @@ Phase 11 Part 2 introduces **opt-in** execution for enabled tenant bindings with
 - Deterministic, redacted evidence packets under `evidence/tenants/<tenant>/<UTC>/`.
 
 CI remains read-only: plan, dry-run, and verify only.
+
+## Phase 11 Part 3 — Capacity Guardrails
+
+Phase 11 Part 3 adds tenant-scale safety controls for noisy-neighbor and SLO
+correctness without changing execution semantics:
+
+- Tenant `capacity.yml` contracts with schema/template/examples.
+- Capacity guardrails evaluated before apply/DR execute (contract-only in CI).
+- SLO/failure semantics validation for single vs cluster variants.
+- Deterministic capacity evidence under `evidence/tenants/<tenant>/<UTC>/substrate-capacity/`.
+
+Acceptance remains read-only and CI-safe; no apply or DR execute is triggered.

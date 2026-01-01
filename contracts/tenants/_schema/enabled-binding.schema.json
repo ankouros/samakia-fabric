@@ -8,6 +8,8 @@
     "variant",
     "ha_ready",
     "executor",
+    "slo",
+    "failure_semantics",
     "dr",
     "endpoints",
     "secret_ref",
@@ -27,15 +29,35 @@
         "plan_only": {"type": "boolean"}
       }
     },
+    "slo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier"],
+      "properties": {
+        "tier": {"enum": ["tier0", "tier1", "tier2", "bronze", "silver", "gold"]},
+        "availability": {"type": "number"}
+      }
+    },
+    "failure_semantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "expectations"],
+      "properties": {
+        "mode": {"enum": ["spof", "failover"]},
+        "expectations": {"type": "string"}
+      }
+    },
     "dr": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["required_testcases", "backup", "restore_verification"],
+      "required": ["required_testcases", "backup", "restore_verification", "rpo_target", "rto_target"],
       "properties": {
         "required_testcases": {
           "type": "array",
           "items": {"type": "string"}
         },
+        "rpo_target": {"type": "string"},
+        "rto_target": {"type": "string"},
         "backup": {
           "type": "object",
           "additionalProperties": false,

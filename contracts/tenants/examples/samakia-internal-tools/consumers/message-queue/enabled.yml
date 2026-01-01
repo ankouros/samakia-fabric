@@ -7,8 +7,18 @@
     "mode": "dry-run",
     "plan_only": true
   },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Single node; DR restore required"
+  },
   "dr": {
     "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
     "backup": {
       "schedule": "<placeholder>",
       "retention": "<placeholder>"
@@ -18,11 +28,21 @@
     }
   },
   "endpoints": {
-    "host": "mq.samakia-internal-tools.internal",
-    "port": 5672,
-    "protocol": "tcp",
+    "host": "mq.internal-tools.internal",
+    "port": 15672,
+    "protocol": "https",
     "tls_required": true
   },
   "secret_ref": "tenants/samakia-internal-tools/message-queue/primary",
-  "resources": {}
+  "resources": {
+    "vhost": "internal_tools",
+    "user": "tools_app",
+    "max_connections": 300,
+    "max_queues": 800,
+    "max_message_bytes": 1048576,
+    "policy_defaults": {
+      "queue_type": "classic",
+      "ha_mode": "none"
+    }
+  }
 }

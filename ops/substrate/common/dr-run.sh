@@ -53,6 +53,9 @@ run_for_tenant() {
   local tenant_dir="$1"
   local tenant_id="$2"
 
+  CAPACITY_EVIDENCE_ROOT="${EVIDENCE_ROOT}" CAPACITY_STAMP="${stamp}" TENANT="${tenant_id}" \
+    bash "${FABRIC_REPO_ROOT}/ops/substrate/capacity/capacity-guard.sh"
+
   local out_dir="${EVIDENCE_ROOT}/${tenant_id}/${stamp}/substrate-dr-execute"
   local backup_dir="${out_dir}/backup"
   local restore_dir="${out_dir}/restore"
