@@ -1033,6 +1033,10 @@ tenants.dr.run: ## Run tenant DR harness (dry-run default) (TENANT=<id> ENV=<env
 	@TENANT="$(TENANT)" ENV="$(ENV)" DR_MODE="$(DR_MODE)" \
 		bash "$(REPO_ROOT)/ops/tenants/dr/run.sh" --tenant "$(TENANT)" --mode "$${DR_MODE:-dry-run}"
 
+.PHONY: substrate.contracts.validate
+substrate.contracts.validate: ## Validate substrate enabled contracts (design-only)
+	@bash "$(REPO_ROOT)/ops/substrate/validate.sh"
+
 .PHONY: phase10.entry.check
 phase10.entry.check: ## Phase 10 entry checklist (writes acceptance/PHASE10_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase10-entry-check.sh"
@@ -1052,6 +1056,14 @@ phase10.part2.entry.check: ## Phase 10 Part 2 entry checklist (writes acceptance
 .PHONY: phase10.part2.accept
 phase10.part2.accept: ## Run Phase 10 Part 2 acceptance suite (read-only)
 	@bash "$(OPS_SCRIPTS_DIR)/phase10-part2-accept.sh"
+
+.PHONY: phase11.entry.check
+phase11.entry.check: ## Phase 11 entry checklist (writes acceptance/PHASE11_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase11-entry-check.sh"
+
+.PHONY: phase11.accept
+phase11.accept: ## Run Phase 11 acceptance suite (design-only, read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase11-accept.sh"
 
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)

@@ -53,6 +53,11 @@ VM image workflows live in:
 
 - `docs/images/README.md`
 
+Substrate executor design (Phase 11) lives in:
+
+- `docs/substrate/README.md`
+- `contracts/substrate/`
+
 ### TLS policy
 - Default: strict verification
 - Proxmox internal CA: install CA into the runner host trust store (no insecure flags)

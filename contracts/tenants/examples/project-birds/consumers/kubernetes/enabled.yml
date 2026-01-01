@@ -1,23 +1,28 @@
 {
-  "apiVersion": "samakia.fabric/v1alpha1",
-  "kind": "TenantConsumerBinding",
-  "metadata": {
-    "tenant_id": "project-birds",
-    "consumer": "kubernetes"
-  },
-  "spec": {
-    "consumer": "kubernetes",
-    "variant": "single",
-    "ha_ready": true,
+  "consumer": "kubernetes",
+  "variant": "single",
+  "ha_ready": true,
+  "executor": {
+    "provider": "kubernetes",
     "mode": "dry-run",
-    "endpoint_ref": "k8s-control",
-    "secret_ref": "secrets/tenants/project-birds/k8s-control",
-    "backup_target": "backup://project-birds/kubernetes",
-    "restore_testcases": ["restore-from-backup"],
-    "dr_testcases": ["gameday:service-restart"],
-    "owner": {
-      "tenant_id": "project-birds",
-      "consumer": "kubernetes"
+    "plan_only": true
+  },
+  "dr": {
+    "required_testcases": ["backup_integrity", "restore_smoke"],
+    "backup": {
+      "schedule": "<placeholder>",
+      "retention": "<placeholder>"
+    },
+    "restore_verification": {
+      "smoke": "<placeholder>"
     }
-  }
+  },
+  "endpoints": {
+    "host": "k8s.project-birds.internal",
+    "port": 6443,
+    "protocol": "https",
+    "tls_required": true
+  },
+  "secret_ref": "tenants/project-birds/kubernetes/cluster",
+  "resources": {}
 }

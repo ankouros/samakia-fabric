@@ -1,0 +1,125 @@
+# Phase 11 Entry Checklist
+
+Timestamp (UTC): 2025-12-31T23:51:54Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE0_ACCEPTED.md
+  - Command: test -f acceptance/PHASE0_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE2_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE2_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE3_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE3_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE5_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE6_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE6_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE7_ACCEPTED.md
+  - Command: test -f acceptance/PHASE7_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART1_2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART1_2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE8_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE8_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE9_ACCEPTED.md
+  - Command: test -f acceptance/PHASE9_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE10_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE10_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE10_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE10_PART2_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- ADR-0029 present
+  - Command: rg -n "ADR-0029" DECISIONS.md
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/enabled-executor.schema.json
+  - Command: test -f contracts/tenants/_schema/enabled-executor.schema.json
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/enabled-dr.schema.json
+  - Command: test -f contracts/tenants/_schema/enabled-dr.schema.json
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/enabled-resources.schema.json
+  - Command: test -f contracts/tenants/_schema/enabled-resources.schema.json
+  - Result: PASS
+- Schema present: contracts/tenants/_schema/enabled-binding.schema.json
+  - Command: test -f contracts/tenants/_schema/enabled-binding.schema.json
+  - Result: PASS
+- Substrate contract present: contracts/substrate/README.md
+  - Command: test -f contracts/substrate/README.md
+  - Result: PASS
+- Substrate contract present: contracts/substrate/dr-testcases.yml
+  - Command: test -f contracts/substrate/dr-testcases.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/database/enabled.yml
+  - Command: test -f contracts/tenants/_templates/consumers/database/enabled.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/message-queue/enabled.yml
+  - Command: test -f contracts/tenants/_templates/consumers/message-queue/enabled.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/cache/enabled.yml
+  - Command: test -f contracts/tenants/_templates/consumers/cache/enabled.yml
+  - Result: PASS
+- Template present: contracts/tenants/_templates/consumers/vector/enabled.yml
+  - Command: test -f contracts/tenants/_templates/consumers/vector/enabled.yml
+  - Result: PASS
+- Validation script present: ops/substrate/validate-dr-taxonomy.sh
+  - Command: test -f ops/substrate/validate-dr-taxonomy.sh
+  - Result: PASS
+- Validation script present: ops/substrate/validate-enabled-contracts.sh
+  - Command: test -f ops/substrate/validate-enabled-contracts.sh
+  - Result: PASS
+- Validation script present: ops/substrate/validate.sh
+  - Command: test -f ops/substrate/validate.sh
+  - Result: PASS
+- Makefile target present: substrate.contracts.validate
+  - Command: rg -n "^substrate\.contracts\.validate:" Makefile
+  - Result: PASS
+- Makefile target present: phase11.entry.check
+  - Command: rg -n "^phase11\.entry\.check:" Makefile
+  - Result: PASS
+- PR validation runs substrate.contracts.validate
+  - Command: rg -n "substrate\.contracts\.validate" .github/workflows/pr-validate.yml
+  - Result: PASS
+- Acceptance plan present: acceptance/PHASE11_ACCEPTANCE_PLAN.md
+  - Command: test -f acceptance/PHASE11_ACCEPTANCE_PLAN.md
+  - Result: PASS

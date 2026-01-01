@@ -894,6 +894,33 @@ Phase 9 establishes operator UX as a **first-class contract**:
 
 ---
 
+## ADR-0029 — Tenant-Scoped Substrate Executors (Design-Only)
+
+### Decision
+
+- Executors operate only on `contracts/tenants/<tenant>/consumers/<consumer>/enabled.yml`.
+- Supported substrate consumers: database, message-queue, cache, vector.
+- Provider mapping (design-only): postgres, mariadb, rabbitmq, dragonfly, qdrant.
+- Variants are `single` and `cluster`, and `ha_ready` must be true.
+- `single` requires explicit DR expectations and acceptance.
+- Kubernetes consumer is binding-only and never provisions infrastructure.
+- CI is validate/plan only; no apply paths in Phase 11.
+- Evidence packets are mandatory for future execution phases.
+
+### Rationale
+
+- Keeps substrate executors contract-first and audit-ready before execution exists.
+- Aligns with Phase 6 consumer taxonomy and Phase 9 operator UX.
+- Preserves safety boundaries while enabling future provisioning phases.
+
+### Consequences
+
+- Enabled contracts must validate against substrate DR taxonomy.
+- Provider/consumer compatibility is enforced by validation tooling.
+- Phase 11 is design-only; no execution or infrastructure mutation is allowed.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

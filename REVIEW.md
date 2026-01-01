@@ -524,3 +524,16 @@ Phase 10 Part 2 adds guarded execute mode and DR harness:
 - Offline-first credential issuance under `ops/tenants/creds/`.
 - Tenant DR dry-run/execute harness (`make tenants.dr.run`).
 No infrastructure is deployed in Phase 10.
+
+## Phase 11 — Tenant-Scoped Substrate Executors (Design)
+
+Phase 11 formalizes **enabled** substrate executor contracts for tenant-ready
+stateful primitives, without any execution:
+
+- ADR-0029 locking the contract-first executor model (design-only).
+- Substrate DR taxonomy under `contracts/substrate/dr-testcases.yml`.
+- Enabled executor schemas + templates for substrate consumers.
+- Validation gate: `make substrate.contracts.validate`.
+
+No infrastructure is deployed in Phase 11. The deliverable is contract
+consistency, DR taxonomy enforcement, and read-only validation.

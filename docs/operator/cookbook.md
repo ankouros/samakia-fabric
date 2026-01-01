@@ -280,6 +280,32 @@ None by default.
 #### Rollback / safe exit
 Stop and fix tenant contracts.
 
+### Task: Validate substrate enabled contracts (design-only)
+
+#### Intent
+Validate enabled bindings for substrate executors (design-only; no execution).
+
+#### Preconditions
+- Enabled bindings present under `contracts/tenants/**/consumers/*/enabled.yml`
+
+#### Command
+```bash
+make substrate.contracts.validate
+```
+
+#### Expected result
+Substrate contract validation PASS.
+
+#### Evidence outputs
+None by default.
+
+#### Failure modes
+- Provider/consumer mismatch
+- DR testcase mismatch
+
+#### Rollback / safe exit
+Stop and fix enabled contracts.
+
 ### Task: Tenant tooling doctor
 
 #### Intent
@@ -610,6 +636,58 @@ Checklist written under `acceptance/PHASE10_ENTRY_CHECKLIST.md`.
 #### Rollback / safe exit
 Stop and remediate missing artifacts.
 
+### Task: Phase 11 entry checklist (design-only)
+
+#### Intent
+Confirm Phase 11 design entry conditions are satisfied.
+
+#### Preconditions
+- Phase 10 Part 2 accepted marker present
+- Substrate contracts and validation tooling present
+
+#### Command
+```bash
+make phase11.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE11_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing ADR-0029
+- Missing substrate contracts or tools
+
+#### Rollback / safe exit
+Stop and restore missing files.
+
+### Task: Phase 11 acceptance (design-only)
+
+#### Intent
+Run the Phase 11 acceptance suite (non-destructive).
+
+#### Preconditions
+- Phase 11 entry checklist passes
+
+#### Command
+```bash
+make phase11.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE11_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_ACCEPTED.md`
+
+#### Failure modes
+- Validation errors
+
+#### Rollback / safe exit
+Stop and remediate validation issues.
+
 ### Task: Onboard a project to consume Fabric primitives (design-only)
 
 #### Intent
@@ -845,9 +923,12 @@ make phase9.accept
 make phase10.entry.check
 make phase10.part1.entry.check
 make phase10.part1.accept
+make phase11.entry.check
+make phase11.accept
 make policy.check
 make docs.operator.check
 make docs.cookbook.lint
+make substrate.contracts.validate
 make shared.ntp.accept
 make shared.obs.accept
 make shared.obs.ingest.accept

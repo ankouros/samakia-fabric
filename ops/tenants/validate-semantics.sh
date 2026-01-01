@@ -134,40 +134,86 @@ for tenant_file in root.rglob("tenant.yml"):
         binding = load_json(enabled_file)
         if not binding:
             continue
-        spec = binding.get("spec", {})
-        consumer = spec.get("consumer", "")
-        if consumer != consumer_dir:
-            errors.append(f"{enabled_file}: spec.consumer '{consumer}' does not match folder '{consumer_dir}'")
-        if consumer not in allowed:
-            errors.append(f"{enabled_file}: consumer '{consumer}' not in allowed_consumers")
-        variant = spec.get("variant")
-        if variant not in {"single", "cluster"}:
-            errors.append(f"{enabled_file}: invalid variant '{variant}'")
-        if consumer in allowed_variants and variant not in allowed_variants.get(consumer, []):
-            errors.append(f"{enabled_file}: variant '{variant}' not allowed for consumer '{consumer}'")
-        if spec.get("ha_ready") is not True:
-            errors.append(f"{enabled_file}: ha_ready must be true")
-        mode = spec.get("mode")
-        if mode not in {"dry-run", "execute"}:
-            errors.append(f"{enabled_file}: mode must be dry-run or execute")
-        endpoint_ref = spec.get("endpoint_ref")
-        if not isinstance(endpoint_ref, str) or not endpoint_ref.strip():
-            errors.append(f"{enabled_file}: endpoint_ref must be a non-empty string")
-        secret_ref = spec.get("secret_ref")
-        if not isinstance(secret_ref, str) or not secret_ref.strip():
-            errors.append(f"{enabled_file}: secret_ref must be a non-empty string")
-        backup_target = spec.get("backup_target")
-        if not isinstance(backup_target, str) or not backup_target.strip():
-            errors.append(f"{enabled_file}: backup_target must be a non-empty string")
-        restore_tests = spec.get("restore_testcases", [])
-        if not isinstance(restore_tests, list) or not restore_tests:
-            errors.append(f"{enabled_file}: restore_testcases must be a non-empty list")
-        dr = spec.get("dr_testcases", [])
-        if not isinstance(dr, list) or not dr:
-            errors.append(f"{enabled_file}: dr_testcases must be a non-empty list")
-        owner = spec.get("owner", {})
-        if owner.get("tenant_id") != tenant_id or owner.get("consumer") != consumer:
-            errors.append(f"{enabled_file}: owner must match tenant_id and consumer")
+        spec = binding.get("spec")
+        if isinstance(spec, dict):
+            consumer = spec.get("consumer", "")
+            if consumer != consumer_dir:
+                errors.append(f"{enabled_file}: spec.consumer '{consumer}' does not match folder '{consumer_dir}'")
+            if consumer not in allowed:
+                errors.append(f"{enabled_file}: consumer '{consumer}' not in allowed_consumers")
+            variant = spec.get("variant")
+            if variant not in {"single", "cluster"}:
+                errors.append(f"{enabled_file}: invalid variant '{variant}'")
+            if consumer in allowed_variants and variant not in allowed_variants.get(consumer, []):
+                errors.append(f"{enabled_file}: variant '{variant}' not allowed for consumer '{consumer}'")
+            if spec.get("ha_ready") is not True:
+                errors.append(f"{enabled_file}: ha_ready must be true")
+            mode = spec.get("mode")
+            if mode not in {"dry-run", "execute"}:
+                errors.append(f"{enabled_file}: mode must be dry-run or execute")
+            endpoint_ref = spec.get("endpoint_ref")
+            if not isinstance(endpoint_ref, str) or not endpoint_ref.strip():
+                errors.append(f"{enabled_file}: endpoint_ref must be a non-empty string")
+            secret_ref = spec.get("secret_ref")
+            if not isinstance(secret_ref, str) or not secret_ref.strip():
+                errors.append(f"{enabled_file}: secret_ref must be a non-empty string")
+            backup_target = spec.get("backup_target")
+            if not isinstance(backup_target, str) or not backup_target.strip():
+                errors.append(f"{enabled_file}: backup_target must be a non-empty string")
+            restore_tests = spec.get("restore_testcases", [])
+            if not isinstance(restore_tests, list) or not restore_tests:
+                errors.append(f"{enabled_file}: restore_testcases must be a non-empty list")
+            dr = spec.get("dr_testcases", [])
+            if not isinstance(dr, list) or not dr:
+                errors.append(f"{enabled_file}: dr_testcases must be a non-empty list")
+            owner = spec.get("owner", {})
+            if owner.get("tenant_id") != tenant_id or owner.get("consumer") != consumer:
+                errors.append(f"{enabled_file}: owner must match tenant_id and consumer")
+        else:
+            consumer = binding.get("consumer", "")
+            if consumer != consumer_dir:
+                errors.append(f"{enabled_file}: consumer '{consumer}' does not match folder '{consumer_dir}'")
+            if consumer not in allowed:
+                errors.append(f"{enabled_file}: consumer '{consumer}' not in allowed_consumers")
+            variant = binding.get("variant")
+            if variant not in {"single", "cluster"}:
+                errors.append(f"{enabled_file}: invalid variant '{variant}'")
+            if consumer in allowed_variants and variant not in allowed_variants.get(consumer, []):
+                errors.append(f"{enabled_file}: variant '{variant}' not allowed for consumer '{consumer}'")
+            if binding.get("ha_ready") is not True:
+                errors.append(f"{enabled_file}: ha_ready must be true")
+            executor = binding.get("executor", {})
+            mode = executor.get("mode")
+            if mode not in {"dry-run", "execute"}:
+                errors.append(f"{enabled_file}: executor.mode must be dry-run or execute")
+            plan_only = executor.get("plan_only")
+            if not isinstance(plan_only, bool):
+                errors.append(f"{enabled_file}: executor.plan_only must be boolean")
+            dr = binding.get("dr", {})
+            required = dr.get("required_testcases", [])
+            if not isinstance(required, list) or not required:
+                errors.append(f"{enabled_file}: dr.required_testcases must be a non-empty list")
+            backup = dr.get("backup", {})
+            if not isinstance(backup.get("schedule"), str) or not backup.get("schedule"):
+                errors.append(f"{enabled_file}: dr.backup.schedule must be a non-empty string")
+            if not isinstance(backup.get("retention"), str) or not backup.get("retention"):
+                errors.append(f"{enabled_file}: dr.backup.retention must be a non-empty string")
+            restore = dr.get("restore_verification", {})
+            if not isinstance(restore.get("smoke"), str) or not restore.get("smoke"):
+                errors.append(f"{enabled_file}: dr.restore_verification.smoke must be a non-empty string")
+            endpoints = binding.get("endpoints", {})
+            if not isinstance(endpoints.get("host"), str) or not endpoints.get("host"):
+                errors.append(f"{enabled_file}: endpoints.host must be a non-empty string")
+            if not isinstance(endpoints.get("port"), int):
+                errors.append(f"{enabled_file}: endpoints.port must be an integer")
+            protocol = endpoints.get("protocol")
+            if protocol not in {"tcp", "https"}:
+                errors.append(f"{enabled_file}: endpoints.protocol must be tcp or https")
+            if not isinstance(endpoints.get("tls_required"), bool):
+                errors.append(f"{enabled_file}: endpoints.tls_required must be boolean")
+            secret_ref = binding.get("secret_ref")
+            if not isinstance(secret_ref, str) or not secret_ref.strip():
+                errors.append(f"{enabled_file}: secret_ref must be a non-empty string")
 
 if errors:
     for err in errors:

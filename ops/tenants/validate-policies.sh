@@ -103,7 +103,9 @@ for tenant_dir in tenants_root.rglob("tenant.yml"):
             binding = load_json(binding_path)
             if not binding:
                 continue
-            consumer = binding.get("spec", {}).get("consumer")
+            consumer = binding.get("consumer")
+            if not consumer and isinstance(binding.get("spec"), dict):
+                consumer = binding.get("spec", {}).get("consumer")
             if consumer and consumer not in allowed:
                 errors.append(f"{binding_path}: consumer '{consumer}' not in allowed_consumers")
 

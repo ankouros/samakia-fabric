@@ -1,23 +1,28 @@
 {
-  "apiVersion": "samakia.fabric/v1alpha1",
-  "kind": "TenantConsumerBinding",
-  "metadata": {
-    "tenant_id": "<tenant-id>",
-    "consumer": "cache"
-  },
-  "spec": {
-    "consumer": "cache",
-    "variant": "single",
-    "ha_ready": true,
+  "consumer": "cache",
+  "variant": "single",
+  "ha_ready": true,
+  "executor": {
+    "provider": "dragonfly",
     "mode": "dry-run",
-    "endpoint_ref": "cache-primary",
-    "secret_ref": "secrets/tenants/<tenant-id>/cache-primary",
-    "backup_target": "backup://<tenant-id>/cache",
-    "restore_testcases": ["restore-from-backup"],
-    "dr_testcases": ["gameday:vip-failover"],
-    "owner": {
-      "tenant_id": "<tenant-id>",
-      "consumer": "cache"
+    "plan_only": true
+  },
+  "dr": {
+    "required_testcases": ["backup_integrity", "restore_smoke"],
+    "backup": {
+      "schedule": "<placeholder>",
+      "retention": "<placeholder>"
+    },
+    "restore_verification": {
+      "smoke": "<placeholder>"
     }
-  }
+  },
+  "endpoints": {
+    "host": "example.internal",
+    "port": 6379,
+    "protocol": "tcp",
+    "tls_required": true
+  },
+  "secret_ref": "tenants/<tenant>/cache/<name>",
+  "resources": {}
 }

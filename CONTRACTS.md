@@ -57,4 +57,6 @@ Any change that violates a contract must be redesigned before merging.
 - AI operations are read-only by default; any remediation requires explicit guards and evidence packets.
 - VM golden images are contract-governed; canonical reference is storage_path + sha256; Fabric does not manage VM lifecycle.
 - Operator UX is a first-class contract: `docs/operator/cookbook.md` is canonical, and operator-visible commands must be documented or explicitly waived by policy.
+- Tenant bindings and substrate executor contracts are metadata-only by default; enabled.yml is contract-first and execution is always guarded, auditable, and opt-in.
 - Tenants are project bindings by contract; tenant files are metadata-only with no secrets and no apply paths in design phases.
+- Substrate executor DR taxonomy and design contracts live under `contracts/substrate/`.

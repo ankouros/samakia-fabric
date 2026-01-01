@@ -25,12 +25,12 @@ Related:
 
 - File: `consumers/<type>/enabled.yml`
 - Must include:
-  - `mode` (`dry-run` or `execute`)
-  - `endpoint_ref` and `secret_ref` (metadata only)
-  - DR expectations (`dr_testcases`, `restore_testcases`, `backup_target`)
-  - `owner` block (`tenant_id`, `consumer`)
+  - `executor` block (`provider`, `mode`, `plan_only`)
+  - `endpoints` (`host`, `port`, `protocol`, `tls_required`)
+  - `secret_ref` (reference only)
+  - DR expectations (`dr.required_testcases`, `dr.backup`, `dr.restore_verification`)
 - Execution is always opt-in and guarded; no apply in CI
-- `endpoint_ref` must exist in the tenant `endpoints.yml`
+- Endpoints are metadata only; no secrets
 
 Validate:
 

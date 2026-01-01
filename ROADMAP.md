@@ -377,6 +377,26 @@ Non-scope:
 
 ---
 
+## Phase 11 — Tenant-Scoped Substrate Executors (Design)
+
+Goal: Define contract-first substrate executor semantics for tenant-enabled
+stateful primitives (no execution).
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- ADR-0029 locking tenant-scoped executor contract model (design-only).
+- Substrate DR taxonomy under `contracts/substrate/dr-testcases.yml`.
+- Enabled executor schemas + templates for substrate consumers.
+- Validation gate: `make substrate.contracts.validate`.
+- Phase 11 entry checklist + acceptance marker: `acceptance/PHASE11_ACCEPTED.md`.
+
+Non-scope:
+- No provisioning or apply paths
+- No secrets creation or infra mutation
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

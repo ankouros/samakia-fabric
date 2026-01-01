@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TenantConsumerEnabled",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "consumer",
+    "variant",
+    "ha_ready",
+    "executor",
+    "dr",
+    "endpoints",
+    "secret_ref",
+    "resources"
+  ],
+  "properties": {
+    "consumer": {"enum": ["database", "message-queue", "cache", "vector", "kubernetes"]},
+    "variant": {"enum": ["single", "cluster"]},
+    "ha_ready": {"type": "boolean"},
+    "executor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "mode", "plan_only"],
+      "properties": {
+        "provider": {"enum": ["postgres", "mariadb", "rabbitmq", "dragonfly", "qdrant", "kubernetes"]},
+        "mode": {"enum": ["dry-run", "execute"]},
+        "plan_only": {"type": "boolean"}
+      }
+    },
+    "dr": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_testcases", "backup", "restore_verification"],
+      "properties": {
+        "required_testcases": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "backup": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schedule", "retention"],
+          "properties": {
+            "schedule": {"type": "string"},
+            "retention": {"type": "string"}
+          }
+        },
+        "restore_verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["smoke"],
+          "properties": {
+            "smoke": {"type": "string"}
+          }
+        }
+      }
+    },
+    "endpoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "port", "protocol", "tls_required"],
+      "properties": {
+        "host": {"type": "string"},
+        "port": {"type": "integer"},
+        "protocol": {"enum": ["tcp", "https"]},
+        "tls_required": {"type": "boolean"}
+      }
+    },
+    "secret_ref": {"type": "string"},
+    "resources": {"type": "object", "additionalProperties": true}
+  }
+}

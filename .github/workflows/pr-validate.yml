@@ -84,6 +84,9 @@ jobs:
           make tenants.execute.policy.check
           make tenants.dr.validate
 
+      - name: Substrate contract checks
+        run: make substrate.contracts.validate
+
       - name: Consumer readiness packets
         run: |
           make consumers.evidence

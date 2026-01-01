@@ -96,6 +96,13 @@ The format is inspired by:
 - Phase 10 Part 2 entry checklist: `acceptance/PHASE10_PART2_ENTRY_CHECKLIST.md`
 - Phase 10 Part 2 acceptance marker: `acceptance/PHASE10_PART2_ACCEPTED.md`
 
+#### Substrate executors (Phase 11 design)
+- ADR-0029 locking tenant-scoped substrate executors (design-only).
+- Substrate DR taxonomy under `contracts/substrate/dr-testcases.yml`.
+- Enabled executor schemas + templates for substrate consumers.
+- Validation gate: `make substrate.contracts.validate`.
+- Phase 11 acceptance marker: `acceptance/PHASE11_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

@@ -1,0 +1,21 @@
+# Substrate Executors (Design-Only)
+
+This directory documents tenant-scoped substrate executors for stateful primitives.
+
+Scope:
+- Contract-first design for `enabled.yml` bindings
+- Validation only (no execution, no infrastructure mutation)
+- Two variants for each consumer: `single` and `cluster`
+
+Reference contracts:
+- `contracts/substrate/dr-testcases.yml`
+- `contracts/tenants/**/consumers/**/enabled.yml`
+
+See provider-specific notes:
+- `docs/substrate/postgres.md`
+- `docs/substrate/mariadb.md`
+- `docs/substrate/rabbitmq.md`
+- `docs/substrate/cache.md`
+- `docs/substrate/vector.md`
+- `docs/substrate/ha-semantics.md`
+- `docs/substrate/dr.md`

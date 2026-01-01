@@ -1,23 +1,28 @@
 {
-  "apiVersion": "samakia.fabric/v1alpha1",
-  "kind": "TenantConsumerBinding",
-  "metadata": {
-    "tenant_id": "<tenant-id>",
-    "consumer": "vector"
-  },
-  "spec": {
-    "consumer": "vector",
-    "variant": "single",
-    "ha_ready": true,
+  "consumer": "vector",
+  "variant": "single",
+  "ha_ready": true,
+  "executor": {
+    "provider": "qdrant",
     "mode": "dry-run",
-    "endpoint_ref": "vector-primary",
-    "secret_ref": "secrets/tenants/<tenant-id>/vector-primary",
-    "backup_target": "backup://<tenant-id>/vector",
-    "restore_testcases": ["restore-from-backup"],
-    "dr_testcases": ["gameday:vip-failover"],
-    "owner": {
-      "tenant_id": "<tenant-id>",
-      "consumer": "vector"
+    "plan_only": true
+  },
+  "dr": {
+    "required_testcases": ["backup_integrity", "restore_smoke"],
+    "backup": {
+      "schedule": "<placeholder>",
+      "retention": "<placeholder>"
+    },
+    "restore_verification": {
+      "smoke": "<placeholder>"
     }
-  }
+  },
+  "endpoints": {
+    "host": "example.internal",
+    "port": 6333,
+    "protocol": "https",
+    "tls_required": true
+  },
+  "secret_ref": "tenants/<tenant>/vector/<name>",
+  "resources": {}
 }

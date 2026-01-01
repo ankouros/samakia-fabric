@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EnabledExecutor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider", "mode", "plan_only"],
+  "properties": {
+    "provider": {"enum": ["postgres", "mariadb", "rabbitmq", "dragonfly", "qdrant", "kubernetes"]},
+    "mode": {"enum": ["dry-run", "execute"]},
+    "plan_only": {"type": "boolean"}
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "common": [
+    "backup_integrity",
+    "restore_smoke",
+    "credential_rotation_smoke"
+  ],
+  "database": {
+    "postgres": [
+      "restore_schema_smoke",
+      "optional_pitr_smoke"
+    ],
+    "mariadb": [
+      "restore_schema_smoke",
+      "binlog_replay_smoke"
+    ]
+  },
+  "message-queue": {
+    "rabbitmq": [
+      "definitions_backup_restore"
+    ]
+  },
+  "cache": {
+    "dragonfly": [
+      "config_snapshot_restore"
+    ]
+  },
+  "vector": {
+    "qdrant": [
+      "snapshot_restore_smoke"
+    ]
+  },
+  "cluster-only": [
+    "failover_simulation_dryrun"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EnabledDR",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["required_testcases", "backup", "restore_verification"],
+  "properties": {
+    "required_testcases": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "backup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schedule", "retention"],
+      "properties": {
+        "schedule": {"type": "string"},
+        "retention": {"type": "string"}
+      }
+    },
+    "restore_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke"],
+      "properties": {
+        "smoke": {"type": "string"}
+      }
+    }
+  }
+}

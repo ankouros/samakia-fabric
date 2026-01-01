@@ -1,23 +1,28 @@
 {
-  "apiVersion": "samakia.fabric/v1alpha1",
-  "kind": "TenantConsumerBinding",
-  "metadata": {
-    "tenant_id": "project-birds",
-    "consumer": "message-queue"
-  },
-  "spec": {
-    "consumer": "message-queue",
-    "variant": "single",
-    "ha_ready": true,
+  "consumer": "message-queue",
+  "variant": "single",
+  "ha_ready": true,
+  "executor": {
+    "provider": "rabbitmq",
     "mode": "dry-run",
-    "endpoint_ref": "mq-primary",
-    "secret_ref": "secrets/tenants/project-birds/mq-primary",
-    "backup_target": "backup://project-birds/message-queue",
-    "restore_testcases": ["restore-from-backup"],
-    "dr_testcases": ["gameday:vip-failover"],
-    "owner": {
-      "tenant_id": "project-birds",
-      "consumer": "message-queue"
+    "plan_only": true
+  },
+  "dr": {
+    "required_testcases": ["backup_integrity", "restore_smoke"],
+    "backup": {
+      "schedule": "<placeholder>",
+      "retention": "<placeholder>"
+    },
+    "restore_verification": {
+      "smoke": "<placeholder>"
     }
-  }
+  },
+  "endpoints": {
+    "host": "mq.project-birds.internal",
+    "port": 5672,
+    "protocol": "tcp",
+    "tls_required": true
+  },
+  "secret_ref": "tenants/project-birds/message-queue/primary",
+  "resources": {}
 }
