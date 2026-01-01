@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TenantBinding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "TenantBinding"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant", "env", "workload_id", "workload_type"],
+      "properties": {
+        "tenant": {"type": "string"},
+        "env": {"enum": ["dev", "shared", "staging", "prod"]},
+        "workload_id": {"type": "string"},
+        "workload_type": {"enum": ["k8s", "vm", "job", "external"]}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumers"],
+      "properties": {
+        "consumers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "provider",
+              "variant",
+              "ref",
+              "access_mode",
+              "secret_ref",
+              "connection_profile",
+              "lifecycle"
+            ],
+            "properties": {
+              "type": {"enum": ["database", "mq", "cache", "vector"]},
+              "provider": {"type": "string"},
+              "variant": {"enum": ["single", "cluster"]},
+              "ref": {"type": "string"},
+              "access_mode": {"enum": ["read", "readwrite"]},
+              "secret_ref": {"type": "string"},
+              "connection_profile": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["protocol", "tls_required"],
+                "properties": {
+                  "protocol": {"type": "string"},
+                  "tls_required": {"type": "boolean"},
+                  "connect_timeout_ms": {"type": "integer", "minimum": 1},
+                  "read_timeout_ms": {"type": "integer", "minimum": 1}
+                }
+              },
+              "lifecycle": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["rotate_credentials", "revoke_on_delete"],
+                "properties": {
+                  "rotate_credentials": {"enum": ["manual", "scheduled"]},
+                  "revoke_on_delete": {"type": "boolean"}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

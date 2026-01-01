@@ -1,0 +1,50 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantBinding",
+  "metadata": {
+    "tenant": "samakia-internal-tools",
+    "env": "shared",
+    "workload_id": "ops-api",
+    "workload_type": "k8s"
+  },
+  "spec": {
+    "consumers": [
+      {
+        "type": "mq",
+        "provider": "rabbitmq",
+        "variant": "single",
+        "ref": "contracts/tenants/examples/samakia-internal-tools/consumers/message-queue/enabled.yml",
+        "access_mode": "readwrite",
+        "secret_ref": "tenants/samakia-internal-tools/message-queue/ops-api",
+        "connection_profile": {
+          "protocol": "https",
+          "tls_required": true,
+          "connect_timeout_ms": 5000,
+          "read_timeout_ms": 10000
+        },
+        "lifecycle": {
+          "rotate_credentials": "manual",
+          "revoke_on_delete": true
+        }
+      },
+      {
+        "type": "vector",
+        "provider": "qdrant",
+        "variant": "single",
+        "ref": "contracts/tenants/examples/samakia-internal-tools/consumers/vector/enabled.yml",
+        "access_mode": "readwrite",
+        "secret_ref": "tenants/samakia-internal-tools/vector/ops-api",
+        "connection_profile": {
+          "protocol": "https",
+          "tls_required": true,
+          "connect_timeout_ms": 5000,
+          "read_timeout_ms": 10000
+        },
+        "lifecycle": {
+          "rotate_credentials": "manual",
+          "revoke_on_delete": true
+        }
+      }
+    ]
+  }
+}

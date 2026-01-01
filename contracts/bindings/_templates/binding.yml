@@ -1,0 +1,32 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantBinding",
+  "metadata": {
+    "tenant": "<tenant-id>",
+    "env": "dev",
+    "workload_id": "<workload-id>",
+    "workload_type": "k8s"
+  },
+  "spec": {
+    "consumers": [
+      {
+        "type": "database",
+        "provider": "postgres",
+        "variant": "single",
+        "ref": "contracts/tenants/<tenant-id>/consumers/database/enabled.yml",
+        "access_mode": "readwrite",
+        "secret_ref": "tenants/<tenant-id>/database/<workload-id>",
+        "connection_profile": {
+          "protocol": "tcp",
+          "tls_required": true,
+          "connect_timeout_ms": 5000,
+          "read_timeout_ms": 10000
+        },
+        "lifecycle": {
+          "rotate_credentials": "manual",
+          "revoke_on_delete": true
+        }
+      }
+    ]
+  }
+}

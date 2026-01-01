@@ -907,6 +907,122 @@ Evidence packets created under `evidence/tenants/...`.
 #### Rollback / safe exit
 Fix contracts and re-run evidence.
 
+---
+
+## Tenant bindings (Phase 12)
+
+### Task: Create a binding from template
+
+#### Intent
+Define how a workload consumes substrate endpoints (read-only contract).
+
+#### Preconditions
+- Tenant contract exists
+- Binding template present under `contracts/bindings/_templates/`
+
+#### Command
+```bash
+TENANT_ID="project-birds"
+WORKLOAD_ID="birds-api"
+DEST="contracts/bindings/tenants/${TENANT_ID}"
+mkdir -p "${DEST}"
+cp contracts/bindings/_templates/binding.yml "${DEST}/${WORKLOAD_ID}.binding.yml"
+```
+
+#### Expected result
+Binding file created and ready to edit.
+
+#### Evidence outputs
+None.
+
+#### Failure modes
+- Missing binding template
+- Invalid tenant id
+
+#### Rollback / safe exit
+Remove the binding file if created in error.
+
+### Task: Validate bindings
+
+#### Intent
+Validate binding schema, semantics, and safety (capacity guard included).
+
+#### Preconditions
+- Binding contracts present under `contracts/bindings/tenants/`
+
+#### Command
+```bash
+make bindings.validate TENANT=all
+```
+
+#### Expected result
+Binding checks PASS.
+
+#### Evidence outputs
+None by default.
+
+#### Failure modes
+- Schema mismatch
+- Invalid tenant references
+- Capacity guard failure
+
+#### Rollback / safe exit
+Fix binding files and re-run validation.
+
+### Task: Render connection manifests (read-only)
+
+#### Intent
+Generate redacted connection manifests for workloads (no secrets).
+
+#### Preconditions
+- Binding contracts valid
+
+#### Command
+```bash
+make bindings.render TENANT=all
+```
+
+#### Expected result
+Connection manifests written under `artifacts/bindings/...`.
+
+#### Evidence outputs
+`artifacts/bindings/<tenant>/<workload>/...`
+
+#### Failure modes
+- Missing referenced enabled contract
+- Invalid endpoint shape
+
+#### Rollback / safe exit
+Fix binding or enabled contract and re-run render.
+
+### Task: Apply binding (guarded, non-prod)
+
+#### Intent
+Approve and write manifests to the approved artifacts location.
+
+#### Preconditions
+- Binding validated
+- Non-prod environment
+
+#### Command
+```bash
+BIND_EXECUTE=1 \
+make bindings.apply TENANT=project-birds WORKLOAD=birds-api
+```
+
+#### Expected result
+Evidence packet created and manifests written under `artifacts/bindings/...`.
+
+#### Evidence outputs
+`evidence/bindings/<tenant>/<UTC>/...`
+
+#### Failure modes
+- Missing `BIND_EXECUTE=1`
+- Prod binding without approval
+
+#### Rollback / safe exit
+Stop; do not propagate manifests to downstream systems.
+
 ### Task: Issue tenant credentials (offline-first)
 
 #### Intent

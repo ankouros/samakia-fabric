@@ -91,6 +91,9 @@ jobs:
           make tenants.execute.policy.check
           make tenants.dr.validate
 
+      - name: Binding contract checks
+        run: make bindings.validate TENANT=all
+
       - name: Substrate contract checks
         run: make substrate.contracts.validate
 

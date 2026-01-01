@@ -144,6 +144,14 @@ The format is inspired by:
 - Gate targets: `make phase11.hardening.entry.check`, `make phase11.hardening.accept`.
 - Evidence packets under `evidence/hardening/<UTC>/`.
 
+#### Tenant bindings (Phase 12 Part 1)
+- Binding contract schema + templates under `contracts/bindings/`.
+- Binding validation + safety checks (`make bindings.validate`).
+- Read-only connection manifest rendering (`make bindings.render`).
+- Guarded apply entrypoint (`make bindings.apply`) with evidence output.
+- Phase 12 Part 1 entry checklist: `acceptance/PHASE12_PART1_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 1 acceptance marker: `acceptance/PHASE12_PART1_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

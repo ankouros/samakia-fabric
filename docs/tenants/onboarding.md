@@ -10,6 +10,7 @@ Follow the canonical operator cookbook tasks:
 - “Create a new tenant from templates”
 - “Validate tenant contracts”
 - “Generate tenant evidence packet”
+- “Validate bindings” and “Render connection manifests”
 - “Phase 10 entry checklist (design-only)”
 - “Phase 10 Part 2 entry checklist” and “Phase 10 Part 2 acceptance”
 

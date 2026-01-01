@@ -498,6 +498,28 @@ Non-scope:
 
 ---
 
+## Phase 12 Part 1 — Tenant Bindings (Contract-Only)
+
+Goal: Connect tenant workloads to substrate endpoints with contract-only bindings
+and deterministic, non-destructive connection manifests.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Binding contract schema + templates under `contracts/bindings/`.
+- Binding validation + safety checks (`make bindings.validate`).
+- Read-only connection manifest rendering (`make bindings.render`).
+- Guarded apply entrypoint (`make bindings.apply`) with evidence output.
+- Phase 12 Part 1 entry checklist: `acceptance/PHASE12_PART1_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 1 acceptance marker: `acceptance/PHASE12_PART1_ACCEPTED.md`.
+
+Non-scope:
+- No substrate provisioning
+- No secrets issued in repo
+- CI remains read-only
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

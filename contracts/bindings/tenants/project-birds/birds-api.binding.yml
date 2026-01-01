@@ -1,0 +1,50 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantBinding",
+  "metadata": {
+    "tenant": "project-birds",
+    "env": "dev",
+    "workload_id": "birds-api",
+    "workload_type": "k8s"
+  },
+  "spec": {
+    "consumers": [
+      {
+        "type": "database",
+        "provider": "postgres",
+        "variant": "single",
+        "ref": "contracts/tenants/examples/project-birds/consumers/database/enabled.yml",
+        "access_mode": "readwrite",
+        "secret_ref": "tenants/project-birds/database/birds-api",
+        "connection_profile": {
+          "protocol": "tcp",
+          "tls_required": true,
+          "connect_timeout_ms": 5000,
+          "read_timeout_ms": 10000
+        },
+        "lifecycle": {
+          "rotate_credentials": "manual",
+          "revoke_on_delete": true
+        }
+      },
+      {
+        "type": "cache",
+        "provider": "dragonfly",
+        "variant": "single",
+        "ref": "contracts/tenants/examples/project-birds/consumers/cache/enabled.yml",
+        "access_mode": "readwrite",
+        "secret_ref": "tenants/project-birds/cache/birds-api",
+        "connection_profile": {
+          "protocol": "tcp",
+          "tls_required": true,
+          "connect_timeout_ms": 3000,
+          "read_timeout_ms": 8000
+        },
+        "lifecycle": {
+          "rotate_credentials": "manual",
+          "revoke_on_delete": true
+        }
+      }
+    ]
+  }
+}

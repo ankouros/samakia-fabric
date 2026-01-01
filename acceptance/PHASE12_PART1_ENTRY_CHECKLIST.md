@@ -1,0 +1,62 @@
+# Phase 12 Part 1 Entry Checklist
+
+Timestamp (UTC): 2026-01-01T15:20:30Z
+
+## Criteria
+- Phase 11 hardening accepted
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/bindings/_schema/binding.schema.json
+  - Command: test -f contracts/bindings/_schema/binding.schema.json
+  - Result: PASS
+- File present: contracts/bindings/_templates/binding.yml
+  - Command: test -f contracts/bindings/_templates/binding.yml
+  - Result: PASS
+- File present: docs/bindings/README.md
+  - Command: test -f docs/bindings/README.md
+  - Result: PASS
+- File present: docs/bindings/secrets.md
+  - Command: test -f docs/bindings/secrets.md
+  - Result: PASS
+- File present: ops/bindings/validate/validate-binding-schema.sh
+  - Command: test -f ops/bindings/validate/validate-binding-schema.sh
+  - Result: PASS
+- File present: ops/bindings/validate/validate-binding-semantics.sh
+  - Command: test -f ops/bindings/validate/validate-binding-semantics.sh
+  - Result: PASS
+- File present: ops/bindings/validate/validate-binding-safety.sh
+  - Command: test -f ops/bindings/validate/validate-binding-safety.sh
+  - Result: PASS
+- File present: ops/bindings/render/render-connection-manifest.sh
+  - Command: test -f ops/bindings/render/render-connection-manifest.sh
+  - Result: PASS
+- File present: ops/bindings/apply/bind.sh
+  - Command: test -f ops/bindings/apply/bind.sh
+  - Result: PASS
+- Cookbook includes bindings tasks
+  - Command: rg -n "bindings\.validate" docs/operator/cookbook.md
+  - Result: PASS
+- Makefile target present: bindings.validate
+  - Command: rg -n '^bindings\.validate:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.render
+  - Command: rg -n '^bindings\.render:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.apply
+  - Command: rg -n '^bindings\.apply:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part1.entry.check
+  - Command: rg -n '^phase12\.part1\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part1.accept
+  - Command: rg -n '^phase12\.part1\.accept:' Makefile
+  - Result: PASS
+- Artifacts paths gitignored
+  - Command: rg -n "artifacts/" .gitignore
+  - Result: PASS
+- Evidence paths gitignored
+  - Command: rg -n "evidence/" .gitignore
+  - Result: PASS

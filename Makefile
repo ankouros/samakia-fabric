@@ -1837,6 +1837,35 @@ shared.up: ## One-command shared services deployment (tf apply -> bootstrap -> s
 	'
 
 ###############################################################################
+# Tenant bindings (Phase 12 Part 1)
+###############################################################################
+
+.PHONY: bindings.validate
+bindings.validate: ## Validate tenant bindings (schema + semantics + safety)
+	@bash "$(REPO_ROOT)/ops/bindings/validate/validate-binding-schema.sh"
+	@bash "$(REPO_ROOT)/ops/bindings/validate/validate-binding-semantics.sh"
+	@bash "$(REPO_ROOT)/ops/bindings/validate/validate-binding-safety.sh"
+
+.PHONY: bindings.render
+bindings.render: ## Render binding connection manifests (read-only)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" bash "$(REPO_ROOT)/ops/bindings/render/render-connection-manifest.sh"
+
+.PHONY: bindings.apply
+bindings.apply: ## Apply binding (guarded; non-prod only by default)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" BIND_EXECUTE="$(BIND_EXECUTE)" BIND_PROD_APPROVED="$(BIND_PROD_APPROVED)" \
+		MAINT_WINDOW_START="$(MAINT_WINDOW_START)" MAINT_WINDOW_END="$(MAINT_WINDOW_END)" \
+		EVIDENCE_SIGN="$(EVIDENCE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		bash "$(REPO_ROOT)/ops/bindings/apply/bind.sh"
+
+.PHONY: phase12.part1.entry.check
+phase12.part1.entry.check: ## Phase 12 Part 1 entry checklist
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part1-entry-check.sh"
+
+.PHONY: phase12.part1.accept
+phase12.part1.accept: ## Phase 12 Part 1 acceptance (bindings only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part1-accept.sh"
+
+###############################################################################
 # Operator UX (Phase 9)
 ###############################################################################
 

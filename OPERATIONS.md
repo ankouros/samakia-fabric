@@ -45,9 +45,15 @@ Tenant binding workflows live in:
 - `docs/tenants/README.md`
 - `docs/tenants/onboarding.md`
 - `docs/tenants/consumer-bindings.md`
+- `docs/bindings/README.md`
+- `docs/bindings/secrets.md`
 - Evidence packets (gitignored) are written under `evidence/tenants/<tenant>/<UTC>/`.
 - Execute mode is **guarded and opt-in**; see the operator cookbook for `tenants.plan`,
   `tenants.apply`, and DR dry-run/execute flows.
+- Binding contracts and connection manifests:
+  - Validate: `make bindings.validate TENANT=all`
+  - Render: `make bindings.render TENANT=all`
+  - Apply (guarded): `make bindings.apply TENANT=<tenant> WORKLOAD=<id>`
 
 VM image workflows live in:
 

@@ -607,3 +607,16 @@ are intact before any workload-facing routing is enabled.
 The hardening checklist is machine-verifiable: `hardening/checklist.json` is
 the source of truth, validated in CI and rendered into operator-facing
 markdown.
+
+## Phase 12 Part 1 — Tenant Bindings (Contract-Only)
+
+Phase 12 Part 1 introduces tenant binding contracts that map workloads to
+enabled substrate endpoints without provisioning or secrets issuance:
+
+- Contract schema + templates under `contracts/bindings/`.
+- Validation + safety gates (`make bindings.validate`).
+- Read-only connection manifest rendering (`make bindings.render`).
+- Guarded apply entrypoint with evidence output (opt-in; never in CI).
+
+Bindings are contract-only and deterministic; manifests are redacted and
+evidence remains gitignored.
