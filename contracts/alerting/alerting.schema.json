@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Samakia Alert Routing",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "defaults", "envs", "tenants", "quiet_hours", "sinks"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "v1"
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["delivery", "local_evidence", "rate_limit", "quiet_hours", "maintenance_window"],
+      "properties": {
+        "delivery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {
+            "enabled": {"type": "boolean"}
+          }
+        },
+        "local_evidence": {"type": "boolean"},
+        "rate_limit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["window", "max_events"],
+          "properties": {
+            "window": {"type": "string"},
+            "max_events": {"type": "integer", "minimum": 1}
+          }
+        },
+        "quiet_hours": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {
+            "enabled": {"type": "boolean"}
+          }
+        },
+        "maintenance_window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required_for_prod"],
+          "properties": {
+            "required_for_prod": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "envs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["samakia-dev", "samakia-shared", "samakia-prod"],
+      "properties": {
+        "samakia-dev": {"$ref": "#/definitions/env"},
+        "samakia-shared": {"$ref": "#/definitions/env"},
+        "samakia-prod": {"$ref": "#/definitions/env"}
+      }
+    },
+    "tenants": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/tenant"},
+      "minItems": 1
+    },
+    "providers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "postgres": {"$ref": "#/definitions/provider"},
+        "mariadb": {"$ref": "#/definitions/provider"},
+        "rabbitmq": {"$ref": "#/definitions/provider"},
+        "dragonfly": {"$ref": "#/definitions/provider"},
+        "qdrant": {"$ref": "#/definitions/provider"}
+      }
+    },
+    "quiet_hours": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["samakia-dev", "samakia-shared", "samakia-prod"],
+      "properties": {
+        "samakia-dev": {"$ref": "#/definitions/quiet_hours"},
+        "samakia-shared": {"$ref": "#/definitions/quiet_hours"},
+        "samakia-prod": {"$ref": "#/definitions/quiet_hours"}
+      }
+    },
+    "sinks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slack", "webhook", "email"],
+      "properties": {
+        "slack": {"$ref": "#/definitions/sink"},
+        "webhook": {"$ref": "#/definitions/sink"},
+        "email": {"$ref": "#/definitions/sink"}
+      }
+    }
+  },
+  "definitions": {
+    "env": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "severity_mapping", "emit_on", "delivery", "rate_limit"],
+      "properties": {
+        "description": {"type": "string"},
+        "severity_mapping": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["WARN", "FAIL"],
+          "properties": {
+            "WARN": {"enum": ["info", "warning", "critical"]},
+            "FAIL": {"enum": ["info", "warning", "critical"]}
+          }
+        },
+        "emit_on": {
+          "type": "array",
+          "items": {"enum": ["WARN", "FAIL"]},
+          "minItems": 1
+        },
+        "delivery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {
+            "enabled": {"type": "boolean"}
+          }
+        },
+        "rate_limit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["window", "max_events"],
+          "properties": {
+            "window": {"type": "string"},
+            "max_events": {"type": "integer", "minimum": 1}
+          }
+        },
+        "require": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "signed_evidence": {"type": "boolean"},
+            "change_window_context": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "tenant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "envs"],
+      "properties": {
+        "id": {"type": "string"},
+        "envs": {
+          "type": "array",
+          "items": {"enum": ["samakia-dev", "samakia-shared", "samakia-prod"]},
+          "minItems": 1
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": {"type": "boolean"}
+      }
+    },
+    "quiet_hours": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timezone", "windows"],
+      "properties": {
+        "timezone": {"type": "string"},
+        "windows": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/quiet_window"}
+        }
+      }
+    },
+    "quiet_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": {"type": "string"},
+        "to": {"type": "string"}
+      }
+    },
+    "sink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "secret_ref"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "secret_ref": {"type": "string"}
+      }
+    }
+  }
+}

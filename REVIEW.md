@@ -583,3 +583,14 @@ enabled contracts, without any remediation:
 
 Drift is reported as PASS/WARN/FAIL but never auto-remediated; all outputs are
 redacted and evidence is gitignored.
+
+## Phase 11 Part 5 — Alert Routing Defaults (Evidence-Only)
+
+Phase 11 Part 5 defines environment-aligned, conservative drift alert routing
+defaults:
+
+- Explicit tenant allowlist and provider filters (no wildcards).
+- Evidence-only emission with local packets; all sinks disabled by default.
+- Quiet hours and maintenance window requirements for production.
+
+No remediation or external delivery is enabled unless explicitly configured.

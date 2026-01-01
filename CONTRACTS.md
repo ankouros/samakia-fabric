@@ -59,3 +59,4 @@ Any change that violates a contract must be redesigned before merging.
 - Operator UX is a first-class contract: `docs/operator/cookbook.md` is canonical, and operator-visible commands must be documented or explicitly waived by policy.
 - Tenant bindings and substrate executor contracts are metadata-only by default; enabled.yml is contract-first and execution is always guarded, auditable, and opt-in.
 - Substrate runtime observability and drift classification are read-only; evidence is mandatory and drift never auto-remediates or fails CI by itself.
+- Drift alert routing defaults are evidence-only; external delivery is disabled unless explicitly enabled and allowed.

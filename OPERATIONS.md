@@ -60,6 +60,10 @@ Substrate executor design (Phase 11) lives in:
 - `docs/substrate/slo-failure-semantics.md`
 - `docs/substrate/observability.md`
 - `contracts/substrate/`
+- Default drift alert routing (evidence-only):
+  - `contracts/alerting/routing.yml`
+  - `make substrate.alert.validate`
+  - `make phase11.part5.routing.accept`
 - Plan-only executor workflow (read-only):
   - `make substrate.plan TENANT=all`
   - `make substrate.dr.dryrun TENANT=all`

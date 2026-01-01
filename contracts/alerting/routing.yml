@@ -1,0 +1,135 @@
+{
+  "version": "v1",
+  "defaults": {
+    "delivery": {
+      "enabled": false
+    },
+    "local_evidence": true,
+    "rate_limit": {
+      "window": "15m",
+      "max_events": 3
+    },
+    "quiet_hours": {
+      "enabled": true
+    },
+    "maintenance_window": {
+      "required_for_prod": true
+    }
+  },
+  "envs": {
+    "samakia-dev": {
+      "description": "Development environment",
+      "severity_mapping": {
+        "WARN": "info",
+        "FAIL": "warning"
+      },
+      "emit_on": ["WARN", "FAIL"],
+      "delivery": {
+        "enabled": false
+      },
+      "rate_limit": {
+        "window": "30m",
+        "max_events": 2
+      }
+    },
+    "samakia-shared": {
+      "description": "Shared internal services",
+      "severity_mapping": {
+        "WARN": "warning",
+        "FAIL": "critical"
+      },
+      "emit_on": ["WARN", "FAIL"],
+      "delivery": {
+        "enabled": false
+      },
+      "rate_limit": {
+        "window": "15m",
+        "max_events": 3
+      }
+    },
+    "samakia-prod": {
+      "description": "Production environment",
+      "severity_mapping": {
+        "WARN": "warning",
+        "FAIL": "critical"
+      },
+      "emit_on": ["WARN", "FAIL"],
+      "delivery": {
+        "enabled": false
+      },
+      "rate_limit": {
+        "window": "10m",
+        "max_events": 5
+      },
+      "require": {
+        "signed_evidence": true,
+        "change_window_context": true
+      }
+    }
+  },
+  "tenants": [
+    {
+      "id": "samakia-internal-tools",
+      "envs": ["samakia-dev", "samakia-shared"]
+    },
+    {
+      "id": "project-birds",
+      "envs": ["samakia-dev"]
+    }
+  ],
+  "providers": {
+    "postgres": {
+      "enabled": true
+    },
+    "mariadb": {
+      "enabled": true
+    },
+    "rabbitmq": {
+      "enabled": true
+    },
+    "dragonfly": {
+      "enabled": true
+    },
+    "qdrant": {
+      "enabled": true
+    }
+  },
+  "quiet_hours": {
+    "samakia-dev": {
+      "timezone": "Europe/Athens",
+      "windows": [
+        {
+          "from": "20:00",
+          "to": "08:00"
+        }
+      ]
+    },
+    "samakia-shared": {
+      "timezone": "Europe/Athens",
+      "windows": [
+        {
+          "from": "22:00",
+          "to": "07:00"
+        }
+      ]
+    },
+    "samakia-prod": {
+      "timezone": "Europe/Athens",
+      "windows": []
+    }
+  },
+  "sinks": {
+    "slack": {
+      "enabled": false,
+      "secret_ref": "slack-webhook"
+    },
+    "webhook": {
+      "enabled": false,
+      "secret_ref": "webhook-url"
+    },
+    "email": {
+      "enabled": false,
+      "secret_ref": "smtp-creds"
+    }
+  }
+}

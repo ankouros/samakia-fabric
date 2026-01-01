@@ -100,6 +100,9 @@ jobs:
       - name: Substrate observe compare (read-only)
         run: make substrate.observe.compare TENANT=all
 
+      - name: Drift alert routing validation
+        run: make substrate.alert.validate
+
       - name: Consumer readiness packets
         run: |
           make consumers.evidence

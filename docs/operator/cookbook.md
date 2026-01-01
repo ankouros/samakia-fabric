@@ -126,6 +126,62 @@ Stop and remediate environment/credentials.
 
 ---
 
+## Alerting (routing defaults)
+
+### Task: Validate drift alert routing defaults
+
+#### Intent
+Validate the routing defaults for drift alert evidence emission.
+
+#### Preconditions
+- Routing defaults present under `contracts/alerting/`
+
+#### Command
+```bash
+make substrate.alert.validate
+```
+
+#### Expected result
+Routing validation PASS with no external delivery enabled.
+
+#### Evidence outputs
+None (validation only).
+
+#### Failure modes
+- Missing tenant allowlist entry
+- Delivery enabled by default
+
+#### Rollback / safe exit
+Stop and fix routing configuration.
+
+### Task: Run routing defaults acceptance (evidence only)
+
+#### Intent
+Simulate WARN/FAIL drift events and verify evidence-only routing.
+
+#### Preconditions
+- Routing defaults validated
+
+#### Command
+```bash
+make phase11.part5.routing.accept
+```
+
+#### Expected result
+Evidence packets written under `evidence/alerts/` and no delivery attempted.
+
+#### Evidence outputs
+`evidence/alerts/<env>/<UTC>/...`
+
+#### Failure modes
+- Routing schema violation
+- Tenant not allowlisted
+
+#### Rollback / safe exit
+Stop; do not enable external sinks.
+
+---
+
 ## GameDays (dry-run vs execute)
 
 ### Task: GameDay dry-run (safe)

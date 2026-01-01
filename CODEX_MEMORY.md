@@ -17,3 +17,15 @@
 - `make substrate.observe.compare TENANT=all`
 - `make phase11.part4.entry.check`
 - `make phase11.part4.accept`
+
+## Phase 11 Part 5 Summary
+- Added drift alert routing defaults under `contracts/alerting/` with strict env-aligned policy.
+- Added alert routing validation under `ops/substrate/alert/` and Phase 11 Part 5 entry/accept scripts.
+- Wired Makefile targets and PR validation to enforce `substrate.alert.validate`.
+- Updated operator docs and governance docs to reference alert routing defaults and acceptance.
+
+## Tests Run (Part 5)
+- `make policy.check`
+- `make substrate.alert.validate`
+- `make phase11.part5.entry.check`
+- `make phase11.part5.routing.accept`

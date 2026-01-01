@@ -132,6 +132,11 @@ The format is inspired by:
 - Phase 11 Part 4 entry checklist: `acceptance/PHASE11_PART4_ENTRY_CHECKLIST.md`.
 - Phase 11 Part 4 acceptance marker: `acceptance/PHASE11_PART4_ACCEPTED.md`.
 
+#### Substrate executors (Phase 11 Part 5)
+- Default drift alert routing aligned to environments (evidence-only, no delivery by default).
+- Routing validation target: `make substrate.alert.validate`.
+- Phase 11 Part 5 acceptance marker: `acceptance/PHASE11_PART5_ROUTING_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

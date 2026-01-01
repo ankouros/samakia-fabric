@@ -1090,6 +1090,10 @@ substrate.observe.compare: ## Compare declared vs observed substrate state (read
 substrate.observe.evidence: ## Generate substrate observability evidence (read-only) (TENANT=<id|all>)
 	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/observe/compare.sh"
 
+.PHONY: substrate.alert.validate
+substrate.alert.validate: ## Validate drift alert routing defaults (read-only)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(REPO_ROOT)/ops/substrate/alert/validate-routing.sh"
+
 .PHONY: phase10.entry.check
 phase10.entry.check: ## Phase 10 entry checklist (writes acceptance/PHASE10_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase10-entry-check.sh"
@@ -1149,6 +1153,14 @@ phase11.part4.entry.check: ## Phase 11 Part 4 entry checklist (writes acceptance
 .PHONY: phase11.part4.accept
 phase11.part4.accept: ## Run Phase 11 Part 4 acceptance suite (observability, read-only)
 	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part4-accept.sh"
+
+.PHONY: phase11.part5.entry.check
+phase11.part5.entry.check: ## Phase 11 Part 5 entry checklist (writes acceptance/PHASE11_PART5_ENTRY_CHECKLIST.md)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part5-entry-check.sh"
+
+.PHONY: phase11.part5.routing.accept
+phase11.part5.routing.accept: ## Run Phase 11 Part 5 routing defaults acceptance (read-only)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part5-routing-accept.sh"
 
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)

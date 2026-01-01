@@ -23,5 +23,6 @@ See provider-specific notes:
 - `docs/substrate/capacity.md`
 - `docs/substrate/slo-failure-semantics.md`
 - `docs/substrate/observability.md`
+- `contracts/alerting/README.md`
 
 Operator commands live in `docs/operator/cookbook.md` (plan + DR dry-run + guarded execute).
