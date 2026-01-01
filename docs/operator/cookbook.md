@@ -549,6 +549,169 @@ Drift classification emitted as `PASS`, `WARN`, or `FAIL`. No auto-remediation o
 #### Rollback / safe exit
 None required (read-only).
 
+### Task: Generate substrate observation evidence (read-only)
+
+#### Intent
+Produce deterministic observation evidence packets without mutation.
+
+#### Preconditions
+- Substrate observe tooling present
+- Enabled bindings present
+
+#### Command
+```bash
+make substrate.observe.evidence TENANT=all
+```
+
+#### Expected result
+Observation evidence written under `evidence/tenants/<tenant>/<UTC>/substrate-observe/`.
+
+#### Evidence outputs
+`evidence/tenants/<tenant>/<UTC>/substrate-observe/observed.json`
+
+#### Failure modes
+- Invalid enabled bindings
+- Missing tooling (bash, jq, python3)
+
+#### Rollback / safe exit
+None required (read-only).
+
+### Task: Run Phase 11 hardening entry check (read-only)
+
+#### Intent
+Generate the pre-exposure hardening entry checklist before allowing Phase 12 exposure.
+
+#### Preconditions
+- Phase 11 Part 5 acceptance marker present
+- REQUIRED-FIXES.md has no OPEN items
+
+#### Command
+```bash
+make phase11.hardening.entry.check
+```
+
+#### Expected result
+Checklist written to `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing Phase 11 acceptance markers
+- Hardening prerequisites missing (capacity guard/observe tooling)
+- Phase 12 artifacts detected
+
+#### Rollback / safe exit
+None required (read-only).
+
+### Task: Run Phase 11 hardening gate acceptance (read-only)
+
+#### Intent
+Run the full pre-exposure hardening gate and emit the acceptance marker.
+
+#### Preconditions
+- Entry checklist passes (`make phase11.hardening.entry.check`)
+
+#### Command
+```bash
+make phase11.hardening.accept
+```
+
+#### Expected result
+Acceptance marker and evidence packet written; Phase 12 exposure may proceed.
+
+#### Evidence outputs
+- `acceptance/PHASE11_HARDENING_ACCEPTED.md`
+- `evidence/hardening/<UTC>/summary.md`
+
+#### Failure modes
+- Lint/validate/policy failures
+- Observability compare failures
+- OPEN items in REQUIRED-FIXES.md
+
+#### Rollback / safe exit
+None required (read-only).
+
+### Task: Run Phase 11 Part 4 entry check (read-only)
+
+#### Intent
+Verify Part 4 readiness before running its acceptance gate.
+
+#### Preconditions
+- Phase 11 Part 3 accepted
+- REQUIRED-FIXES.md has no OPEN items
+
+#### Command
+```bash
+make phase11.part4.entry.check
+```
+
+#### Expected result
+Entry checklist written under `acceptance/PHASE11_PART4_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART4_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing Part 4 prerequisites
+- OPEN items in REQUIRED-FIXES.md
+
+#### Rollback / safe exit
+None required (read-only).
+
+### Task: Run Phase 11 Part 4 acceptance (read-only)
+
+#### Intent
+Run Part 4 acceptance gates and emit the acceptance marker.
+
+#### Preconditions
+- Part 4 entry checklist passes
+
+#### Command
+```bash
+make phase11.part4.accept
+```
+
+#### Expected result
+Acceptance marker written; no infra mutation occurs.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART4_ACCEPTED.md`
+
+#### Failure modes
+- Policy/validation failures
+- Missing prerequisite artifacts
+
+#### Rollback / safe exit
+None required (read-only).
+
+### Task: Run Phase 11 Part 5 entry check (read-only)
+
+#### Intent
+Verify Part 5 prerequisites before running routing defaults acceptance.
+
+#### Preconditions
+- Phase 11 Part 4 accepted
+- REQUIRED-FIXES.md has no OPEN items
+
+#### Command
+```bash
+make phase11.part5.entry.check
+```
+
+#### Expected result
+Entry checklist written under `acceptance/PHASE11_PART5_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART5_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing Part 5 prerequisites
+- OPEN items in REQUIRED-FIXES.md
+
+#### Rollback / safe exit
+None required (read-only).
+
 ### Task: Verify tenant substrate endpoints (read-only)
 
 #### Intent

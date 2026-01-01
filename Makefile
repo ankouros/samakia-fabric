@@ -1162,6 +1162,14 @@ phase11.part5.entry.check: ## Phase 11 Part 5 entry checklist (writes acceptance
 phase11.part5.routing.accept: ## Run Phase 11 Part 5 routing defaults acceptance (read-only)
 	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part5-routing-accept.sh"
 
+.PHONY: phase11.hardening.entry.check
+phase11.hardening.entry.check: ## Phase 11 pre-exposure hardening entry checklist (writes acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-hardening-entry-check.sh"
+
+.PHONY: phase11.hardening.accept
+phase11.hardening.accept: ## Run Phase 11 pre-exposure hardening gate (read-only)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-hardening-accept.sh"
+
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)
 	@bash "$(REPO_ROOT)/ops/consumers/validate/validate-consumers.sh"

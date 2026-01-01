@@ -479,6 +479,24 @@ Non-scope:
 
 ---
 
+## Phase 11 Hardening Gate — Pre-Exposure
+
+Goal: Ensure substrate contracts, capacity guardrails, and read-only observability
+checks pass before any Phase 12 exposure is allowed.
+
+Status: PASSED ✅
+
+### Completed (canonical)
+- Entry checklist: `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`.
+- Acceptance marker: `acceptance/PHASE11_HARDENING_ACCEPTED.md`.
+- Gate targets: `make phase11.hardening.entry.check`, `make phase11.hardening.accept`.
+
+Non-scope:
+- No apply or DR execute
+- No infrastructure mutation
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

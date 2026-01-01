@@ -594,3 +594,12 @@ defaults:
 - Quiet hours and maintenance window requirements for production.
 
 No remediation or external delivery is enabled unless explicitly configured.
+
+## Phase 11 Hardening Gate — Pre-Exposure
+
+The pre-exposure hardening gate consolidates contract integrity, capacity
+guardrails, and read-only observability checks into a single **PASS/FAIL**
+checkpoint before Phase 12 exposure. It is deliberately non-destructive:
+reachability is best-effort and failures are reported without remediation.
+This reduces exposure risk by ensuring all governance and validation layers
+are intact before any workload-facing routing is enabled.

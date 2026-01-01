@@ -137,6 +137,12 @@ The format is inspired by:
 - Routing validation target: `make substrate.alert.validate`.
 - Phase 11 Part 5 acceptance marker: `acceptance/PHASE11_PART5_ROUTING_ACCEPTED.md`.
 
+#### Substrate hardening gate (Phase 11 pre-exposure)
+- Pre-exposure hardening entry checklist: `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`.
+- Pre-exposure hardening acceptance marker: `acceptance/PHASE11_HARDENING_ACCEPTED.md`.
+- Gate targets: `make phase11.hardening.entry.check`, `make phase11.hardening.accept`.
+- Evidence packets under `evidence/hardening/<UTC>/`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets
