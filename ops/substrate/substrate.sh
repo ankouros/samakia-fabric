@@ -9,6 +9,8 @@ source "${FABRIC_REPO_ROOT}/ops/substrate/common/env.sh"
 source "${FABRIC_REPO_ROOT}/ops/substrate/common/guards.sh"
 # shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/substrate/common/plan-format.sh"
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/substrate/common/contract.sh"
 
 usage() {
   cat <<'USAGE'
@@ -17,6 +19,9 @@ Usage: substrate.sh <command> [TENANT=<id|all>]
 Commands:
   plan
   dr-dryrun
+  apply
+  verify
+  dr-execute
   doctor
 USAGE
 }
@@ -45,6 +50,7 @@ run_for_tenant() {
   local tenant_dir="$1"
   local tenant_id="$2"
   local stamp="$3"
+  local provider_dir=""
 
   if [[ "${cmd}" == "plan" ]]; then
     local out_dir="${EVIDENCE_ROOT}/${tenant_id}/${stamp}/substrate-plan"
@@ -64,6 +70,41 @@ run_for_tenant() {
     return
   fi
 
+  if [[ "${cmd}" == "apply" ]]; then
+    local contracts_json providers
+    contracts_json="$(list_enabled_contracts "${tenant_dir}" "${provider_filter}")"
+    providers="$(echo "${contracts_json}" | jq -r '.[].provider' | sort -u)"
+    if [[ -z "${providers}" ]]; then
+      echo "WARN substrate apply: no enabled contracts for tenant ${tenant_id}"
+      return
+    fi
+    for provider in ${providers}; do
+      provider_dir="${provider}"
+      if [[ "${provider}" == "dragonfly" ]]; then
+        provider_dir="cache"
+      fi
+      TENANT="${tenant_id}" bash "${FABRIC_REPO_ROOT}/ops/substrate/${provider_dir}/apply.sh"
+    done
+    return
+  fi
+
+  if [[ "${cmd}" == "verify" ]]; then
+    local contracts_json providers
+    contracts_json="$(list_enabled_contracts "${tenant_dir}" "${provider_filter}")"
+    providers="$(echo "${contracts_json}" | jq -r '.[].provider' | sort -u)"
+    if [[ -z "${providers}" ]]; then
+      echo "WARN substrate verify: no enabled contracts for tenant ${tenant_id}"
+      return
+    fi
+    for provider in ${providers}; do
+      provider_dir="${provider}"
+      if [[ "${provider}" == "dragonfly" ]]; then
+        provider_dir="cache"
+      fi
+      TENANT="${tenant_id}" bash "${FABRIC_REPO_ROOT}/ops/substrate/${provider_dir}/verify.sh"
+    done
+    return
+  fi
 }
 
 case "${cmd}" in
@@ -90,6 +131,40 @@ case "${cmd}" in
         exit 1
       fi
       run_for_tenant "${tenant_dir}" "${TENANT}" "${stamp}"
+    fi
+    ;;
+  apply|verify)
+    require_tools
+    require_paths "${TENANTS_ROOT}" "${DR_TAXONOMY}" "${FABRIC_REPO_ROOT}/ops/substrate/validate-enabled-contracts.sh"
+
+    "${FABRIC_REPO_ROOT}/ops/tenants/validate.sh"
+    "${FABRIC_REPO_ROOT}/ops/tenants/validate-consumer-bindings.sh"
+    "${FABRIC_REPO_ROOT}/ops/substrate/validate-enabled-contracts.sh"
+
+    if [[ "${TENANT}" == "all" ]]; then
+      for tenant_dir in "${TENANTS_ROOT}"/*; do
+        [[ -d "${tenant_dir}" ]] || continue
+        tenant_id="$(basename "${tenant_dir}")"
+        run_for_tenant "${tenant_dir}" "${tenant_id}" ""
+      done
+    else
+      tenant_dir="${TENANTS_ROOT}/${TENANT}"
+      if [[ ! -d "${tenant_dir}" ]]; then
+        echo "ERROR: tenant not found: ${TENANT}" >&2
+        exit 1
+      fi
+      run_for_tenant "${tenant_dir}" "${TENANT}" ""
+    fi
+    ;;
+  dr-execute)
+    if [[ -n "${provider_filter}" ]]; then
+      echo "ERROR: dr-execute does not support PROVIDER filter" >&2
+      exit 1
+    fi
+    if [[ -n "${TENANT:-}" ]]; then
+      TENANT="${TENANT}" bash "${FABRIC_REPO_ROOT}/ops/substrate/common/dr-run.sh"
+    else
+      bash "${FABRIC_REPO_ROOT}/ops/substrate/common/dr-run.sh"
     fi
     ;;
   doctor)

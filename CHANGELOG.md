@@ -110,6 +110,13 @@ The format is inspired by:
 - Phase 11 Part 1 entry checklist: `acceptance/PHASE11_PART1_ENTRY_CHECKLIST.md`.
 - Phase 11 Part 1 acceptance marker: `acceptance/PHASE11_PART1_ACCEPTED.md`.
 
+#### Substrate executors (Phase 11 Part 2)
+- Guarded execute policy allowlists for env/tenant/provider/variant.
+- Apply/verify/DR execute scripts per provider (Postgres/MariaDB/RabbitMQ/Dragonfly/Qdrant).
+- New targets: `substrate.apply`, `substrate.verify`, `substrate.dr.execute`.
+- Phase 11 Part 2 entry checklist: `acceptance/PHASE11_PART2_ENTRY_CHECKLIST.md`.
+- Phase 11 Part 2 acceptance marker: `acceptance/PHASE11_PART2_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

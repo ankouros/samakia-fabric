@@ -423,9 +423,9 @@ Non-scope:
 Goal: Introduce guarded, opt-in substrate execution for enabled tenant contracts,
 with deterministic evidence and strict policy enforcement.
 
-Status: Planned
+Status: Completed ✅
 
-Planned (summary):
+Delivered (summary):
 - Substrate execute policy allowlists for env/tenant/provider/variant.
 - Apply/verify/DR execute scripts per provider (Postgres/MariaDB/RabbitMQ/Dragonfly/Qdrant).
 - Planned targets: `substrate.apply`, `substrate.verify`, `substrate.dr.execute`.

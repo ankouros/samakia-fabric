@@ -60,6 +60,10 @@ Substrate executor design (Phase 11) lives in:
 - Plan-only executor workflow (read-only):
   - `make substrate.plan TENANT=all`
   - `make substrate.dr.dryrun TENANT=all`
+  - `make substrate.verify TENANT=all`
+- Guarded execute workflow (explicit opt-in; never in CI):
+  - `make substrate.apply TENANT=all ENV=samakia-dev`
+  - `make substrate.dr.execute TENANT=all ENV=samakia-dev`
 
 ### TLS policy
 - Default: strict verification

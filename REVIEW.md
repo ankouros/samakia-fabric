@@ -549,3 +549,13 @@ Phase 11 Part 1 makes the design actionable without mutation:
 
 This is still **non-destructive**: no apply paths, no secrets issuance, and no
 infrastructure mutation.
+
+## Phase 11 Part 2 — Guarded Execution
+
+Phase 11 Part 2 introduces **opt-in** execution for enabled tenant bindings with strict guards:
+
+- Execute policy allowlists for env/tenant/provider/variant; prod requires change window + signing.
+- Guarded apply/verify/DR execute scripts per provider.
+- Deterministic, redacted evidence packets under `evidence/tenants/<tenant>/<UTC>/`.
+
+CI remains read-only: plan, dry-run, and verify only.

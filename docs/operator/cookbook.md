@@ -332,6 +332,32 @@ Plan evidence generated; unreachable endpoints marked as `unknown`.
 #### Rollback / safe exit
 Stop and fix contracts; re-run plan.
 
+### Task: Verify tenant substrate endpoints (read-only)
+
+#### Intent
+Check endpoint reachability for enabled contracts without executing mutations.
+
+#### Preconditions
+- Enabled bindings present under `contracts/tenants/**/consumers/*/enabled.yml`
+
+#### Command
+```bash
+make substrate.verify TENANT=all
+```
+
+#### Expected result
+Verification evidence generated; unreachable endpoints are marked `unknown`.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/substrate-verify/...`
+
+#### Failure modes
+- Invalid enabled bindings
+- Missing tooling (bash, jq, python3)
+
+#### Rollback / safe exit
+None required (read-only).
+
 ### Task: Diagnose substrate executor prerequisites (read-only)
 
 #### Intent
@@ -384,6 +410,68 @@ DR dry-run evidence generated; no snapshots or restores executed.
 
 #### Rollback / safe exit
 Stop and fix DR requirements; re-run dry-run.
+
+### Task: Apply tenant substrate enablement (guarded)
+
+#### Intent
+Execute tenant substrate enablement for enabled contracts with explicit guards and evidence.
+
+#### Preconditions
+- Enabled contracts are valid (`make substrate.contracts.validate`).
+- Secrets resolved via `secret_ref` are available locally (offline-first secrets).
+- Execute policy allowlists include the tenant/env/provider.
+
+#### Command
+```bash
+TENANT_EXECUTE=1 I_UNDERSTAND_TENANT_MUTATION=1 EXECUTE_REASON="initial enablement" \
+ENV=samakia-dev TENANT=all \
+make substrate.apply
+```
+
+#### Expected result
+Apply executes idempotently and writes evidence under `substrate-apply/`.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/substrate-apply/...`
+
+#### Failure modes
+- Execute policy deny (env/tenant/provider not allowlisted)
+- Missing secrets for `secret_ref`
+- Idempotency error or connectivity failure
+
+#### Rollback / safe exit
+Stop and fix policy or secrets; re-run apply.
+
+### Task: Run tenant substrate DR execute (guarded)
+
+#### Intent
+Run backup + restore verification for enabled contracts with explicit guards.
+
+#### Preconditions
+- DR testcases declared in enabled contracts.
+- Execute policy allows DR execution.
+- Change window + signing required for prod.
+
+#### Command
+```bash
+TENANT_EXECUTE=1 I_UNDERSTAND_TENANT_MUTATION=1 EXECUTE_REASON="dr verification" \
+DR_EXECUTE=1 ENV=samakia-dev TENANT=all \
+make substrate.dr.execute
+```
+
+#### Expected result
+DR execute runs backups and restore verification with evidence under `substrate-dr-execute/`.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/substrate-dr-execute/...`
+
+#### Failure modes
+- DR execute guard missing
+- Change window/signing missing for prod
+- Provider-specific backup/restore failure
+
+#### Rollback / safe exit
+Stop execution; resolve provider-specific issues before re-run.
 
 ### Task: Tenant tooling doctor
 
@@ -814,6 +902,59 @@ Acceptance marker written under `acceptance/PHASE11_PART1_ACCEPTED.md`.
 
 #### Failure modes
 - Plan or DR dry-run validation errors
+
+#### Rollback / safe exit
+Stop and remediate validation issues.
+
+### Task: Phase 11 Part 2 entry checklist (guarded execute)
+
+#### Intent
+Confirm Phase 11 Part 2 entry conditions for guarded execute mode.
+
+#### Preconditions
+- Phase 11 Part 1 accepted
+- Execute policy present for substrate executors
+
+#### Command
+```bash
+make phase11.part2.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE11_PART2_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART2_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing execute policy tooling
+- Missing apply/verify/DR scripts
+
+#### Rollback / safe exit
+Stop and restore missing files.
+
+### Task: Phase 11 Part 2 acceptance (guarded execute)
+
+#### Intent
+Run Phase 11 Part 2 acceptance suite (non-destructive; apply/DR execute are guarded).
+
+#### Preconditions
+- Phase 11 Part 2 entry checklist passes
+
+#### Command
+```bash
+make phase11.part2.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE11_PART2_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART2_ACCEPTED.md`
+
+#### Failure modes
+- Validation errors
+- Missing execute policy
 
 #### Rollback / safe exit
 Stop and remediate validation issues.

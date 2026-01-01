@@ -124,3 +124,17 @@ Final status:
 - **Verification command(s):**
   - `ENV=samakia-shared make shared.obs.accept` (PASS)
   - `ENV=samakia-shared make phase2.1.accept` (PASS)
+
+---
+
+## Phase 11 Part 3 Blockers
+
+### PHASE11-PART3-MISSING-PART2-MARKER
+- **Description:** Phase 11 Part 3 hard gate failed because `acceptance/PHASE11_PART2_ACCEPTED.md` is missing.
+- **Impact:** Phase 11 Part 3 implementation cannot start; hard gate requires Part 2 acceptance.
+- **Root cause:** Phase 11 Part 2 has not been accepted/locked in this repo state.
+- **Required remediation:** Complete Phase 11 Part 2 acceptance and create `acceptance/PHASE11_PART2_ACCEPTED.md` (with self-hash) per the Phase 11 Part 2 protocol.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `make phase11.part2.accept` (PASS)
+  - `test -f acceptance/PHASE11_PART2_ACCEPTED.md` (PASS)

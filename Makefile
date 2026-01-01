@@ -1045,6 +1045,18 @@ substrate.plan: ## Generate tenant substrate plan (read-only) (TENANT=<id|all>)
 substrate.dr.dryrun: ## Generate tenant substrate DR dry-run plan (read-only) (TENANT=<id|all>)
 	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/substrate.sh" dr-dryrun "TENANT=$${TENANT:-all}"
 
+.PHONY: substrate.apply
+substrate.apply: ## Apply tenant substrate enablement (guarded) (TENANT=<id|all> ENV=<env>)
+	@TENANT="$(TENANT)" ENV="$(ENV)" bash "$(REPO_ROOT)/ops/substrate/substrate.sh" apply "TENANT=$${TENANT:-all}"
+
+.PHONY: substrate.verify
+substrate.verify: ## Verify tenant substrate endpoints (read-only) (TENANT=<id|all>)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/substrate.sh" verify "TENANT=$${TENANT:-all}"
+
+.PHONY: substrate.dr.execute
+substrate.dr.execute: ## Execute tenant substrate DR (guarded) (TENANT=<id|all> ENV=<env>)
+	@TENANT="$(TENANT)" ENV="$(ENV)" bash "$(REPO_ROOT)/ops/substrate/substrate.sh" dr-execute "TENANT=$${TENANT:-all}"
+
 .PHONY: substrate.doctor
 substrate.doctor: ## Check substrate plan tooling and contracts
 	@bash "$(REPO_ROOT)/ops/substrate/substrate.sh" doctor
@@ -1088,6 +1100,14 @@ phase11.part1.entry.check: ## Phase 11 Part 1 entry checklist (writes acceptance
 .PHONY: phase11.part1.accept
 phase11.part1.accept: ## Run Phase 11 Part 1 acceptance suite (plan-only, read-only)
 	@bash "$(OPS_SCRIPTS_DIR)/phase11-part1-accept.sh"
+
+.PHONY: phase11.part2.entry.check
+phase11.part2.entry.check: ## Phase 11 Part 2 entry checklist (writes acceptance/PHASE11_PART2_ENTRY_CHECKLIST.md)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part2-entry-check.sh"
+
+.PHONY: phase11.part2.accept
+phase11.part2.accept: ## Run Phase 11 Part 2 acceptance suite (guarded, read-only in CI)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part2-accept.sh"
 
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)

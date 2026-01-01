@@ -3,6 +3,13 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
-if [[ -n "${MAINT_WINDOW_START:-}" || -n "${MAINT_WINDOW_END:-}" ]]; then
-  echo "INFO: change window enforcement is not enabled in Phase 11 Part 1"
+start="${MAINT_WINDOW_START:-}"
+end="${MAINT_WINDOW_END:-}"
+max_minutes="${MAINT_WINDOW_MAX_MINUTES:-60}"
+
+if [[ -z "${start}" || -z "${end}" ]]; then
+  echo "ERROR: MAINT_WINDOW_START and MAINT_WINDOW_END are required" >&2
+  exit 2
 fi
+
+"${FABRIC_REPO_ROOT}/ops/scripts/maint-window.sh" --start "${start}" --end "${end}" --max-minutes "${max_minutes}"

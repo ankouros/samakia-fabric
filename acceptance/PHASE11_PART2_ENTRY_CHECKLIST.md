@@ -1,0 +1,107 @@
+# Phase 11 Part 2 Entry Checklist
+
+Timestamp (UTC): 2026-01-01T10:47:20Z
+
+## Criteria
+- Phase 11 Part 1 accepted
+  - Command: test -f acceptance/PHASE11_PART1_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- Script present: ops/substrate/common/execute-policy.yml
+  - Command: test -f ops/substrate/common/execute-policy.yml
+  - Result: PASS
+- Script present: ops/substrate/common/validate-execute-policy.sh
+  - Command: test -f ops/substrate/common/validate-execute-policy.sh
+  - Result: PASS
+- Script present: ops/substrate/common/enforce-execute-policy.sh
+  - Command: test -f ops/substrate/common/enforce-execute-policy.sh
+  - Result: PASS
+- Script present: ops/substrate/common/dr-run.sh
+  - Command: test -f ops/substrate/common/dr-run.sh
+  - Result: PASS
+- Script present: ops/substrate/postgres/apply.sh
+  - Command: test -f ops/substrate/postgres/apply.sh
+  - Result: PASS
+- Script present: ops/substrate/postgres/verify.sh
+  - Command: test -f ops/substrate/postgres/verify.sh
+  - Result: PASS
+- Script present: ops/substrate/mariadb/apply.sh
+  - Command: test -f ops/substrate/mariadb/apply.sh
+  - Result: PASS
+- Script present: ops/substrate/mariadb/verify.sh
+  - Command: test -f ops/substrate/mariadb/verify.sh
+  - Result: PASS
+- Script present: ops/substrate/rabbitmq/apply.sh
+  - Command: test -f ops/substrate/rabbitmq/apply.sh
+  - Result: PASS
+- Script present: ops/substrate/rabbitmq/verify.sh
+  - Command: test -f ops/substrate/rabbitmq/verify.sh
+  - Result: PASS
+- Script present: ops/substrate/cache/apply.sh
+  - Command: test -f ops/substrate/cache/apply.sh
+  - Result: PASS
+- Script present: ops/substrate/cache/verify.sh
+  - Command: test -f ops/substrate/cache/verify.sh
+  - Result: PASS
+- Script present: ops/substrate/qdrant/apply.sh
+  - Command: test -f ops/substrate/qdrant/apply.sh
+  - Result: PASS
+- Script present: ops/substrate/qdrant/verify.sh
+  - Command: test -f ops/substrate/qdrant/verify.sh
+  - Result: PASS
+- Script present: ops/substrate/postgres/backup.sh
+  - Command: test -f ops/substrate/postgres/backup.sh
+  - Result: PASS
+- Script present: ops/substrate/postgres/restore.sh
+  - Command: test -f ops/substrate/postgres/restore.sh
+  - Result: PASS
+- Script present: ops/substrate/mariadb/backup.sh
+  - Command: test -f ops/substrate/mariadb/backup.sh
+  - Result: PASS
+- Script present: ops/substrate/mariadb/restore.sh
+  - Command: test -f ops/substrate/mariadb/restore.sh
+  - Result: PASS
+- Script present: ops/substrate/rabbitmq/backup.sh
+  - Command: test -f ops/substrate/rabbitmq/backup.sh
+  - Result: PASS
+- Script present: ops/substrate/rabbitmq/restore.sh
+  - Command: test -f ops/substrate/rabbitmq/restore.sh
+  - Result: PASS
+- Script present: ops/substrate/cache/backup.sh
+  - Command: test -f ops/substrate/cache/backup.sh
+  - Result: PASS
+- Script present: ops/substrate/cache/restore.sh
+  - Command: test -f ops/substrate/cache/restore.sh
+  - Result: PASS
+- Script present: ops/substrate/qdrant/backup.sh
+  - Command: test -f ops/substrate/qdrant/backup.sh
+  - Result: PASS
+- Script present: ops/substrate/qdrant/restore.sh
+  - Command: test -f ops/substrate/qdrant/restore.sh
+  - Result: PASS
+- Makefile target present: substrate.apply
+  - Command: rg -n '^substrate\.apply:' Makefile
+  - Result: PASS
+- Makefile target present: substrate.verify
+  - Command: rg -n '^substrate\.verify:' Makefile
+  - Result: PASS
+- Makefile target present: substrate.dr.execute
+  - Command: rg -n '^substrate\.dr\.execute:' Makefile
+  - Result: PASS
+- Makefile target present: phase11.part2.entry.check
+  - Command: rg -n '^phase11\.part2\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase11.part2.accept
+  - Command: rg -n '^phase11\.part2\.accept:' Makefile
+  - Result: PASS
+- Cookbook includes substrate apply task
+  - Command: rg -n "substrate\.apply" docs/operator/cookbook.md
+  - Result: PASS
+- Cookbook includes substrate DR execute task
+  - Command: rg -n "substrate\.dr\.execute" docs/operator/cookbook.md
+  - Result: PASS
+- Evidence paths gitignored
+  - Command: rg -n "evidence/" .gitignore
+  - Result: PASS
