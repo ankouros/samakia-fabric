@@ -3,8 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/substrate/common/env.sh"
+# shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/substrate/common/guards.sh"
+# shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/substrate/common/plan-format.sh"
 
 usage() {
@@ -60,6 +63,7 @@ run_for_tenant() {
     echo "PASS substrate DR dry-run: ${out_dir}"
     return
   fi
+
 }
 
 case "${cmd}" in

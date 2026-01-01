@@ -418,6 +418,26 @@ Non-scope:
 
 ---
 
+## Phase 11 Part 2 — Guarded Execution
+
+Goal: Introduce guarded, opt-in substrate execution for enabled tenant contracts,
+with deterministic evidence and strict policy enforcement.
+
+Status: Planned
+
+Planned (summary):
+- Substrate execute policy allowlists for env/tenant/provider/variant.
+- Apply/verify/DR execute scripts per provider (Postgres/MariaDB/RabbitMQ/Dragonfly/Qdrant).
+- Planned targets: `substrate.apply`, `substrate.verify`, `substrate.dr.execute`.
+- Phase 11 Part 2 entry checklist + acceptance marker.
+
+Non-scope:
+- No implicit apply or DR execution
+- No secrets committed to Git
+- CI remains read-only
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

@@ -3,4 +3,6 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
-echo "INFO: change-window check is not enforced in plan-only mode"
+if [[ -n "${MAINT_WINDOW_START:-}" || -n "${MAINT_WINDOW_END:-}" ]]; then
+  echo "INFO: change window enforcement is not enabled in Phase 11 Part 1"
+fi

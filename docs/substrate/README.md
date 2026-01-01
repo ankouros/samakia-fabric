@@ -4,7 +4,7 @@ This directory documents tenant-scoped substrate executors for stateful primitiv
 
 Scope:
 - Contract-first design for `enabled.yml` bindings
-- Validation only (no execution, no infrastructure mutation)
+- Read-only planning and DR dry-run (no execute in Part 1)
 - Two variants for each consumer: `single` and `cluster`
 
 Reference contracts:
@@ -20,4 +20,4 @@ See provider-specific notes:
 - `docs/substrate/ha-semantics.md`
 - `docs/substrate/dr.md`
 
-Operator commands live in `docs/operator/cookbook.md` (substrate plan and DR dry-run tasks).
+Operator commands live in `docs/operator/cookbook.md` (plan + DR dry-run only).

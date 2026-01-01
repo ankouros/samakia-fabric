@@ -1,4 +1,4 @@
-# RabbitMQ Executor (Design-Only)
+# RabbitMQ Executor (Plan + DR Dry-Run)
 
 Design notes:
 - Consumer: `message-queue`

@@ -1,4 +1,4 @@
-# Cache Executor (Dragonfly, Design-Only)
+# Cache Executor (Dragonfly, Plan + DR Dry-Run)
 
 Design notes:
 - Consumer: `cache`

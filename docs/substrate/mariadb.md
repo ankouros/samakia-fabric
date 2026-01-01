@@ -1,4 +1,4 @@
-# MariaDB Executor (Design-Only)
+# MariaDB Executor (Plan + DR Dry-Run)
 
 Design notes:
 - Consumer: `database`

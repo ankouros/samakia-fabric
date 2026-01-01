@@ -1,4 +1,4 @@
-# Postgres Executor (Design-Only)
+# Postgres Executor (Plan + DR Dry-Run)
 
 Design notes:
 - Consumer: `database`

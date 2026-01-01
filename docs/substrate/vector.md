@@ -1,4 +1,4 @@
-# Vector Executor (Qdrant, Design-Only)
+# Vector Executor (Qdrant, Plan + DR Dry-Run)
 
 Design notes:
 - Consumer: `vector`

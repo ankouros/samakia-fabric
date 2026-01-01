@@ -818,6 +818,31 @@ Acceptance marker written under `acceptance/PHASE11_PART1_ACCEPTED.md`.
 #### Rollback / safe exit
 Stop and remediate validation issues.
 
+### Task: Phase 11 Part 2 acceptance (guarded, read-only)
+
+#### Intent
+Run the Phase 11 Part 2 acceptance suite (non-destructive; verification is best-effort).
+
+#### Preconditions
+- Phase 11 Part 2 entry checklist passes
+
+#### Command
+```bash
+make phase11.part2.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE11_PART2_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART2_ACCEPTED.md`
+
+#### Failure modes
+- Validation errors
+
+#### Rollback / safe exit
+Stop and remediate validation issues.
+
 ### Task: Onboard a project to consume Fabric primitives (design-only)
 
 #### Intent
