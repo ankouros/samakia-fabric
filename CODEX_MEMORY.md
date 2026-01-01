@@ -29,3 +29,19 @@
 - `make substrate.alert.validate`
 - `make phase11.part5.entry.check`
 - `make phase11.part5.routing.accept`
+
+## Phase 11 Hardening Gate (JSON Checklist) Summary
+- Added JSON-based hardening checklist source of truth under `hardening/` with schema, validation, and render tooling.
+- Updated hardening entry/accept scripts to use the JSON checklist, generate operator-facing Markdown, and emit a JSON acceptance marker.
+- Added Make targets for checklist validate/render/summary and wired PR validation to run the summary gate.
+- Updated governance and operator docs to reference the generated hardening docs and acceptance marker.
+
+## Tests Run (Hardening Gate)
+- `pre-commit run --all-files`
+- `bash fabric-ci/scripts/lint.sh`
+- `bash fabric-ci/scripts/validate.sh`
+- `make hardening.checklist.validate`
+- `make hardening.checklist.render`
+- `make hardening.checklist.summary`
+- `make phase11.hardening.entry.check`
+- `make phase11.hardening.accept`

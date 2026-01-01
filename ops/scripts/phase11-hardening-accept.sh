@@ -4,7 +4,8 @@ set -euo pipefail
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
 acceptance_dir="${FABRIC_REPO_ROOT}/acceptance"
-marker="${acceptance_dir}/PHASE11_HARDENING_ACCEPTED.md"
+marker="${acceptance_dir}/PHASE11_HARDENING_JSON_ACCEPTED.md"
+marker_hash="${marker}.sha256"
 stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 evidence_dir="${FABRIC_REPO_ROOT}/evidence/hardening/${stamp}"
@@ -28,6 +29,9 @@ commands=(
   "make tenants.capacity.validate TENANT=all"
   "make substrate.observe TENANT=all"
   "make substrate.observe.compare TENANT=all"
+  "make hardening.checklist.validate"
+  "make hardening.checklist.render"
+  "make hardening.checklist.summary"
   "make phase11.hardening.entry.check"
 )
 
@@ -41,6 +45,9 @@ run_step "Substrate contract validation" make -C "${FABRIC_REPO_ROOT}" substrate
 run_step "Capacity validation" make -C "${FABRIC_REPO_ROOT}" tenants.capacity.validate TENANT=all
 run_step "Substrate observe" make -C "${FABRIC_REPO_ROOT}" substrate.observe TENANT=all
 run_step "Substrate observe compare" make -C "${FABRIC_REPO_ROOT}" substrate.observe.compare TENANT=all
+run_step "Hardening checklist validate" make -C "${FABRIC_REPO_ROOT}" hardening.checklist.validate
+run_step "Hardening checklist render" make -C "${FABRIC_REPO_ROOT}" hardening.checklist.render
+run_step "Hardening checklist summary" make -C "${FABRIC_REPO_ROOT}" hardening.checklist.summary
 run_step "Hardening entry check" make -C "${FABRIC_REPO_ROOT}" phase11.hardening.entry.check
 
 mkdir -p "${evidence_dir}"
@@ -95,7 +102,7 @@ fi
 
 mkdir -p "${acceptance_dir}"
 cat >"${marker}" <<EOF_MARKER
-# Phase 11 Pre-Exposure Hardening Gate Acceptance
+# Phase 11 Pre-Exposure Hardening Gate Acceptance (JSON Checklist)
 
 Timestamp (UTC): ${stamp}
 Commit: ${commit_hash}
@@ -111,6 +118,9 @@ Commands executed:
 - make tenants.capacity.validate TENANT=all
 - make substrate.observe TENANT=all
 - make substrate.observe.compare TENANT=all
+- make hardening.checklist.validate
+- make hardening.checklist.render
+- make hardening.checklist.summary
 - make phase11.hardening.entry.check
 
 Result: PASS
@@ -120,7 +130,7 @@ Evidence:
 - ${evidence_dir}/checks.json
 
 Statement:
-Phase 11 pre-exposure hardening gate passed. Phase 12 workload exposure may proceed only with this marker present.
+Phase 11 pre-exposure hardening gate passed. Checklist is machine-verifiable and auto-generated.
 EOF_MARKER
 
 self_hash="$(sha256sum "${marker}" | awk '{print $1}')"
@@ -128,4 +138,4 @@ self_hash="$(sha256sum "${marker}" | awk '{print $1}')"
   echo
   echo "Self-hash (sha256 of content above): ${self_hash}"
 } >> "${marker}"
-sha256sum "${marker}" | awk '{print $1}' > "${marker}.sha256"
+sha256sum "${marker}" | awk '{print $1}' > "${marker_hash}"

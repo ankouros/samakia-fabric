@@ -1,0 +1,448 @@
+{
+  "categories": [
+    {
+      "checks": [
+        {
+          "description": "Phase 11 acceptance markers are present.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "All Phase 11 markers exist.",
+          "id": "contracts.markers.present",
+          "notes": "",
+          "rationale": "Hardening gate depends on prior Phase 11 acceptances and routing defaults.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f acceptance/PHASE11_ACCEPTED.md && test -f acceptance/PHASE11_PART1_ACCEPTED.md && test -f acceptance/PHASE11_PART2_ACCEPTED.md && test -f acceptance/PHASE11_PART3_ACCEPTED.md && test -f acceptance/PHASE11_PART4_ACCEPTED.md && test -f acceptance/PHASE11_PART5_ROUTING_ACCEPTED.md",
+            "type": "command"
+          }
+        },
+        {
+          "description": "REQUIRED-FIXES.md has no OPEN items.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "No OPEN entries present.",
+          "id": "contracts.required-fixes.clean",
+          "notes": "",
+          "rationale": "Open blockers must be resolved before pre-exposure hardening is accepted.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "! rg -n \"OPEN\" REQUIRED-FIXES.md",
+            "type": "command"
+          }
+        },
+        {
+          "description": "Phase 12 artifacts are absent.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "No Phase 12 markers or Make targets.",
+          "id": "contracts.phase12.gating",
+          "notes": "",
+          "rationale": "Phase 12 must not start before this hardening gate passes.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test ! -f acceptance/PHASE12_ACCEPTED.md && test ! -f acceptance/PHASE12_ENTRY_CHECKLIST.md && ! rg -n \"phase12\" Makefile",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Required acceptance markers and governance files must exist and Phase 12 must not be started.",
+      "id": "contracts-governance",
+      "severity": "hard",
+      "title": "Contracts and Governance"
+    },
+    {
+      "checks": [
+        {
+          "description": "Enabled contracts contain no inline secret keys.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "No secret-like keys in enabled contracts.",
+          "id": "identity.no-inline-secrets",
+          "notes": "",
+          "rationale": "Secrets must never be stored in contracts; only secret_ref is allowed.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "! rg -n \"(^|\\s)(password|token|secret)\\s*:\\s\" contracts/tenants/**/consumers/**/enabled.yml",
+            "type": "command"
+          }
+        },
+        {
+          "description": "Enabled contracts declare secret_ref.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "secret_ref is present in enabled contracts.",
+          "id": "identity.secret-ref-present",
+          "notes": "",
+          "rationale": "Secret references are required for tenant credentials and endpoints.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "rg -n \"secret_ref\" contracts/tenants/**/consumers/**/enabled.yml",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Enabled contracts must not contain inline secrets and must reference secret_ref.",
+      "id": "identity-access",
+      "severity": "hard",
+      "title": "Identity and Access"
+    },
+    {
+      "checks": [
+        {
+          "description": "Core guardrail files exist.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "All guardrail files are present.",
+          "id": "tenant.guardrail-files",
+          "notes": "",
+          "rationale": "Capacity and execute policy tooling is required for safe multi-tenant execution.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f ops/substrate/capacity/capacity-guard.sh && test -f ops/substrate/validate-enabled-contracts.sh && test -f ops/substrate/common/execute-policy.yml && test -f ops/substrate/common/validate-execute-policy.sh",
+            "type": "command"
+          }
+        },
+        {
+          "description": "Capacity guard is wired into the substrate dispatcher.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "capacity-guard.sh referenced in substrate dispatcher.",
+          "id": "tenant.capacity-guard-wired",
+          "notes": "",
+          "rationale": "Capacity must be enforced before apply or DR execute.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "rg -n \"capacity-guard.sh\" ops/substrate/substrate.sh",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Substrate execution guardrails and policies must exist and be wired.",
+      "id": "tenant-isolation",
+      "severity": "hard",
+      "title": "Tenant Isolation and Guardrails"
+    },
+    {
+      "checks": [
+        {
+          "description": "Capacity schema and template files exist.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "Capacity schema and template present.",
+          "id": "capacity.schema-template",
+          "notes": "",
+          "rationale": "Capacity contracts are required for noisy-neighbor guardrails.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f contracts/tenants/_schema/capacity.schema.json && test -f contracts/tenants/_templates/capacity.yml",
+            "type": "command"
+          }
+        },
+        {
+          "description": "Capacity semantics validator exists.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "Capacity validator present.",
+          "id": "capacity.validator-present",
+          "notes": "",
+          "rationale": "Capacity limits must be validated before apply or DR execute.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f ops/substrate/capacity/validate-capacity-semantics.sh",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Capacity schema, templates, and validators must exist.",
+      "id": "capacity-quotas",
+      "severity": "hard",
+      "title": "Capacity and Quotas"
+    },
+    {
+      "checks": [
+        {
+          "description": "Enabled contract validator exists.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "Enabled contract validator present.",
+          "id": "ha.enabled-contract-validation",
+          "notes": "",
+          "rationale": "Enabled contract validation enforces HA-ready semantics.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f ops/substrate/validate-enabled-contracts.sh",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Enabled contract validation must exist to enforce HA and DR semantics.",
+      "id": "ha-failure-semantics",
+      "severity": "hard",
+      "title": "HA and Failure Semantics"
+    },
+    {
+      "checks": [
+        {
+          "description": "DR dry-run scripts exist for all supported providers.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "All DR dry-run scripts present.",
+          "id": "dr.dryrun-scripts",
+          "notes": "",
+          "rationale": "DR readiness must be assessed without mutation.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f ops/substrate/postgres/dr-dryrun.sh && test -f ops/substrate/mariadb/dr-dryrun.sh && test -f ops/substrate/rabbitmq/dr-dryrun.sh && test -f ops/substrate/cache/dr-dryrun.sh && test -f ops/substrate/qdrant/dr-dryrun.sh",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "DR dry-run scripts must exist for each provider.",
+      "id": "disaster-recovery",
+      "severity": "hard",
+      "title": "Disaster Recovery"
+    },
+    {
+      "checks": [
+        {
+          "description": "Observe and compare scripts exist.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "Observability scripts present.",
+          "id": "observability.scripts",
+          "notes": "",
+          "rationale": "Hardening gate requires drift/observability checks to be available.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f ops/substrate/observe/observe.sh && test -f ops/substrate/observe/compare.sh",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Substrate observability scripts must be present.",
+      "id": "observability-drift",
+      "severity": "hard",
+      "title": "Observability and Drift"
+    },
+    {
+      "checks": [
+        {
+          "description": "Offline-first secrets interface exists.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "Secrets interface present.",
+          "id": "secrets.interface-present",
+          "notes": "",
+          "rationale": "Credential handling relies on the Phase 5 secrets interface.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f ops/secrets/secrets.sh",
+            "type": "command"
+          }
+        },
+        {
+          "description": "Evidence and artifacts are gitignored.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "evidence/ and artifacts/ are gitignored.",
+          "id": "secrets.evidence-gitignored",
+          "notes": "",
+          "rationale": "Evidence packets must never be committed.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "rg -n \"^evidence/\" .gitignore && rg -n \"^artifacts/\" .gitignore",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Secrets interface and evidence gitignore must be present.",
+      "id": "secrets-management",
+      "severity": "hard",
+      "title": "Secrets and Evidence Hygiene"
+    },
+    {
+      "checks": [
+        {
+          "description": "PR validation workflow has no apply steps.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "No apply commands in PR validation.",
+          "id": "execution.no-apply-pr-validate",
+          "notes": "",
+          "rationale": "CI must remain read-only.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "! rg -n \"terraform apply|tf.apply|substrate.apply|tenants.apply\" .github/workflows/pr-validate.yml",
+            "type": "command"
+          }
+        },
+        {
+          "description": "PR plan workflow has no apply steps.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "No apply commands in PR plan workflow.",
+          "id": "execution.no-apply-pr-plan",
+          "notes": "",
+          "rationale": "Plan workflows must remain read-only.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "! rg -n \"terraform apply|tf.apply|substrate.apply|tenants.apply\" .github/workflows/pr-tf-plan.yml",
+            "type": "command"
+          }
+        },
+        {
+          "description": "Non-prod apply workflow is manual.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "apply-nonprod is manual.",
+          "id": "execution.apply-manual",
+          "notes": "",
+          "rationale": "Apply must require explicit manual triggering.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f .github/workflows/apply-nonprod.yml && rg -n \"workflow_dispatch\" .github/workflows/apply-nonprod.yml",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "CI workflows must be read-only and apply must be manual.",
+      "id": "execution-safety",
+      "severity": "hard",
+      "title": "Execution Safety"
+    },
+    {
+      "checks": [
+        {
+          "description": "Cookbook documents hardening gate commands.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "Hardening gate commands documented in cookbook.",
+          "id": "docs.cookbook-hardening",
+          "notes": "",
+          "rationale": "Operator workflows must be documented in the canonical cookbook.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "rg -n \"phase11.hardening\" docs/operator/cookbook.md",
+            "type": "command"
+          }
+        },
+        {
+          "description": "OPERATIONS.md references hardening gate.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "OPERATIONS.md references hardening gate.",
+          "id": "docs.operations-hardening",
+          "notes": "",
+          "rationale": "Operations index must point to the hardening gate.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "rg -n \"phase11.hardening\" OPERATIONS.md",
+            "type": "command"
+          }
+        },
+        {
+          "description": "Generated hardening doc exists.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "docs/operator/hardening.md exists.",
+          "id": "docs.hardening-generated",
+          "notes": "",
+          "rationale": "The checklist must be readable by operators without editing JSON.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "test -f docs/operator/hardening.md",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Hardening gate must be documented and auto-generated docs must exist.",
+      "id": "operator-ux-docs",
+      "severity": "hard",
+      "title": "Operator UX and Docs"
+    },
+    {
+      "checks": [
+        {
+          "description": "Makefile includes phase11.hardening.entry.check target.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "Makefile target exists.",
+          "id": "makefile.hardening-entry-target",
+          "notes": "",
+          "rationale": "Operators must have a single entry point for the hardening checklist.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "rg -n \"phase11.hardening.entry.check\" Makefile",
+            "type": "command"
+          }
+        },
+        {
+          "description": "Makefile includes phase11.hardening.accept target.",
+          "evidence": {
+            "type": "command-exit"
+          },
+          "expected": "Makefile target exists.",
+          "id": "makefile.hardening-accept-target",
+          "notes": "",
+          "rationale": "Operators must have a single acceptance gate for hardening.",
+          "severity": "hard",
+          "status": "PASS",
+          "verification": {
+            "ref": "rg -n \"phase11.hardening.accept\" Makefile",
+            "type": "command"
+          }
+        }
+      ],
+      "description": "Hardening gate targets must exist in Makefile.",
+      "id": "makefile-integration",
+      "severity": "hard",
+      "title": "Makefile Integration"
+    }
+  ],
+  "generated_at": "2026-01-01T14:17:30Z",
+  "phase": "phase11-hardening",
+  "scope": "pre-exposure substrate hardening gate",
+  "version": "1.0"
+}

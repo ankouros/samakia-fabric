@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "phase", "scope", "generated_at", "categories"],
+  "properties": {
+    "version": {"type": "string"},
+    "phase": {"type": "string"},
+    "scope": {"type": "string"},
+    "generated_at": {"type": "string"},
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "severity", "description", "checks"],
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "severity": {"type": "string", "enum": ["hard", "soft"]},
+          "description": {"type": "string"},
+          "checks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "description",
+                "rationale",
+                "severity",
+                "verification",
+                "expected",
+                "evidence",
+                "status"
+              ],
+              "properties": {
+                "id": {"type": "string"},
+                "description": {"type": "string"},
+                "rationale": {"type": "string"},
+                "severity": {"type": "string", "enum": ["hard", "soft"]},
+                "verification": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["type", "ref"],
+                  "properties": {
+                    "type": {"type": "string", "enum": ["command"]},
+                    "ref": {"type": "string"}
+                  }
+                },
+                "expected": {"type": "string"},
+                "evidence": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["type"],
+                  "properties": {
+                    "type": {"type": "string", "enum": ["command-exit"]}
+                  }
+                },
+                "status": {"type": "string", "enum": ["PASS", "FAIL", "WARN"]},
+                "notes": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

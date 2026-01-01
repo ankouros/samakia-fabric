@@ -138,8 +138,9 @@ The format is inspired by:
 - Phase 11 Part 5 acceptance marker: `acceptance/PHASE11_PART5_ROUTING_ACCEPTED.md`.
 
 #### Substrate hardening gate (Phase 11 pre-exposure)
-- Pre-exposure hardening entry checklist: `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`.
-- Pre-exposure hardening acceptance marker: `acceptance/PHASE11_HARDENING_ACCEPTED.md`.
+- Pre-exposure hardening checklist is machine-verifiable (`hardening/checklist.json` + schema).
+- Auto-generated entry checklist: `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`.
+- Pre-exposure hardening acceptance marker: `acceptance/PHASE11_HARDENING_JSON_ACCEPTED.md`.
 - Gate targets: `make phase11.hardening.entry.check`, `make phase11.hardening.accept`.
 - Evidence packets under `evidence/hardening/<UTC>/`.
 

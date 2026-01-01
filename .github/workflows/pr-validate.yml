@@ -58,6 +58,12 @@ jobs:
       - name: Docs anti-drift checks
         run: make docs.operator.check
 
+      - name: Hardening checklist validate
+        run: make hardening.checklist.validate
+
+      - name: Hardening checklist summary
+        run: make hardening.checklist.summary
+
       - name: Pre-commit
         run: pre-commit run --all-files
 

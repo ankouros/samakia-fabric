@@ -591,10 +591,11 @@ make phase11.hardening.entry.check
 ```
 
 #### Expected result
-Checklist written to `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`.
+Checklist rendered to `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md` and `docs/operator/hardening.md`.
 
 #### Evidence outputs
-`acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`
+- `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`
+- `docs/operator/hardening.md`
 
 #### Failure modes
 - Missing Phase 11 acceptance markers
@@ -621,7 +622,7 @@ make phase11.hardening.accept
 Acceptance marker and evidence packet written; Phase 12 exposure may proceed.
 
 #### Evidence outputs
-- `acceptance/PHASE11_HARDENING_ACCEPTED.md`
+- `acceptance/PHASE11_HARDENING_JSON_ACCEPTED.md`
 - `evidence/hardening/<UTC>/summary.md`
 
 #### Failure modes

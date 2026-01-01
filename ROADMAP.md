@@ -487,8 +487,9 @@ checks pass before any Phase 12 exposure is allowed.
 Status: PASSED ✅
 
 ### Completed (canonical)
-- Entry checklist: `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`.
-- Acceptance marker: `acceptance/PHASE11_HARDENING_ACCEPTED.md`.
+- Entry checklist (auto-generated): `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`.
+- JSON source of truth: `hardening/checklist.json` (validated + rendered).
+- Acceptance marker (JSON gate): `acceptance/PHASE11_HARDENING_JSON_ACCEPTED.md`.
 - Gate targets: `make phase11.hardening.entry.check`, `make phase11.hardening.accept`.
 
 Non-scope:

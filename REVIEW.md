@@ -603,3 +603,7 @@ checkpoint before Phase 12 exposure. It is deliberately non-destructive:
 reachability is best-effort and failures are reported without remediation.
 This reduces exposure risk by ensuring all governance and validation layers
 are intact before any workload-facing routing is enabled.
+
+The hardening checklist is machine-verifiable: `hardening/checklist.json` is
+the source of truth, validated in CI and rendered into operator-facing
+markdown.

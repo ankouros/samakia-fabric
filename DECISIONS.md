@@ -921,6 +921,28 @@ Phase 9 establishes operator UX as a **first-class contract**:
 
 ---
 
+## ADR-0030 — Hardening Checklist Is Code (Machine-Verifiable)
+
+### Decision
+
+- The pre-exposure hardening checklist is defined in JSON (`hardening/checklist.json`) and validated against a JSON schema.
+- The checklist is evaluated by executing declared read-only commands and emitting machine-verifiable PASS/FAIL results.
+- Operator-facing markdown is auto-generated from JSON and must not be edited manually.
+
+### Rationale
+
+- A code-defined checklist is deterministic and CI-enforceable.
+- Reduces drift between operator docs and acceptance logic.
+- Preserves auditability without exposing secrets.
+
+### Consequences
+
+- Entry and acceptance scripts must run JSON validation and summary checks.
+- CI must gate on checklist validation and summary output.
+- Manual edits to `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md` or `docs/operator/hardening.md` are invalid.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

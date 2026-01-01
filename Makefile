@@ -1170,6 +1170,18 @@ phase11.hardening.entry.check: ## Phase 11 pre-exposure hardening entry checklis
 phase11.hardening.accept: ## Run Phase 11 pre-exposure hardening gate (read-only)
 	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-hardening-accept.sh"
 
+.PHONY: hardening.checklist.validate
+hardening.checklist.validate: ## Validate and evaluate the hardening checklist (JSON source of truth)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(REPO_ROOT)/hardening/validate/checklist-validate.sh"
+
+.PHONY: hardening.checklist.render
+hardening.checklist.render: hardening.checklist.validate ## Render hardening checklist markdown from JSON
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(REPO_ROOT)/hardening/render/checklist-to-md.sh"
+
+.PHONY: hardening.checklist.summary
+hardening.checklist.summary: hardening.checklist.validate ## Emit hardening checklist summary (JSON) and fail on hard failures
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(REPO_ROOT)/hardening/render/checklist-to-summary.sh"
+
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)
 	@bash "$(REPO_ROOT)/ops/consumers/validate/validate-consumers.sh"

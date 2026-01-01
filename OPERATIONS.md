@@ -74,6 +74,9 @@ Substrate executor design (Phase 11) lives in:
   - `make substrate.apply TENANT=all ENV=samakia-dev`
   - `make substrate.dr.execute TENANT=all ENV=samakia-dev`
 - Pre-exposure hardening gate (read-only; required before Phase 12 exposure):
+  - JSON checklist source: `hardening/checklist.json`
+  - Auto-generated checklist: `acceptance/PHASE11_HARDENING_ENTRY_CHECKLIST.md`
+  - Operator view: `docs/operator/hardening.md`
   - `make phase11.hardening.entry.check`
   - `make phase11.hardening.accept`
 
