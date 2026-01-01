@@ -19,3 +19,5 @@ See provider-specific notes:
 - `docs/substrate/vector.md`
 - `docs/substrate/ha-semantics.md`
 - `docs/substrate/dr.md`
+
+Operator commands live in `docs/operator/cookbook.md` (substrate plan and DR dry-run tasks).

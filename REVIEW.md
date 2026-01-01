@@ -537,3 +537,15 @@ stateful primitives, without any execution:
 
 No infrastructure is deployed in Phase 11. The deliverable is contract
 consistency, DR taxonomy enforcement, and read-only validation.
+
+## Phase 11 Part 1 — Plan-Only Executors
+
+Phase 11 Part 1 makes the design actionable without mutation:
+
+- Plan-only executor scaffold for Postgres/MariaDB/RabbitMQ/Dragonfly/Qdrant.
+- DR dry-run harness mapped to the shared DR taxonomy.
+- Deterministic evidence packets under `evidence/tenants/<tenant>/<UTC>/`.
+- Read-only Make targets: `substrate.plan`, `substrate.dr.dryrun`, `substrate.doctor`.
+
+This is still **non-destructive**: no apply paths, no secrets issuance, and no
+infrastructure mutation.

@@ -87,6 +87,9 @@ jobs:
       - name: Substrate contract checks
         run: make substrate.contracts.validate
 
+      - name: Substrate plan (CI-safe)
+        run: make substrate.plan.ci
+
       - name: Consumer readiness packets
         run: |
           make consumers.evidence

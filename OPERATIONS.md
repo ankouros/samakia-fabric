@@ -57,6 +57,9 @@ Substrate executor design (Phase 11) lives in:
 
 - `docs/substrate/README.md`
 - `contracts/substrate/`
+- Plan-only executor workflow (read-only):
+  - `make substrate.plan TENANT=all`
+  - `make substrate.dr.dryrun TENANT=all`
 
 ### TLS policy
 - Default: strict verification

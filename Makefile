@@ -1037,6 +1037,22 @@ tenants.dr.run: ## Run tenant DR harness (dry-run default) (TENANT=<id> ENV=<env
 substrate.contracts.validate: ## Validate substrate enabled contracts (design-only)
 	@bash "$(REPO_ROOT)/ops/substrate/validate.sh"
 
+.PHONY: substrate.plan
+substrate.plan: ## Generate tenant substrate plan (read-only) (TENANT=<id|all>)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/substrate.sh" plan "TENANT=$${TENANT:-all}"
+
+.PHONY: substrate.dr.dryrun
+substrate.dr.dryrun: ## Generate tenant substrate DR dry-run plan (read-only) (TENANT=<id|all>)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/substrate.sh" dr-dryrun "TENANT=$${TENANT:-all}"
+
+.PHONY: substrate.doctor
+substrate.doctor: ## Check substrate plan tooling and contracts
+	@bash "$(REPO_ROOT)/ops/substrate/substrate.sh" doctor
+
+.PHONY: substrate.plan.ci
+substrate.plan.ci: ## CI-safe substrate plan (examples only; no persistence)
+	@CI=1 TENANT=all bash "$(REPO_ROOT)/ops/substrate/substrate.sh" plan "TENANT=$${TENANT:-all}"
+
 .PHONY: phase10.entry.check
 phase10.entry.check: ## Phase 10 entry checklist (writes acceptance/PHASE10_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase10-entry-check.sh"
@@ -1064,6 +1080,14 @@ phase11.entry.check: ## Phase 11 entry checklist (writes acceptance/PHASE11_ENTR
 .PHONY: phase11.accept
 phase11.accept: ## Run Phase 11 acceptance suite (design-only, read-only)
 	@bash "$(OPS_SCRIPTS_DIR)/phase11-accept.sh"
+
+.PHONY: phase11.part1.entry.check
+phase11.part1.entry.check: ## Phase 11 Part 1 entry checklist (writes acceptance/PHASE11_PART1_ENTRY_CHECKLIST.md)
+	@bash "$(OPS_SCRIPTS_DIR)/phase11-part1-entry-check.sh"
+
+.PHONY: phase11.part1.accept
+phase11.part1.accept: ## Run Phase 11 Part 1 acceptance suite (plan-only, read-only)
+	@bash "$(OPS_SCRIPTS_DIR)/phase11-part1-accept.sh"
 
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)

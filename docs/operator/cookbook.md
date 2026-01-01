@@ -306,6 +306,85 @@ None by default.
 #### Rollback / safe exit
 Stop and fix enabled contracts.
 
+### Task: Generate tenant substrate plan (read-only)
+
+#### Intent
+Produce deterministic, non-executing substrate plans for tenant enabled bindings.
+
+#### Preconditions
+- Enabled bindings present under `contracts/tenants/**/consumers/*/enabled.yml`
+
+#### Command
+```bash
+make substrate.plan TENANT=all
+```
+
+#### Expected result
+Plan evidence generated; unreachable endpoints marked as `unknown`.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/substrate-plan/...`
+
+#### Failure modes
+- Invalid enabled bindings
+- Missing DR taxonomy
+
+#### Rollback / safe exit
+Stop and fix contracts; re-run plan.
+
+### Task: Diagnose substrate executor prerequisites (read-only)
+
+#### Intent
+Confirm the substrate executor runtime can plan and dry-run without infra access.
+
+#### Preconditions
+- Phase 11 design accepted
+- Substrate contracts validated
+
+#### Command
+```bash
+make substrate.doctor
+```
+
+#### Expected result
+Doctor checks pass and report required tools/contracts present.
+
+#### Evidence outputs
+None (stdout only)
+
+#### Failure modes
+- Missing tooling (bash, jq, python3)
+- Missing substrate contracts
+
+#### Rollback / safe exit
+None required (read-only)
+
+### Task: Run tenant substrate DR dry-run (read-only)
+
+#### Intent
+Generate DR dry-run evidence mapped to the substrate DR taxonomy.
+
+#### Preconditions
+- Enabled bindings include `dr.required_testcases`
+
+#### Command
+```bash
+make substrate.dr.dryrun TENANT=all
+```
+
+#### Expected result
+DR dry-run evidence generated; no snapshots or restores executed.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/substrate-dr-dryrun/...`
+
+#### Failure modes
+- Missing DR placeholders
+- Unknown DR testcases
+
+#### Rollback / safe exit
+Stop and fix DR requirements; re-run dry-run.
+
 ### Task: Tenant tooling doctor
 
 #### Intent
@@ -684,6 +763,57 @@ Acceptance marker written under `acceptance/PHASE11_ACCEPTED.md`.
 
 #### Failure modes
 - Validation errors
+
+#### Rollback / safe exit
+Stop and remediate validation issues.
+
+### Task: Phase 11 Part 1 entry checklist (plan-only)
+
+#### Intent
+Confirm Phase 11 Part 1 entry conditions for plan-only executors.
+
+#### Preconditions
+- Phase 11 design accepted
+- Substrate executor scripts present
+
+#### Command
+```bash
+make phase11.part1.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE11_PART1_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART1_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing executor scripts or Make targets
+
+#### Rollback / safe exit
+Stop and restore missing files.
+
+### Task: Phase 11 Part 1 acceptance (plan-only)
+
+#### Intent
+Run the plan-only substrate acceptance suite (non-destructive).
+
+#### Preconditions
+- Phase 11 Part 1 entry checklist passes
+
+#### Command
+```bash
+make phase11.part1.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE11_PART1_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE11_PART1_ACCEPTED.md`
+
+#### Failure modes
+- Plan or DR dry-run validation errors
 
 #### Rollback / safe exit
 Stop and remediate validation issues.

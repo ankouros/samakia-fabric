@@ -103,6 +103,13 @@ The format is inspired by:
 - Validation gate: `make substrate.contracts.validate`.
 - Phase 11 acceptance marker: `acceptance/PHASE11_ACCEPTED.md`.
 
+#### Substrate executors (Phase 11 Part 1)
+- Plan-only executor scaffold and dispatcher (`ops/substrate/substrate.sh`).
+- DR dry-run harness per provider with deterministic evidence packets.
+- New targets: `substrate.plan`, `substrate.dr.dryrun`, `substrate.doctor`.
+- Phase 11 Part 1 entry checklist: `acceptance/PHASE11_PART1_ENTRY_CHECKLIST.md`.
+- Phase 11 Part 1 acceptance marker: `acceptance/PHASE11_PART1_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

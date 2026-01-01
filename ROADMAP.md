@@ -397,6 +397,27 @@ Non-scope:
 
 ---
 
+## Phase 11 Part 1 — Plan-Only Executors
+
+Goal: Provide read-only executor scaffolding for tenant substrate consumers,
+including plan output and DR dry-run evidence, without execution.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Plan-only executor runtime for Postgres/MariaDB/RabbitMQ/Dragonfly/Qdrant.
+- DR dry-run harness with taxonomy validation and deterministic evidence packets.
+- Make targets: `substrate.plan`, `substrate.dr.dryrun`, `substrate.doctor`.
+- Phase 11 Part 1 entry checklist: `acceptance/PHASE11_PART1_ENTRY_CHECKLIST.md`.
+- Phase 11 Part 1 acceptance marker: `acceptance/PHASE11_PART1_ACCEPTED.md`.
+
+Non-scope:
+- No apply or provisioning
+- No secrets issuance
+- No infra mutation
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

@@ -1,0 +1,83 @@
+# Phase 11 Part 1 Entry Checklist
+
+Timestamp (UTC): 2026-01-01T08:25:57Z
+
+## Criteria
+- Phase 11 design accepted
+  - Command: test -f acceptance/PHASE11_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- Script present: ops/substrate/substrate.sh
+  - Command: test -f ops/substrate/substrate.sh
+  - Result: PASS
+- Script present: ops/substrate/common/env.sh
+  - Command: test -f ops/substrate/common/env.sh
+  - Result: PASS
+- Script present: ops/substrate/common/guards.sh
+  - Command: test -f ops/substrate/common/guards.sh
+  - Result: PASS
+- Script present: ops/substrate/common/plan-format.sh
+  - Command: test -f ops/substrate/common/plan-format.sh
+  - Result: PASS
+- Script present: ops/substrate/common/connectivity.sh
+  - Command: test -f ops/substrate/common/connectivity.sh
+  - Result: PASS
+- Script present: ops/substrate/common/redaction.sh
+  - Command: test -f ops/substrate/common/redaction.sh
+  - Result: PASS
+- Script present: ops/substrate/common/evidence.sh
+  - Command: test -f ops/substrate/common/evidence.sh
+  - Result: PASS
+- Script present: ops/substrate/postgres/plan.sh
+  - Command: test -f ops/substrate/postgres/plan.sh
+  - Result: PASS
+- Script present: ops/substrate/postgres/dr-dryrun.sh
+  - Command: test -f ops/substrate/postgres/dr-dryrun.sh
+  - Result: PASS
+- Script present: ops/substrate/mariadb/plan.sh
+  - Command: test -f ops/substrate/mariadb/plan.sh
+  - Result: PASS
+- Script present: ops/substrate/mariadb/dr-dryrun.sh
+  - Command: test -f ops/substrate/mariadb/dr-dryrun.sh
+  - Result: PASS
+- Script present: ops/substrate/rabbitmq/plan.sh
+  - Command: test -f ops/substrate/rabbitmq/plan.sh
+  - Result: PASS
+- Script present: ops/substrate/rabbitmq/dr-dryrun.sh
+  - Command: test -f ops/substrate/rabbitmq/dr-dryrun.sh
+  - Result: PASS
+- Script present: ops/substrate/cache/plan.sh
+  - Command: test -f ops/substrate/cache/plan.sh
+  - Result: PASS
+- Script present: ops/substrate/cache/dr-dryrun.sh
+  - Command: test -f ops/substrate/cache/dr-dryrun.sh
+  - Result: PASS
+- Script present: ops/substrate/qdrant/plan.sh
+  - Command: test -f ops/substrate/qdrant/plan.sh
+  - Result: PASS
+- Script present: ops/substrate/qdrant/dr-dryrun.sh
+  - Command: test -f ops/substrate/qdrant/dr-dryrun.sh
+  - Result: PASS
+- Makefile target present: substrate.plan
+  - Command: rg -n '^substrate\.plan:' Makefile
+  - Result: PASS
+- Makefile target present: substrate.dr.dryrun
+  - Command: rg -n '^substrate\.dr\.dryrun:' Makefile
+  - Result: PASS
+- Makefile target present: substrate.plan.ci
+  - Command: rg -n '^substrate\.plan\.ci:' Makefile
+  - Result: PASS
+- Makefile target present: phase11.part1.entry.check
+  - Command: rg -n '^phase11\.part1\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase11.part1.accept
+  - Command: rg -n '^phase11\.part1\.accept:' Makefile
+  - Result: PASS
+- Cookbook includes substrate plan task
+  - Command: rg -n "substrate\.plan" docs/operator/cookbook.md
+  - Result: PASS
+- Evidence paths gitignored
+  - Command: rg -n "evidence/" .gitignore
+  - Result: PASS

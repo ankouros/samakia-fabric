@@ -1,1 +1,3 @@
-waivers: []
+waivers:
+  - name: substrate.plan.ci
+    reason: CI-only target; operators use substrate.plan instead.
