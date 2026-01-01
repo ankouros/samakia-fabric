@@ -1078,6 +1078,18 @@ substrate.doctor: ## Check substrate plan tooling and contracts
 substrate.plan.ci: ## CI-safe substrate plan (examples only; no persistence)
 	@CI=1 TENANT=all bash "$(REPO_ROOT)/ops/substrate/substrate.sh" plan "TENANT=$${TENANT:-all}"
 
+.PHONY: substrate.observe
+substrate.observe: ## Observe substrate runtime (read-only) (TENANT=<id|all>)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/observe/observe.sh"
+
+.PHONY: substrate.observe.compare
+substrate.observe.compare: ## Compare declared vs observed substrate state (read-only) (TENANT=<id|all>)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/observe/compare.sh"
+
+.PHONY: substrate.observe.evidence
+substrate.observe.evidence: ## Generate substrate observability evidence (read-only) (TENANT=<id|all>)
+	@TENANT="$(TENANT)" bash "$(REPO_ROOT)/ops/substrate/observe/compare.sh"
+
 .PHONY: phase10.entry.check
 phase10.entry.check: ## Phase 10 entry checklist (writes acceptance/PHASE10_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase10-entry-check.sh"
@@ -1129,6 +1141,14 @@ phase11.part3.entry.check: ## Phase 11 Part 3 entry checklist (writes acceptance
 .PHONY: phase11.part3.accept
 phase11.part3.accept: ## Run Phase 11 Part 3 acceptance suite (capacity guardrails, read-only)
 	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part3-accept.sh"
+
+.PHONY: phase11.part4.entry.check
+phase11.part4.entry.check: ## Phase 11 Part 4 entry checklist (writes acceptance/PHASE11_PART4_ENTRY_CHECKLIST.md)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part4-entry-check.sh"
+
+.PHONY: phase11.part4.accept
+phase11.part4.accept: ## Run Phase 11 Part 4 acceptance suite (observability, read-only)
+	@FABRIC_REPO_ROOT="$(FABRIC_REPO_ROOT)" bash "$(OPS_SCRIPTS_DIR)/phase11-part4-accept.sh"
 
 .PHONY: consumers.validate
 consumers.validate: ## Validate consumer contracts (schema + semantics)

@@ -94,6 +94,12 @@ jobs:
       - name: Substrate plan (CI-safe)
         run: make substrate.plan.ci
 
+      - name: Substrate observe (read-only)
+        run: make substrate.observe TENANT=all
+
+      - name: Substrate observe compare (read-only)
+        run: make substrate.observe.compare TENANT=all
+
       - name: Consumer readiness packets
         run: |
           make consumers.evidence

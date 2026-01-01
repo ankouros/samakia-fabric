@@ -571,3 +571,15 @@ correctness without changing execution semantics:
 - Deterministic capacity evidence under `evidence/tenants/<tenant>/<UTC>/substrate-capacity/`.
 
 Acceptance remains read-only and CI-safe; no apply or DR execute is triggered.
+
+## Phase 11 Part 4 — Runtime Observability & Drift Detection
+
+Phase 11 Part 4 adds read-only runtime observation and drift comparison for
+enabled contracts, without any remediation:
+
+- Read-only observe/compare engines for substrate consumers.
+- Deterministic evidence packets under `evidence/tenants/<tenant>/<UTC>/substrate-observe/`.
+- CI gates for `substrate.observe` and `substrate.observe.compare`.
+
+Drift is reported as PASS/WARN/FAIL but never auto-remediated; all outputs are
+redacted and evidence is gitignored.

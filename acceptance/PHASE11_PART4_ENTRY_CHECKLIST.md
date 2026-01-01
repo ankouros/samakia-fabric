@@ -1,0 +1,95 @@
+# Phase 11 Part 4 Entry Checklist
+
+Timestamp (UTC): 2026-01-01T12:44:19Z
+
+## Criteria
+- Phase 11 Part 3 accepted
+  - Command: test -f acceptance/PHASE11_PART3_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/substrate/observe/observe-engine.sh
+  - Command: test -f ops/substrate/observe/observe-engine.sh
+  - Result: PASS
+- File present: ops/substrate/observe/compare-engine.sh
+  - Command: test -f ops/substrate/observe/compare-engine.sh
+  - Result: PASS
+- File present: ops/substrate/observe/observe.sh
+  - Command: test -f ops/substrate/observe/observe.sh
+  - Result: PASS
+- File present: ops/substrate/observe/compare.sh
+  - Command: test -f ops/substrate/observe/compare.sh
+  - Result: PASS
+- File present: ops/substrate/observe/normalize-json.sh
+  - Command: test -f ops/substrate/observe/normalize-json.sh
+  - Result: PASS
+- File present: ops/substrate/postgres/observe.sh
+  - Command: test -f ops/substrate/postgres/observe.sh
+  - Result: PASS
+- File present: ops/substrate/postgres/normalize.sh
+  - Command: test -f ops/substrate/postgres/normalize.sh
+  - Result: PASS
+- File present: ops/substrate/postgres/compare.sh
+  - Command: test -f ops/substrate/postgres/compare.sh
+  - Result: PASS
+- File present: ops/substrate/mariadb/observe.sh
+  - Command: test -f ops/substrate/mariadb/observe.sh
+  - Result: PASS
+- File present: ops/substrate/mariadb/normalize.sh
+  - Command: test -f ops/substrate/mariadb/normalize.sh
+  - Result: PASS
+- File present: ops/substrate/mariadb/compare.sh
+  - Command: test -f ops/substrate/mariadb/compare.sh
+  - Result: PASS
+- File present: ops/substrate/rabbitmq/observe.sh
+  - Command: test -f ops/substrate/rabbitmq/observe.sh
+  - Result: PASS
+- File present: ops/substrate/rabbitmq/normalize.sh
+  - Command: test -f ops/substrate/rabbitmq/normalize.sh
+  - Result: PASS
+- File present: ops/substrate/rabbitmq/compare.sh
+  - Command: test -f ops/substrate/rabbitmq/compare.sh
+  - Result: PASS
+- File present: ops/substrate/cache/observe.sh
+  - Command: test -f ops/substrate/cache/observe.sh
+  - Result: PASS
+- File present: ops/substrate/cache/normalize.sh
+  - Command: test -f ops/substrate/cache/normalize.sh
+  - Result: PASS
+- File present: ops/substrate/cache/compare.sh
+  - Command: test -f ops/substrate/cache/compare.sh
+  - Result: PASS
+- File present: ops/substrate/qdrant/observe.sh
+  - Command: test -f ops/substrate/qdrant/observe.sh
+  - Result: PASS
+- File present: ops/substrate/qdrant/normalize.sh
+  - Command: test -f ops/substrate/qdrant/normalize.sh
+  - Result: PASS
+- File present: ops/substrate/qdrant/compare.sh
+  - Command: test -f ops/substrate/qdrant/compare.sh
+  - Result: PASS
+- File present: docs/substrate/observability.md
+  - Command: test -f docs/substrate/observability.md
+  - Result: PASS
+- Makefile target present: substrate.observe
+  - Command: rg -n "substrate.observe" Makefile
+  - Result: PASS
+- Makefile target present: substrate.observe.compare
+  - Command: rg -n "substrate.observe.compare" Makefile
+  - Result: PASS
+- Makefile target present: phase11.part4.entry.check
+  - Command: rg -n "phase11.part4.entry.check" Makefile
+  - Result: PASS
+- Makefile target present: phase11.part4.accept
+  - Command: rg -n "phase11.part4.accept" Makefile
+  - Result: PASS
+- PR validation includes substrate.observe
+  - Command: rg -n "substrate.observe" .github/workflows/pr-validate.yml
+  - Result: PASS
+- PR validation includes substrate.observe.compare
+  - Command: rg -n "substrate.observe.compare" .github/workflows/pr-validate.yml
+  - Result: PASS
+- Evidence paths gitignored
+  - Command: rg -n "evidence/" .gitignore
+  - Result: PASS

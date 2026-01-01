@@ -440,6 +440,59 @@ Plan evidence generated; unreachable endpoints marked as `unknown`.
 #### Rollback / safe exit
 Stop and fix contracts; re-run plan.
 
+### Task: Observe substrate runtime (read-only)
+
+#### Intent
+Collect read-only runtime observations and generate evidence packets.
+
+#### Preconditions
+- Enabled bindings present under `contracts/tenants/**/consumers/*/enabled.yml`
+
+#### Command
+```bash
+make substrate.observe TENANT=all
+```
+
+#### Expected result
+Observation evidence generated; reachability marked `unknown` when endpoints are unreachable or CI-safe checks are enforced.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/substrate-observe/observed.json`
+
+#### Failure modes
+- Invalid enabled bindings
+- Missing tooling (bash, jq, python3)
+
+#### Rollback / safe exit
+None required (read-only).
+
+### Task: Compare declared vs observed drift (read-only)
+
+#### Intent
+Classify drift between declared contracts and observed runtime state.
+
+#### Preconditions
+- Substrate observability tooling present
+- Capacity contracts validated (if present)
+
+#### Command
+```bash
+make substrate.observe.compare TENANT=all
+```
+
+#### Expected result
+Drift classification emitted as `PASS`, `WARN`, or `FAIL`. No auto-remediation occurs.
+
+#### Evidence outputs
+`evidence/tenants/<tenant-id>/<UTC>/substrate-observe/decision.json`
+
+#### Failure modes
+- Schema/engine errors
+- Missing contracts or capacity files
+
+#### Rollback / safe exit
+None required (read-only).
+
 ### Task: Verify tenant substrate endpoints (read-only)
 
 #### Intent

@@ -58,11 +58,14 @@ Substrate executor design (Phase 11) lives in:
 - `docs/substrate/README.md`
 - `docs/substrate/capacity.md`
 - `docs/substrate/slo-failure-semantics.md`
+- `docs/substrate/observability.md`
 - `contracts/substrate/`
 - Plan-only executor workflow (read-only):
   - `make substrate.plan TENANT=all`
   - `make substrate.dr.dryrun TENANT=all`
   - `make substrate.verify TENANT=all`
+  - `make substrate.observe TENANT=all`
+  - `make substrate.observe.compare TENANT=all`
 - Guarded execute workflow (explicit opt-in; never in CI):
   - `make substrate.apply TENANT=all ENV=samakia-dev`
   - `make substrate.dr.execute TENANT=all ENV=samakia-dev`

@@ -459,6 +459,26 @@ Non-scope:
 
 ---
 
+## Phase 11 Part 4 — Runtime Observability & Drift Detection
+
+Goal: Add read-only runtime observation and drift comparison for enabled tenant
+substrate contracts, producing deterministic evidence without remediation.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Read-only observe/compare engines with provider filters.
+- Evidence packets for declared vs observed state and drift decisions.
+- Make targets: `substrate.observe`, `substrate.observe.compare`.
+- Phase 11 Part 4 entry checklist + acceptance marker.
+
+Non-scope:
+- No apply or DR execute
+- No auto-remediation
+- CI remains read-only
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

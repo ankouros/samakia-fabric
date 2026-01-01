@@ -125,6 +125,13 @@ The format is inspired by:
 - Phase 11 Part 3 entry checklist: `acceptance/PHASE11_PART3_ENTRY_CHECKLIST.md`.
 - Phase 11 Part 3 acceptance marker: `acceptance/PHASE11_PART3_ACCEPTED.md`.
 
+#### Substrate executors (Phase 11 Part 4)
+- Runtime observability (read-only) + drift comparison for enabled contracts.
+- Evidence packets under `evidence/tenants/**/substrate-observe`.
+- CI gates: `substrate.observe`, `substrate.observe.compare`.
+- Phase 11 Part 4 entry checklist: `acceptance/PHASE11_PART4_ENTRY_CHECKLIST.md`.
+- Phase 11 Part 4 acceptance marker: `acceptance/PHASE11_PART4_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets
