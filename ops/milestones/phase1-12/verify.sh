@@ -28,6 +28,8 @@ stamp="${MILESTONE_STAMP:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
 packet_root="${MILESTONE_PACKET_ROOT:-${FABRIC_REPO_ROOT}/evidence/milestones/phase1-12}"
 packet_dir="${packet_root}/${stamp}"
 mkdir -p "${packet_dir}"
+steps_dir="${packet_dir}/steps"
+mkdir -p "${steps_dir}"
 
 commands_log="${packet_dir}/commands.log"
 results_tmp="$(mktemp)"
@@ -56,8 +58,10 @@ record_result() {
   local status="$4"
   local exit_code="$5"
   local notes="$6"
+  local step_name="${7:-}"
+  local step_log_dir="${8:-}"
 
-  SECTION="${section}" LABEL="${label}" COMMAND="${command}" STATUS="${status}" EXIT_CODE="${exit_code}" NOTES="${notes}" RESULTS_FILE="${results_tmp}" \
+  SECTION="${section}" LABEL="${label}" COMMAND="${command}" STATUS="${status}" EXIT_CODE="${exit_code}" NOTES="${notes}" STEP_NAME="${step_name}" STEP_LOG_DIR="${step_log_dir}" RESULTS_FILE="${results_tmp}" \
     python3 - <<'PY'
 import json
 import os
@@ -69,6 +73,8 @@ status = os.environ.get("STATUS", "UNKNOWN")
 exit_code = int(os.environ.get("EXIT_CODE", "0"))
 notes_raw = os.environ.get("NOTES", "")
 notes = [line for line in notes_raw.splitlines() if line.strip()]
+step_name = os.environ.get("STEP_NAME", "")
+step_log_dir = os.environ.get("STEP_LOG_DIR", "")
 
 payload = {
     "section": section,
@@ -77,6 +83,8 @@ payload = {
     "status": status,
     "exit_code": exit_code,
     "notes": notes,
+    "step_name": step_name,
+    "step_log_dir": step_log_dir,
 }
 
 with open(os.environ["RESULTS_FILE"], "a", encoding="utf-8") as fh:
@@ -101,24 +109,36 @@ sys.stdout.write(text)
 PY
 }
 
-run_cmd() {
+run_step() {
   local section="$1"
   local label="$2"
-  local cmd="$3"
+  local step_name="$3"
+  shift 3
+
+  local log_dir="${steps_dir}/${step_name}"
+  local stdout="${log_dir}/stdout.log"
+  local stderr="${log_dir}/stderr.log"
+  local exit_code_file="${log_dir}/exit_code"
+  mkdir -p "${log_dir}"
+
+  local cmd_str
+  cmd_str="$(printf '%q ' "$@")"
+  cmd_str="${cmd_str% }"
 
   local start
   start="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   {
     echo "[${start}] ${section} :: ${label}"
-    echo "CMD: ${cmd}"
+    echo "CMD: ${cmd_str}"
+    echo "LOGS: ${log_dir}"
   } >> "${commands_log}"
 
-  local output
-  output="$(mktemp)"
   set +e
-  (cd "${FABRIC_REPO_ROOT}" && bash -c "${cmd}") >"${output}" 2>&1
+  (cd "${FABRIC_REPO_ROOT}" && "$@") >"${stdout}" 2>"${stderr}"
   local rc=$?
   set -e
+
+  echo "${rc}" > "${exit_code_file}"
 
   local status="PASS"
   if [[ ${rc} -ne 0 ]]; then
@@ -126,8 +146,8 @@ run_cmd() {
   fi
 
   local warn_lines=""
-  if [[ -s "${output}" ]]; then
-    warn_lines="$(grep -E '^(WARN|Warning|WARNING)' "${output}" | head -n 20 || true)"
+  if [[ -s "${stdout}" || -s "${stderr}" ]]; then
+    warn_lines="$(cat "${stdout}" "${stderr}" | grep -E '^(WARN|Warning|WARNING)' | head -n 20 || true)"
   fi
 
   if [[ -n "${warn_lines}" ]]; then
@@ -141,13 +161,15 @@ run_cmd() {
   echo "RESULT: ${status} (exit=${rc})" >> "${commands_log}"
   echo >> "${commands_log}"
 
-  record_result "${section}" "${label}" "${cmd}" "${status}" "${rc}" "${warn_lines}"
-  rm -f "${output}" 2>/dev/null || true
+  record_result "${section}" "${label}" "${cmd_str}" "${status}" "${rc}" "${warn_lines}" "${step_name}" "${log_dir}"
 
   if [[ "${status}" != "PASS" ]]; then
     overall_status="FAIL"
     halted=1
-    return 1
+    if [[ ${failure_exit_code} -eq 0 ]]; then
+      failure_exit_code=${rc}
+    fi
+    return "${rc}"
   fi
 
   return 0
@@ -185,6 +207,9 @@ check_marker() {
   if [[ "${status}" != "PASS" ]]; then
     overall_status="FAIL"
     marker_failures+="${marker_name}\n"
+    if [[ ${failure_exit_code} -eq 0 ]]; then
+      failure_exit_code=1
+    fi
   fi
 }
 
@@ -255,15 +280,32 @@ PY
 
 overall_status="PASS"
 halted=0
+failure_exit_code=0
 marker_failures=""
 
 section_gate="GATE"
+test_mode="${MILESTONE_TEST_MODE:-0}"
 
+if [[ "${test_mode}" == "1" ]]; then
+  if ! run_step "T" "test pass" "test-pass" bash -c 'echo "test pass"'; then
+    :
+  fi
+  if [[ "${MILESTONE_TEST_FAIL:-1}" == "1" ]]; then
+    if ! run_step "T" "test fail" "test-fail" bash -c 'echo "intentional failure" >&2; exit 23'; then
+      :
+    fi
+  fi
+fi
+
+if [[ "${test_mode}" != "1" ]]; then
 clean_status="$(git -C "${FABRIC_REPO_ROOT}" status --porcelain)"
 if [[ -n "${clean_status}" ]]; then
   record_result "${section_gate}" "repo clean" "git status --porcelain" "FAIL" 1 "working tree not clean"
   overall_status="FAIL"
   halted=1
+  if [[ ${failure_exit_code} -eq 0 ]]; then
+    failure_exit_code=1
+  fi
 else
   record_result "${section_gate}" "repo clean" "git status --porcelain" "PASS" 0 ""
 fi
@@ -273,28 +315,39 @@ if [[ ${halted} -eq 0 ]]; then
     record_result "${section_gate}" "required fixes" "rg -n OPEN REQUIRED-FIXES.md" "FAIL" 1 "OPEN items present"
     overall_status="FAIL"
     halted=1
+    if [[ ${failure_exit_code} -eq 0 ]]; then
+      failure_exit_code=1
+    fi
   else
     record_result "${section_gate}" "required fixes" "rg -n OPEN REQUIRED-FIXES.md" "PASS" 0 ""
   fi
 fi
 
 if [[ ${halted} -eq 0 ]]; then
-  if ! run_cmd "A" "git pull" "git pull --ff-only"; then
-    halted=1
+  if ! run_step "A" "git pull" "git-pull" git pull --ff-only; then
+    :
   fi
 fi
 
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "A" "pre-commit" "pre-commit run --all-files" || true
+  if ! run_step "A" "pre-commit" "pre-commit" pre-commit run --all-files; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "A" "lint" "bash fabric-ci/scripts/lint.sh" || true
+  if ! run_step "A" "lint" "lint" bash fabric-ci/scripts/lint.sh; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "A" "validate" "bash fabric-ci/scripts/validate.sh" || true
+  if ! run_step "A" "validate" "validate" bash fabric-ci/scripts/validate.sh; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "A" "policy" "make policy.check" || true
+  if ! run_step "A" "policy" "policy-check" make policy.check; then
+    :
+  fi
 fi
 
 if [[ ${halted} -eq 0 ]]; then
@@ -359,92 +412,148 @@ PY
     record_result "C" "invariants" "rg -n patterns" "FAIL" 1 "see invariants.json"
     overall_status="FAIL"
     halted=1
+    if [[ ${failure_exit_code} -eq 0 ]]; then
+      failure_exit_code=1
+    fi
   fi
 fi
 
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "D" "phase2 dns" "ENV=samakia-dns make phase2.accept" || true
+  if ! run_step "D" "phase2 dns" "phase2-dns" env ENV=samakia-dns make phase2.accept; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "D" "phase2 minio" "ENV=samakia-minio make phase2.accept" || true
+  if ! run_step "D" "phase2 minio" "phase2-minio" env ENV=samakia-minio make phase2.accept; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "D" "phase2.1 shared" "ENV=samakia-shared make phase2.1.accept" || true
+  if ! run_step "D" "phase2.1 shared" "phase2-1-shared" env ENV=samakia-shared make phase2.1.accept; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "D" "phase2.2 shared" "ENV=samakia-shared make phase2.2.accept" || true
-fi
-
-if [[ ${halted} -eq 0 ]]; then
-  run_cmd "E" "phase3 part1" "make phase3.part1.accept" || true
-fi
-if [[ ${halted} -eq 0 ]]; then
-  run_cmd "E" "phase3 part2" "make phase3.part2.accept" || true
-fi
-if [[ ${halted} -eq 0 ]]; then
-  run_cmd "E" "phase3 part3" "ENV=samakia-prod make phase3.part3.accept" || true
+  if ! run_step "D" "phase2.2 shared" "phase2-2-shared" env ENV=samakia-shared make phase2.2.accept; then
+    :
+  fi
 fi
 
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "F" "policy" "make policy.check" || true
+  if ! run_step "E" "phase3 part1" "phase3-part1" make phase3.part1.accept; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "F" "validate" "bash fabric-ci/scripts/validate.sh" || true
-fi
-
-if [[ ${halted} -eq 0 ]]; then
-  run_cmd "G" "phase5 entry" "make phase5.entry.check" || true
+  if ! run_step "E" "phase3 part2" "phase3-part2" make phase3.part2.accept; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "G" "phase5 accept" "make phase5.accept" || true
-fi
-
-if [[ ${halted} -eq 0 ]]; then
-  run_cmd "H" "phase6 entry" "make phase6.entry.check" || true
-fi
-if [[ ${halted} -eq 0 ]]; then
-  run_cmd "H" "phase6 part1" "make phase6.part1.accept" || true
-fi
-if [[ ${halted} -eq 0 ]]; then
-  run_cmd "H" "phase6 part2" "make phase6.part2.accept" || true
-fi
-if [[ ${halted} -eq 0 ]]; then
-  run_cmd "H" "phase6 part3" "make phase6.part3.accept" || true
+  if ! run_step "E" "phase3 part3" "phase3-part3" env ENV=samakia-prod make phase3.part3.accept; then
+    :
+  fi
 fi
 
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "I" "phase8 entry" "make phase8.entry.check" || true
+  if ! run_step "F" "policy" "policy-recheck" make policy.check; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "I" "phase8 part1" "CI=1 make phase8.part1.accept" || true
+  if ! run_step "F" "validate" "validate-recheck" bash fabric-ci/scripts/validate.sh; then
+    :
+  fi
 fi
 
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "tenants validate" "make tenants.validate" || true
+  if ! run_step "G" "phase5 entry" "phase5-entry" make phase5.entry.check; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "substrate contracts" "make substrate.contracts.validate" || true
+  if ! run_step "G" "phase5 accept" "phase5-accept" make phase5.accept; then
+    :
+  fi
+fi
+
+if [[ ${halted} -eq 0 ]]; then
+  if ! run_step "H" "phase6 entry" "phase6-entry" make phase6.entry.check; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "tenants capacity" "make tenants.capacity.validate TENANT=all" || true
+  if ! run_step "H" "phase6 part1" "phase6-part1" make phase6.part1.accept; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "bindings validate" "make bindings.validate TENANT=all" || true
+  if ! run_step "H" "phase6 part2" "phase6-part2" make phase6.part2.accept; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "bindings render" "make bindings.render TENANT=all" || true
+  if ! run_step "H" "phase6 part3" "phase6-part3" make phase6.part3.accept; then
+    :
+  fi
+fi
+
+if [[ ${halted} -eq 0 ]]; then
+  if ! run_step "I" "phase8 entry" "phase8-entry" make phase8.entry.check; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "bindings secrets" "make bindings.secrets.inspect TENANT=all" || true
+  if ! run_step "I" "phase8 part1" "phase8-part1" env CI=1 make phase8.part1.accept; then
+    :
+  fi
+fi
+
+if [[ ${halted} -eq 0 ]]; then
+  if ! run_step "J" "tenants validate" "tenants-validate" make tenants.validate; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "bindings verify" "make bindings.verify.offline TENANT=all" || true
+  if ! run_step "J" "substrate contracts" "substrate-contracts" make substrate.contracts.validate; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "drift detect" "TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none make drift.detect" || true
+  if ! run_step "J" "tenants capacity" "tenants-capacity" env TENANT=all make tenants.capacity.validate; then
+    :
+  fi
 fi
 if [[ ${halted} -eq 0 ]]; then
-  run_cmd "J" "drift summary" "make drift.summary TENANT=all" || true
+  if ! run_step "J" "bindings validate" "bindings-validate" env TENANT=all make bindings.validate; then
+    :
+  fi
+fi
+if [[ ${halted} -eq 0 ]]; then
+  if ! run_step "J" "bindings render" "bindings-render" env TENANT=all make bindings.render; then
+    :
+  fi
+fi
+if [[ ${halted} -eq 0 ]]; then
+  if ! run_step "J" "bindings secrets" "bindings-secrets" env TENANT=all make bindings.secrets.inspect; then
+    :
+  fi
+fi
+if [[ ${halted} -eq 0 ]]; then
+  if ! run_step "J" "bindings verify" "bindings-verify" env TENANT=all make bindings.verify.offline; then
+    :
+  fi
+fi
+if [[ ${halted} -eq 0 ]]; then
+  if ! run_step "J" "drift detect" "drift-detect" env TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none make drift.detect; then
+    :
+  fi
+fi
+if [[ ${halted} -eq 0 ]]; then
+  if ! run_step "J" "drift summary" "drift-summary" env TENANT=all make drift.summary; then
+    :
+  fi
+fi
 fi
 
 sign_manifest=0
@@ -460,6 +569,9 @@ fi
 
 if [[ "${sign_manifest}" -eq 1 ]] && ! command -v gpg >/dev/null 2>&1; then
   overall_status="FAIL"
+  if [[ ${failure_exit_code} -eq 0 ]]; then
+    failure_exit_code=1
+  fi
   echo "WARN: gpg missing; milestone signing required" >> "${warnings_tmp}"
 fi
 
@@ -482,6 +594,7 @@ PY
 python3 - "${results_tmp}" "${warnings_tmp}" "${phase_results_json}" "${summary_md}" "${stamp}" "${overall_status}" "${packet_dir}" "${FABRIC_REPO_ROOT}" <<'PY'
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -518,6 +631,18 @@ if warnings_path.exists():
         if line.strip():
             warnings.append(line.strip())
 
+redact_patterns = [
+    (re.compile(r"(PVEAPIToken=)([^\s]+)"), r"\\1REDACTED"),
+    (re.compile(r"(?i)(PM_API_TOKEN_SECRET|TF_VAR_pm_api_token_secret|PM_API_TOKEN_ID|PM_API_TOKEN_SECRET|PASSWORD|SECRET)=([^\s]+)"), r"\\1=REDACTED"),
+]
+
+
+def redact_line(line: str) -> str:
+    text = line
+    for pattern, replacement in redact_patterns:
+        text = pattern.sub(replacement, text)
+    return text
+
 payload = {
     "milestone": "phase1-12",
     "timestamp_utc": stamp,
@@ -546,6 +671,24 @@ if failures:
     lines.append("## Failures")
     for entry in failures:
         lines.append(f"- {entry.get('section')} {entry.get('label')}: {entry.get('status')}")
+    lines.append("")
+    lines.append("## Failure details")
+    for entry in failures:
+        step_name = entry.get("step_name") or entry.get("label") or "unknown"
+        exit_code = entry.get("exit_code")
+        log_dir = entry.get("step_log_dir")
+        lines.append(f"- Step: {step_name} (exit {exit_code})")
+        if log_dir:
+            stderr_path = Path(log_dir) / "stderr.log"
+            if stderr_path.exists():
+                stderr_lines = stderr_path.read_text(encoding="utf-8").splitlines()[:20]
+                if stderr_lines:
+                    lines.append("  stderr (first 20 lines, redacted):")
+                    for line in stderr_lines:
+                        lines.append(f"  {redact_line(line)}")
+            lines.append(f"  Logs: {log_dir}")
+        else:
+            lines.append("  Logs: n/a")
 
 if warnings:
     lines.append("")
@@ -603,7 +746,11 @@ fi
 if [[ "${overall_status}" != "PASS" ]]; then
   echo "FAIL: milestone verification failed" >&2
   echo "Evidence written to ${packet_dir}" >&2
-  exit 1
+  exit_code="${failure_exit_code:-1}"
+  if [[ ${exit_code} -eq 0 ]]; then
+    exit_code=1
+  fi
+  exit "${exit_code}"
 fi
 
 echo "OK: milestone verification PASS; evidence at ${packet_dir}"

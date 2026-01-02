@@ -55,6 +55,7 @@ bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-targets.sh"
 bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-guards.sh"
 bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-docs-generated.sh"
 bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-readiness-packet.sh"
+bash "$ROOT_DIR/ops/scripts/test-milestone/test-wrapper-exit-semantics.sh"
 
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 

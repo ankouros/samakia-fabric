@@ -85,18 +85,18 @@ This document records what was fixed, what remains blocked (if anything), and th
 
 ## Still Blocked (if any)
 
-- Milestone Phase 1–12 verification (see MILESTONE-1-12-PHASE2-DNS).
+- None (as of the latest run).
 
 ## Milestone Phase 1–12 Blockers
 
 ### MILESTONE-1-12-PHASE2-DNS
-- **Description:** `make milestone.phase1-12.verify` fails at Section D with `ENV=samakia-dns make phase2.accept` returning exit code 2.
+- **Description:** `make milestone.phase1-12.verify` falsely failed at Section D even though `ENV=samakia-dns make phase2.accept` passes.
 - **Impact:** Milestone Phase 1–12 verification cannot be completed; milestone acceptance marker cannot be issued.
-- **Root cause:** Unknown; manual `ENV=samakia-dns make phase2.accept` succeeds, but the milestone run reports a failure.
-- **Required remediation:** Capture the failing output during milestone verification and resolve the underlying DNS Phase 2 acceptance failure; rerun `make milestone.phase1-12.verify`.
-- **Resolution status:** **OPEN**
+- **Root cause:** Wrapper exit semantics and missing per-step stdout/stderr capture in the milestone verifier; Phase 2 DNS itself was not failing.
+- **Required remediation:** Fix milestone wrapper to preserve stdout/stderr per step, propagate real exit codes, and rerun `make milestone.phase1-12.verify`.
+- **Resolution status:** **FIXED**
 - **Verification command(s):**
-  - `make milestone.phase1-12.verify`
+  - `make milestone.phase1-12.verify` (PASS)
 
 ## Verification Status
 

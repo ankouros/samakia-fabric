@@ -7,6 +7,7 @@ This document records what was implemented for the **Terraform remote state back
 - Added end-to-end regression verification and lock scripts under `ops/milestones/phase1-12/`.
 - Evidence packets are written to `evidence/milestones/phase1-12/<UTC>/` with summaries and manifests.
 - Milestone lock is gated on a PASS verification and writes `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md`.
+- Verifier now captures per-step stdout/stderr with exit codes, and failure summaries include redacted stderr excerpts plus log pointers.
 
 ## MinIO HA Backend — What was implemented
 
