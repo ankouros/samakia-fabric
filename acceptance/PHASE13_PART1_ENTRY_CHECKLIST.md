@@ -1,0 +1,95 @@
+# Phase 13 Part 1 Entry Checklist
+
+Timestamp (UTC): 2026-01-02T19:20:22Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE13_ENTRY_CHECKLIST.md
+  - Command: test -f acceptance/PHASE13_ENTRY_CHECKLIST.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE12_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/exposure/exposure-policy.schema.json
+  - Command: test -f contracts/exposure/exposure-policy.schema.json
+  - Result: PASS
+- File present: contracts/exposure/exposure-policy.yml
+  - Command: test -f contracts/exposure/exposure-policy.yml
+  - Result: PASS
+- File present: ops/exposure/policy/load.sh
+  - Command: test -f ops/exposure/policy/load.sh
+  - Result: PASS
+- File present: ops/exposure/policy/validate.sh
+  - Command: test -f ops/exposure/policy/validate.sh
+  - Result: PASS
+- File present: ops/exposure/policy/evaluate.sh
+  - Command: test -f ops/exposure/policy/evaluate.sh
+  - Result: PASS
+- File present: ops/exposure/policy/explain.sh
+  - Command: test -f ops/exposure/policy/explain.sh
+  - Result: PASS
+- File present: ops/exposure/plan/plan.sh
+  - Command: test -f ops/exposure/plan/plan.sh
+  - Result: PASS
+- File present: ops/exposure/plan/render.sh
+  - Command: test -f ops/exposure/plan/render.sh
+  - Result: PASS
+- File present: ops/exposure/plan/diff.sh
+  - Command: test -f ops/exposure/plan/diff.sh
+  - Result: PASS
+- File present: ops/exposure/plan/redact.sh
+  - Command: test -f ops/exposure/plan/redact.sh
+  - Result: PASS
+- File present: ops/exposure/evidence/generate.sh
+  - Command: test -f ops/exposure/evidence/generate.sh
+  - Result: PASS
+- File present: ops/exposure/evidence/manifest.sh
+  - Command: test -f ops/exposure/evidence/manifest.sh
+  - Result: PASS
+- File present: ops/exposure/evidence/sign.sh
+  - Command: test -f ops/exposure/evidence/sign.sh
+  - Result: PASS
+- File present: docs/operator/exposure.md
+  - Command: test -f docs/operator/exposure.md
+  - Result: PASS
+- File present: docs/exposure/semantics.md
+  - Command: test -f docs/exposure/semantics.md
+  - Result: PASS
+- Policy gates wired: policy-exposure.sh
+  - Command: rg -n policy-exposure.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: exposure.policy.check
+  - Command: rg -n '^exposure\.policy\.check:' Makefile
+  - Result: PASS
+- Makefile target present: exposure.plan
+  - Command: rg -n '^exposure\.plan:' Makefile
+  - Result: PASS
+- Makefile target present: exposure.plan.explain
+  - Command: rg -n '^exposure\.plan\.explain:' Makefile
+  - Result: PASS
+- Makefile target present: phase13.part1.entry.check
+  - Command: rg -n '^phase13\.part1\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase13.part1.accept
+  - Command: rg -n '^phase13\.part1\.accept:' Makefile
+  - Result: PASS
+- Policy check
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Bindings validate
+  - Command: make -C /home/aggelos/samakia-fabric bindings.validate TENANT=all
+  - Result: PASS
+- Bindings render
+  - Command: make -C /home/aggelos/samakia-fabric bindings.render TENANT=all
+  - Result: PASS
+- Tenants validate
+  - Command: make -C /home/aggelos/samakia-fabric tenants.validate
+  - Result: PASS
