@@ -85,7 +85,7 @@ This document records what was fixed, what remains blocked (if anything), and th
 
 ## Still Blocked (if any)
 
-- None (as of the latest run).
+- Milestone Phase 1–12 verification (see MILESTONE-1-12-PHASE2-1-SHARED-POLICY).
 
 ## Milestone Phase 1–12 Blockers
 
@@ -109,7 +109,19 @@ This document records what was fixed, what remains blocked (if anything), and th
   - `audit/minio-backend-smoke/20260102T130656Z/report.md`
   - `audit/minio-backend-smoke/20260102T130656Z/terraform-init.txt`
 - **Verification command(s):**
-  - `make milestone.phase1-12.verify` (PASS)
+  - `make milestone.phase1-12.verify` (blocked by MILESTONE-1-12-PHASE2-1-SHARED-POLICY)
+
+### MILESTONE-1-12-PHASE2-1-SHARED-POLICY
+- **Description:** `make milestone.phase1-12.verify` fails in Section D during `ENV=samakia-shared make phase2.1.accept` at the shared observability policy gate.
+- **Impact:** Milestone Phase 1–12 verification cannot be completed; milestone acceptance marker cannot be issued.
+- **Root cause:** The shared observability tier does not currently satisfy policy requirements (anti-affinity, replica count, and host count).
+- **Required remediation:** Bring shared observability workloads into compliance (anti_affinity=true, replicas>=2, at least 2 hosts) and rerun milestone verification.
+- **Resolution status:** **OPEN**
+- **Evidence:**
+  - `evidence/milestones/phase1-12/2026-01-02T13:14:52Z/steps/phase2-1-shared/stderr.log`
+- **Verification command(s):**
+  - `ENV=samakia-shared make phase2.1.accept`
+  - `make milestone.phase1-12.verify`
 
 ## Verification Status
 

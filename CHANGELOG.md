@@ -201,6 +201,7 @@ The format is inspired by:
 - Added milestone wrapper exit-semantics regression test.
 - Recorded and resolved the MinIO backend smoke marker blocker for milestone verification in `REQUIRED-FIXES.md`.
 - Milestone verification no longer forces `-backend=false` for `terraform init`, allowing backend smoke checks to confirm S3 initialization.
+- Recorded the open shared observability policy blocker for milestone verification in `REQUIRED-FIXES.md`.
 
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
