@@ -247,6 +247,127 @@ None required (read-only).
 
 ---
 
+Phase 12 exposure one-pager: [phase12-exposure.md](phase12-exposure.md).
+
+### Task: Phase 12 readiness packet (read-only)
+
+#### Intent
+Generate a deterministic Phase 12 release readiness packet (redacted).
+
+#### Preconditions
+- Phase 12 Parts 1–5 accepted
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+TENANT=all make phase12.readiness.packet
+```
+Optional signing (prod): set `READINESS_SIGN=1` with a local GPG key. In CI, signing is skipped unless `READINESS_SIGN=1` is set.
+
+#### Expected result
+Readiness packet created under `evidence/release-readiness/phase12/<UTC>/`.
+
+#### Evidence outputs
+`evidence/release-readiness/phase12/<UTC>/...`
+
+#### Failure modes
+- Missing required markers
+- Policy or docs gate failure
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 12 Part 6 entry check (read-only)
+
+#### Intent
+Validate Phase 12 Part 6 prerequisites before acceptance.
+
+#### Preconditions
+- Phase 12 Parts 1–5 accepted
+- Phase 11 hardening accepted
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase12.part6.entry.check
+```
+
+#### Expected result
+Entry checklist written under `acceptance/`.
+
+#### Evidence outputs
+`acceptance/PHASE12_PART6_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing markers or scripts
+- Policy gates not wired
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 12 acceptance (umbrella, read-only)
+
+#### Intent
+Run the Phase 12 read-only acceptance suite and generate the readiness packet.
+
+#### Preconditions
+- Phase 12 Parts 1–5 accepted
+- Phase 12 Part 6 entry check passes
+
+#### Command
+```bash
+TENANT=all make phase12.accept
+```
+
+#### Expected result
+Readiness packet generated; no execute paths run.
+
+#### Evidence outputs
+`evidence/release-readiness/phase12/<UTC>/...`
+
+#### Failure modes
+- Policy/doc gates fail
+- Offline verify or drift summary fails
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 12 Part 6 acceptance
+
+#### Intent
+Lock Phase 12 closure and create acceptance markers.
+
+#### Preconditions
+- Phase 12 acceptance passes
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase12.part6.accept
+```
+
+#### Expected result
+Acceptance markers written for Part 6 and Phase 12.
+
+#### Evidence outputs
+- `acceptance/PHASE12_PART6_ACCEPTED.md`
+- `acceptance/PHASE12_ACCEPTED.md`
+
+#### Failure modes
+- Readiness packet generation fails
+- Policy or docs gate failure
+
+#### Rollback / safe exit
+None required; rerun after remediation.
+
+---
+
 ## Alerting (routing defaults)
 
 ### Task: Validate drift alert routing defaults
@@ -1573,6 +1694,60 @@ Binding apply evidence under `evidence/bindings/...`.
 
 #### Rollback / safe exit
 Stop; do not proceed without proper guards.
+
+### Task: Phase 12 Part 4 entry check
+
+#### Intent
+Verify Phase 12 Part 4 prerequisites before acceptance (read-only).
+
+#### Preconditions
+- Phase 12 Part 3 accepted
+- Proposal tooling present
+
+#### Command
+```bash
+make phase12.part4.entry.check
+```
+
+#### Expected result
+Entry checklist PASS with no blockers.
+
+#### Evidence outputs
+`acceptance/PHASE12_PART4_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing proposal tooling
+- OPEN items in REQUIRED-FIXES.md
+
+#### Rollback / safe exit
+Stop and remediate reported blockers before acceptance.
+
+### Task: Phase 12 Part 4 acceptance
+
+#### Intent
+Run Phase 12 Part 4 acceptance gates (read-only).
+
+#### Preconditions
+- Phase 12 Part 4 entry check PASS
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase12.part4.accept
+```
+
+#### Expected result
+Acceptance PASS and marker written.
+
+#### Evidence outputs
+`acceptance/PHASE12_PART4_ACCEPTED.md`
+
+#### Failure modes
+- Proposal validation or review fails
+- Policy gate failure
+
+#### Rollback / safe exit
+Stop; do not claim acceptance until gates PASS.
 
 ### Task: Phase 12 Part 3 entry check
 

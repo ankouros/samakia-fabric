@@ -1,0 +1,104 @@
+# Phase 12 Part 6 Entry Checklist
+
+Timestamp (UTC): 2026-01-02T08:02:39Z
+
+## Criteria
+- Marker present: acceptance/PHASE12_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART1_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART2_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART3_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART4_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART5_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/release/phase12/phase12-readiness-packet.sh
+  - Command: test -f ops/release/phase12/phase12-readiness-packet.sh
+  - Result: PASS
+- File present: ops/release/phase12/phase12-readiness-manifest.sh
+  - Command: test -f ops/release/phase12/phase12-readiness-manifest.sh
+  - Result: PASS
+- File present: ops/release/phase12/phase12-readiness-redact.sh
+  - Command: test -f ops/release/phase12/phase12-readiness-redact.sh
+  - Result: PASS
+- File present: ops/scripts/test-phase12/test-phase12-targets.sh
+  - Command: test -f ops/scripts/test-phase12/test-phase12-targets.sh
+  - Result: PASS
+- File present: ops/scripts/test-phase12/test-phase12-guards.sh
+  - Command: test -f ops/scripts/test-phase12/test-phase12-guards.sh
+  - Result: PASS
+- File present: ops/scripts/test-phase12/test-phase12-docs-generated.sh
+  - Command: test -f ops/scripts/test-phase12/test-phase12-docs-generated.sh
+  - Result: PASS
+- File present: ops/scripts/test-phase12/test-phase12-readiness-packet.sh
+  - Command: test -f ops/scripts/test-phase12/test-phase12-readiness-packet.sh
+  - Result: PASS
+- File present: docs/operator/phase12-exposure.md
+  - Command: test -f docs/operator/phase12-exposure.md
+  - Result: PASS
+- File present: docs/operator/cookbook.md
+  - Command: test -f docs/operator/cookbook.md
+  - Result: PASS
+- File present: docs/operator/README.md
+  - Command: test -f docs/operator/README.md
+  - Result: PASS
+- Phase 12 tests wired
+  - Command: rg -n "test-phase12" fabric-ci/scripts/validate.sh
+  - Result: PASS
+- Policy gate wired: policy-bindings-verify.sh
+  - Command: rg -n "policy-bindings-verify.sh" ops/policy/policy.sh
+  - Result: PASS
+- Policy gate wired: policy-proposals.sh
+  - Command: rg -n "policy-proposals.sh" ops/policy/policy.sh
+  - Result: PASS
+- Policy gate wired: policy-drift.sh
+  - Command: rg -n "policy-drift.sh" ops/policy/policy.sh
+  - Result: PASS
+- Policy gate wired: policy-secrets-materialization.sh
+  - Command: rg -n "policy-secrets-materialization.sh" ops/policy/policy.sh
+  - Result: PASS
+- Policy gate wired: policy-secrets-rotation.sh
+  - Command: rg -n "policy-secrets-rotation.sh" ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: phase12.readiness.packet
+  - Command: rg -n '^phase12\.readiness\.packet:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part6.entry.check
+  - Command: rg -n '^phase12\.part6\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part6.accept
+  - Command: rg -n '^phase12\.part6\.accept:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.accept
+  - Command: rg -n '^phase12\.accept:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.validate
+  - Command: rg -n '^bindings\.validate:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.render
+  - Command: rg -n '^bindings\.render:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.secrets.inspect
+  - Command: rg -n '^bindings\.secrets\.inspect:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.verify.offline
+  - Command: rg -n '^bindings\.verify\.offline:' Makefile
+  - Result: PASS
+- Makefile target present: drift.summary
+  - Command: rg -n '^drift\.summary:' Makefile
+  - Result: PASS
+- Cookbook includes phase12.accept
+  - Command: rg -n "phase12\.accept" docs/operator/cookbook.md
+  - Result: PASS

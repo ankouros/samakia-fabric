@@ -79,6 +79,11 @@ Tenant binding workflows live in:
   - Detect tenant drift (non-blocking): `TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none make drift.detect`
   - Emit tenant summaries: `TENANT=all make drift.summary`
   - Acceptance gate: `make phase12.part5.accept`
+- Phase 12 closure (release readiness packet):
+  - One-page flow: `docs/operator/phase12-exposure.md`
+  - CI-safe umbrella: `TENANT=all make phase12.accept`
+  - Packet only: `TENANT=all make phase12.readiness.packet`
+  - Acceptance markers: `make phase12.part6.accept`
 
 VM image workflows live in:
 

@@ -13,6 +13,10 @@ if [[ "${APPLY_DRYRUN:-}" != "1" && "${PROPOSAL_APPLY:-}" != "1" ]]; then
   echo "ERROR: set PROPOSAL_APPLY=1 to apply or APPLY_DRYRUN=1 for dry-run" >&2
   exit 1
 fi
+if [[ "${CI:-0}" == "1" && "${PROPOSAL_APPLY:-}" == "1" ]]; then
+  echo "ERROR: proposal apply is not allowed in CI" >&2
+  exit 2
+fi
 
 proposal_path=$(find "${FABRIC_REPO_ROOT}/proposals/inbox" -type f -name "proposal.yml" -path "*/${proposal_id}/*" 2>/dev/null | head -n1 || true)
 if [[ -z "${proposal_path}" ]]; then

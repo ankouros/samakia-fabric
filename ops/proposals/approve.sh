@@ -8,6 +8,10 @@ if [[ -z "${proposal_id}" ]]; then
   echo "ERROR: set PROPOSAL_ID" >&2
   exit 1
 fi
+if [[ "${CI:-0}" == "1" ]]; then
+  echo "ERROR: proposal approval is not allowed in CI" >&2
+  exit 2
+fi
 if [[ "${OPERATOR_APPROVE:-}" != "1" ]]; then
   echo "ERROR: set OPERATOR_APPROVE=1 to approve" >&2
   exit 1

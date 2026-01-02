@@ -35,6 +35,11 @@ if [[ ${#bindings[@]} -eq 0 ]]; then
   exit 1
 fi
 
+if [[ "${BIND_EXECUTE:-0}" == "1" && "${CI:-0}" == "1" ]]; then
+  echo "ERROR: binding apply is not allowed in CI" >&2
+  exit 2
+fi
+
 "${FABRIC_REPO_ROOT}/ops/bindings/validate/validate-binding-schema.sh"
 "${FABRIC_REPO_ROOT}/ops/bindings/validate/validate-binding-semantics.sh"
 "${FABRIC_REPO_ROOT}/ops/bindings/validate/validate-binding-safety.sh"

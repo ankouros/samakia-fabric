@@ -2,7 +2,7 @@
 
 WARNING: This document is auto-generated. Source of truth: hardening/checklist.json
 
-Generated (UTC): 2026-01-01T14:17:29Z
+Generated (UTC): 2026-01-01T14:17:30Z
 Phase: phase11-hardening
 Scope: pre-exposure substrate hardening gate
 

@@ -62,3 +62,4 @@ Any change that violates a contract must be redesigned before merging.
 - Substrate runtime observability and drift classification are read-only; evidence is mandatory and drift never auto-remediates or fails CI by itself.
 - Drift alert routing defaults are evidence-only; external delivery is disabled unless explicitly enabled and allowed.
 - Pre-exposure substrate hardening must pass before Phase 12 workload exposure; acceptance marker and evidence are mandatory.
+- Phase 12 workload exposure requires a redacted release readiness packet and acceptance markers (Part 6 + overall); CI remains read-only.

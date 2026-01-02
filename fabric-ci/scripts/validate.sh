@@ -50,6 +50,12 @@ bash "$ROOT_DIR/ops/scripts/test-dns-rrset-check.sh"
 # HA enforcement override test (offline; no Proxmox needed).
 bash "$ROOT_DIR/ops/scripts/ha/test-enforce-placement.sh"
 
+# Phase 12 closure regression checks (offline).
+bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-targets.sh"
+bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-guards.sh"
+bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-docs-generated.sh"
+bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-readiness-packet.sh"
+
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 
 for env_dir in "$TERRAFORM_ENVS_DIR"/*; do

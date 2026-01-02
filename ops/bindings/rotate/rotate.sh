@@ -31,6 +31,11 @@ if [[ "${ROTATE_EXECUTE:-0}" != "1" ]]; then
   exit 2
 fi
 
+if [[ "${CI:-0}" == "1" ]]; then
+  echo "ERROR: secret rotation execute is not allowed in CI" >&2
+  exit 2
+fi
+
 if [[ -z "${ROTATE_REASON:-}" ]]; then
   echo "ERROR: ROTATE_REASON is required for rotation" >&2
   exit 2

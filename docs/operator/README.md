@@ -4,6 +4,7 @@ This directory is the **canonical operator UX surface** for Samakia Fabric.
 
 Start here:
 - `cookbook.md` — task-oriented command recipes (copy/paste)
+- `phase12-exposure.md` — one-page Phase 12 exposure flow
 - `safety-model.md` — read-only default, execute guards, evidence posture
 - `evidence-and-artifacts.md` — where evidence and artifacts live
 - `glossary.md` — operator terms used across runbooks

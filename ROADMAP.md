@@ -609,6 +609,28 @@ Non-scope:
 
 ---
 
+## Phase 12 Part 6 — Release Readiness Closure
+
+Goal: Consolidate Phase 12 deliverables into a single release readiness packet
+and lock exposure with acceptance markers.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Phase 12 release readiness packet tooling under `ops/release/phase12/`.
+- Operator one-page exposure flow: `docs/operator/phase12-exposure.md`.
+- Regression guardrails and offline tests under `ops/scripts/test-phase12/`.
+- Make targets: `phase12.readiness.packet`, `phase12.part6.entry.check`, `phase12.part6.accept`, `phase12.accept`.
+- Phase 12 Part 6 acceptance marker: `acceptance/PHASE12_PART6_ACCEPTED.md`.
+- Phase 12 acceptance marker: `acceptance/PHASE12_ACCEPTED.md`.
+
+Non-scope:
+- No apply or execute actions
+- No secrets in readiness packets
+- CI remains read-only
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

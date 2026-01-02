@@ -671,3 +671,16 @@ any remediation:
 
 Drift signals never trigger apply. They surface deviations for operator action
 only, keeping tenant UX informed without granting control.
+
+## Phase 12 Part 6 — Release Readiness Closure
+
+Phase 12 Part 6 consolidates all binding, secrets, verification, proposals, and
+drift outputs into a deterministic, redacted release readiness packet:
+
+- Release readiness packet scripts under `ops/release/phase12/` with manifest + summary.
+- Operator one-page exposure flow: `docs/operator/phase12-exposure.md`.
+- Regression guardrails under `ops/scripts/test-phase12/` wired into validation.
+- Acceptance markers for Part 6 and overall Phase 12 exposure.
+
+This closure maintains backward compatibility with Phase 11/10 controls and
+keeps CI read-only by blocking all execute paths.

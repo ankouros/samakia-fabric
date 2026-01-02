@@ -2013,6 +2013,30 @@ phase12.part5.accept: ## Phase 12 Part 5 acceptance (drift awareness)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part5-accept.sh"
 
 ###############################################################################
+# Phase 12 Part 6 (Release Readiness Closure)
+###############################################################################
+
+.PHONY: phase12.readiness.packet
+phase12.readiness.packet: ## Generate Phase 12 release readiness packet (read-only) (TENANT=<id|all>)
+	@TENANT="$(TENANT)" ENV="$(ENV)" READINESS_SIGN="$(READINESS_SIGN)" READINESS_STAMP="$(READINESS_STAMP)" \
+		PHASE12_PACKET_ROOT="$(PHASE12_PACKET_ROOT)" \
+		bash "$(REPO_ROOT)/ops/release/phase12/phase12-readiness-packet.sh"
+
+.PHONY: phase12.part6.entry.check
+phase12.part6.entry.check: ## Phase 12 Part 6 entry checklist (release readiness closure)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part6-entry-check.sh"
+
+.PHONY: phase12.part6.accept
+phase12.part6.accept: ## Phase 12 Part 6 acceptance (release readiness closure)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part6-accept.sh"
+
+.PHONY: phase12.accept
+phase12.accept: ## Run Phase 12 acceptance suite (read-only)
+	@TENANT="$(TENANT)" ENV="$(ENV)" READINESS_SIGN="$(READINESS_SIGN)" READINESS_STAMP="$(READINESS_STAMP)" \
+		PHASE12_PACKET_ROOT="$(PHASE12_PACKET_ROOT)" \
+		bash "$(REPO_ROOT)/ops/release/phase12/phase12-readiness-packet.sh"
+
+###############################################################################
 # Operator UX (Phase 9)
 ###############################################################################
 

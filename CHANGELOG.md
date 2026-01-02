@@ -181,6 +181,14 @@ The format is inspired by:
 - Phase 12 Part 5 entry checklist: `acceptance/PHASE12_PART5_ENTRY_CHECKLIST.md`.
 - Phase 12 Part 5 acceptance marker: `acceptance/PHASE12_PART5_ACCEPTED.md`.
 
+#### Tenant bindings (Phase 12 Part 6)
+- Phase 12 release readiness packet tooling under `ops/release/phase12/`.
+- One-page exposure flow: `docs/operator/phase12-exposure.md`.
+- Regression tests under `ops/scripts/test-phase12/` wired into `fabric-ci/scripts/validate.sh`.
+- Make targets: `phase12.readiness.packet`, `phase12.part6.entry.check`, `phase12.part6.accept`, `phase12.accept`.
+- Phase 12 Part 6 acceptance marker: `acceptance/PHASE12_PART6_ACCEPTED.md`.
+- Phase 12 acceptance marker: `acceptance/PHASE12_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets
