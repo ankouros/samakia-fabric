@@ -199,6 +199,8 @@ The format is inspired by:
 - Recorded and closed the Phase 1–12 milestone verification blocker in `REQUIRED-FIXES.md`.
 - Milestone wrapper now captures per-step stdout/stderr, preserves exit codes, and includes failure excerpts in summary evidence.
 - Added milestone wrapper exit-semantics regression test.
+- Recorded and resolved the MinIO backend smoke marker blocker for milestone verification in `REQUIRED-FIXES.md`.
+- Milestone verification no longer forces `-backend=false` for `terraform init`, allowing backend smoke checks to confirm S3 initialization.
 
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)

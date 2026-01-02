@@ -47,7 +47,7 @@ export PRE_COMMIT_HOME="${PRE_COMMIT_HOME:-${FABRIC_REPO_ROOT}/.cache/pre-commit
 export ANSIBLE_LOCAL_TMP="${ANSIBLE_LOCAL_TMP:-${FABRIC_REPO_ROOT}/.cache/ansible/tmp}"
 export ANSIBLE_LOCAL_TEMP="${ANSIBLE_LOCAL_TEMP:-${FABRIC_REPO_ROOT}/.cache/ansible/tmp}"
 export TF_PLUGIN_CACHE_DIR="${TF_PLUGIN_CACHE_DIR:-${FABRIC_REPO_ROOT}/.cache/terraform-plugins}"
-export TF_CLI_ARGS_init="${TF_CLI_ARGS_init:--backend=false -input=false}"
+export TF_CLI_ARGS_init="${TF_CLI_ARGS_init:--input=false}"
 
 mkdir -p "${PRE_COMMIT_HOME}" "${ANSIBLE_LOCAL_TMP}" "${TF_PLUGIN_CACHE_DIR}"
 

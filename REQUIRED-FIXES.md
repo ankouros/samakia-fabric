@@ -96,6 +96,19 @@ This document records what was fixed, what remains blocked (if anything), and th
 - **Required remediation:** Fix milestone wrapper to preserve stdout/stderr per step, propagate real exit codes, and rerun `make milestone.phase1-12.verify`.
 - **Resolution status:** **FIXED**
 - **Verification command(s):**
+  - `bash ops/scripts/test-milestone/test-wrapper-exit-semantics.sh` (PASS)
+  - `make milestone.phase1-12.verify` (blocked by MILESTONE-1-12-MINIO-BACKEND-SMOKE)
+
+### MILESTONE-1-12-MINIO-BACKEND-SMOKE
+- **Description:** `make milestone.phase1-12.verify` failed in Section D during `ENV=samakia-minio make phase2.accept` because `minio.backend.smoke` reported “backend type not confirmed in init output”.
+- **Impact:** Milestone Phase 1–12 verification could not be completed; milestone acceptance marker could not be issued.
+- **Root cause:** `TF_CLI_ARGS_init` in the milestone verifier forced `-backend=false`, suppressing the backend marker in `terraform init` output and tripping the smoke parser.
+- **Required remediation:** Remove the forced `-backend=false` default for milestone verification and rerun the milestone suite.
+- **Resolution status:** **FIXED**
+- **Evidence:**
+  - `audit/minio-backend-smoke/20260102T130656Z/report.md`
+  - `audit/minio-backend-smoke/20260102T130656Z/terraform-init.txt`
+- **Verification command(s):**
   - `make milestone.phase1-12.verify` (PASS)
 
 ## Verification Status
