@@ -566,6 +566,9 @@ fi
 if [[ "${CI:-0}" == "1" && "${MILESTONE_SIGN:-0}" != "1" ]]; then
   sign_manifest=0
 fi
+if [[ "${test_mode}" == "1" ]]; then
+  sign_manifest=0
+fi
 
 if [[ "${sign_manifest}" -eq 1 ]] && ! command -v gpg >/dev/null 2>&1; then
   overall_status="FAIL"

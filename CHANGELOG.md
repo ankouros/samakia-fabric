@@ -205,6 +205,7 @@ The format is inspired by:
 - Shared bootstrap only targets VLAN nodes that still accept root SSH during first-time bootstraps.
 - MinIO cluster nodes now receive chrony client configuration, and time-skew checks run concurrently to avoid false positives.
 - Phase 12 readiness packet tests now run in CI mode to avoid GPG signing when ENV is prod.
+- Milestone wrapper tests skip manifest signing in test mode to preserve exit semantics without GPG keys.
 - Added milestone wrapper exit-semantics regression test.
 - Recorded and resolved the MinIO backend smoke marker blocker for milestone verification in `REQUIRED-FIXES.md`.
 - Milestone verification no longer forces `-backend=false` for `terraform init`, allowing backend smoke checks to confirm S3 initialization.
