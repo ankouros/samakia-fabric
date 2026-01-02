@@ -225,15 +225,31 @@ ok "cluster membership & state signals OK (best-effort)"
 ###############################################################################
 
 check "Clock skew across MinIO nodes < 1s (best-effort)"
-ts1="$(ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -J "samakia@${edge1_lan},samakia@${edge2_lan}" "samakia@10.10.140.11" 'date +%s%N' 2>/dev/null || true)"
-ts2="$(ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -J "samakia@${edge1_lan},samakia@${edge2_lan}" "samakia@10.10.140.12" 'date +%s%N' 2>/dev/null || true)"
-ts3="$(ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -J "samakia@${edge1_lan},samakia@${edge2_lan}" "samakia@10.10.140.13" 'date +%s%N' 2>/dev/null || true)"
+tmp_dir="$(mktemp -d)"
+cleanup_timeskew() { rm -rf "${tmp_dir}"; }
+trap cleanup_timeskew EXIT
 
-if [[ -z "${ts1}" || -z "${ts2}" || -z "${ts3}" ]]; then
-  fail "could not read time from one or more minio nodes via ProxyJump (ensure nodes are reachable and samakia SSH works)"
-fi
+pids=()
+for ip in "${MINIO_NODES[@]}"; do
+  ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new \
+    -J "samakia@${edge1_lan},samakia@${edge2_lan}" "samakia@${ip}" 'date +%s%N' \
+    >"${tmp_dir}/${ip}" 2>/dev/null &
+  pids+=("$!")
+done
+for pid in "${pids[@]}"; do
+  wait "${pid}" || true
+done
 
-python3 - <<'PY' "${ts1}" "${ts2}" "${ts3}"
+ts_vals=()
+for ip in "${MINIO_NODES[@]}"; do
+  ts="$(cat "${tmp_dir}/${ip}" 2>/dev/null || true)"
+  if [[ -z "${ts}" ]]; then
+    fail "could not read time from one or more minio nodes via ProxyJump (ensure nodes are reachable and samakia SSH works)"
+  fi
+  ts_vals+=("${ts}")
+done
+
+python3 - <<'PY' "${ts_vals[@]}"
 import sys
 
 vals = [int(x) for x in sys.argv[1:]]

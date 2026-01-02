@@ -203,6 +203,7 @@ The format is inspired by:
 - Shared observability now satisfies HA placement requirements with an obs-2 node, updated edge backends, and expanded acceptance coverage.
 - Loki configuration blocks structured metadata under v11 schemas and ensures data directories are owned by the Loki user.
 - Shared bootstrap only targets VLAN nodes that still accept root SSH during first-time bootstraps.
+- MinIO cluster nodes now receive chrony client configuration, and time-skew checks run concurrently to avoid false positives.
 - Added milestone wrapper exit-semantics regression test.
 - Recorded and resolved the MinIO backend smoke marker blocker for milestone verification in `REQUIRED-FIXES.md`.
 - Milestone verification no longer forces `-backend=false` for `terraform init`, allowing backend smoke checks to confirm S3 initialization.

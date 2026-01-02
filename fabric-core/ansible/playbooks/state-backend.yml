@@ -9,6 +9,7 @@
   hosts: minio-[0-9]*
   become: true
   roles:
+    - role: ntp_chrony_client
     - role: minio_cluster
 
 - name: MinIO bootstrap (bucket + terraform user)

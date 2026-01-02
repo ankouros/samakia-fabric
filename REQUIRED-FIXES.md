@@ -124,6 +124,16 @@ This document records what was fixed, what remains blocked (if anything), and th
   - `ENV=samakia-shared make phase2.1.accept`
   - `make milestone.phase1-12.verify`
 
+### MILESTONE-1-12-PHASE2-MINIO-TIME-SKEW
+- **Description:** `make milestone.phase1-12.verify` failed in Section D during `ENV=samakia-dns make phase2.accept` because MinIO convergence reported time skew > 1s.
+- **Impact:** Milestone Phase 1–12 verification cannot be completed; milestone acceptance marker cannot be issued.
+- **Root cause:** MinIO nodes lacked chrony client setup, and the skew check was serialized enough to exceed the 1s threshold under normal SSH latency.
+- **Required remediation:** Install chrony client on MinIO nodes and collect time samples concurrently, then re-run MinIO convergence acceptance.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-minio ANSIBLE_FLAGS="--limit minio-1,minio-2,minio-3" make minio.ansible.apply`
+  - `ENV=samakia-minio make minio.converged.accept`
+
 ## Verification Status
 
 Commands executed (local):

@@ -3,4 +3,5 @@
   hosts: minio-*
   become: true
   roles:
+    - role: ntp_chrony_client
     - role: minio_cluster
