@@ -205,6 +205,7 @@ The format is inspired by:
 - Introduced `RUNNER_MODE=ci|operator` to enforce non-interactive CI behavior and explicit inputs.
 - Documented SSH trust rotation, networking determinism policy, runner modes, and template upgrade semantics.
 - Updated milestone lock statement for Phase 13 readiness.
+- Re-verified Milestone Phase 1–12 and refreshed the acceptance marker.
 - Phase 12 validation allows the milestone invariant scan pattern without tripping the insecure TLS guard.
 - Backfilled `acceptance/PHASE1_ACCEPTED.md` with a SHA256 self-hash for marker integrity.
 - Invariant scans now normalize repo-relative paths and allowlist the milestone scan patterns.

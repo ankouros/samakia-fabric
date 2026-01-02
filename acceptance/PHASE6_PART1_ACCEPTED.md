@@ -10,8 +10,8 @@ Assurance statement:
 Consumer contracts validated; HA-ready and disaster-aware patterns enforced; no infrastructure deployed.
 
 Repository:
-- Commit: 9cdc45b0932d188f7d6c001a65d65f0356b7554f
-- Timestamp (UTC): 2026-01-02T15:29:20Z
+- Commit: 0ff9ab2c0420dbf5f5cece230726a258eb87af0a
+- Timestamp (UTC): 2026-01-02T17:14:08Z
 
 Acceptance commands executed:
 - make consumers.validate
@@ -24,4 +24,4 @@ Acceptance commands executed:
 Remediation ledger:
 - REQUIRED-FIXES.md
 
-SHA256 (content excluding this line): 0fb7d79f067e5619bab2a27247e3df18e15818263b51eaecfd428b9bde1c2d7a
+SHA256 (content excluding this line): e0371c9d59acca421fe961d50624e8e3912f50fa855bc25872f2dd0ebf01ede0

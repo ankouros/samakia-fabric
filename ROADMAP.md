@@ -635,7 +635,7 @@ Non-scope:
 
 Goal: Close Phase 12 gaps, re-verify the Phase 1–12 milestone, and lock readiness for Phase 13.
 
-Status: IN PROGRESS (pending milestone verification + lock)
+Status: COMPLETED (milestone verified and locked)
 
 Scope (hardening):
 - Image reproducibility and provenance (pinned digests, apt snapshots, build metadata).
@@ -668,7 +668,7 @@ Status: COMPLETED ✅
 ### Scope (canonical)
 - End-to-end verification target: `make milestone.phase1-12.verify`.
 - Consolidated evidence packet: `evidence/milestones/phase1-12/<UTC>/`.
-- Latest verification evidence: `evidence/milestones/phase1-12/2026-01-02T15:22:32Z`.
+- Latest verification evidence: `evidence/milestones/phase1-12/2026-01-02T17:07:50Z`.
 - Milestone lock target: `make milestone.phase1-12.lock`.
 - Acceptance marker: `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md` (self-hash).
 

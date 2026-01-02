@@ -7,7 +7,7 @@ This document records what was implemented for the **Terraform remote state back
 - Added end-to-end regression verification and lock scripts under `ops/milestones/phase1-12/`.
 - Evidence packets are written to `evidence/milestones/phase1-12/<UTC>/` with summaries and manifests.
 - Milestone lock is gated on a PASS verification and writes `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md`.
-- Milestone verification passed and the lock marker references evidence at `evidence/milestones/phase1-12/2026-01-02T15:22:32Z`.
+- Milestone verification passed and the lock marker references evidence at `evidence/milestones/phase1-12/2026-01-02T17:07:50Z`.
 - Verifier now captures per-step stdout/stderr with exit codes, and failure summaries include redacted stderr excerpts plus log pointers.
 - Shared observability now includes `obs-2` to satisfy HA placement policy, and Loki readiness is stabilized via config + data directory fixes.
 - Post-Phase12 hardening adds image provenance stamps, pinned base digests, and apt snapshot sources.
@@ -176,14 +176,12 @@ make dns.accept
 
 - `pre-commit run --all-files`: **PASS**
 - `bash fabric-ci/scripts/lint.sh`: **PASS**
-- `bash fabric-ci/scripts/validate.sh`: **PASS**
-- `make minio.up ENV=samakia-minio`: **PASS** (includes SDN apply; strict TLS; token-only)
-- `make minio.accept`: **PASS**
-- `make minio.quorum.guard ENV=samakia-minio`: **PASS**
-- `make minio.backend.smoke ENV=samakia-minio`: **PASS**
-- `make minio.state.migrate ENV=samakia-minio`: **PASS** (non-interactive; `-force-copy`)
-- `make dns.up ENV=samakia-dns`: **PASS** (bootstraps edges first, then VLAN-only auth via ProxyJump; strict contracts)
-- `make dns.accept`: **PASS**
+- `bash fabric-ci/scripts/validate.sh`: **PASS** (warnings: missing secret refs; drift non-blocking)
+- `make policy.check`: **PASS**
+- `CI=1 make phase8.part1.accept`: **PASS** (QCOW2 fixture skipped in tool-only mode)
+- `ENV=samakia-shared make phase2.1.accept`: **PASS**
+- `make milestone.phase1-12.verify`: **PASS** (`evidence/milestones/phase1-12/2026-01-02T17:07:50Z`)
+- `make milestone.phase1-12.lock`: **PASS**
 
 ---
 
