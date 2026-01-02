@@ -1,37 +1,38 @@
 # Samakia Fabric
 
-**Samakia Fabric** is a production-grade, open infrastructure framework for building and operating
-**Proxmox-based, LXC-first platforms** using Infrastructure as Code.
+Samakia Fabric is a production-minded infrastructure framework for building and
+operating Proxmox-based, LXC-first platforms with Infrastructure as Code.
+It aims to be clear, deterministic, and auditable.
 
-It is designed for:
+It is intended for:
 
 - Infrastructure engineers
-- DevOps / SRE teams
+- DevOps and SRE teams
 - Platform operators
 - AI-assisted operations
 
-Samakia Fabric is **not** a demo or tutorial repository.
-It is a **reference-quality infrastructure fabric**.
+Samakia Fabric is not a demo or a tutorial repository.
+It is a reference-quality infrastructure fabric.
 
 ---
 
-## What Samakia Fabric Is
+## What This Repository Tries To Provide
 
-Samakia Fabric provides a **clean, disciplined, and opinionated** approach to:
+Samakia Fabric provides a disciplined approach to:
 
 - Golden image creation (Packer)
 - Infrastructure lifecycle management (Terraform)
 - OS configuration and policy (Ansible)
 - Secure, delegated automation on Proxmox VE
-- LXC-first workloads with rebuild-over-repair philosophy
+- LXC-first workloads with a rebuild-over-repair philosophy
 
-The goal is **operability, clarity, and long-term maintainability**.
+The goal is operability, clarity, and long-term maintainability.
 
 ---
 
-## What Samakia Fabric Is Not
+## What This Repository Does Not Try To Be
 
-Samakia Fabric is **not**:
+Samakia Fabric is not:
 
 - A managed service
 - A Kubernetes distribution
@@ -39,7 +40,7 @@ Samakia Fabric is **not**:
 - A beginner playground
 - A click-ops replacement
 
-It assumes you want **control**, not convenience.
+It assumes you want control, not convenience.
 
 ---
 
@@ -65,10 +66,10 @@ At a high level:
 
 - Packer builds golden LXC images
 - Terraform creates and manages infrastructure
-- Ansible configures OS users, SSH, sudo, policy
+- Ansible configures OS users, SSH, sudo, and policy
 - Proxmox VE runs and secures the platform
 
-Each layer has **clear ownership and boundaries**.
+Each layer has clear ownership and boundaries.
 
 For details, see:
 
@@ -81,28 +82,28 @@ For details, see:
 
 ```text
 fabric-core/
-├── packer/        # Golden image pipeline
-├── terraform/
-│   ├── modules/   # Reusable infrastructure modules
-│   └── envs/      # Environment definitions (dev/prod)
-├── ansible/
-│   ├── playbooks/ # Bootstrap & configuration
-│   └── roles/     # Reusable OS roles
-└── docs/          # Optional diagrams and references
+|-- packer/        # Golden image pipeline
+|-- terraform/
+|   |-- modules/   # Reusable infrastructure modules
+|   `-- envs/      # Environment definitions (dev/prod)
+|-- ansible/
+|   |-- playbooks/ # Bootstrap and configuration
+|   `-- roles/     # Reusable OS roles
+`-- docs/          # Documentation and references
 ```
 
-Terraform is **only** executed from `envs/*`.
+Terraform is only executed from `envs/*`.
 
 ---
 
 ## Supported Stack
 
-- **Hypervisor**: Proxmox VE (9+)
-- **Compute**: LXC (unprivileged by default)
-- **IaC**: Terraform (telmate/proxmox provider)
-- **Configuration**: Ansible
-- **Images**: Packer (Docker-based rootfs build)
-- **OS**: Ubuntu LTS (currently 24.04)
+- Hypervisor: Proxmox VE (9+)
+- Compute: LXC (unprivileged by default)
+- IaC: Terraform (telmate/proxmox provider)
+- Configuration: Ansible
+- Images: Packer (Docker-based rootfs build)
+- OS: Ubuntu LTS (currently 24.04)
 
 ---
 
@@ -122,22 +123,30 @@ Security is documented in:
 
 ---
 
+## Getting Started
+
+- Read `docs/README.md` for the documentation map.
+- Follow `docs/tutorials/README.md` in order for first-time setup.
+- Review `CONTRACTS.md` and `SECURITY.md` before making changes.
+
+---
+
 ## Documentation Index
 
 This repository is documentation-first.
 
 Start here:
 
-- 📐 `ARCHITECTURE.md`
-- 🧠 `DECISIONS.md`
-- 🛠️ `OPERATIONS.md`
-- 🔐 `SECURITY.md`
-- 📜 `CONTRACTS.md`
-- 🎨 `STYLEGUIDE.md`
-- 🤝 `CONTRIBUTING.md`
-- 🤖 `AGENTS.md`
-- 🧭 `ROADMAP.md`
-- 📘 `docs/glossary.md`
+- `ARCHITECTURE.md`
+- `DECISIONS.md`
+- `OPERATIONS.md`
+- `SECURITY.md`
+- `CONTRACTS.md`
+- `STYLEGUIDE.md`
+- `CONTRIBUTING.md`
+- `AGENTS.md`
+- `ROADMAP.md`
+- `docs/glossary.md`
 
 If something is not documented, it is considered incomplete.
 
@@ -145,7 +154,7 @@ If something is not documented, it is considered incomplete.
 
 ## Contribution Model
 
-Contributions are welcome, but **discipline is required**.
+Contributions are welcome, but discipline is required.
 
 Before contributing:
 1. Read `CONTRIBUTING.md`
@@ -158,11 +167,7 @@ Pull requests that violate architectural boundaries will be rejected.
 
 ## AI Agents
 
-Samakia Fabric is explicitly designed to be:
-- Readable by AI agents
-- Operable by AI agents
-- Safe for AI-assisted workflows
-
+Samakia Fabric is designed to be readable and operable by AI agents.
 Rules for agents are defined in `AGENTS.md`.
 Shared ecosystem contract: `/home/aggelos/samakia-specs/specs/base/ecosystem.yaml`.
 
@@ -170,7 +175,7 @@ Shared ecosystem contract: `/home/aggelos/samakia-specs/specs/base/ecosystem.yam
 
 ## License
 
-Samakia Fabric is licensed under the **Apache License 2.0**.
+Samakia Fabric is licensed under the Apache License 2.0.
 
 You may:
 - Use it commercially
@@ -188,7 +193,7 @@ See `LICENSE` for details.
 
 Samakia Fabric exists to answer a simple question:
 
-> “What does clean, serious, on-prem infrastructure look like in 2025?”
+"What does clean, serious, on-prem infrastructure look like in 2025?"
 
 If you value:
 - Explicit design
@@ -196,4 +201,4 @@ If you value:
 - Security by default
 - Long-term clarity
 
-Then Samakia Fabric is for you.
+Samakia Fabric is built for you.

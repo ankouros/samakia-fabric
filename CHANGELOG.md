@@ -75,6 +75,10 @@ The format is inspired by:
 - Anti-drift doc tooling + CI gate (`make docs.operator.check`)
 - Phase 9 acceptance marker: `acceptance/PHASE9_ACCEPTED.md`
 
+#### Tutorials (Phase 1-2 onboarding)
+- Tutorial index at `docs/tutorials/README.md` with required order.
+- New tutorials for MinIO backend, DNS plane, and shared services under `docs/tutorials/`.
+
 #### Tenant binding (Phase 10 design)
 - ADR-0027 locking tenant = project binding model (design-only)
 - Tenant contract schemas + templates + examples under `contracts/tenants/`
@@ -348,6 +352,7 @@ The format is inspired by:
 
 ### Changed
 - Refreshed Phase 1–12 milestone lock evidence to `evidence/milestones/phase1-12/2026-01-02T15:22:32Z` and updated the acceptance marker.
+- Refreshed README and REVIEW narrative to align with current docs and a more humble, operator-focused tone.
 - Migrated Codex remediation log into `CHANGELOG.md` (retired `codex-changelog.md`)
 - Enforced Proxmox API token-only auth in Terraform envs and runner guardrails (password auth variables are no longer supported)
 - Enabled strict SSH host key checking in Ansible (`fabric-core/ansible/ansible.cfg`), requiring explicit known_hosts rotation/enrollment on host replacement

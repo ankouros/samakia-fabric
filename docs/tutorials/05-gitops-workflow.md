@@ -305,3 +305,10 @@ It does not belong in Samakia Fabric.
 
 Git defines intent.
 Reality follows.
+
+---
+
+## What's Next
+
+Proceed to:
+- `docs/tutorials/06-bootstrap-remote-state-minio.md`

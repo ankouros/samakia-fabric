@@ -189,180 +189,183 @@ make dns.accept
 
 ## 1. Executive Summary
 
-Samakia Fabric είναι πλέον ένα production-grade IaaS substrate για Proxmox VE (LXC-first) με ξεκάθαρα security/ops contracts και επιθετικά guardrails. Η αρχιτεκτονική είναι συνεπής με immutability-by-default: versioned golden images, strict TLS (internal CA), API-token-only για Proxmox, 2-phase Ansible (bootstrap → harden), και ξεχωριστό audit/compliance/forensics layer που παράγει signable evidence bundles (GPG signatures, dual-control, TSA tokens) χωρίς auto-remediation.
+Samakia Fabric aims to be a production-grade Proxmox LXC substrate with clear
+separation of responsibilities, strict TLS, and evidence-first operations.
+This review focuses on correctness, operability, and audit readiness.
 
-Τα μεγαλύτερα ρίσκα/κενά δεν είναι “λειτουργικά” αλλά operational sharp edges: SSH trust/known_hosts lifecycle μετά από replace/recreate, DHCP/MAC determinism για σταθερά IPs, και reproducibility guarantees στο image build (docker base / apt drift). Αυτά είναι απολύτως λύσιμα με μικρές, deterministic πολιτικές και επιπλέον “provenance” stamping στο image.
+Current strengths include layered ownership (Packer/Terraform/Ansible),
+delegated Proxmox access, and deterministic acceptance workflows.
+The primary gaps are reproducibility of image builds, SSH known_hosts
+lifecycle friction after replace/recreate, and uneven non-interactive
+defaults across entrypoints.
 
-Γενικό verdict: ισχυρό foundation, ήδη αξιοποιήσιμο σε παραγωγή για single-site Proxmox, με σαφή next steps για να γίνει ακόμη πιο deterministic και audit-friendly.
+Verdict: suitable as a production foundation for a single-site Proxmox
+cluster when the recommended operational guardrails are adopted.
 
 ---
 
 ## 2. Architectural Assessment
 
 **Strengths**
-- Καθαρό layering: Packer (image) → Terraform (lifecycle) → Ansible (policy). Η αλληλουχία και τα συμβόλαια είναι σαφή και enforceable.
-- Proxmox-9 safety: αποφυγή forbidden provider, provider pinning, και χρήση API tokens αντί για SSH/root scripts.
-- Immutability: versioned rootfs archives (`*-vN.tar.gz`) και storage content type `vztmpl`. Το upload ακολουθεί “immutable rule” (no overwrite).
-- GitOps readiness: scripts/runbooks/guardrails σχεδιασμένα για runner-host execution, με deterministic inputs και χωρίς interactive “χαοτικές” εξαρτήσεις στο runtime.
+- Clear layering: Packer (image) -> Terraform (lifecycle) -> Ansible (policy).
+- Proxmox safety: provider pinning, delegated tokens, no root automation.
+- Immutability: versioned rootfs archives and no overwrite semantics.
+- GitOps readiness: deterministic inputs and repo-rooted scripts.
 
 **Operational reality learned**
-- Το template “δεν εμφανίζεται” συχνά είναι UI filter issue. Canonical verification: `pvesm list <storage> --content vztmpl`.
-- In-place replace/recreate σε CT αλλάζει host key → strict SSH θα μπλοκάρει μέχρι να γίνει controlled known_hosts rotation.
+- Template visibility is often a Proxmox UI filter issue. Verify with
+  `pvesm list <storage> --content vztmpl`.
+- Replace/recreate rotates host keys; strict SSH will block until a
+  controlled known_hosts update occurs.
 
 ---
 
 ## 3. IaC Design Review (Packer / Terraform / Ansible)
 
 ### Packer (Golden LXC images)
-- Golden LXC image workflow είναι ευθυγραμμισμένο: userless image, root key-only bootstrap, minimal cloud-init.
-- Versioning policy υπάρχει και προστατεύει από overwrite.
+- Userless images, key-only bootstrap, and reset hygiene match the contract.
+- Versioned artifacts prevent accidental overwrites.
 
 **Gap**
-- Reproducibility/Provenance: αν η βάση είναι docker image + apt updates, υπάρχει drift με τον χρόνο. Προτείνεται:
-  - pin docker base digest (όχι μόνο tag),
-  - pin apt snapshot/apt proxy snapshot strategy,
-  - add image provenance stamp (π.χ. `/etc/samakia-image-version` + build UTC + git SHA).
+- Reproducibility and provenance need strengthening. Consider:
+  - Pinning Docker base digests, not tags.
+  - Using an apt snapshot strategy.
+  - Stamping `/etc/samakia-image-version` with build UTC and git SHA.
 
 ### Terraform (Proxmox LXC lifecycle)
-- Strict TLS χωρίς insecure flags, canonical host CA trust με installer/guardrails.
-- SSH keys inject μέσω `ssh_public_keys` για προσωρινό bootstrap access είναι σωστό pattern.
-- Inventory fallback μέσω Proxmox API resolve (strict TLS) μειώνει dependency σε DNS/DHCP timing.
+- Strict TLS is enforced; CA trust is explicit.
+- SSH keys are injected via `ssh_public_keys` for bootstrap only.
+- Inventory fallback via Proxmox API reduces DNS timing dependencies.
 
 **Operational sharp edges**
-- Plan/apply δεν θα δείξει “upgrade existing CT to new template” by itself: templates είναι create-time seed. Για νέο golden version σε existing CT απαιτείται `-replace` ή blue/green.
+- Template upgrades are create-time only; plan/apply will not upgrade
+  existing CTs without explicit replace or blue/green cutover.
 
 ### Ansible (2-phase policy enforcement)
-- Phase-1 bootstrap: root-only minimal, CA install στο LXC, operator user + keys + sudo, disable root ssh.
-- Phase-2 hardening: runs as `samakia` (become) και είναι LXC-safe (sysctls only when writable, UFW optional, sshd -t validation pre-reload).
+- Phase 1 bootstrap is root-only and minimal.
+- Phase 2 hardening runs as `samakia` with LXC-safe guards.
 
 **Gap**
-- SSH trust model: χρειάζεται explicit operator workflow για known_hosts rotate σε replace/recreate (χωρίς να χαλαρώσει strict checking).
+- Known_hosts rotation needs a canonical operator procedure that does not
+  relax strict SSH checking.
 
 ---
 
 ## 4. GitOps Model Review
 
-- Guardrails coverage είναι ισχυρό: terraform fmt/validate, ansible-lint, shellcheck, gitleaks, provider pinning enforcement.
-- Drift detection/audit reporting ως read-only pipeline είναι σωστό: plan-based drift + ansible check/diff.
-- Promotion flow τεκμηριωμένο (image → template → env) και consistent με immutability.
+**Strengths**
+- Guardrails are comprehensive (fmt/validate/lint/security checks).
+- Drift detection is read-only and evidence-first.
+- Promotion flow (image -> template -> env) is explicit.
 
 **Gap**
-- Καλό θα ήταν να υπάρχει canonical “non-interactive mode” everywhere (inputs μέσω env vars/files) ώστε CI runners να μην μπλοκάρουν.
-- Makefile orchestration προσφέρει UX, αλλά πρέπει να αποφεύγει interactive prompts σε CI unless explicitly enabled.
+- Every entrypoint should support a fully non-interactive mode for CI and
+  deterministic automation.
 
 ---
 
 ## 5. Security Review
 
 **Strengths**
-- No insecure TLS: Proxmox API strict TLS trust μέσω internal CA στο host trust store.
-- API token only: αφαιρέθηκαν SSH/root scripts προς Proxmox (σωστό).
-- Root SSH disabled post-bootstrap. SSH contract verified (operator OK, root FAIL).
-- Evidence pipelines:
-  - signed compliance snapshots (sha256 manifest + GPG detached signature),
-  - dual-control signing (2-person rule),
-  - TSA notarization (RFC3161),
-  - offline verification pipeline.
+- Strict TLS with internal CA trust; no insecure flags.
+- Delegated Proxmox tokens only; `root@pam` automation is forbidden.
+- Root SSH is disabled after bootstrap.
+- Evidence tooling supports signing and offline verification.
 
 **Major risk**
-- SSH host key lifecycle: σε replace/recreate αλλάζει host key και strict SSH σταματάει. Αυτό είναι σωστό security posture, αλλά χρειάζεται documented procedure:
-  - controlled `ssh-keygen -R <ip|host>`,
-  - optional out-of-band fingerprint verification (Proxmox console),
-  - never disable strict checking globally.
+- SSH host key rotation after replace/recreate is a real operational edge.
+  It needs a documented, strict procedure (no global relaxations).
 
 **Secondary risk**
-- Secrets placement: το να μπαίνουν tokens σε `.bashrc` είναι πρακτικά βολικό αλλά risk. Προτείνεται `~/.config/samakia-fabric/env.sh` (chmod 600) και `.bashrc` να κάνει source, όχι inline secret.
+- Secrets should remain in `~/.config/samakia-fabric/env.sh` and never be
+  embedded in shell profiles or Git.
 
 ---
 
 ## 6. High Availability Review
 
-- HA/failure-domains runbook είναι ρεαλιστικό: ξεχωρίζει compute, storage, network partitions και αποφεύγει “HA theater”.
-- GameDays / failure simulation framework είναι production-minded: safety gates, abort criteria, roles (conductor/observer/comms), verification + rollback, evidence capture.
+**Strengths**
+- HA semantics are explicit and tested via GameDays.
+- Failure domains and placement policies are enforced.
 
 **Gap**
-- Single Proxmox node: HA είναι πρακτικά “operational resilience” όχι true HA. Τα runbooks πρέπει να συνεχίσουν να το λένε ωμά (και ήδη το κάνουν).
+- Single-node deployments are resilience only, not true HA. This should
+  stay explicit in docs and runbooks.
 
 ---
 
 ## 7. Operational Readiness
 
 **Strengths**
-- Break-glass / recovery runbooks: SSH lockout, firewall lockout, sshd repair, key restore via console, safe rerun rules (bootstrap vs harden).
-- Pre-release readiness audit framework: Go/No-Go gate, acceptance criteria, signable readiness packet scaffolding.
-- Legal hold/retention automation: label-only packs independent from evidence manifests, dual-control markers, release workflow.
-- Shared control-plane services: deterministic SDN plane + VIP endpoints (NTP/Vault/observability) with read-only acceptance gates.
+- Break-glass and recovery flows are documented.
+- Release readiness and compliance evidence have clear workflows.
+- Shared services are guarded and accepted in read-only mode.
 
 **Operational sharp edges**
-- DHCP determinism: σε in-place replace αλλάζει MAC → αλλάζει IP. Αυτό απαιτεί:
-  - DHCP reservations by MAC, ή
-  - fixed hwaddr/MAC management via IaC (όπου υποστηρίζεται),
-  - explicit cutover strategy (DNS/IP).
+- DHCP/MAC determinism needs consistent reservations or pinned MACs to
+  avoid surprise IP changes on replacement.
 
 ---
 
 ## 8. Documentation Quality
 
-- Docs-first approach είναι ισχυρό asset: promotion, break-glass, compliance audits, key custody, evidence notarization, app compliance overlay, forensics, HA simulation, readiness.
-- Τα runbooks είναι “03:00-safe”: βήματα, safety gates, no root SSH assumption.
-- Clear contracts: “no insecure TLS”, “API token only”, “root SSH disabled”, “no auto-remediation in drift”.
+**Strengths**
+- Docs-first approach with strong runbooks and contracts.
+- Operator guidance is safety-focused and practical.
 
 **Gap**
-- Να προστεθεί μικρό operator tip section σε relevant runbooks:
-  - canonical template verification via `pvesm list ... --content vztmpl`,
-  - known_hosts rotate step after replace/recreate,
-  - DHCP/MAC determinism recommendation.
+- Add concise operator tips in key runbooks for known_hosts rotation and
+  Proxmox template verification.
 
 ---
 
 ## 9. AI-Operability Assessment
 
-Το repo είναι AI-operable με ασφάλεια, επειδή:
-- Υπάρχουν guardrails που αποτρέπουν risky changes (provider pinning, gitleaks, shellcheck, ansible-lint).
-- Τα audit/compliance/forensics scripts είναι read-only by default, χωρίς auto-remediation.
-- Τα runbooks έχουν explicit contracts και “do not relax security”.
+**Strengths**
+- Guardrails block risky automation.
+- Evidence workflows are deterministic and read-only by default.
 
 **Risk**
-- Interactive prompts (Terraform vars, selection menus) μπορεί να μπερδέψουν agents. Πρέπει να υπάρχει consistent non-interactive mode + clear env var contract για runners.
+- Interactive prompts can confuse automation; expand explicit non-interactive
+  flags and environment variable contracts.
 
 ---
 
 ## 10. Risks and Gaps
 
-1) **Reproducibility risk στο image build** (docker base/apt drift) → μειώνει audit confidence.
-2) **SSH known_hosts lifecycle** μετά από replace/recreate → operational friction, χρειάζεται canonical procedure (όχι disable strict).
-3) **DHCP/MAC determinism** → IP changes σε replace, impact σε automation/monitoring/ops.
-4) **Dev/staging parity** → χωρίς πλήρη staging env, promotion έχει λιγότερα safety nets.
-5) **“Template upgrade” misconception** → απαιτεί explicit replace/blue-green, δεν είναι in-place upgrade feature.
+1) Image build reproducibility (base image and apt drift).
+2) SSH known_hosts lifecycle after replace/recreate.
+3) DHCP/MAC determinism for stable IP assignments.
+4) Limited staging parity for promotion flows.
+5) Template upgrade misconceptions (requires replace or blue/green).
 
 ---
 
 ## 11. Recommendations (Short / Medium / Long term)
 
-### Short-term (next 1–2 iterations)
-- Add image provenance stamp (`/etc/samakia-image-version`, build UTC, git SHA).
-- Document known_hosts rotate workflow (strict) ως explicit step μετά από replace.
-- Make DHCP reservations by MAC canonical for key CTs (or pin MAC in IaC if feasible).
-- Add “pvesm list” verification snippets σε operations docs.
+### Short-term (next 1-2 iterations)
+- Add image provenance stamps and build metadata.
+- Document known_hosts rotation with strict SSH.
+- Canonicalize DHCP reservations or MAC pinning.
+- Add Proxmox template verification snippets to runbooks.
 
 ### Medium-term
-- Improve image reproducibility: pin base image digest + apt snapshot strategy.
-- Add a minimal staging env that mirrors prod guardrails and runs promotion end-to-end.
-- Expand “non-interactive runner mode” for all ops commands (CI-safe).
+- Pin base image digests and adopt apt snapshot strategy.
+- Add a minimal staging environment that mirrors prod guardrails.
+- Normalize non-interactive runner flags across scripts and Make targets.
 
 ### Long-term
-- True HA requires multi-node cluster + storage/network architecture. Keep HA design honest and operationally tested via GameDays.
-- Consider formalizing evidence chain-of-custody into a single “audit packet” standard across substrate/app/forensics.
+- Keep HA design honest and tested via GameDays.
+- Consider a unified audit packet standard across evidence types.
 
 ---
 
 ## 12. Final Verdict
 
-Samakia Fabric είναι ένα σοβαρό, production-ready substrate για Proxmox LXC IaaS με unusually strong compliance/evidence/forensics capabilities και σωστό security posture (strict TLS, API tokens, root SSH disabled). Ο σχεδιασμός είναι συνεπής και τα guardrails είναι ουσιαστικά.
+Samakia Fabric reads as a serious, well-guarded infrastructure substrate.
+With the short-term operational hardening items adopted, it is appropriate
+as a production foundation for single-site Proxmox environments.
 
-Το project είναι έτοιμο για παραγωγή σε single-site Proxmox, με την προϋπόθεση ότι θα υιοθετηθούν ως standard τα operational procedures για SSH trust rotation και DHCP determinism, και θα ενισχυθεί η reproducibility/provenance του golden image build.
-
-Verdict: **GO for production foundation**, με τα Short-term items ως required hardening για να μειωθούν τα day-0/day-2 sharp edges.
 
 ## Phase 2.1 Acceptance Note
 

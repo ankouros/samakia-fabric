@@ -6,6 +6,7 @@ This directory contains Samakia Fabric documentation.
 
 - `concepts/`: design and architecture concepts
 - `tutorials/`: step-by-step guides
+- `tutorials/README.md`: tutorial index and required order
 - `operator/`: canonical operator UX and cookbook
 - `consumers/`: consumer catalog and variants
 - `tenants/`: tenant (project) binding design
@@ -17,7 +18,7 @@ This directory contains Samakia Fabric documentation.
 
 - Start with `../ARCHITECTURE.md` and `../DECISIONS.md`
 - Review `../CONTRACTS.md` and `../SECURITY.md` for non-negotiables
-- Follow tutorials in order for first-time setup
+- Follow tutorials in order for first-time setup (`tutorials/README.md`)
 
 ## Status
 

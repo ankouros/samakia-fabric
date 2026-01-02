@@ -293,3 +293,10 @@ terraform destroy -target=module.monitoring_1
 ```
 
 If destruction feels dangerous, immutability is not understood.
+
+---
+
+## What's Next
+
+Proceed to:
+- `docs/tutorials/04-bootstrap-with-ansible.md`

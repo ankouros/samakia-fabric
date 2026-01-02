@@ -238,3 +238,10 @@ All are image-level problems.
 - Credentials are injected at deploy time
 - Compromised images are rebuilt, not fixed
 - Image rebuild is the only safe fix
+
+---
+
+## What's Next
+
+Proceed to:
+- `docs/tutorials/03-deploy-lxc-with-terraform.md`
