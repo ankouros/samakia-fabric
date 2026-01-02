@@ -7,3 +7,4 @@ docs/images/proxmox-template-registration.md
 ops/scripts/phase2-1-entry-check.sh
 ops/scripts/phase2-2-entry-check.sh
 ops/scripts/test-phase12/test-phase12-targets.sh
+ops/milestones/phase1-12/verify.sh

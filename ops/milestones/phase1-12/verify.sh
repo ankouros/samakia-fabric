@@ -196,7 +196,7 @@ scan_invariants() {
 
   output="$(rg -n "${pattern}" "${FABRIC_REPO_ROOT}" || true)"
 
-  SCAN_LABEL="${label}" SCAN_PATTERN="${pattern}" SCAN_OUTPUT="${output}" ALLOWLIST_FILE="${allowlist_file}" OUT_FILE="${invariants_tmp}" \
+  SCAN_LABEL="${label}" SCAN_PATTERN="${pattern}" SCAN_OUTPUT="${output}" ALLOWLIST_FILE="${allowlist_file}" OUT_FILE="${invariants_tmp}" SCAN_ROOT="${FABRIC_REPO_ROOT}" \
     python3 - <<'PY'
 import json
 import os
@@ -206,6 +206,7 @@ label = os.environ.get("SCAN_LABEL", "scan")
 pattern = os.environ.get("SCAN_PATTERN", "")
 raw = os.environ.get("SCAN_OUTPUT", "")
 allowlist_path = Path(os.environ.get("ALLOWLIST_FILE", ""))
+root = Path(os.environ.get("SCAN_ROOT", "")).resolve()
 
 allowlist = []
 if allowlist_path.is_file():
@@ -218,8 +219,21 @@ if allowlist_path.is_file():
 allowed = []
 violations = []
 for entry in [line for line in raw.splitlines() if line.strip()]:
-    path = entry.split(":", 1)[0]
-    is_allowed = any(path == item or path.startswith(item.rstrip("/")) for item in allowlist)
+    raw_path = entry.split(":", 1)[0]
+    rel_path = raw_path
+    path_obj = Path(raw_path)
+    if root and path_obj.is_absolute():
+        try:
+            rel_path = str(path_obj.resolve().relative_to(root))
+        except ValueError:
+            rel_path = raw_path
+    is_allowed = any(
+        rel_path == item
+        or rel_path.startswith(item.rstrip("/"))
+        or raw_path == item
+        or raw_path.startswith(item.rstrip("/"))
+        for item in allowlist
+    )
     if is_allowed:
         allowed.append(entry)
     else:
