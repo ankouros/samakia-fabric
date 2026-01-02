@@ -116,9 +116,10 @@ This document records what was fixed, what remains blocked (if anything), and th
 - **Impact:** Milestone Phase 1–12 verification cannot be completed; milestone acceptance marker cannot be issued.
 - **Root cause:** The shared observability tier does not currently satisfy policy requirements (anti-affinity, replica count, and host count).
 - **Required remediation:** Bring shared observability workloads into compliance (anti_affinity=true, replicas>=2, at least 2 hosts) and rerun milestone verification.
-- **Resolution status:** **OPEN**
+- **Resolution status:** **FIXED**
 - **Evidence:**
   - `evidence/milestones/phase1-12/2026-01-02T13:14:52Z/steps/phase2-1-shared/stderr.log`
+  - `ENV=samakia-shared make phase2.1.accept` (PASS)
 - **Verification command(s):**
   - `ENV=samakia-shared make phase2.1.accept`
   - `make milestone.phase1-12.verify`
