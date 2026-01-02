@@ -1,3 +1,5 @@
 waivers:
   - name: substrate.plan.ci
     reason: CI-only target; operators use substrate.plan instead.
+  - name: phase11.entry.check
+    reason: Design-phase governance check; referenced in phase docs instead of cookbook.

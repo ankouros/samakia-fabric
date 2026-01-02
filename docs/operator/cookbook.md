@@ -1187,6 +1187,112 @@ Evidence packet created and manifests written under `artifacts/bindings/...`.
 #### Rollback / safe exit
 Stop; do not propagate manifests to downstream systems.
 
+### Task: Phase 12 Part 1 entry check
+
+#### Intent
+Verify Phase 12 Part 1 prerequisites before acceptance (read-only).
+
+#### Preconditions
+- Phase 12 Part 1 prerequisites exist
+- Repo is clean
+
+#### Command
+```bash
+make phase12.part1.entry.check
+```
+
+#### Expected result
+Entry checklist PASS with no blockers.
+
+#### Evidence outputs
+None (checklist only).
+
+#### Failure modes
+- Missing Phase 12 prerequisites
+- OPEN items in REQUIRED-FIXES.md
+
+#### Rollback / safe exit
+Stop and remediate the reported blockers before acceptance.
+
+### Task: Phase 12 Part 1 acceptance
+
+#### Intent
+Run Phase 12 Part 1 acceptance gates (read-only).
+
+#### Preconditions
+- Phase 12 Part 1 entry check PASS
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase12.part1.accept
+```
+
+#### Expected result
+Acceptance PASS and marker written.
+
+#### Evidence outputs
+`acceptance/PHASE12_PART1_ACCEPTED.md`
+
+#### Failure modes
+- Validation or policy gate failure
+
+#### Rollback / safe exit
+Stop; do not claim acceptance until gates PASS.
+
+### Task: Phase 12 Part 2 entry check
+
+#### Intent
+Verify Phase 12 Part 2 prerequisites before acceptance (read-only).
+
+#### Preconditions
+- Phase 12 Part 2 prerequisites exist
+- Repo is clean
+
+#### Command
+```bash
+make phase12.part2.entry.check
+```
+
+#### Expected result
+Entry checklist PASS with no blockers.
+
+#### Evidence outputs
+None (checklist only).
+
+#### Failure modes
+- Missing Phase 12 prerequisites
+- OPEN items in REQUIRED-FIXES.md
+
+#### Rollback / safe exit
+Stop and remediate the reported blockers before acceptance.
+
+### Task: Phase 12 Part 2 acceptance
+
+#### Intent
+Run Phase 12 Part 2 acceptance gates (read-only).
+
+#### Preconditions
+- Phase 12 Part 2 entry check PASS
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase12.part2.accept
+```
+
+#### Expected result
+Acceptance PASS and marker written.
+
+#### Evidence outputs
+`acceptance/PHASE12_PART2_ACCEPTED.md`
+
+#### Failure modes
+- Validation or policy gate failure
+
+#### Rollback / safe exit
+Stop; do not claim acceptance until gates PASS.
+
 ### Task: Issue tenant credentials (offline-first)
 
 #### Intent
