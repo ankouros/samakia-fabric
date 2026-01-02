@@ -19,25 +19,25 @@ fi
 "${FABRIC_REPO_ROOT}/ops/bindings/validate/validate-binding-semantics.sh"
 
 BINDINGS_LIST="$(printf '%s\n' "${bindings[@]}")" python3 - <<'PY'
-import json
 import os
 import sys
 from pathlib import Path
+import yaml
 
 bindings = [Path(p) for p in os.environ.get("BINDINGS_LIST", "").splitlines() if p]
 
 records = []
 errors = []
 
-def load_json(path: Path):
+def load_yaml(path: Path):
     try:
-        return json.loads(path.read_text())
-    except json.JSONDecodeError as exc:
-        errors.append(f"{path}: invalid JSON ({exc})")
+        return yaml.safe_load(path.read_text())
+    except yaml.YAMLError as exc:
+        errors.append(f"{path}: invalid YAML ({exc})")
         return None
 
 for binding in bindings:
-    data = load_json(binding)
+    data = load_yaml(binding)
     if not data:
         continue
     meta = data.get("metadata", {})
@@ -77,15 +77,15 @@ while IFS=$'\t' read -r tenant env binding_path; do
   fi
   echo "PASS safety: ${binding_path}: env '${env}'"
 done <<< "$(BINDINGS_LIST="$(printf '%s\n' "${bindings[@]}")" python3 - <<'PY'
-import json
 import os
 import sys
 from pathlib import Path
+import yaml
 
 bindings = [Path(p) for p in os.environ.get("BINDINGS_LIST", "").splitlines() if p]
 
 for binding in bindings:
-    data = json.loads(binding.read_text())
+    data = yaml.safe_load(binding.read_text())
     meta = data.get("metadata", {})
     tenant = meta.get("tenant") or ""
     env = meta.get("env") or ""

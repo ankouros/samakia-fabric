@@ -336,6 +336,170 @@ None by default.
 #### Rollback / safe exit
 Stop and fix tenant contracts.
 
+### Task: Inspect binding secret refs (read-only)
+
+#### Intent
+List binding secret references without reading secret values.
+
+#### Preconditions
+- Binding contracts exist under `contracts/bindings/`
+
+#### Command
+```bash
+make bindings.secrets.inspect TENANT=all
+```
+
+#### Expected result
+Secret refs listed; no secret values printed.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- Missing binding contracts
+- Inline secret values detected
+
+#### Rollback / safe exit
+Stop; fix binding contracts.
+
+### Task: Materialize binding secrets (dry-run)
+
+#### Intent
+Generate redacted evidence for secret materialization without writing secrets.
+
+#### Preconditions
+- `docs/bindings/secrets.md` reviewed
+- Optional input file prepared
+
+#### Command
+```bash
+make bindings.secrets.materialize.dryrun TENANT=all
+```
+
+#### Expected result
+Redacted evidence written under `evidence/bindings/<tenant>/<UTC>/secrets/`.
+
+#### Evidence outputs
+`evidence/bindings/<tenant>/<UTC>/secrets/...`
+
+#### Failure modes
+- Missing `secret_ref` or `secret_shape`
+- Unsupported backend
+
+#### Rollback / safe exit
+Stop; fix contracts or input map.
+
+### Task: Materialize binding secrets (execute, guarded)
+
+#### Intent
+Write secrets to the offline file backend using operator-provided input.
+
+#### Preconditions
+- `BIND_SECRET_INPUT_FILE` prepared and validated
+- Guard flags set
+
+#### Command
+```bash
+MATERIALIZE_EXECUTE=1 \
+BIND_SECRETS_BACKEND=file \
+BIND_SECRET_INPUT_FILE=./secrets-input.json \
+make bindings.secrets.materialize TENANT=project-birds
+```
+
+#### Expected result
+Secrets written to the file backend; redacted evidence generated.
+
+#### Evidence outputs
+`evidence/bindings/<tenant>/<UTC>/secrets/...`
+
+#### Failure modes
+- Missing guard flags
+- Input map missing required keys
+
+#### Rollback / safe exit
+Stop; do not reuse partially written secrets without review.
+
+### Task: Plan binding secret rotation (read-only)
+
+#### Intent
+Compute rotation plans without writing new secrets.
+
+#### Preconditions
+- Rotation policy declared in bindings
+
+#### Command
+```bash
+make bindings.secrets.rotate.plan TENANT=all
+```
+
+#### Expected result
+Rotation plan evidence produced.
+
+#### Evidence outputs
+`evidence/bindings/<tenant>/<UTC>/rotation/plan.json`
+
+#### Failure modes
+- Invalid rotation policy
+
+#### Rollback / safe exit
+Stop; fix binding rotation policy.
+
+### Task: Rotate binding secrets (dry-run)
+
+#### Intent
+Generate rotation evidence without writing secrets.
+
+#### Preconditions
+- Rotation plan is valid
+
+#### Command
+```bash
+make bindings.secrets.rotate.dryrun TENANT=all
+```
+
+#### Expected result
+Rotation evidence written; no secrets stored.
+
+#### Evidence outputs
+`evidence/bindings/<tenant>/<UTC>/rotation/...`
+
+#### Failure modes
+- Missing `secret_ref` or `secret_shape`
+
+#### Rollback / safe exit
+Stop; fix contracts.
+
+### Task: Rotate binding secrets (execute, guarded)
+
+#### Intent
+Write a new secret version to the file backend and emit evidence.
+
+#### Preconditions
+- `ROTATE_INPUT_FILE` prepared or generation allowlisted
+- Guard flags set
+
+#### Command
+```bash
+ROTATE_EXECUTE=1 \
+ROTATE_REASON="scheduled rotation" \
+BIND_SECRETS_BACKEND=file \
+ROTATE_INPUT_FILE=./rotation-input.json \
+make bindings.secrets.rotate TENANT=project-birds
+```
+
+#### Expected result
+New secret version written; evidence generated.
+
+#### Evidence outputs
+`evidence/bindings/<tenant>/<UTC>/rotation/...`
+
+#### Failure modes
+- Missing guard flags
+- Input map missing required entries
+
+#### Rollback / safe exit
+Stop; do not cut over workloads in Phase 12 Part 2.
+
 ### Task: Define tenant capacity (capacity.yml)
 
 #### Intent

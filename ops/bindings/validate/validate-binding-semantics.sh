@@ -16,11 +16,11 @@ if [[ ${#bindings[@]} -eq 0 ]]; then
 fi
 
 BINDINGS_LIST="$(printf '%s\n' "${bindings[@]}")" FABRIC_REPO_ROOT="${FABRIC_REPO_ROOT}" python3 - <<'PY'
-import json
 import os
 import re
 import sys
 from pathlib import Path
+import yaml
 
 root = Path(os.environ["FABRIC_REPO_ROOT"])
 bindings = [Path(p) for p in os.environ["BINDINGS_LIST"].splitlines() if p]
@@ -34,6 +34,13 @@ provider_map = {
     "cache": {"dragonfly"},
     "vector": {"qdrant"},
 }
+shape_map = {
+    "postgres": "postgres",
+    "mariadb": "mariadb",
+    "rabbitmq": "rabbitmq",
+    "dragonfly": "dragonfly",
+    "qdrant": "qdrant",
+}
 consumer_map = {
     "database": "database",
     "mq": "message-queue",
@@ -44,16 +51,16 @@ consumer_map = {
 errors = []
 
 
-def load_json(path: Path):
+def load_yaml(path: Path):
     try:
-        return json.loads(path.read_text())
-    except json.JSONDecodeError as exc:
-        errors.append(f"{path}: invalid JSON ({exc})")
+        return yaml.safe_load(path.read_text())
+    except yaml.YAMLError as exc:
+        errors.append(f"{path}: invalid YAML ({exc})")
         return None
 
 
 for binding_path in bindings:
-    data = load_json(binding_path)
+    data = load_yaml(binding_path)
     if not data:
         continue
 
@@ -75,7 +82,7 @@ for binding_path in bindings:
         errors.append(f"{binding_path}: tenant directory missing {tenant_dir}")
         continue
 
-    tenant_data = load_json(tenant_file) if tenant_file.exists() else None
+    tenant_data = load_yaml(tenant_file) if tenant_file.exists() else None
     if not tenant_data:
         errors.append(f"{binding_path}: tenant.yml missing or invalid")
         continue
@@ -116,6 +123,9 @@ for binding_path in bindings:
         ref = consumer.get("ref")
         access_mode = consumer.get("access_mode")
         secret_ref = consumer.get("secret_ref")
+        secret_shape = consumer.get("secret_shape")
+        rotation_policy = consumer.get("rotation_policy", {})
+        credential_source = consumer.get("credential_source")
         connection_profile = consumer.get("connection_profile", {})
         lifecycle = consumer.get("lifecycle", {})
 
@@ -136,6 +146,29 @@ for binding_path in bindings:
         elif not secret_ref.startswith(f"tenants/{tenant}/"):
             errors.append(f"{binding_path}: consumer[{idx}].secret_ref must start with tenants/{tenant}/")
 
+        expected_shape = shape_map.get(provider)
+        if secret_shape != expected_shape:
+            errors.append(
+                f"{binding_path}: consumer[{idx}].secret_shape '{secret_shape}' must match provider '{provider}'"
+            )
+
+        if credential_source not in {"existing_ref", "operator_input", "generated", "vault_readonly"}:
+            errors.append(f"{binding_path}: consumer[{idx}].credential_source invalid")
+
+        if not isinstance(rotation_policy, dict):
+            errors.append(f"{binding_path}: consumer[{idx}].rotation_policy must be object")
+        else:
+            if not isinstance(rotation_policy.get("enabled"), bool):
+                errors.append(f"{binding_path}: consumer[{idx}].rotation_policy.enabled must be boolean")
+            if rotation_policy.get("mode") not in {"manual", "scheduled"}:
+                errors.append(f"{binding_path}: consumer[{idx}].rotation_policy.mode invalid")
+            max_age = rotation_policy.get("max_age_days")
+            if max_age is not None and (not isinstance(max_age, int) or max_age < 1):
+                errors.append(f"{binding_path}: consumer[{idx}].rotation_policy.max_age_days invalid")
+            rod = rotation_policy.get("rotate_on_drift")
+            if rod is not None and not isinstance(rod, bool):
+                errors.append(f"{binding_path}: consumer[{idx}].rotation_policy.rotate_on_drift invalid")
+
         if not isinstance(ref, str) or not ref:
             errors.append(f"{binding_path}: consumer[{idx}].ref missing")
             continue
@@ -153,7 +186,7 @@ for binding_path in bindings:
         if f"/contracts/tenants/{tenant}/" not in ref_posix and f"/contracts/tenants/examples/{tenant}/" not in ref_posix:
             errors.append(f"{binding_path}: consumer[{idx}].ref must reference tenant {tenant}")
 
-        enabled = load_json(ref_path)
+        enabled = load_yaml(ref_path)
         if enabled:
             expected_consumer = consumer_map.get(c_type)
             if enabled.get("consumer") != expected_consumer:

@@ -14,6 +14,8 @@ fi
 scripts=(
   "policy-terraform.sh"
   "policy-secrets.sh"
+  "policy-secrets-materialization.sh"
+  "policy-secrets-rotation.sh"
   "policy-ha.sh"
   "policy-docs.sh"
   "policy-security.sh"

@@ -152,6 +152,13 @@ The format is inspired by:
 - Phase 12 Part 1 entry checklist: `acceptance/PHASE12_PART1_ENTRY_CHECKLIST.md`.
 - Phase 12 Part 1 acceptance marker: `acceptance/PHASE12_PART1_ACCEPTED.md`.
 
+#### Tenant bindings (Phase 12 Part 2)
+- Binding secret shapes (keys only) under `contracts/secrets/shapes/`.
+- Operator-controlled secret materialization + rotation hooks with redacted evidence.
+- Policy gates for materialization/rotation wired into `make policy.check`.
+- Phase 12 Part 2 entry checklist: `acceptance/PHASE12_PART2_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 2 acceptance marker: `acceptance/PHASE12_PART2_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

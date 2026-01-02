@@ -48,11 +48,11 @@ for binding in "${bindings[@]}"; do
   fi
 
   read -r tenant env workload_id < <(python3 - <<PY
-import json
 from pathlib import Path
+import yaml
 
 binding = Path("${binding}")
-data = json.loads(binding.read_text())
+data = yaml.safe_load(binding.read_text())
 meta = data.get("metadata", {})
 tenant = meta.get("tenant", "")
 env = meta.get("env", "")
@@ -93,16 +93,17 @@ PY
   mkdir -p "${manifests_dir}"
 
   python3 - <<PY
-import json
 from pathlib import Path
+import yaml
+
 binding = Path("${binding}")
 output = Path("${evidence_dir}") / "binding.yml.redacted"
 
-data = json.loads(binding.read_text())
+data = yaml.safe_load(binding.read_text())
 for consumer in data.get("spec", {}).get("consumers", []):
     if "secret_ref" in consumer:
         consumer["secret_ref"] = "<redacted>"
-output.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+output.write_text(yaml.safe_dump(data, sort_keys=True))
 PY
 
   if [[ -d "${out_dir}" ]]; then

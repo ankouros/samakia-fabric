@@ -620,3 +620,16 @@ enabled substrate endpoints without provisioning or secrets issuance:
 
 Bindings are contract-only and deterministic; manifests are redacted and
 evidence remains gitignored.
+
+## Phase 12 Part 2 — Binding Secrets (Operator-Controlled)
+
+Phase 12 Part 2 adds guarded secret materialization and rotation hooks for
+binding contracts without introducing self-service or CI execution:
+
+- Secret shapes (keys only) under `contracts/secrets/shapes/`.
+- Materialize/inspect hooks (dry-run by default) via `ops/bindings/secrets/`.
+- Rotation plan/dry-run/execute hooks (guarded) via `ops/bindings/rotate/`.
+- Policy gates enforce no inline secrets, allowlisted backends, and prod
+  change windows + signing.
+
+Secret values remain local-only; evidence is redacted and gitignored.

@@ -54,6 +54,15 @@ Tenant binding workflows live in:
   - Validate: `make bindings.validate TENANT=all`
   - Render: `make bindings.render TENANT=all`
   - Apply (guarded): `make bindings.apply TENANT=<tenant> WORKLOAD=<id>`
+- Binding secrets (Phase 12 Part 2; operator-controlled):
+  - Inspect refs (read-only): `make bindings.secrets.inspect TENANT=all`
+  - Materialize (dry-run): `make bindings.secrets.materialize.dryrun TENANT=all`
+  - Materialize (execute, guarded):
+    - `MATERIALIZE_EXECUTE=1 BIND_SECRETS_BACKEND=file BIND_SECRET_INPUT_FILE=./secrets-input.json make bindings.secrets.materialize TENANT=<tenant>`
+  - Rotation plan (read-only): `make bindings.secrets.rotate.plan TENANT=all`
+  - Rotation dry-run: `make bindings.secrets.rotate.dryrun TENANT=all`
+  - Rotation execute (guarded):
+    - `ROTATE_EXECUTE=1 ROTATE_REASON="..." BIND_SECRETS_BACKEND=file ROTATE_INPUT_FILE=./rotation-input.json make bindings.secrets.rotate TENANT=<tenant>`
 
 VM image workflows live in:
 

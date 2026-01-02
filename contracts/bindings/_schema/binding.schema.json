@@ -35,6 +35,9 @@
               "ref",
               "access_mode",
               "secret_ref",
+              "secret_shape",
+              "rotation_policy",
+              "credential_source",
               "connection_profile",
               "lifecycle"
             ],
@@ -45,6 +48,23 @@
               "ref": {"type": "string"},
               "access_mode": {"enum": ["read", "readwrite"]},
               "secret_ref": {"type": "string"},
+              "secret_shape": {
+                "enum": ["postgres", "mariadb", "rabbitmq", "dragonfly", "qdrant"]
+              },
+              "rotation_policy": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["enabled", "mode"],
+                "properties": {
+                  "enabled": {"type": "boolean"},
+                  "mode": {"enum": ["manual", "scheduled"]},
+                  "max_age_days": {"type": "integer", "minimum": 1},
+                  "rotate_on_drift": {"type": "boolean"}
+                }
+              },
+              "credential_source": {
+                "enum": ["existing_ref", "operator_input", "generated", "vault_readonly"]
+              },
               "connection_profile": {
                 "type": "object",
                 "additionalProperties": false,

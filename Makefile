@@ -1857,6 +1857,48 @@ bindings.apply: ## Apply binding (guarded; non-prod only by default)
 		EVIDENCE_SIGN="$(EVIDENCE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
 		bash "$(REPO_ROOT)/ops/bindings/apply/bind.sh"
 
+.PHONY: bindings.secrets.inspect
+bindings.secrets.inspect: ## Inspect binding secret refs (presence-only)
+	@TENANT="$(TENANT)" BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" \
+		bash "$(REPO_ROOT)/ops/bindings/secrets/inspect.sh"
+
+.PHONY: bindings.secrets.materialize
+bindings.secrets.materialize: ## Materialize binding secrets (guarded; execute with MATERIALIZE_EXECUTE=1)
+	@TENANT="$(TENANT)" MATERIALIZE_EXECUTE="$(MATERIALIZE_EXECUTE)" \
+		BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" BIND_SECRET_INPUT_FILE="$(BIND_SECRET_INPUT_FILE)" \
+		SECRETS_GENERATE="$(SECRETS_GENERATE)" SECRETS_GENERATE_ALLOWLIST="$(SECRETS_GENERATE_ALLOWLIST)" \
+		VAULT_ENABLE="$(VAULT_ENABLE)" \
+		EVIDENCE_SIGN="$(EVIDENCE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		MAINT_WINDOW_START="$(MAINT_WINDOW_START)" MAINT_WINDOW_END="$(MAINT_WINDOW_END)" \
+		bash "$(REPO_ROOT)/ops/bindings/secrets/materialize.sh"
+
+.PHONY: bindings.secrets.materialize.dryrun
+bindings.secrets.materialize.dryrun: ## Dry-run binding secret materialization
+	@TENANT="$(TENANT)" MATERIALIZE_EXECUTE=0 \
+		BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" BIND_SECRET_INPUT_FILE="$(BIND_SECRET_INPUT_FILE)" \
+		SECRETS_GENERATE="$(SECRETS_GENERATE)" SECRETS_GENERATE_ALLOWLIST="$(SECRETS_GENERATE_ALLOWLIST)" \
+		VAULT_ENABLE="$(VAULT_ENABLE)" \
+		bash "$(REPO_ROOT)/ops/bindings/secrets/materialize.sh"
+
+.PHONY: bindings.secrets.rotate.plan
+bindings.secrets.rotate.plan: ## Plan binding secret rotation (read-only)
+	@TENANT="$(TENANT)" ROTATION_STAMP="$(ROTATION_STAMP)" \
+		bash "$(REPO_ROOT)/ops/bindings/rotate/rotate-plan.sh"
+
+.PHONY: bindings.secrets.rotate.dryrun
+bindings.secrets.rotate.dryrun: ## Dry-run binding secret rotation (evidence only)
+	@TENANT="$(TENANT)" ROTATION_STAMP="$(ROTATION_STAMP)" \
+		bash "$(REPO_ROOT)/ops/bindings/rotate/rotate-dryrun.sh"
+
+.PHONY: bindings.secrets.rotate
+bindings.secrets.rotate: ## Rotate binding secrets (guarded; execute with ROTATE_EXECUTE=1)
+	@TENANT="$(TENANT)" ROTATE_EXECUTE="$(ROTATE_EXECUTE)" BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" \
+		ROTATE_INPUT_FILE="$(ROTATE_INPUT_FILE)" BIND_SECRET_INPUT_FILE="$(BIND_SECRET_INPUT_FILE)" \
+		SECRETS_GENERATE="$(SECRETS_GENERATE)" SECRETS_GENERATE_ALLOWLIST="$(SECRETS_GENERATE_ALLOWLIST)" \
+		EVIDENCE_SIGN="$(EVIDENCE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		MAINT_WINDOW_START="$(MAINT_WINDOW_START)" MAINT_WINDOW_END="$(MAINT_WINDOW_END)" \
+		bash "$(REPO_ROOT)/ops/bindings/rotate/rotate.sh"
+
 .PHONY: phase12.part1.entry.check
 phase12.part1.entry.check: ## Phase 12 Part 1 entry checklist
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part1-entry-check.sh"
@@ -1864,6 +1906,14 @@ phase12.part1.entry.check: ## Phase 12 Part 1 entry checklist
 .PHONY: phase12.part1.accept
 phase12.part1.accept: ## Phase 12 Part 1 acceptance (bindings only)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part1-accept.sh"
+
+.PHONY: phase12.part2.entry.check
+phase12.part2.entry.check: ## Phase 12 Part 2 entry checklist (binding secrets)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part2-entry-check.sh"
+
+.PHONY: phase12.part2.accept
+phase12.part2.accept: ## Phase 12 Part 2 acceptance (binding secrets)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part2-accept.sh"
 
 ###############################################################################
 # Operator UX (Phase 9)

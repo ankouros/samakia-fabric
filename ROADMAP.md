@@ -520,6 +520,28 @@ Non-scope:
 
 ---
 
+## Phase 12 Part 2 — Binding Secrets Materialization & Rotation (Operator-Controlled)
+
+Goal: Provide guarded, operator-controlled secret materialization and rotation
+for tenant bindings, with redacted evidence and strict CI safety.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Binding secret shapes under `contracts/secrets/shapes/`.
+- Materialization + inspect hooks under `ops/bindings/secrets/` (dry-run default).
+- Rotation plan/dry-run/execute hooks under `ops/bindings/rotate/` (guarded).
+- Policy gates: `policy-secrets-materialization.sh`, `policy-secrets-rotation.sh`.
+- Phase 12 Part 2 entry checklist: `acceptance/PHASE12_PART2_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 2 acceptance marker: `acceptance/PHASE12_PART2_ACCEPTED.md`.
+
+Non-scope:
+- No workload cutover or credential revocation
+- No CI execution
+- No secrets stored in Git or evidence
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

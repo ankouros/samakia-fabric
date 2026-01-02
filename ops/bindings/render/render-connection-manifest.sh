@@ -42,11 +42,12 @@ if [[ ${#bindings[@]} -eq 0 ]]; then
 fi
 
 OUT_ROOT="${out_root}" FABRIC_REPO_ROOT="${FABRIC_REPO_ROOT}" BINDINGS_LIST="$(printf '%s\n' "${bindings[@]}")" python3 - <<'PY'
-import json
 import os
 from pathlib import Path
 from datetime import datetime, timezone
 import hashlib
+import json
+import yaml
 
 root = Path(os.environ["FABRIC_REPO_ROOT"])
 out_root = Path(os.environ["OUT_ROOT"])
@@ -60,8 +61,8 @@ provider_key_map = {
 }
 
 
-def load_json(path: Path):
-    return json.loads(path.read_text())
+def load_yaml(path: Path):
+    return yaml.safe_load(path.read_text())
 
 
 def sha256_file(path: Path):
@@ -73,7 +74,7 @@ def sha256_file(path: Path):
 
 
 for binding_path in bindings:
-    data = load_json(binding_path)
+    data = load_yaml(binding_path)
     meta = data.get("metadata", {})
     spec = data.get("spec", {})
     tenant = meta.get("tenant")
@@ -107,7 +108,7 @@ for binding_path in bindings:
         connection_profile = consumer.get("connection_profile", {})
 
         enabled_path = (root / ref).resolve()
-        enabled = load_json(enabled_path)
+        enabled = load_yaml(enabled_path)
         endpoints = enabled.get("endpoints", {})
         resources = enabled.get("resources", {})
 

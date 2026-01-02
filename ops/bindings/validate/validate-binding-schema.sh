@@ -23,6 +23,7 @@ import json
 import os
 import sys
 from pathlib import Path
+import yaml
 
 schema_path = Path(os.environ["SCHEMA_PATH"])
 bindings = [Path(p) for p in os.environ["BINDINGS_LIST"].splitlines() if p]
@@ -98,9 +99,9 @@ except json.JSONDecodeError as exc:
 ok = True
 for binding in bindings:
     try:
-        data = json.loads(binding.read_text())
-    except json.JSONDecodeError as exc:
-        errors.append(f"{binding}: invalid JSON ({exc})")
+        data = yaml.safe_load(binding.read_text())
+    except yaml.YAMLError as exc:
+        errors.append(f"{binding}: invalid YAML ({exc})")
         ok = False
         continue
     if not validate(data, schema, binding.name):

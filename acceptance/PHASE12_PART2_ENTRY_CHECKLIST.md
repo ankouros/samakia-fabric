@@ -1,0 +1,110 @@
+# Phase 12 Part 2 Entry Checklist
+
+Timestamp (UTC): 2026-01-02T01:36:03Z
+
+## Criteria
+- Marker present: acceptance/PHASE12_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART1_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE11_PART4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_PART4_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE10_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE10_PART2_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/secrets/shapes/postgres.yml
+  - Command: test -f contracts/secrets/shapes/postgres.yml
+  - Result: PASS
+- File present: contracts/secrets/shapes/mariadb.yml
+  - Command: test -f contracts/secrets/shapes/mariadb.yml
+  - Result: PASS
+- File present: contracts/secrets/shapes/rabbitmq.yml
+  - Command: test -f contracts/secrets/shapes/rabbitmq.yml
+  - Result: PASS
+- File present: contracts/secrets/shapes/dragonfly.yml
+  - Command: test -f contracts/secrets/shapes/dragonfly.yml
+  - Result: PASS
+- File present: contracts/secrets/shapes/qdrant.yml
+  - Command: test -f contracts/secrets/shapes/qdrant.yml
+  - Result: PASS
+- File present: docs/bindings/secrets.md
+  - Command: test -f docs/bindings/secrets.md
+  - Result: PASS
+- File present: ops/bindings/secrets/backends/file.sh
+  - Command: test -f ops/bindings/secrets/backends/file.sh
+  - Result: PASS
+- File present: ops/bindings/secrets/backends/vault.sh
+  - Command: test -f ops/bindings/secrets/backends/vault.sh
+  - Result: PASS
+- File present: ops/bindings/secrets/materialize.sh
+  - Command: test -f ops/bindings/secrets/materialize.sh
+  - Result: PASS
+- File present: ops/bindings/secrets/inspect.sh
+  - Command: test -f ops/bindings/secrets/inspect.sh
+  - Result: PASS
+- File present: ops/bindings/secrets/generate.sh
+  - Command: test -f ops/bindings/secrets/generate.sh
+  - Result: PASS
+- File present: ops/bindings/secrets/redact.sh
+  - Command: test -f ops/bindings/secrets/redact.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/rotate.sh
+  - Command: test -f ops/bindings/rotate/rotate.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/rotate-plan.sh
+  - Command: test -f ops/bindings/rotate/rotate-plan.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/rotate-dryrun.sh
+  - Command: test -f ops/bindings/rotate/rotate-dryrun.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/rotate-evidence.sh
+  - Command: test -f ops/bindings/rotate/rotate-evidence.sh
+  - Result: PASS
+- File present: ops/policy/policy-secrets-materialization.sh
+  - Command: test -f ops/policy/policy-secrets-materialization.sh
+  - Result: PASS
+- File present: ops/policy/policy-secrets-rotation.sh
+  - Command: test -f ops/policy/policy-secrets-rotation.sh
+  - Result: PASS
+- Cookbook includes secret materialize task
+  - Command: rg -n "bindings\.secrets\.materialize" docs/operator/cookbook.md
+  - Result: PASS
+- Cookbook includes rotation plan task
+  - Command: rg -n "bindings\.secrets\.rotate\.plan" docs/operator/cookbook.md
+  - Result: PASS
+- Makefile target present: bindings.secrets.inspect
+  - Command: rg -n '^bindings\.secrets\.inspect:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.secrets.materialize
+  - Command: rg -n '^bindings\.secrets\.materialize:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.secrets.materialize.dryrun
+  - Command: rg -n '^bindings\.secrets\.materialize\.dryrun:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.secrets.rotate.plan
+  - Command: rg -n '^bindings\.secrets\.rotate\.plan:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.secrets.rotate.dryrun
+  - Command: rg -n '^bindings\.secrets\.rotate\.dryrun:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.secrets.rotate
+  - Command: rg -n '^bindings\.secrets\.rotate:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part2.entry.check
+  - Command: rg -n '^phase12\.part2\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part2.accept
+  - Command: rg -n '^phase12\.part2\.accept:' Makefile
+  - Result: PASS
+- Evidence paths gitignored
+  - Command: rg -n "evidence/" .gitignore
+  - Result: PASS
+- Artifacts paths gitignored
+  - Command: rg -n "artifacts/" .gitignore
+  - Result: PASS
