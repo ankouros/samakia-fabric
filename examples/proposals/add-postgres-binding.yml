@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: BindingProposal
+proposal_id: add-postgres-binding
+tenant_id: project-birds
+requested_by: "tenant-admin@project-birds"
+created_at: "2025-01-01T00:00:00Z"
+scope:
+  bindings: true
+  capacity: false
+  rotation: false
+  environment: dev
+changes:
+  - action: add
+    kind: binding
+    target: contracts/bindings/tenants/project-birds/birds-api.binding.yml
+    note: "Add postgres binding for birds-api"
+justification: "New workload needs database access"
+expires_at: "2026-01-01T00:00:00Z"

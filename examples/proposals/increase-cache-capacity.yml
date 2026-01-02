@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: BindingProposal
+proposal_id: increase-cache-capacity
+tenant_id: samakia-internal-tools
+requested_by: "ops@samakia"
+created_at: "2025-01-01T00:00:00Z"
+scope:
+  bindings: false
+  capacity: true
+  rotation: false
+  environment: shared
+changes:
+  - action: modify
+    kind: capacity
+    target: contracts/tenants/examples/samakia-internal-tools/capacity.yml
+    note: "Increase dragonfly max_memory_mb"
+justification: "Observed cache pressure; need higher limit"
+expires_at: "2026-01-01T00:00:00Z"

@@ -20,3 +20,10 @@ make phase6.entry.check
 - `acceptance/PHASE6_ACCEPTANCE_PLAN.md`
 
 No service deployment is performed by Phase 6.
+
+## Proposal flow for binding changes (Phase 12 Part 4)
+
+Binding changes may be submitted via the proposal workflow for operator review and approval.
+See the operator cookbook for the canonical commands:
+
+- `docs/operator/cookbook.md` (Tenant proposals section)

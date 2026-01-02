@@ -117,6 +117,8 @@ logs/
 tmp/
 temp/
 .cache/
+proposals/inbox/
+proposals/archive/
 audit/
 evidence/
 artifacts/

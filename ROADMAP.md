@@ -564,6 +564,29 @@ Non-scope:
 
 ---
 
+## Phase 12 Part 4 — Optional Proposal Workflow (Review → Approve → Apply)
+
+Goal: Provide an optional, operator-controlled proposal flow so tenants can
+request binding/capacity changes without any autonomous apply.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Proposal schema + examples under `contracts/proposals/` and `examples/proposals/`.
+- Proposal intake + validation + review + approval tooling under `ops/proposals/`.
+- Policy gate: `ops/policy/policy-proposals.sh` (wired into `policy.check`).
+- Guarded Make targets: `proposals.submit`, `proposals.validate`, `proposals.review`,
+  `proposals.approve`, `proposals.reject`, `proposals.apply`.
+- Phase 12 Part 4 entry checklist: `acceptance/PHASE12_PART4_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 4 acceptance marker: `acceptance/PHASE12_PART4_ACCEPTED.md`.
+
+Non-scope:
+- No autonomous apply
+- No CI approval or apply
+- No secrets in proposals
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

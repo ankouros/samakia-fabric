@@ -645,3 +645,16 @@ rendered binding manifests:
 
 Verification is conservative: unreachable endpoints are marked **unknown** rather
 than failing the contract, preserving CI safety.
+
+## Phase 12 Part 4 — Optional Proposal Workflow
+
+Phase 12 Part 4 introduces an optional proposal workflow that enables tenants
+to **request** binding or capacity changes without any autonomous apply:
+
+- Proposal schema + examples under `contracts/proposals/` and `examples/proposals/`.
+- Intake, validation, review, and decision tooling under `ops/proposals/`.
+- Explicit approval + signing requirements (prod approvals signed).
+- Apply path remains operator-controlled and guarded; no CI execution.
+
+Proposals are immutable inputs; evidence bundles and decisions are deterministic
+and gitignored.

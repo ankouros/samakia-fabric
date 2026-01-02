@@ -1242,6 +1242,200 @@ Evidence packet created and manifests written under `artifacts/bindings/...`.
 #### Rollback / safe exit
 Stop; do not propagate manifests to downstream systems.
 
+---
+
+## Tenant proposals (Phase 12 Part 4)
+
+### Task: Submit a proposal (read-only intake)
+
+#### Intent
+Submit a tenant proposal for binding or capacity changes (no apply).
+
+#### Preconditions
+- Proposal YAML prepared
+- No secrets in proposal
+
+#### Command
+```bash
+make proposals.submit FILE=examples/proposals/add-postgres-binding.yml
+```
+
+#### Expected result
+Proposal stored under `proposals/inbox/<tenant>/<proposal_id>/proposal.yml`.
+
+#### Evidence outputs
+Proposal file in `proposals/inbox/...` (gitignored).
+
+#### Failure modes
+- Missing proposal schema
+- Proposal contains secret-like values
+
+#### Rollback / safe exit
+Remove the inbox entry if submitted in error.
+
+### Task: Validate a proposal
+
+#### Intent
+Validate a proposal against schema, bindings, and capacity rules.
+
+#### Preconditions
+- Proposal submitted or example exists
+
+#### Command
+```bash
+make proposals.validate PROPOSAL_ID=add-postgres-binding
+```
+
+#### Expected result
+Validation PASS (no changes applied).
+
+#### Evidence outputs
+None by default (use `VALIDATION_OUT=...` for JSON).
+
+#### Failure modes
+- Schema mismatch
+- Target not found under tenant
+
+#### Rollback / safe exit
+Fix proposal and re-run validation.
+
+### Task: Review a proposal (diff + impact)
+
+#### Intent
+Generate review bundle for operator decision.
+
+#### Preconditions
+- Proposal validates
+
+#### Command
+```bash
+make proposals.review PROPOSAL_ID=add-postgres-binding
+```
+
+#### Expected result
+Review bundle under `evidence/proposals/<tenant>/<proposal_id>/`.
+
+#### Evidence outputs
+`evidence/proposals/<tenant>/<proposal_id>/diff.md`, `impact.json`, `validation.json`
+
+#### Failure modes
+- Invalid target path
+- Missing tenant binding contract
+
+#### Rollback / safe exit
+Fix proposal inputs and re-run review.
+
+### Task: Approve a proposal (guarded)
+
+#### Intent
+Record an explicit operator approval (signed in prod).
+
+#### Preconditions
+- Proposal reviewed
+- Operator identity available
+
+#### Command
+```bash
+OPERATOR_APPROVE=1 APPROVER_ID="ops-01" \
+make proposals.approve PROPOSAL_ID=add-postgres-binding
+```
+
+#### Expected result
+Decision recorded under `evidence/proposals/<tenant>/<proposal_id>/decision.json`.
+
+#### Evidence outputs
+`evidence/proposals/<tenant>/<proposal_id>/decision.json` (+ signature in prod)
+
+#### Failure modes
+- Missing OPERATOR_APPROVE
+- Prod approval without signing key
+
+#### Rollback / safe exit
+Reject the proposal if approval was accidental.
+
+### Task: Reject a proposal (guarded)
+
+#### Intent
+Record rejection and archive the proposal.
+
+#### Preconditions
+- Operator identity available
+
+#### Command
+```bash
+OPERATOR_REJECT=1 APPROVER_ID="ops-01" \
+make proposals.reject PROPOSAL_ID=add-postgres-binding
+```
+
+#### Expected result
+Decision recorded and proposal archived under `proposals/archive/...`.
+
+#### Evidence outputs
+`evidence/proposals/<tenant>/<proposal_id>/decision.json`
+
+#### Failure modes
+- Missing OPERATOR_REJECT
+- Proposal not found in inbox
+
+#### Rollback / safe exit
+None; rejection is immutable.
+
+### Task: Apply proposal (dry-run)
+
+#### Intent
+Preview operator apply path with no mutation.
+
+#### Preconditions
+- Proposal approved
+
+#### Command
+```bash
+APPLY_DRYRUN=1 \
+make proposals.apply PROPOSAL_ID=add-postgres-binding
+```
+
+#### Expected result
+Dry-run output lists planned binding apply steps.
+
+#### Evidence outputs
+None (dry-run output only).
+
+#### Failure modes
+- Missing approval decision
+- Prod decision missing signature
+
+#### Rollback / safe exit
+Stop; fix approval or proposal inputs.
+
+### Task: Apply proposal (execute, guarded)
+
+#### Intent
+Run operator-controlled apply using existing binding apply paths.
+
+#### Preconditions
+- Proposal approved
+- Non-prod environment (prod requires signed decision)
+- Binding apply guards satisfied
+
+#### Command
+```bash
+PROPOSAL_APPLY=1 BIND_EXECUTE=1 \
+make proposals.apply PROPOSAL_ID=add-postgres-binding
+```
+
+#### Expected result
+Bindings applied via operator-controlled paths (no tenant self-apply).
+
+#### Evidence outputs
+Binding apply evidence under `evidence/bindings/...`.
+
+#### Failure modes
+- Missing PROPOSAL_APPLY guard
+- Prod decision signature missing
+
+#### Rollback / safe exit
+Stop; do not proceed without proper guards.
+
 ### Task: Phase 12 Part 3 entry check
 
 #### Intent

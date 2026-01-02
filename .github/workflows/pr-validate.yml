@@ -97,6 +97,10 @@ jobs:
       - name: Binding verify (offline)
         run: make bindings.verify.offline TENANT=all
 
+      - name: Proposal contract checks
+        run: |
+          make proposals.validate PROPOSAL_ID=example
+
       - name: Substrate contract checks
         run: make substrate.contracts.validate
 

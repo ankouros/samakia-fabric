@@ -66,6 +66,15 @@ Tenant binding workflows live in:
   - Rotation dry-run: `make bindings.secrets.rotate.dryrun TENANT=all`
   - Rotation execute (guarded):
     - `ROTATE_EXECUTE=1 ROTATE_REASON="..." BIND_SECRETS_BACKEND=file ROTATE_INPUT_FILE=./rotation-input.json make bindings.secrets.rotate TENANT=<tenant>`
+- Proposal workflow (Phase 12 Part 4; optional, operator-controlled):
+  - Submit proposal (intake only): `make proposals.submit FILE=examples/proposals/add-postgres-binding.yml`
+  - Validate proposal: `make proposals.validate PROPOSAL_ID=<id>`
+  - Review bundle (diff + impact): `make proposals.review PROPOSAL_ID=<id>`
+  - Approve (guarded): `OPERATOR_APPROVE=1 APPROVER_ID="ops-01" make proposals.approve PROPOSAL_ID=<id>`
+  - Reject + archive (guarded): `OPERATOR_REJECT=1 APPROVER_ID="ops-01" make proposals.reject PROPOSAL_ID=<id>`
+  - Apply dry-run: `APPLY_DRYRUN=1 make proposals.apply PROPOSAL_ID=<id>`
+  - Apply execute (guarded): `PROPOSAL_APPLY=1 BIND_EXECUTE=1 make proposals.apply PROPOSAL_ID=<id>`
+  - Prod approvals require signed decisions; apply verifies decision signatures for prod.
 
 VM image workflows live in:
 

@@ -1936,6 +1936,50 @@ phase12.part3.accept: ## Phase 12 Part 3 acceptance (binding verification)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part3-accept.sh"
 
 ###############################################################################
+# Proposals (Phase 12 Part 4)
+###############################################################################
+
+.PHONY: proposals.submit
+proposals.submit: ## Submit proposal into inbox (guarded by schema)
+	@FILE="$(FILE)" bash "$(REPO_ROOT)/ops/proposals/submit.sh"
+
+.PHONY: proposals.validate
+proposals.validate: ## Validate proposal schema + policy
+	@PROPOSAL_ID="$(PROPOSAL_ID)" FILE="$(FILE)" VALIDATION_OUT="$(VALIDATION_OUT)" \
+		bash "$(REPO_ROOT)/ops/proposals/validate.sh"
+
+.PHONY: proposals.review
+proposals.review: ## Generate proposal review bundle (diff + impact)
+	@PROPOSAL_ID="$(PROPOSAL_ID)" FILE="$(FILE)" \
+		bash "$(REPO_ROOT)/ops/proposals/review.sh"
+
+.PHONY: proposals.approve
+proposals.approve: ## Approve proposal (guarded; requires OPERATOR_APPROVE=1)
+	@PROPOSAL_ID="$(PROPOSAL_ID)" APPROVER_ID="$(APPROVER_ID)" OPERATOR_APPROVE="$(OPERATOR_APPROVE)" \
+		APPROVE_REASON="$(APPROVE_REASON)" EVIDENCE_SIGN="$(EVIDENCE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		bash "$(REPO_ROOT)/ops/proposals/approve.sh"
+
+.PHONY: proposals.reject
+proposals.reject: ## Reject proposal (guarded; requires OPERATOR_REJECT=1)
+	@PROPOSAL_ID="$(PROPOSAL_ID)" APPROVER_ID="$(APPROVER_ID)" OPERATOR_REJECT="$(OPERATOR_REJECT)" \
+		REJECT_REASON="$(REJECT_REASON)" \
+		bash "$(REPO_ROOT)/ops/proposals/reject.sh"
+
+.PHONY: proposals.apply
+proposals.apply: ## Apply proposal (guarded; uses existing apply paths)
+	@PROPOSAL_ID="$(PROPOSAL_ID)" PROPOSAL_APPLY="$(PROPOSAL_APPLY)" APPLY_DRYRUN="$(APPLY_DRYRUN)" \
+		BIND_EXECUTE="$(BIND_EXECUTE)" \
+		bash "$(REPO_ROOT)/ops/proposals/apply.sh"
+
+.PHONY: phase12.part4.entry.check
+phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part4-entry-check.sh"
+
+.PHONY: phase12.part4.accept
+phase12.part4.accept: ## Phase 12 Part 4 acceptance (proposal flow)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part4-accept.sh"
+
+###############################################################################
 # Operator UX (Phase 9)
 ###############################################################################
 

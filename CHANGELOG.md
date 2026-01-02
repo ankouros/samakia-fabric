@@ -166,6 +166,13 @@ The format is inspired by:
 - Phase 12 Part 3 entry checklist: `acceptance/PHASE12_PART3_ENTRY_CHECKLIST.md`.
 - Phase 12 Part 3 acceptance marker: `acceptance/PHASE12_PART3_ACCEPTED.md`.
 
+#### Tenant bindings (Phase 12 Part 4)
+- Proposal schema + examples under `contracts/proposals/` and `examples/proposals/`.
+- Intake/review/approval tooling under `ops/proposals/` (guarded; operator-controlled).
+- Policy gate: `policy-proposals.sh` wired into `make policy.check`.
+- Phase 12 Part 4 entry checklist: `acceptance/PHASE12_PART4_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 4 acceptance marker: `acceptance/PHASE12_PART4_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

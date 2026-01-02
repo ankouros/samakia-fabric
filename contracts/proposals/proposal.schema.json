@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BindingProposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "proposal_id",
+    "tenant_id",
+    "requested_by",
+    "created_at",
+    "scope",
+    "changes",
+    "justification"
+  ],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "BindingProposal"},
+    "proposal_id": {"type": "string"},
+    "tenant_id": {"type": "string"},
+    "requested_by": {"type": "string"},
+    "created_at": {"type": "string"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bindings": {"type": "boolean"},
+        "capacity": {"type": "boolean"},
+        "rotation": {"type": "boolean"},
+        "environment": {"enum": ["dev", "shared", "staging", "prod"]}
+      }
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "kind", "target"],
+        "properties": {
+          "action": {"enum": ["add", "modify", "remove"]},
+          "kind": {"enum": ["binding", "capacity", "rotation"]},
+          "target": {"type": "string"},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "justification": {"type": "string"},
+    "desired_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {"type": "string"},
+        "end": {"type": "string"}
+      }
+    },
+    "expires_at": {"type": "string"}
+  }
+}

@@ -1,0 +1,104 @@
+# Phase 12 Part 4 Entry Checklist
+
+Timestamp (UTC): 2026-01-02T04:20:27Z
+
+## Criteria
+- Marker present: acceptance/PHASE12_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART1_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART2_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART3_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/proposals/proposal.schema.json
+  - Command: test -f contracts/proposals/proposal.schema.json
+  - Result: PASS
+- File present: examples/proposals/add-postgres-binding.yml
+  - Command: test -f examples/proposals/add-postgres-binding.yml
+  - Result: PASS
+- File present: examples/proposals/increase-cache-capacity.yml
+  - Command: test -f examples/proposals/increase-cache-capacity.yml
+  - Result: PASS
+- File present: ops/proposals/submit.sh
+  - Command: test -f ops/proposals/submit.sh
+  - Result: PASS
+- File present: ops/proposals/validate.sh
+  - Command: test -f ops/proposals/validate.sh
+  - Result: PASS
+- File present: ops/proposals/diff.sh
+  - Command: test -f ops/proposals/diff.sh
+  - Result: PASS
+- File present: ops/proposals/impact.sh
+  - Command: test -f ops/proposals/impact.sh
+  - Result: PASS
+- File present: ops/proposals/review.sh
+  - Command: test -f ops/proposals/review.sh
+  - Result: PASS
+- File present: ops/proposals/approve.sh
+  - Command: test -f ops/proposals/approve.sh
+  - Result: PASS
+- File present: ops/proposals/reject.sh
+  - Command: test -f ops/proposals/reject.sh
+  - Result: PASS
+- File present: ops/proposals/decision.sh
+  - Command: test -f ops/proposals/decision.sh
+  - Result: PASS
+- File present: ops/proposals/apply.sh
+  - Command: test -f ops/proposals/apply.sh
+  - Result: PASS
+- File present: ops/proposals/redact.sh
+  - Command: test -f ops/proposals/redact.sh
+  - Result: PASS
+- File present: ops/policy/policy-proposals.sh
+  - Command: test -f ops/policy/policy-proposals.sh
+  - Result: PASS
+- File present: docs/operator/cookbook.md
+  - Command: test -f docs/operator/cookbook.md
+  - Result: PASS
+- File present: docs/consumers/onboarding.md
+  - Command: test -f docs/consumers/onboarding.md
+  - Result: PASS
+- Policy gate wired
+  - Command: rg -n "policy-proposals\.sh" ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: proposals.submit
+  - Command: rg -n '^proposals\.submit:' Makefile
+  - Result: PASS
+- Makefile target present: proposals.validate
+  - Command: rg -n '^proposals\.validate:' Makefile
+  - Result: PASS
+- Makefile target present: proposals.review
+  - Command: rg -n '^proposals\.review:' Makefile
+  - Result: PASS
+- Makefile target present: proposals.approve
+  - Command: rg -n '^proposals\.approve:' Makefile
+  - Result: PASS
+- Makefile target present: proposals.reject
+  - Command: rg -n '^proposals\.reject:' Makefile
+  - Result: PASS
+- Makefile target present: proposals.apply
+  - Command: rg -n '^proposals\.apply:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part4.entry.check
+  - Command: rg -n '^phase12\.part4\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part4.accept
+  - Command: rg -n '^phase12\.part4\.accept:' Makefile
+  - Result: PASS
+- Cookbook includes proposal validation
+  - Command: rg -n "proposals\.validate" docs/operator/cookbook.md
+  - Result: PASS
+- Cookbook includes proposal review
+  - Command: rg -n "proposals\.review" docs/operator/cookbook.md
+  - Result: PASS
+- Proposal inbox gitignored
+  - Command: rg -n "proposals/inbox/" .gitignore
+  - Result: PASS
