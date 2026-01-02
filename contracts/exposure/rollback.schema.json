@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExposureRollback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "scope",
+    "intent",
+    "verification",
+    "requested_by",
+    "requested_at",
+    "reason"
+  ],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "ExposureRollback"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["env", "tenant", "workload"],
+      "properties": {
+        "env": {"type": "string"},
+        "tenant": {"type": "string"},
+        "workload": {"type": "string"}
+      }
+    },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action"],
+      "properties": {
+        "action": {"const": "disable_exposure_artifacts"},
+        "notes": {"type": "string"}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steps", "evidence_ref"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string"}
+        },
+        "evidence_ref": {"type": "string"}
+      }
+    },
+    "requested_by": {"type": "string"},
+    "requested_at": {"type": "string"},
+    "reason": {"type": "string"}
+  }
+}

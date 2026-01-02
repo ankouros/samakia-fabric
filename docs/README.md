@@ -11,6 +11,7 @@ This directory contains Samakia Fabric documentation.
 - `consumers/`: consumer catalog and variants
 - `tenants/`: tenant (project) binding design
 - `bindings/`: tenant binding contracts + connection manifests
+- `exposure/`: exposure semantics, rollback, change windows
 - `glossary.md`: canonical terminology
 - `PRINCIPLES.md`: non-negotiable principles
 

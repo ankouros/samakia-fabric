@@ -1,0 +1,18 @@
+apiVersion: v1alpha1
+kind: ExposureRollback
+scope:
+  env: samakia-dev
+  tenant: canary
+  workload: sample
+intent:
+  action: disable_exposure_artifacts
+  notes: "Rollback exposure artifacts after canary verification window."
+verification:
+  steps:
+    - "Confirm exposure artifacts removed"
+    - "Run offline workload verify"
+    - "Capture drift snapshot"
+  evidence_ref: "evidence/exposure-rollback/canary/sample/2026-01-02T00:00:00Z"
+requested_by: "ops-001"
+requested_at: "2026-01-02T00:30:00Z"
+reason: "Canary window complete."

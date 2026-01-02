@@ -199,6 +199,12 @@ The format is inspired by:
 - Make targets: `milestone.phase1-12.verify`, `milestone.phase1-12.lock`.
 - Milestone lock acceptance marker: `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md` (self-hash; evidence-bound).
 
+#### Production workload exposure (Phase 13 design)
+- ADR-0031 defining governed exposure choreography (plan -> approve -> apply -> verify -> rollback).
+- Exposure policy, approval, and rollback contracts under `contracts/exposure/`.
+- Exposure operator docs and semantics under `docs/exposure/` and `docs/operator/exposure.md`.
+- Phase 13 entry checklist and acceptance plan under `acceptance/`.
+
 ### Changed
 #### Phase 12 post-actions (hardening)
 - Pinned base digests and apt snapshot sources for image builds; stamped `/etc/samakia-image-version` with provenance metadata.

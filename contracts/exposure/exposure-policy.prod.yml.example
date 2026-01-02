@@ -1,0 +1,47 @@
+apiVersion: v1alpha1
+kind: ExposurePolicy
+metadata:
+  name: prod
+  policy_version: "2026-01-02"
+  description: "Production exposure policy (signing + change window mandatory)."
+spec:
+  allowlist:
+    envs:
+      - samakia-prod
+    tenants:
+      samakia-prod:
+        - canary
+    workloads:
+      canary:
+        - sample
+    providers:
+      - postgres
+      - mariadb
+      - rabbitmq
+      - dragonfly
+      - qdrant
+    variants:
+      - single
+      - cluster
+  invariants:
+    tls_required: true
+    allow_plaintext_endpoints: false
+  enforcement:
+    prod:
+      require_signing: true
+      require_change_window: true
+      require_approval: true
+    non_prod:
+      require_signing: false
+      require_change_window: false
+      require_approval: true
+      allow_execute: true
+  naming:
+    output_format: "YYYYMMDDTHHMMSSZ-<build_id>"
+    build_id_source: "env:EXPOSURE_BUILD_ID"
+    tag_keys:
+      - tenant
+      - workload
+      - provider
+      - variant
+      - policy_version

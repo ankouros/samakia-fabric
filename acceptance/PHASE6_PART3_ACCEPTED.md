@@ -10,8 +10,8 @@ Assurance statement:
 Acceptance is dry-run only; no mutations performed; execute mode is guarded and allowlisted.
 
 Repository:
-- Commit: 0ff9ab2c0420dbf5f5cece230726a258eb87af0a
-- Timestamp (UTC): 2026-01-02T17:15:04Z
+- Commit: 5404414ca3804b9f7840c7615284fcbc1ec5a34a
+- Timestamp (UTC): 2026-01-02T17:38:29Z
 
 Acceptance commands executed:
 - make policy.check
@@ -29,4 +29,4 @@ Synthetic guard validations:
 Remediation ledger:
 - REQUIRED-FIXES.md
 
-SHA256 (content excluding this line): 26df669648a6104f5e43f3b0a79e068312fd275641443fdcd7d561fcc134456f
+SHA256 (content excluding this line): 126bb04337159ed6db66eaf16290aa19051474dfab54a730e008b5d3b2a45668

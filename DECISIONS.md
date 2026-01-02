@@ -943,6 +943,53 @@ Phase 9 establishes operator UX as a **first-class contract**:
 
 ---
 
+## ADR-0031 — Production exposure is a governed choreography, not a toggle
+
+**Status:** Accepted
+**Date:** 2026-01-02
+
+### Context
+
+- Phases 1-12 provide a hardened substrate, bindings, secrets hooks, and drift awareness.
+- Production exposure must be explicit, operator-controlled, and auditable.
+
+### Decision
+
+- Exposure follows: plan -> review -> approval -> apply -> verify -> rollback.
+- Execution is operator-controlled only; CI remains read-only.
+- Prod requires a change window and signing.
+- Tenant proposals are advisory and never imply execution.
+
+### Alternatives considered
+
+- Self-service apply (rejected)
+- Auto-remediation (rejected)
+- "Just give creds" (rejected)
+
+### Consequences
+
+- Exposure is slower but safer, with deterministic evidence packets.
+- Policy and approval artifacts become first-class inputs.
+
+### Non-goals
+
+- Substrate provisioning
+- Kubernetes operators/controllers
+- Autonomous execution
+
+### Security notes
+
+- Evidence is redacted.
+- Secrets are never stored in Git.
+
+### Migration
+
+- Phase 13 design -> Phase 13 Part 1 (policy + plan + evidence)
+- Phase 13 Part 2 (guarded apply + rollback)
+- Phase 13 Part 3 (operator UX hardening + regressions)
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

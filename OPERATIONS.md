@@ -31,6 +31,7 @@ This document does NOT cover:
 Operator commands and task flows are defined in:
 
 - `docs/operator/cookbook.md` (canonical command cookbook)
+- `docs/operator/exposure.md` (governed exposure choreography)
 - `docs/operator/runner-modes.md`
 - `docs/operator/ssh-trust.md`
 - `docs/operator/networking.md`
@@ -87,6 +88,10 @@ Tenant binding workflows live in:
   - CI-safe umbrella: `TENANT=all make phase12.accept`
   - Packet only: `TENANT=all make phase12.readiness.packet`
   - Acceptance markers: `make phase12.part6.accept`
+- Phase 13 exposure (governed choreography; operator-controlled):
+  - Semantics: `docs/exposure/semantics.md`
+  - Change windows + signing: `docs/exposure/change-window-and-signing.md`
+  - Rollback: `docs/exposure/rollback.md`
 - Milestone Phase 1–12 verification (release manager, read-only):
   - Verify: `make milestone.phase1-12.verify`
   - Lock: `make milestone.phase1-12.lock`

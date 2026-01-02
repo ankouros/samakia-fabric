@@ -13,6 +13,12 @@ This document records what was implemented for the **Terraform remote state back
 - Post-Phase12 hardening adds image provenance stamps, pinned base digests, and apt snapshot sources.
 - Operator docs now cover SSH trust rotation, networking determinism policy, runner modes, and template upgrade semantics.
 
+## Phase 13 Design — Governed Exposure (Design Only)
+
+- Defines exposure as a governed choreography (plan -> approve -> apply -> verify -> rollback).
+- Adds exposure contracts, operator docs, and acceptance artifacts.
+- Non-goals: no substrate provisioning, no autonomous execution, no CI apply.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

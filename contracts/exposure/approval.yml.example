@@ -1,0 +1,19 @@
+apiVersion: v1alpha1
+kind: ExposureApproval
+proposal_id: "optional-proposal-id"
+plan_evidence_ref: "evidence/exposure-plan/canary/sample/2026-01-02T00:00:00Z"
+scope:
+  env: samakia-dev
+  tenant: canary
+  workload: sample
+approver:
+  id: "ops-001"
+  name: "Operator"
+  role: "platform"
+approved_at: "2026-01-02T00:00:00Z"
+reason: "Approved for canary exposure plan verification."
+change_window:
+  window_id: "change-window-001"
+  start: "2026-01-02T01:00:00Z"
+  end: "2026-01-02T02:00:00Z"
+signature_ref: "gpg:KEYID"
