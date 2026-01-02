@@ -284,6 +284,17 @@ All must be fixed in code.
 
 ---
 
+## Template Upgrade Semantics (Important)
+
+Terraform does not upgrade existing containers when a new template is published.
+Use one of the following:
+- Replace (taint or recreate)
+- Blue/green cutover
+
+Never assume in-place upgrades.
+
+---
+
 ## Destruction Is Normal
 
 Destroying containers is routine:

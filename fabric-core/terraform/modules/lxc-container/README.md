@@ -73,6 +73,11 @@ Format must be:
 
 - Terraform will fail if the template is missing
 
+### Template upgrade semantics
+
+Terraform does not upgrade existing containers when a new template is published.
+Upgrade requires explicit replace or a blue/green cutover.
+
 ## 🔒 Proxmox VE 9 Compatibility
 
 This module includes explicit guards for known Proxmox 9 behaviors:

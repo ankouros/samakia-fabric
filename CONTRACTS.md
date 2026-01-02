@@ -48,19 +48,25 @@ Any change that violates a contract must be redesigned before merging.
 ## Fabric Contract
 
 - Packer builds golden images only; no users, keys, or environment logic baked in.
+- Golden image inputs are reproducible: base images pinned by digest, apt sources use snapshot mirrors, and `/etc/samakia-image-version` includes image_name, image_version, build_utc, git_sha, and packer_template_id.
 - Terraform manages infrastructure lifecycle only; no provisioning or OS config.
 - Ansible handles OS policy and user access; it must remain idempotent.
 - Proxmox automation uses delegated users; `root@pam` is forbidden for automation.
 - LXC feature flags are immutable post-creation; storage selection is explicit.
 - SSH is key-only; root SSH is temporary for bootstrap only.
+- SSH host key rotation is mandatory after replace/recreate; strict host key checking must remain enabled with out-of-band fingerprint verification.
+- Tier-0 network identity is deterministic: MAC pinning or DHCP reservations are required, and IP cutovers must be documented and evidence-backed.
 - Phase acceptance requires `make phase<N>.accept` (or phase-equivalent), evidence recording, and acceptance markers.
 - AI operations are read-only by default; any remediation requires explicit guards and evidence packets.
 - VM golden images are contract-governed; canonical reference is storage_path + sha256; Fabric does not manage VM lifecycle.
 - Operator UX is a first-class contract: `docs/operator/cookbook.md` is canonical, and operator-visible commands must be documented or explicitly waived by policy.
+- Template upgrades are replace/blue-green only; Terraform never upgrades existing CTs in-place.
+- Runner mode is a contract: `RUNNER_MODE=ci|operator` (default `ci`); CI mode forbids prompts and requires explicit inputs.
 - Tenant bindings and substrate executor contracts are metadata-only by default; enabled.yml is contract-first and execution is always guarded, auditable, and opt-in.
 - Binding secret materialization and rotation are offline-first, guarded, and evidence-backed; `secret_ref` only with no secrets in Git.
 - Substrate runtime observability and drift classification are read-only; evidence is mandatory and drift never auto-remediates or fails CI by itself.
 - Drift alert routing defaults are evidence-only; external delivery is disabled unless explicitly enabled and allowed.
+- Shared observability must satisfy HA policy: replicas >= 2, anti_affinity = true, and placement across at least two hosts.
 - Pre-exposure substrate hardening must pass before Phase 12 workload exposure; acceptance marker and evidence are mandatory.
 - Phase 12 workload exposure requires a redacted release readiness packet and acceptance markers (Part 6 + overall); CI remains read-only.
 - Milestone Phase 1–12 verification requires deterministic end-to-end evidence packets, `make milestone.phase1-12.verify`, `make milestone.phase1-12.lock`, and an acceptance marker with a self-hash; CI remains read-only.

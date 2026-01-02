@@ -23,6 +23,9 @@ Security rules:
 
 Non-interactive mode:
   Requires inputs to already be present in the current environment.
+
+Runner mode:
+  RUNNER_MODE=ci forbids prompts; use --non-interactive.
 EOF
 }
 
@@ -36,6 +39,10 @@ read_secret() {
   local prompt="$1"
   local out_var="$2"
   local value=""
+  if [[ "${runner_mode}" == "ci" ]]; then
+    echo "ERROR: RUNNER_MODE=ci forbids interactive prompts (use --non-interactive)." >&2
+    exit 2
+  fi
   read -r -s -p "${prompt}" value
   echo >&2
   printf -v "${out_var}" '%s' "${value}"
@@ -46,6 +53,10 @@ read_default() {
   local default="$2"
   local out_var="$3"
   local value=""
+  if [[ "${runner_mode}" == "ci" ]]; then
+    echo "ERROR: RUNNER_MODE=ci forbids interactive prompts (use --non-interactive)." >&2
+    exit 2
+  fi
   read -r -p "${prompt} [${default}]: " value
   if [[ -z "${value}" ]]; then
     value="${default}"
@@ -63,6 +74,7 @@ require_env() {
 
 env_file="${DEFAULT_ENV_FILE}"
 non_interactive=0
+runner_mode="${RUNNER_MODE:-ci}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -85,6 +97,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ "${runner_mode}" == "ci" && "${non_interactive}" -ne 1 ]]; then
+  echo "ERROR: RUNNER_MODE=ci requires --non-interactive (no prompts allowed)." >&2
+  exit 2
+fi
 
 mkdir -p "$(dirname "${env_file}")"
 chmod 700 "$(dirname "${env_file}")" || true

@@ -10,6 +10,8 @@ This document records what was implemented for the **Terraform remote state back
 - Milestone verification passed and the lock marker references evidence at `evidence/milestones/phase1-12/2026-01-02T15:22:32Z`.
 - Verifier now captures per-step stdout/stderr with exit codes, and failure summaries include redacted stderr excerpts plus log pointers.
 - Shared observability now includes `obs-2` to satisfy HA placement policy, and Loki readiness is stabilized via config + data directory fixes.
+- Post-Phase12 hardening adds image provenance stamps, pinned base digests, and apt snapshot sources.
+- Operator docs now cover SSH trust rotation, networking determinism policy, runner modes, and template upgrade semantics.
 
 ## MinIO HA Backend — What was implemented
 
@@ -195,12 +197,13 @@ This review focuses on correctness, operability, and audit readiness.
 
 Current strengths include layered ownership (Packer/Terraform/Ansible),
 delegated Proxmox access, and deterministic acceptance workflows.
-The primary gaps are reproducibility of image builds, SSH known_hosts
-lifecycle friction after replace/recreate, and uneven non-interactive
-defaults across entrypoints.
+Recent hardening closes the prior gaps around image reproducibility,
+known_hosts rotation, and non-interactive runner behavior. The remaining
+risks are mostly operational discipline issues (staging parity and
+replace/blue-green cutovers).
 
 Verdict: suitable as a production foundation for a single-site Proxmox
-cluster when the recommended operational guardrails are adopted.
+cluster when the documented guardrails are followed.
 
 ---
 
@@ -225,12 +228,10 @@ cluster when the recommended operational guardrails are adopted.
 ### Packer (Golden LXC images)
 - Userless images, key-only bootstrap, and reset hygiene match the contract.
 - Versioned artifacts prevent accidental overwrites.
-
-**Gap**
-- Reproducibility and provenance need strengthening. Consider:
-  - Pinning Docker base digests, not tags.
-  - Using an apt snapshot strategy.
-  - Stamping `/etc/samakia-image-version` with build UTC and git SHA.
+- Reproducibility and provenance are now explicit:
+  - Base images pinned by digest.
+  - Apt sources use snapshot mirrors during build.
+  - `/etc/samakia-image-version` stamps build UTC + git SHA + template ID.
 
 ### Terraform (Proxmox LXC lifecycle)
 - Strict TLS is enforced; CA trust is explicit.
@@ -244,10 +245,8 @@ cluster when the recommended operational guardrails are adopted.
 ### Ansible (2-phase policy enforcement)
 - Phase 1 bootstrap is root-only and minimal.
 - Phase 2 hardening runs as `samakia` with LXC-safe guards.
-
-**Gap**
-- Known_hosts rotation needs a canonical operator procedure that does not
-  relax strict SSH checking.
+- Known_hosts rotation is documented with strict SSH posture in
+  `docs/operator/ssh-trust.md`.
 
 ---
 
@@ -258,9 +257,9 @@ cluster when the recommended operational guardrails are adopted.
 - Drift detection is read-only and evidence-first.
 - Promotion flow (image -> template -> env) is explicit.
 
-**Gap**
-- Every entrypoint should support a fully non-interactive mode for CI and
-  deterministic automation.
+**Update**
+- Runner mode contract (`RUNNER_MODE=ci|operator`) now enforces deterministic,
+  non-interactive behavior for CI and automation.
 
 ---
 
@@ -272,9 +271,8 @@ cluster when the recommended operational guardrails are adopted.
 - Root SSH is disabled after bootstrap.
 - Evidence tooling supports signing and offline verification.
 
-**Major risk**
-- SSH host key rotation after replace/recreate is a real operational edge.
-  It needs a documented, strict procedure (no global relaxations).
+**Update**
+- SSH host key rotation now has a strict, documented procedure (no relaxations).
 
 **Secondary risk**
 - Secrets should remain in `~/.config/samakia-fabric/env.sh` and never be
@@ -302,8 +300,8 @@ cluster when the recommended operational guardrails are adopted.
 - Shared services are guarded and accepted in read-only mode.
 
 **Operational sharp edges**
-- DHCP/MAC determinism needs consistent reservations or pinned MACs to
-  avoid surprise IP changes on replacement.
+- DHCP/MAC determinism policy is documented; tier-0 services pin MACs and
+  require reservations for stable addressing.
 
 ---
 
@@ -313,9 +311,9 @@ cluster when the recommended operational guardrails are adopted.
 - Docs-first approach with strong runbooks and contracts.
 - Operator guidance is safety-focused and practical.
 
-**Gap**
-- Add concise operator tips in key runbooks for known_hosts rotation and
-  Proxmox template verification.
+**Update**
+- Added operator docs for SSH trust rotation, networking determinism, runner
+  modes, and template upgrade semantics.
 
 ---
 
@@ -325,34 +323,32 @@ cluster when the recommended operational guardrails are adopted.
 - Guardrails block risky automation.
 - Evidence workflows are deterministic and read-only by default.
 
-**Risk**
-- Interactive prompts can confuse automation; expand explicit non-interactive
-  flags and environment variable contracts.
+**Update**
+- Runner mode contract reduces prompt risk; new entrypoints must continue to
+  honor `RUNNER_MODE=ci` defaults.
 
 ---
 
 ## 10. Risks and Gaps
 
-1) Image build reproducibility (base image and apt drift).
-2) SSH known_hosts lifecycle after replace/recreate.
-3) DHCP/MAC determinism for stable IP assignments.
-4) Limited staging parity for promotion flows.
-5) Template upgrade misconceptions (requires replace or blue/green).
+1) Limited staging parity for promotion flows.
+2) Replace/blue-green cutovers still require careful scheduling and operator
+   discipline.
+3) Acceptance suites depend on external infrastructure and runner readiness.
 
 ---
 
 ## 11. Recommendations (Short / Medium / Long term)
 
 ### Short-term (next 1-2 iterations)
-- Add image provenance stamps and build metadata.
-- Document known_hosts rotation with strict SSH.
-- Canonicalize DHCP reservations or MAC pinning.
-- Add Proxmox template verification snippets to runbooks.
+- Keep apt snapshot/digest policy current for image builds.
+- Ensure new scripts honor `RUNNER_MODE=ci` non-interactive behavior.
+- Maintain tier-0 MAC/DHCP reservations when adding services.
+- Document cutover windows for replace/blue-green upgrades.
 
 ### Medium-term
-- Pin base image digests and adopt apt snapshot strategy.
 - Add a minimal staging environment that mirrors prod guardrails.
-- Normalize non-interactive runner flags across scripts and Make targets.
+- Continue expanding operator runbooks as new services are added.
 
 ### Long-term
 - Keep HA design honest and tested via GameDays.

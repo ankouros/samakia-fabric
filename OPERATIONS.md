@@ -31,6 +31,9 @@ This document does NOT cover:
 Operator commands and task flows are defined in:
 
 - `docs/operator/cookbook.md` (canonical command cookbook)
+- `docs/operator/runner-modes.md`
+- `docs/operator/ssh-trust.md`
+- `docs/operator/networking.md`
 - `docs/operator/safety-model.md`
 - `docs/operator/evidence-and-artifacts.md`
 
@@ -155,11 +158,27 @@ Creates `~/.config/samakia-fabric/env.sh` with `chmod 600` (local-only; never co
 bash "$FABRIC_REPO_ROOT/ops/scripts/runner-env-install.sh"
 ```
 
+CI/automation (non-interactive):
+
+```bash
+RUNNER_MODE=ci bash "$FABRIC_REPO_ROOT/ops/scripts/runner-env-install.sh" --non-interactive
+```
+
 Validate (presence-only; secrets are never printed):
 
 ```bash
 bash "$FABRIC_REPO_ROOT/ops/scripts/runner-env-check.sh"
 ```
+
+### Runner mode contract
+
+Samakia Fabric enforces a runner contract to keep automation deterministic.
+
+- `RUNNER_MODE=ci` (default): prompts are forbidden; scripts must fail fast.
+- `RUNNER_MODE=operator`: prompts allowed when guardrails permit them.
+- For CI or automation, pass `--non-interactive` where supported (for example, `runner-env-install.sh`).
+
+See `docs/operator/runner-modes.md` for details and usage examples.
 
 ### Install MinIO/S3 backend CA (only if required)
 

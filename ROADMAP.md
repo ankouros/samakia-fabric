@@ -631,6 +631,33 @@ Non-scope:
 
 ---
 
+## Phase 12 Post-Actions (Prior Phase 13)
+
+Goal: Close Phase 12 gaps, re-verify the Phase 1–12 milestone, and lock readiness for Phase 13.
+
+Status: IN PROGRESS (pending milestone verification + lock)
+
+Scope (hardening):
+- Image reproducibility and provenance (pinned digests, apt snapshots, build metadata).
+- SSH trust rotation procedure (strict known_hosts).
+- DHCP/MAC determinism policy for tier-0 services.
+- Non-interactive runner contract (`RUNNER_MODE=ci|operator`).
+- Shared observability compliance checks (Phase 2.1 acceptance).
+- Template upgrade semantics (replace/blue-green only).
+- Milestone Phase 1–12 re-verification and lock.
+
+Acceptance:
+- `pre-commit run --all-files`
+- `bash fabric-ci/scripts/lint.sh`
+- `bash fabric-ci/scripts/validate.sh`
+- `make policy.check`
+- `CI=1 make phase8.part1.accept`
+- `ENV=samakia-shared make phase2.1.accept`
+- `make milestone.phase1-12.verify`
+- `make milestone.phase1-12.lock`
+
+---
+
 ## Milestone — Phase 1–12 End-to-End Verification
 
 Goal: Verify all completed phases remain regression-clean and lock the first

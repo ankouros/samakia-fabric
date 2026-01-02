@@ -13,6 +13,11 @@ Operator commands live in `../operator/cookbook.md`.
 5. Generate evidence packet (not committed)
 6. Optional: register as Proxmox template (guarded; token-only; evidence required)
 
+Reproducibility rules:
+- Base images must be pinned by digest (no floating tags).
+- APT sources must use a snapshot mirror during build.
+- Each image must include `/etc/samakia-image-version` with build metadata.
+
 ## Evidence packets
 
 Stored under `evidence/images/<name>/<version>/<UTC>/` and include:

@@ -84,6 +84,11 @@ This avoids:
 - Nested virtualization
 - Proxmox-specific coupling
 
+Reproducibility controls:
+- The base image is pinned by digest (no floating tags).
+- APT uses a snapshot mirror during builds.
+- `/etc/samakia-image-version` is stamped with build metadata.
+
 ---
 
 ## Provisioning Script Responsibilities

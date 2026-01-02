@@ -114,7 +114,7 @@ lock_stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   done
   echo
   echo "Statement:"
-  echo "All phases 1–12 verified end-to-end. Platform is regression-clean and ready for controlled workload exposure."
+  echo "Phase 1–12 verified, hardened, and safe for Phase 13."
 } >"${marker}"
 
 self_hash="$(sha256sum "${marker}" | awk '{print $1}')"

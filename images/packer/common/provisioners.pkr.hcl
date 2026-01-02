@@ -13,7 +13,7 @@ build {
     playbook_file = var.ansible_playbook_path
     extra_arguments = [
       "--extra-vars",
-      "golden_base_image_id=${var.image_id} golden_base_image_version=${var.image_version} golden_base_build_time=${var.build_time}"
+      "golden_base_image_id=${var.image_id} golden_base_image_version=${var.image_version} golden_base_build_time=${var.build_time} golden_base_git_sha=${var.git_sha} golden_base_packer_template_id=${var.packer_template_id} golden_base_apt_snapshot_url=${var.apt_snapshot_url} golden_base_apt_snapshot_security_url=${var.apt_snapshot_security_url}"
     ]
   }
 

@@ -1,4 +1,32 @@
 ---
+- name: Configure apt snapshot sources (if provided)
+  ansible.builtin.blockinfile:
+    path: /etc/apt/apt.conf.d/99snapshot
+    create: true
+    mode: "0644"
+    block: |
+      Acquire::Check-Valid-Until "false";
+  when: golden_base_apt_snapshot_url | length > 0
+
+- name: Configure apt sources for snapshot (if provided)
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {% set codename = ansible_distribution_release | lower %}
+      {% if ansible_distribution | lower == 'debian' %}
+      deb {{ golden_base_apt_snapshot_url }} {{ codename }} main contrib non-free non-free-firmware
+      deb {{ golden_base_apt_snapshot_url }} {{ codename }}-updates main contrib non-free non-free-firmware
+      deb {{ golden_base_apt_snapshot_security_url }} {{ codename }}-security main contrib non-free non-free-firmware
+      {% else %}
+      deb {{ golden_base_apt_snapshot_url }} {{ codename }} main restricted universe multiverse
+      deb {{ golden_base_apt_snapshot_url }} {{ codename }}-updates main restricted universe multiverse
+      deb {{ golden_base_apt_snapshot_url }} {{ codename }}-security main restricted universe multiverse
+      {% endif %}
+  when: golden_base_apt_snapshot_url | length > 0
+
 - name: Ensure minimal packages
   ansible.builtin.package:
     name: "{{ golden_base_minimal_packages }}"
@@ -24,6 +52,14 @@
   ansible.builtin.template:
     src: build-info.json.j2
     dest: "{{ golden_base_image_dir }}/build-info.json"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Write image version stamp
+  ansible.builtin.template:
+    src: image-version.txt.j2
+    dest: /etc/samakia-image-version
     owner: root
     group: root
     mode: "0644"

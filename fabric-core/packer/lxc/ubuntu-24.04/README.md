@@ -12,3 +12,9 @@ hardened Ubuntu 24.04 LTS rootfs for Proxmox LXC templates.
 ## Usage
 
 See `docs/tutorials/02-build-lxc-image.md` for the full build and validation flow.
+
+## Reproducibility notes
+
+- Base image is pinned by digest in `packer.pkr.hcl` (no floating tags).
+- APT uses a snapshot mirror for deterministic package sets.
+- The build stamps `/etc/samakia-image-version` with image metadata.

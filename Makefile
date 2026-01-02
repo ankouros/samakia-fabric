@@ -17,6 +17,7 @@ REPO_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 FABRIC_REPO_ROOT ?= $(shell git -C "$(REPO_ROOT)" rev-parse --show-toplevel 2>/dev/null || echo "$(REPO_ROOT)")
 export FABRIC_REPO_ROOT
 export TF_VAR_fabric_repo_root ?= $(FABRIC_REPO_ROOT)
+export RUNNER_MODE
 
 ###############################################################################
 # Global variables (override via env or CLI)
@@ -81,6 +82,10 @@ AUDIT_EXPORT_ID ?= audit-export-$(shell date -u +%Y%m%d-%H%M%S)
 LEGAL_HOLD_ACTION ?= list
 FORENSICS_FLAGS ?= --env $(ENV)
 DOCTOR_FULL ?= 0
+RUNNER_MODE ?= ci
+PACKER_IMAGE_NAME ?= ubuntu-24.04-lxc-rootfs
+APT_SNAPSHOT_URL ?= https://snapshot.ubuntu.com/ubuntu/20260102T000000Z
+PACKER_TEMPLATE_ID ?= fabric-core/packer/lxc/ubuntu-24.04/packer.pkr.hcl
 
 # Non-interactive / CI defaults
 CI ?= 0
@@ -176,13 +181,23 @@ image.build: ## Build golden LXC image (VERSION=N optional; default: next)
 		fi; \
 		fabric_version="v$${next}"; \
 		artifact_basename="$${prefix}-v$${next}"; \
+		git_sha="$$(git -C "$(REPO_ROOT)" rev-parse HEAD 2>/dev/null || echo unknown)"; \
 		out="$$dir_abs/$${artifact_basename}.tar.gz"; \
 		if [[ -e "$$out" ]]; then echo "ERROR: artifact already exists (refusing to overwrite): $$out" >&2; exit 1; fi; \
 		echo "max+1 build: artifact=$${artifact_basename}.tar.gz"; \
 		cd "$$dir_abs"; \
 		packer init .; \
 		packer validate .; \
-		packer build -var "fabric_version=$$fabric_version" -var "artifact_basename=$$artifact_basename" "$(PACKER_TEMPLATE)"; \
+		packer build \
+			-var "fabric_version=$$fabric_version" \
+			-var "artifact_basename=$$artifact_basename" \
+			-var "image_name=$(PACKER_IMAGE_NAME)" \
+			-var "image_version=$$fabric_version" \
+			-var "build_time=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+			-var "git_sha=$$git_sha" \
+			-var "packer_template_id=$(PACKER_TEMPLATE_ID)" \
+			-var "apt_snapshot_url=$(APT_SNAPSHOT_URL)" \
+			"$(PACKER_TEMPLATE)"; \
 		if [[ ! -f "$$out" ]]; then echo "ERROR: build completed but artifact not found: $$out" >&2; exit 1; fi; \
 		echo "$$out" \
 	'
@@ -199,6 +214,7 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 		max="$$((next-1))"; \
 		fabric_version="v$${next}"; \
 		artifact_basename="$${prefix}-v$${next}"; \
+		git_sha="$$(git -C "$(REPO_ROOT)" rev-parse HEAD 2>/dev/null || echo unknown)"; \
 		out="$$dir_abs/$${artifact_basename}.tar.gz"; \
 		if [[ -e "$$out" ]]; then \
 			echo "ERROR: next artifact already exists (refusing to overwrite): $$out" >&2; \
@@ -210,7 +226,16 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 		cd "$$dir_abs"; \
 		packer init .; \
 		packer validate .; \
-		packer build -var "fabric_version=$$fabric_version" -var "artifact_basename=$$artifact_basename" "$(PACKER_TEMPLATE)"; \
+		packer build \
+			-var "fabric_version=$$fabric_version" \
+			-var "artifact_basename=$$artifact_basename" \
+			-var "image_name=$(PACKER_IMAGE_NAME)" \
+			-var "image_version=$$fabric_version" \
+			-var "build_time=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+			-var "git_sha=$$git_sha" \
+			-var "packer_template_id=$(PACKER_TEMPLATE_ID)" \
+			-var "apt_snapshot_url=$(APT_SNAPSHOT_URL)" \
+			"$(PACKER_TEMPLATE)"; \
 		if [[ ! -f "$$out" ]]; then \
 			echo "ERROR: build completed but artifact not found: $$out" >&2; \
 			echo "Directory listing:" >&2; \
@@ -236,8 +261,8 @@ image.vm.build: ## Build VM golden image (IMAGE=ubuntu-24.04|debian-12 VERSION=v
 			exit 2; \
 		fi; \
 		case "$(IMAGE)" in \
-			ubuntu-24.04) vars_file="ubuntu24.pkrvars.hcl" ;; \
-			debian-12) vars_file="debian12.pkrvars.hcl" ;; \
+			ubuntu-24.04) vars_file="ubuntu24.pkrvars.hcl"; apt_snapshot_url="https://snapshot.ubuntu.com/ubuntu/20260102T000000Z"; apt_snapshot_security_url="" ;; \
+			debian-12) vars_file="debian12.pkrvars.hcl"; apt_snapshot_url="https://snapshot.debian.org/archive/debian/20260102T000000Z"; apt_snapshot_security_url="https://snapshot.debian.org/archive/debian-security/20260102T000000Z" ;; \
 			*) echo "ERROR: unsupported IMAGE=$(IMAGE)" >&2; exit 2 ;; \
 		esac; \
 		common_dir="$(VM_PACKER_COMMON)"; \
@@ -257,6 +282,8 @@ image.vm.build: ## Build VM golden image (IMAGE=ubuntu-24.04|debian-12 VERSION=v
 		cp -a "$$common_dir/scripts" "$$tmp_dir/"; \
 		cp -a "$$vm_dir/"*.pkr.hcl "$$tmp_dir/"; \
 		cp -a "$$vm_dir/$$vars_file" "$$tmp_dir/"; \
+		git_sha="$$(git -C "$(REPO_ROOT)" rev-parse HEAD 2>/dev/null || echo unknown)"; \
+		packer_template_id="images/packer/$(IMAGE)/$(VERSION)/image.pkr.hcl"; \
 		packer init "$$tmp_dir"; \
 		packer build \
 			-var-file "$$tmp_dir/$$vars_file" \
@@ -266,6 +293,10 @@ image.vm.build: ## Build VM golden image (IMAGE=ubuntu-24.04|debian-12 VERSION=v
 			-var "image_id=$(IMAGE)" \
 			-var "image_version=$(VERSION)" \
 			-var "build_time=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+			-var "git_sha=$$git_sha" \
+			-var "packer_template_id=$$packer_template_id" \
+			-var "apt_snapshot_url=$$apt_snapshot_url" \
+			-var "apt_snapshot_security_url=$$apt_snapshot_security_url" \
 			"$$tmp_dir"; \
 		echo "$$out_dir" \
 	'
@@ -412,7 +443,7 @@ image.select: ## Interactive image picker (prints IMAGE=<absolute-path>; non-int
 			echo "ERROR: no images found under $$dir_abs matching $(PACKER_ARTIFACT_GLOB)" >&2; \
 			exit 1; \
 		fi; \
-		if [[ "$(INTERACTIVE)" != "1" || "$(CI)" = "1" || ! -t 0 || ! -t 1 ]]; then \
+		if [[ "$(RUNNER_MODE)" = "ci" || "$(INTERACTIVE)" != "1" || "$(CI)" = "1" || ! -t 0 || ! -t 1 ]]; then \
 			latest="$$(LC_ALL=C ls -1t "$$dir_abs"/$(PACKER_ARTIFACT_GLOB) 2>/dev/null | head -n 1)"; \
 			echo "IMAGE=$$latest"; \
 			exit 0; \
@@ -459,6 +490,10 @@ image.upload: ## Upload golden image to Proxmox via API (IMAGE=... or interactiv
 		image="$${IMAGE:-}"; \
 		dir_abs="$$(cd "$(PACKER_IMAGE_DIR)" && pwd)"; \
 		if [[ -z "$$image" ]]; then \
+			if [[ "$(RUNNER_MODE)" = "ci" ]]; then \
+				echo "ERROR: RUNNER_MODE=ci forbids interactive selection. Set IMAGE=... explicitly." >&2; \
+				exit 2; \
+			fi; \
 			if [[ "$(INTERACTIVE)" != "1" || "$(CI)" = "1" || ! -t 0 || ! -t 1 ]]; then \
 				echo "ERROR: IMAGE is required unless INTERACTIVE=1 (e.g. make image.upload IMAGE=...)" >&2; \
 				exit 1; \
@@ -518,6 +553,10 @@ image.build-upload: ## Build next image version then upload (interactive select 
 image.promote: ## Promote image version (GitOps-only: prints the exact pin to apply in Terraform)
 	@bash -euo pipefail -c '\
 		image="$${IMAGE:-}"; \
+		if [[ -z "$$image" && "$(RUNNER_MODE)" = "ci" ]]; then \
+			echo "ERROR: RUNNER_MODE=ci forbids interactive selection. Set IMAGE=... explicitly." >&2; \
+			exit 2; \
+		fi; \
 		if [[ -z "$$image" && "$(INTERACTIVE)" = "1" && "$(CI)" != "1" && -t 0 && -t 1 ]]; then \
 			mapfile -t candidates < <(ls -1 "$(PACKER_DIR)"/ubuntu-24.04-lxc-rootfs-v*.tar.gz 2>/dev/null || true); \
 			if [[ "$${#candidates[@]}" -eq 0 ]]; then \
@@ -727,6 +766,10 @@ compliance.verify: ## Verify compliance snapshot offline (SNAPSHOT_DIR=... or in
 	@bash -euo pipefail -c '\
 		dir="$${SNAPSHOT_DIR:-}"; \
 		if [[ -z "$$dir" ]]; then \
+			if [[ "$(RUNNER_MODE)" = "ci" ]]; then \
+				echo "ERROR: RUNNER_MODE=ci forbids interactive selection. Set SNAPSHOT_DIR=... explicitly." >&2; \
+				exit 2; \
+			fi; \
 			if [[ "$(INTERACTIVE)" != "1" || "$(CI)" = "1" || ! -t 0 || ! -t 1 ]]; then \
 				echo "ERROR: SNAPSHOT_DIR is required unless INTERACTIVE=1 (e.g. make compliance.verify SNAPSHOT_DIR=...)" >&2; \
 				exit 1; \

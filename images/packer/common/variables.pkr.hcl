@@ -71,7 +71,27 @@ variable "image_version" {
   type = string
 }
 
+variable "apt_snapshot_url" {
+  type    = string
+  default = ""
+}
+
+variable "apt_snapshot_security_url" {
+  type    = string
+  default = ""
+}
+
 variable "build_time" {
+  type    = string
+  default = "unknown"
+}
+
+variable "git_sha" {
+  type    = string
+  default = "unknown"
+}
+
+variable "packer_template_id" {
   type    = string
   default = "unknown"
 }

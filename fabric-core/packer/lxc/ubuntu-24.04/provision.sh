@@ -8,10 +8,27 @@ export DEBIAN_FRONTEND=noninteractive
 # -----------------------------------------------------------------------------
 TZ="${TZ:-UTC}"
 LOCALE="${LOCALE:-en_US.UTF-8}"
+APT_SNAPSHOT_URL="${APT_SNAPSHOT_URL:-https://snapshot.ubuntu.com/ubuntu/20260102T000000Z}"
 
 # -----------------------------------------------------------------------------
 # Base OS
 # -----------------------------------------------------------------------------
+# shellcheck disable=SC1091
+# shellcheck source=/etc/os-release
+. /etc/os-release
+codename="${VERSION_CODENAME:-noble}"
+snapshot_root="${APT_SNAPSHOT_URL%/}"
+
+cat >/etc/apt/apt.conf.d/99snapshot <<'EOF'
+Acquire::Check-Valid-Until "false";
+EOF
+
+cat >/etc/apt/sources.list <<EOF
+deb ${snapshot_root} ${codename} main restricted universe multiverse
+deb ${snapshot_root} ${codename}-updates main restricted universe multiverse
+deb ${snapshot_root} ${codename}-security main restricted universe multiverse
+EOF
+
 apt-get update
 
 # Core packages (keep minimal, but useful for ops)
@@ -35,6 +52,24 @@ apt-get install -y --no-install-recommends \
   sudo \
   rsyslog \
   tini
+
+# ---------------------------------------------------------------------------
+# Provenance stamp (immutable metadata)
+# ---------------------------------------------------------------------------
+image_name="${SAMAKIA_IMAGE_NAME:-unknown}"
+image_version="${SAMAKIA_IMAGE_VERSION:-unknown}"
+build_utc="${SAMAKIA_BUILD_UTC:-unknown}"
+git_sha="${SAMAKIA_GIT_SHA:-unknown}"
+packer_template_id="${SAMAKIA_PACKER_TEMPLATE_ID:-unknown}"
+
+cat > /etc/samakia-image-version <<EOF
+image_name=${image_name}
+image_version=${image_version}
+build_utc=${build_utc}
+git_sha=${git_sha}
+packer_template_id=${packer_template_id}
+EOF
+chmod 0644 /etc/samakia-image-version
 
 # NOTE:
 # - Removed cloud-init: it is not reliably useful in LXC rootfs templates and

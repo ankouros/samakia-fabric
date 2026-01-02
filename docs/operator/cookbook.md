@@ -66,6 +66,83 @@ Validation logs only (no artifacts generated).
 #### Rollback / safe exit
 Stop and remediate failures.
 
+### Task: Rotate SSH known_hosts after replace/recreate
+
+#### Intent
+Maintain strict SSH checking while rotating host keys after rebuilds.
+
+#### Preconditions
+- Container was replaced or rebuilt
+- Out-of-band console access for fingerprint verification
+
+#### Command
+```bash
+ssh-keygen -R <host-or-ip>
+ssh <user>@<host-or-ip>
+```
+
+#### Expected result
+You confirm the new fingerprint out-of-band and accept the new key. See `docs/operator/ssh-trust.md`.
+
+#### Evidence outputs
+None (local known_hosts update only).
+
+#### Failure modes
+- Accepting a fingerprint without out-of-band verification
+
+#### Rollback / safe exit
+Abort the connection, re-verify the fingerprint, and retry.
+
+### Task: Review networking determinism policy before replacement
+
+#### Intent
+Confirm MAC pinning and DHCP reservations for tier-0 services.
+
+#### Preconditions
+- Tier of service identified (tier-0/tier-1/tier-2)
+
+#### Command
+```bash
+sed -n '1,200p' docs/operator/networking.md
+```
+
+#### Expected result
+Replacement plan aligns with the tier policy and includes a cutover checklist.
+
+#### Evidence outputs
+None (policy reference).
+
+#### Failure modes
+- Tier-0 service replaced without MAC/DHCP determinism
+
+#### Rollback / safe exit
+Stop and document a deterministic replacement plan before proceeding.
+
+### Task: Plan template upgrades (replace or blue/green only)
+
+#### Intent
+Avoid in-place upgrade assumptions when templates change.
+
+#### Preconditions
+- Template version change approved
+
+#### Command
+```bash
+sed -n '1,200p' docs/images/template-upgrades.md
+```
+
+#### Expected result
+Upgrade strategy is replace or blue/green; in-place upgrades are not used.
+
+#### Evidence outputs
+None (planning step).
+
+#### Failure modes
+- Assuming template changes update existing containers
+
+#### Rollback / safe exit
+Stop and re-scope the upgrade to a replace or blue/green cutover.
+
 ### Task: Terraform plan (read-only)
 
 #### Intent

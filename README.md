@@ -2,7 +2,7 @@
 
 Samakia Fabric is a production-minded infrastructure framework for building and
 operating Proxmox-based, LXC-first platforms with Infrastructure as Code.
-It aims to be clear, deterministic, and auditable.
+We try to keep it clear, deterministic, and auditable.
 
 It is intended for:
 
@@ -11,8 +11,8 @@ It is intended for:
 - Platform operators
 - AI-assisted operations
 
-Samakia Fabric is not a demo or a tutorial repository.
-It is a reference-quality infrastructure fabric.
+Samakia Fabric is not a demo or tutorial repository.
+It aims to be a reference-quality infrastructure fabric.
 
 ---
 
@@ -40,7 +40,8 @@ Samakia Fabric is not:
 - A beginner playground
 - A click-ops replacement
 
-It assumes you want control, not convenience.
+If you need a turnkey or highly automated experience, this may not be the
+right fit.
 
 ---
 
@@ -56,7 +57,7 @@ Samakia Fabric is built around these principles:
 - Rebuild is preferred over repair
 - Security is enforced by architecture, not convention
 
-These principles are non-negotiable.
+We aim to keep these principles consistent across the codebase and docs.
 
 ---
 
@@ -148,7 +149,7 @@ Start here:
 - `ROADMAP.md`
 - `docs/glossary.md`
 
-If something is not documented, it is considered incomplete.
+If something is not documented, please treat it as incomplete.
 
 ---
 
@@ -201,4 +202,4 @@ If you value:
 - Security by default
 - Long-term clarity
 
-Samakia Fabric is built for you.
+We hope this repository is useful.

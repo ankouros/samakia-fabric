@@ -198,6 +198,13 @@ The format is inspired by:
 - Evidence packets under `evidence/milestones/phase1-12/<UTC>/`.
 - Make targets: `milestone.phase1-12.verify`, `milestone.phase1-12.lock`.
 - Milestone lock acceptance marker: `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md` (self-hash; evidence-bound).
+
+### Changed
+#### Phase 12 post-actions (hardening)
+- Pinned base digests and apt snapshot sources for image builds; stamped `/etc/samakia-image-version` with provenance metadata.
+- Introduced `RUNNER_MODE=ci|operator` to enforce non-interactive CI behavior and explicit inputs.
+- Documented SSH trust rotation, networking determinism policy, runner modes, and template upgrade semantics.
+- Updated milestone lock statement for Phase 13 readiness.
 - Phase 12 validation allows the milestone invariant scan pattern without tripping the insecure TLS guard.
 - Backfilled `acceptance/PHASE1_ACCEPTED.md` with a SHA256 self-hash for marker integrity.
 - Invariant scans now normalize repo-relative paths and allowlist the milestone scan patterns.
