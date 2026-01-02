@@ -193,6 +193,7 @@ The format is inspired by:
 - Milestone verification/lock tooling under `ops/milestones/phase1-12/`.
 - Evidence packets under `evidence/milestones/phase1-12/<UTC>/`.
 - Make targets: `milestone.phase1-12.verify`, `milestone.phase1-12.lock`.
+- Milestone lock acceptance marker: `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md` (self-hash; evidence-bound).
 - Phase 12 validation allows the milestone invariant scan pattern without tripping the insecure TLS guard.
 - Backfilled `acceptance/PHASE1_ACCEPTED.md` with a SHA256 self-hash for marker integrity.
 - Invariant scans now normalize repo-relative paths and allowlist the milestone scan patterns.

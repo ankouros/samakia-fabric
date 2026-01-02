@@ -2,11 +2,12 @@
 
 This document records what was implemented for the **Terraform remote state backend (MinIO HA)** and the **DNS infrastructure**, and how to run them **end-to-end**.
 
-## Milestone Phase 1–12 Verification Tooling (In progress)
+## Milestone Phase 1–12 Verification Tooling (Completed)
 
 - Added end-to-end regression verification and lock scripts under `ops/milestones/phase1-12/`.
 - Evidence packets are written to `evidence/milestones/phase1-12/<UTC>/` with summaries and manifests.
 - Milestone lock is gated on a PASS verification and writes `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md`.
+- Milestone verification passed and the lock marker references evidence at `evidence/milestones/phase1-12/2026-01-02T14:44:16Z`.
 - Verifier now captures per-step stdout/stderr with exit codes, and failure summaries include redacted stderr excerpts plus log pointers.
 - Shared observability now includes `obs-2` to satisfy HA placement policy, and Loki readiness is stabilized via config + data directory fixes.
 

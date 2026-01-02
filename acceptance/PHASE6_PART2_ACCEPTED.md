@@ -10,8 +10,8 @@ Assurance statement:
 No infrastructure mutated; GameDays were dry-run only; bundles and readiness packets are deterministic.
 
 Repository:
-- Commit: fe53d3565b5484f471b76babf4efa9879110c870
-- Timestamp (UTC): 2025-12-31T15:59:36Z
+- Commit: 938de08e30867736b27b4f2cb0b96b043cd27f5b
+- Timestamp (UTC): 2026-01-02T14:51:07Z
 
 Acceptance commands executed:
 - make policy.check
@@ -29,4 +29,4 @@ Acceptance commands executed:
 Remediation ledger:
 - REQUIRED-FIXES.md
 
-SHA256 (content excluding this line): eba1cbfa1836274d690d048b7190d912868d733dbc5f5ad5622b7d073a8418c8
+SHA256 (content excluding this line): 6aff846756c5fc815919fff8108816849f22118c703813818e1b714434767e2a

@@ -636,7 +636,7 @@ Non-scope:
 Goal: Verify all completed phases remain regression-clean and lock the first
 production-grade substrate milestone.
 
-Status: IN PROGRESS
+Status: COMPLETED ✅
 
 ### Scope (canonical)
 - End-to-end verification target: `make milestone.phase1-12.verify`.
