@@ -161,6 +161,16 @@ Final status:
   - `ENV=samakia-shared make shared.obs.accept` (PASS)
   - `ENV=samakia-shared make phase2.1.accept` (PASS)
 
+### PHASE2_1-OBS-LOKI-READY
+- **Description:** `ENV=samakia-shared make phase2.1.accept` failed in `shared.obs.accept` with Loki `/ready` returning HTTP 503 on the shared VIP.
+- **Impact:** Phase 2.1 acceptance could not complete; shared observability plane not validated.
+- **Root cause:** Loki was upgraded with a v11 schema but structured metadata defaults required v13 + `tsdb` index, and `/var/lib/loki` lacked writable ownership for the Loki service user.
+- **Required remediation:** Disable structured metadata in Loki config and ensure `/var/lib/loki` directories are owned by the Loki user/group, then re-run shared observability apply.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-shared ANSIBLE_FLAGS="--limit obs-1,obs-2" make shared.ansible.apply`
+  - `ENV=samakia-shared make shared.obs.accept`
+
 ---
 
 ## Phase 11 Part 3 Blockers

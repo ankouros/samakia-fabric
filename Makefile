@@ -1846,12 +1846,14 @@ shared.up: ## One-command shared services deployment (tf apply -> bootstrap -> s
 			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "samakia@$$ip" true >/dev/null 2>&1; then jump="samakia@$$ip"; break; fi; \
 		done; \
 		if [[ -z "$$jump" ]]; then echo "ERROR: cannot reach any shared edge as samakia (192.168.11.106/107); bootstrap cannot proceed" >&2; exit 1; fi; \
-		vlan_need_bootstrap=0; \
-		for ip in 10.10.120.21 10.10.120.22 10.10.120.31; do \
-			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@$$ip" true >/dev/null 2>&1; then vlan_need_bootstrap=1; fi; \
-		done; \
-		if [[ "$$vlan_need_bootstrap" -eq 1 ]]; then \
-			ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit vault-1,vault-2,obs-1" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		vlan_bootstrap_hosts=(); \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.21" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("vault-1"); fi; \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.22" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("vault-2"); fi; \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.31" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("obs-1"); fi; \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.32" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("obs-2"); fi; \
+		if [[ "$${#vlan_bootstrap_hosts[@]}" -gt 0 ]]; then \
+			vlan_bootstrap_list="$$(IFS=,; echo "$${vlan_bootstrap_hosts[*]}")"; \
+			ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit $${vlan_bootstrap_list}" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
 		fi; \
 		$(MAKE) shared.ansible.apply ENV="$(ENV)"; \
 		$(MAKE) shared.accept ENV="$(ENV)"; \

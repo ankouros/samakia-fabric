@@ -12,6 +12,7 @@ EDGE_2_LAN="192.168.11.107"
 VAULT_1_VLAN="10.10.120.21"
 VAULT_2_VLAN="10.10.120.22"
 OBS_1_VLAN="10.10.120.31"
+OBS_2_VLAN="10.10.120.32"
 
 usage() {
   cat >&2 <<'EOT'
@@ -134,11 +135,13 @@ main() {
   done
 
   check "Observability services"
-  check_service "${OBS_1_VLAN}" "${jump}" "prometheus"
-  check_service "${OBS_1_VLAN}" "${jump}" "prometheus-alertmanager"
-  check_service "${OBS_1_VLAN}" "${jump}" "loki"
-  check_service "${OBS_1_VLAN}" "${jump}" "promtail"
-  check_service "${OBS_1_VLAN}" "${jump}" "grafana-server"
+  obs_hosts=("${OBS_1_VLAN}" "${OBS_2_VLAN}")
+  obs_services=("prometheus" "prometheus-alertmanager" "loki" "promtail" "grafana-server")
+  for host in "${obs_hosts[@]}"; do
+    for svc in "${obs_services[@]}"; do
+      check_service "${host}" "${jump}" "${svc}"
+    done
+  done
 
   ok "Shared runtime invariants acceptance completed"
 }

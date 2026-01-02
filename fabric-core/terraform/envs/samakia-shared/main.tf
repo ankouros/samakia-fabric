@@ -315,6 +315,49 @@ resource "proxmox_lxc" "obs_1" {
   }
 }
 
+resource "proxmox_lxc" "obs_2" {
+  depends_on = [null_resource.sdn_shared_plane]
+
+  vmid        = 3306
+  hostname    = "obs-2"
+  target_node = "proxmox3"
+
+  ostemplate = local.lxc_template
+  ostype     = "ubuntu"
+
+  unprivileged = true
+  onboot       = true
+  start        = true
+
+  cores  = 2
+  memory = 2048
+  swap   = 512
+
+  rootfs {
+    storage = "pve-nfs"
+    size    = "16G"
+  }
+
+  network {
+    name   = "eth0"
+    bridge = local.vlan_vnet
+    hwaddr = "BC:24:11:AD:60:E2"
+    ip     = "10.10.120.32/24"
+    gw     = local.vlan_gw_vip
+  }
+
+  ssh_public_keys = join("\n", var.ssh_public_keys)
+
+  tags = "golden-${local.tag_golden};plane-${local.tag_plane};env-${local.tag_env};role-obs"
+
+  lifecycle {
+    ignore_changes = [
+      network,
+      features,
+    ]
+  }
+}
+
 ###############################################################################
 # Outputs for Ansible inventory + acceptance
 ###############################################################################
@@ -347,6 +390,11 @@ output "lxc_inventory" {
       node     = proxmox_lxc.obs_1.target_node
       vmid     = proxmox_lxc.obs_1.vmid
     }
+    obs_2 = {
+      hostname = proxmox_lxc.obs_2.hostname
+      node     = proxmox_lxc.obs_2.target_node
+      vmid     = proxmox_lxc.obs_2.vmid
+    }
   }
 }
 
@@ -367,6 +415,7 @@ output "shared_endpoints" {
     ]
     obs_nodes = [
       "10.10.120.31",
+      "10.10.120.32",
     ]
   }
 }

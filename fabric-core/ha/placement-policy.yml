@@ -86,9 +86,9 @@
           "name": "observability",
           "tier": "tier1",
           "ha_mode": "app",
-          "replicas": 1,
-          "anti_affinity": false,
-          "hosts": ["obs-1"]
+          "replicas": 2,
+          "anti_affinity": true,
+          "hosts": ["obs-1", "obs-2"]
         }
       ]
     },

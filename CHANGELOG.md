@@ -198,6 +198,11 @@ The format is inspired by:
 - Invariant scans now normalize repo-relative paths and allowlist the milestone scan patterns.
 - Recorded and closed the Phase 1–12 milestone verification blocker in `REQUIRED-FIXES.md`.
 - Milestone wrapper now captures per-step stdout/stderr, preserves exit codes, and includes failure excerpts in summary evidence.
+
+### Fixed
+- Shared observability now satisfies HA placement requirements with an obs-2 node, updated edge backends, and expanded acceptance coverage.
+- Loki configuration blocks structured metadata under v11 schemas and ensures data directories are owned by the Loki user.
+- Shared bootstrap only targets VLAN nodes that still accept root SSH during first-time bootstraps.
 - Added milestone wrapper exit-semantics regression test.
 - Recorded and resolved the MinIO backend smoke marker blocker for milestone verification in `REQUIRED-FIXES.md`.
 - Milestone verification no longer forces `-backend=false` for `terraform init`, allowing backend smoke checks to confirm S3 initialization.

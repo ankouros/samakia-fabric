@@ -40,6 +40,25 @@
     state: present
     update_cache: true
 
+- name: Resolve Loki primary group
+  ansible.builtin.command:
+    argv: ["id", "-gn", "loki"]
+  register: loki_group
+  changed_when: false
+  failed_when: false
+
+- name: Ensure Loki data directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: loki
+    group: "{{ (loki_group.stdout | default('') | trim) or 'nogroup' }}"
+    mode: "0750"
+  loop:
+    - /var/lib/loki
+    - /var/lib/loki/chunks
+    - /var/lib/loki/rules
+
 - name: Ensure promtail can read the systemd journal
   ansible.builtin.user:
     name: promtail

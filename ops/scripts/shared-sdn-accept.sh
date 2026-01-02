@@ -35,6 +35,10 @@ OBS_1_NODE="proxmox2"
 OBS_1_VMID="3305"
 OBS_1_IP="10.10.120.31/24"
 
+OBS_2_NODE="proxmox3"
+OBS_2_VMID="3306"
+OBS_2_IP="10.10.120.32/24"
+
 # Canonical VIPs (LAN)
 DNS_VIP="192.168.11.100"
 MINIO_VIP="192.168.11.101"
@@ -343,6 +347,7 @@ check_dual_homed_edge "${NTP_2_NODE}" "${NTP_2_VMID}" "${NTP_2_LAN_IP}" "${NTP_2
 check_vlan_only_node "${VAULT_1_NODE}" "${VAULT_1_VMID}" "${VAULT_1_IP}" && ok "vault-1: vlan-only OK"
 check_vlan_only_node "${VAULT_2_NODE}" "${VAULT_2_VMID}" "${VAULT_2_IP}" && ok "vault-2: vlan-only OK"
 check_vlan_only_node "${OBS_1_NODE}" "${OBS_1_VMID}" "${OBS_1_IP}" && ok "obs-1: vlan-only OK"
+check_vlan_only_node "${OBS_2_NODE}" "${OBS_2_VMID}" "${OBS_2_IP}" && ok "obs-2: vlan-only OK"
 
 ###############################################################################
 # C) Gateway semantics (best-effort)
@@ -387,7 +392,7 @@ fi
 # D) Isolation signals (best-effort)
 ###############################################################################
 
-for ip in "10.10.120.21" "10.10.120.22" "10.10.120.31"; do
+for ip in "10.10.120.21" "10.10.120.22" "10.10.120.31" "10.10.120.32"; do
   if ping -c1 -W1 "${ip}" >/dev/null 2>&1; then
     fail "VLAN node responded to ICMP from runner (expected isolation): ${ip}"
   fi

@@ -8,6 +8,7 @@ This document records what was implemented for the **Terraform remote state back
 - Evidence packets are written to `evidence/milestones/phase1-12/<UTC>/` with summaries and manifests.
 - Milestone lock is gated on a PASS verification and writes `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md`.
 - Verifier now captures per-step stdout/stderr with exit codes, and failure summaries include redacted stderr excerpts plus log pointers.
+- Shared observability now includes `obs-2` to satisfy HA placement policy, and Loki readiness is stabilized via config + data directory fixes.
 
 ## MinIO HA Backend — What was implemented
 
