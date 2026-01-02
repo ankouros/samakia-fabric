@@ -94,6 +94,9 @@ jobs:
       - name: Binding contract checks
         run: make bindings.validate TENANT=all
 
+      - name: Binding verify (offline)
+        run: make bindings.verify.offline TENANT=all
+
       - name: Substrate contract checks
         run: make substrate.contracts.validate
 

@@ -1,0 +1,86 @@
+# Phase 12 Part 3 Entry Checklist
+
+Timestamp (UTC): 2026-01-02T02:58:36Z
+
+## Criteria
+- Marker present: acceptance/PHASE12_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART1_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART2_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/bindings/verify/verify.sh
+  - Command: test -f ops/bindings/verify/verify.sh
+  - Result: PASS
+- File present: ops/bindings/verify/probes/tcp_tls.sh
+  - Command: test -f ops/bindings/verify/probes/tcp_tls.sh
+  - Result: PASS
+- File present: ops/bindings/verify/probes/postgres.sh
+  - Command: test -f ops/bindings/verify/probes/postgres.sh
+  - Result: PASS
+- File present: ops/bindings/verify/probes/mariadb.sh
+  - Command: test -f ops/bindings/verify/probes/mariadb.sh
+  - Result: PASS
+- File present: ops/bindings/verify/probes/rabbitmq.sh
+  - Command: test -f ops/bindings/verify/probes/rabbitmq.sh
+  - Result: PASS
+- File present: ops/bindings/verify/probes/dragonfly.sh
+  - Command: test -f ops/bindings/verify/probes/dragonfly.sh
+  - Result: PASS
+- File present: ops/bindings/verify/probes/qdrant.sh
+  - Command: test -f ops/bindings/verify/probes/qdrant.sh
+  - Result: PASS
+- File present: ops/bindings/verify/common/redact.sh
+  - Command: test -f ops/bindings/verify/common/redact.sh
+  - Result: PASS
+- File present: ops/bindings/verify/common/timeouts.sh
+  - Command: test -f ops/bindings/verify/common/timeouts.sh
+  - Result: PASS
+- File present: ops/bindings/verify/common/json.sh
+  - Command: test -f ops/bindings/verify/common/json.sh
+  - Result: PASS
+- File present: ops/policy/policy-bindings-verify.sh
+  - Command: test -f ops/policy/policy-bindings-verify.sh
+  - Result: PASS
+- File present: docs/bindings/verification.md
+  - Command: test -f docs/bindings/verification.md
+  - Result: PASS
+- Live mode guarded
+  - Command: rg -n "VERIFY_LIVE" ops/bindings/verify/verify.sh
+  - Result: PASS
+- CI guard for live mode
+  - Command: rg -n "live mode is not allowed in CI" ops/bindings/verify/verify.sh
+  - Result: PASS
+- Policy gate wired
+  - Command: rg -n "policy-bindings-verify\.sh" ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: bindings.verify.offline
+  - Command: rg -n '^bindings.verify.offline:' Makefile
+  - Result: PASS
+- Makefile target present: bindings.verify.live
+  - Command: rg -n '^bindings.verify.live:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part3.entry.check
+  - Command: rg -n '^phase12.part3.entry.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part3.accept
+  - Command: rg -n '^phase12.part3.accept:' Makefile
+  - Result: PASS
+- Cookbook includes bindings verify offline
+  - Command: rg -n "bindings\.verify\.offline" docs/operator/cookbook.md
+  - Result: PASS
+- Cookbook includes bindings verify live
+  - Command: rg -n "bindings\.verify\.live" docs/operator/cookbook.md
+  - Result: PASS
+- Evidence paths gitignored
+  - Command: rg -n "evidence/" .gitignore
+  - Result: PASS
+- Artifacts paths gitignored
+  - Command: rg -n "artifacts/" .gitignore
+  - Result: PASS

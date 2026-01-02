@@ -633,3 +633,15 @@ binding contracts without introducing self-service or CI execution:
   change windows + signing.
 
 Secret values remain local-only; evidence is redacted and gitignored.
+
+## Phase 12 Part 3 — Workload-Side Binding Verification
+
+Phase 12 Part 3 adds read-only verification of workload connectivity using
+rendered binding manifests:
+
+- Offline verification produces deterministic evidence under `evidence/bindings-verify/`.
+- Live verification is guarded (`VERIFY_MODE=live`, `VERIFY_LIVE=1`) and blocked in CI.
+- Probes are read-only and never mutate workloads or substrate services.
+
+Verification is conservative: unreachable endpoints are marked **unknown** rather
+than failing the contract, preserving CI safety.

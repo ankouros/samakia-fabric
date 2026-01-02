@@ -542,6 +542,28 @@ Non-scope:
 
 ---
 
+## Phase 12 Part 3 — Workload-Side Binding Verification
+
+Goal: Provide read-only verification of workload connectivity to substrate
+bindings, with offline-by-default evidence and guarded live mode.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Read-only verification tooling under `ops/bindings/verify/`.
+- Offline verify target: `make bindings.verify.offline`.
+- Guarded live verify target: `make bindings.verify.live` (explicit opt-in).
+- Evidence packets under `evidence/bindings-verify/<tenant>/<UTC>/`.
+- Phase 12 Part 3 entry checklist: `acceptance/PHASE12_PART3_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 3 acceptance marker: `acceptance/PHASE12_PART3_ACCEPTED.md`.
+
+Non-scope:
+- No substrate or workload mutation
+- No live verification in CI
+- No secrets written to evidence
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

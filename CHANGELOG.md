@@ -159,6 +159,13 @@ The format is inspired by:
 - Phase 12 Part 2 entry checklist: `acceptance/PHASE12_PART2_ENTRY_CHECKLIST.md`.
 - Phase 12 Part 2 acceptance marker: `acceptance/PHASE12_PART2_ACCEPTED.md`.
 
+#### Tenant bindings (Phase 12 Part 3)
+- Workload-side bindings verification (offline by default; guarded live mode).
+- Verification evidence packets under `evidence/bindings-verify/<tenant>/<UTC>/`.
+- Policy gate: `policy-bindings-verify.sh` wired into `make policy.check`.
+- Phase 12 Part 3 entry checklist: `acceptance/PHASE12_PART3_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 3 acceptance marker: `acceptance/PHASE12_PART3_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

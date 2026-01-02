@@ -47,12 +47,15 @@ Tenant binding workflows live in:
 - `docs/tenants/consumer-bindings.md`
 - `docs/bindings/README.md`
 - `docs/bindings/secrets.md`
+- `docs/bindings/verification.md`
 - Evidence packets (gitignored) are written under `evidence/tenants/<tenant>/<UTC>/`.
 - Execute mode is **guarded and opt-in**; see the operator cookbook for `tenants.plan`,
   `tenants.apply`, and DR dry-run/execute flows.
 - Binding contracts and connection manifests:
   - Validate: `make bindings.validate TENANT=all`
   - Render: `make bindings.render TENANT=all`
+  - Verify (offline, read-only): `make bindings.verify.offline TENANT=all`
+  - Verify (live, guarded): `VERIFY_MODE=live VERIFY_LIVE=1 make bindings.verify.live TENANT=<tenant>`
   - Apply (guarded): `make bindings.apply TENANT=<tenant> WORKLOAD=<id>`
 - Binding secrets (Phase 12 Part 2; operator-controlled):
   - Inspect refs (read-only): `make bindings.secrets.inspect TENANT=all`

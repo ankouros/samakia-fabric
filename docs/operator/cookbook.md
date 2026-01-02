@@ -1159,6 +1159,61 @@ Connection manifests written under `artifacts/bindings/...`.
 #### Rollback / safe exit
 Fix binding or enabled contract and re-run render.
 
+### Task: Verify bindings connectivity (offline)
+
+#### Intent
+Validate workload-side connectivity using rendered manifests (no secrets, read-only).
+
+#### Preconditions
+- Binding manifests rendered under `artifacts/bindings/`
+
+#### Command
+```bash
+make bindings.verify.offline TENANT=all
+```
+
+#### Expected result
+Verification PASS with evidence under `evidence/bindings-verify/`.
+
+#### Evidence outputs
+`evidence/bindings-verify/<tenant>/<UTC>/...`
+
+#### Failure modes
+- Missing connection manifests
+- Invalid binding shape
+
+#### Rollback / safe exit
+Fix bindings or re-run render; no mutation occurs.
+
+### Task: Verify bindings connectivity (live, guarded)
+
+#### Intent
+Validate workload-side connectivity with secret resolution (read-only, guarded).
+
+#### Preconditions
+- Secrets backend configured
+- Not running in CI
+- Explicit live-mode guard set
+
+#### Command
+```bash
+VERIFY_MODE=live VERIFY_LIVE=1 \
+make bindings.verify.live TENANT=project-birds
+```
+
+#### Expected result
+Verification PASS and evidence written under `evidence/bindings-verify/`.
+
+#### Evidence outputs
+`evidence/bindings-verify/<tenant>/<UTC>/...`
+
+#### Failure modes
+- Missing secret_ref
+- Live guard not set
+
+#### Rollback / safe exit
+Stop and fix secret backend or binding inputs; no mutation occurs.
+
 ### Task: Apply binding (guarded, non-prod)
 
 #### Intent
@@ -1186,6 +1241,59 @@ Evidence packet created and manifests written under `artifacts/bindings/...`.
 
 #### Rollback / safe exit
 Stop; do not propagate manifests to downstream systems.
+
+### Task: Phase 12 Part 3 entry check
+
+#### Intent
+Verify Phase 12 Part 3 prerequisites before acceptance (read-only).
+
+#### Preconditions
+- Phase 12 Part 2 accepted
+- Repo is clean
+
+#### Command
+```bash
+make phase12.part3.entry.check
+```
+
+#### Expected result
+Entry checklist PASS with no blockers.
+
+#### Evidence outputs
+`acceptance/PHASE12_PART3_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing Phase 12 Part 3 prerequisites
+- OPEN items in REQUIRED-FIXES.md
+
+#### Rollback / safe exit
+Stop and remediate the reported blockers before acceptance.
+
+### Task: Phase 12 Part 3 acceptance
+
+#### Intent
+Run Phase 12 Part 3 acceptance gates (read-only).
+
+#### Preconditions
+- Phase 12 Part 3 entry check PASS
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase12.part3.accept
+```
+
+#### Expected result
+Acceptance PASS and marker written.
+
+#### Evidence outputs
+`acceptance/PHASE12_PART3_ACCEPTED.md`
+
+#### Failure modes
+- Validation or policy gate failure
+
+#### Rollback / safe exit
+Stop; do not claim acceptance until gates PASS.
 
 ### Task: Phase 12 Part 1 entry check
 

@@ -3,3 +3,5 @@ waivers:
     reason: CI-only target; operators use substrate.plan instead.
   - name: phase11.entry.check
     reason: Design-phase governance check; referenced in phase docs instead of cookbook.
+  - name: bindings.verify.live
+    reason: Live verification is guarded and optional; offline mode is the canonical default.

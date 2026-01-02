@@ -6,4 +6,5 @@ infrastructure or secrets.
 
 See:
 - `docs/bindings/secrets.md`
+- `docs/bindings/verification.md`
 - `docs/operator/cookbook.md` (canonical commands)

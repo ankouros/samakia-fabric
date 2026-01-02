@@ -1899,6 +1899,18 @@ bindings.secrets.rotate: ## Rotate binding secrets (guarded; execute with ROTATE
 		MAINT_WINDOW_START="$(MAINT_WINDOW_START)" MAINT_WINDOW_END="$(MAINT_WINDOW_END)" \
 		bash "$(REPO_ROOT)/ops/bindings/rotate/rotate.sh"
 
+.PHONY: bindings.verify.offline
+bindings.verify.offline: ## Verify bindings (offline; read-only)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" VERIFY_MODE=offline \
+		BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" BINDINGS_ARTIFACT_ROOT="$(BINDINGS_ARTIFACT_ROOT)" \
+		bash "$(REPO_ROOT)/ops/bindings/verify/verify.sh"
+
+.PHONY: bindings.verify.live
+bindings.verify.live: ## Verify bindings (live; guarded)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" VERIFY_MODE=live VERIFY_LIVE="$(VERIFY_LIVE)" \
+		BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" BINDINGS_ARTIFACT_ROOT="$(BINDINGS_ARTIFACT_ROOT)" \
+		bash "$(REPO_ROOT)/ops/bindings/verify/verify.sh"
+
 .PHONY: phase12.part1.entry.check
 phase12.part1.entry.check: ## Phase 12 Part 1 entry checklist
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part1-entry-check.sh"
@@ -1914,6 +1926,14 @@ phase12.part2.entry.check: ## Phase 12 Part 2 entry checklist (binding secrets)
 .PHONY: phase12.part2.accept
 phase12.part2.accept: ## Phase 12 Part 2 acceptance (binding secrets)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part2-accept.sh"
+
+.PHONY: phase12.part3.entry.check
+phase12.part3.entry.check: ## Phase 12 Part 3 entry checklist (binding verification)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part3-entry-check.sh"
+
+.PHONY: phase12.part3.accept
+phase12.part3.accept: ## Phase 12 Part 3 acceptance (binding verification)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part3-accept.sh"
 
 ###############################################################################
 # Operator UX (Phase 9)
