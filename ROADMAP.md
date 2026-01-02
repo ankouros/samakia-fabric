@@ -587,6 +587,28 @@ Non-scope:
 
 ---
 
+## Phase 12 Part 5 — Drift Awareness & Tenant-Scoped Signals (Read-Only)
+
+Goal: Provide tenant-visible drift signals and operator-grade evidence without
+any remediation or apply paths.
+
+Status: COMPLETED ✅
+
+### Completed (canonical)
+- Drift taxonomy under `docs/drift/taxonomy.md`.
+- Read-only drift detection under `ops/drift/` (detect, classify, summary).
+- Tenant-facing summaries under `artifacts/tenant-status/<tenant>/`.
+- Drift policy gate: `ops/policy/policy-drift.sh` (wired into `policy.check`).
+- Phase 12 Part 5 entry checklist: `acceptance/PHASE12_PART5_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 5 acceptance marker: `acceptance/PHASE12_PART5_ACCEPTED.md`.
+
+Non-scope:
+- No remediation or auto-apply
+- No CI execution beyond read-only checks
+- No secrets in drift evidence
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

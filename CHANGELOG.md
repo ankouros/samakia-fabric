@@ -173,6 +173,14 @@ The format is inspired by:
 - Phase 12 Part 4 entry checklist: `acceptance/PHASE12_PART4_ENTRY_CHECKLIST.md`.
 - Phase 12 Part 4 acceptance marker: `acceptance/PHASE12_PART4_ACCEPTED.md`.
 
+#### Tenant drift awareness (Phase 12 Part 5)
+- Drift taxonomy under `docs/drift/taxonomy.md`.
+- Read-only drift detection tooling under `ops/drift/` (detect/classify/summary).
+- Tenant drift summaries under `artifacts/tenant-status/<tenant>/`.
+- Drift policy gate: `policy-drift.sh` wired into `make policy.check`.
+- Phase 12 Part 5 entry checklist: `acceptance/PHASE12_PART5_ENTRY_CHECKLIST.md`.
+- Phase 12 Part 5 acceptance marker: `acceptance/PHASE12_PART5_ACCEPTED.md`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

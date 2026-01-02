@@ -126,6 +126,127 @@ Stop and remediate environment/credentials.
 
 ---
 
+### Task: Tenant drift detection (read-only)
+
+#### Intent
+Detect tenant drift without remediation and write evidence packets.
+
+#### Preconditions
+- Tenant contracts present
+- Drift tooling installed
+
+#### Command
+```bash
+TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none make drift.detect
+```
+
+#### Quick usage + guard vars
+```bash
+TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none DRIFT_REQUIRE_SIGN=0 make drift.detect
+# Guards: DRIFT_OFFLINE (offline-only), DRIFT_NON_BLOCKING (exit 0), DRIFT_FAIL_ON (none|warn|critical), DRIFT_REQUIRE_SIGN (0|1|auto)
+```
+
+#### Expected result
+Drift evidence created per tenant; exit is non-blocking.
+
+#### Evidence outputs
+`evidence/drift/<tenant>/<UTC>/...`
+
+#### Failure modes
+- Missing tenant contracts
+- Drift tooling not present
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Tenant drift summary (read-only)
+
+#### Intent
+Emit tenant-visible drift summaries from the latest evidence.
+
+#### Preconditions
+- Drift detection run completed
+
+#### Command
+```bash
+TENANT=all make drift.summary
+```
+
+#### Expected result
+Tenant summaries written under `artifacts/tenant-status/`.
+
+#### Evidence outputs
+`artifacts/tenant-status/<tenant>/drift-summary.*`
+
+#### Failure modes
+- Missing drift evidence
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 12 Part 5 entry check (read-only)
+
+#### Intent
+Validate Phase 12 Part 5 prerequisites before acceptance.
+
+#### Preconditions
+- Drift tooling present
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase12.part5.entry.check
+```
+
+#### Expected result
+Entry checklist written under `acceptance/`.
+
+#### Evidence outputs
+`acceptance/PHASE12_PART5_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing required markers
+- Missing drift tooling
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 12 Part 5 acceptance (read-only)
+
+#### Intent
+Run drift detection and summary generation with evidence-only outputs.
+
+#### Preconditions
+- Phase 12 Part 5 entry check passes
+
+#### Command
+```bash
+make phase12.part5.accept
+```
+
+#### Expected result
+Drift evidence packets and tenant summaries created; acceptance marker written.
+
+#### Evidence outputs
+- `evidence/drift/<tenant>/<UTC>/...`
+- `artifacts/tenant-status/<tenant>/drift-summary.*`
+- `acceptance/PHASE12_PART5_ACCEPTED.md`
+
+#### Failure modes
+- Missing drift evidence inputs
+- Policy gate failure
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
 ## Alerting (routing defaults)
 
 ### Task: Validate drift alert routing defaults

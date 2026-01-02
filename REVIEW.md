@@ -658,3 +658,16 @@ to **request** binding or capacity changes without any autonomous apply:
 
 Proposals are immutable inputs; evidence bundles and decisions are deterministic
 and gitignored.
+
+## Phase 12 Part 5 — Drift Awareness & Tenant Signals
+
+Phase 12 Part 5 closes the feedback loop by emitting drift signals without
+any remediation:
+
+- Drift taxonomy under `docs/drift/taxonomy.md`.
+- Read-only drift detection tooling (`make drift.detect`, `make drift.summary`).
+- Tenant-visible summaries under `artifacts/tenant-status/<tenant>/`.
+- Policy gate `policy-drift.sh` ensures drift is evidence-only and CI-safe.
+
+Drift signals never trigger apply. They surface deviations for operator action
+only, keeping tenant UX informed without granting control.

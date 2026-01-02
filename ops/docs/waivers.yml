@@ -5,3 +5,5 @@ waivers:
     reason: Design-phase governance check; referenced in phase docs instead of cookbook.
   - name: bindings.verify.live
     reason: Live verification is guarded and optional; offline mode is the canonical default.
+  - name: drift.classify
+    reason: Helper target invoked by drift.detect; operators use drift.detect and drift.summary.

@@ -697,6 +697,27 @@ audit.drift: ## Read-only drift detection
 	@command -v ansible-playbook >/dev/null 2>&1 || (echo "ERROR: ansible-playbook not found in PATH"; exit 1)
 	bash "$(OPS_SCRIPTS_DIR)/drift-audit.sh" "$(ENV)"
 
+.PHONY: drift.detect
+drift.detect: ## Tenant drift detection (read-only; TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required (use TENANT=all for all tenants)"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" \
+		DRIFT_OFFLINE="$(DRIFT_OFFLINE)" DRIFT_FAIL_ON="$(DRIFT_FAIL_ON)" \
+		DRIFT_NON_BLOCKING="$(DRIFT_NON_BLOCKING)" DRIFT_REQUIRE_SIGN="$(DRIFT_REQUIRE_SIGN)" \
+		DRIFT_EVIDENCE_ROOT="$(DRIFT_EVIDENCE_ROOT)" DRIFT_SUMMARY_ROOT="$(DRIFT_SUMMARY_ROOT)" \
+		bash "$(REPO_ROOT)/ops/drift/detect.sh"
+
+.PHONY: drift.classify
+drift.classify: ## Classify drift (latest evidence; TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" \
+		bash "$(REPO_ROOT)/ops/drift/classify.sh" --tenant "$(TENANT)"
+
+.PHONY: drift.summary
+drift.summary: ## Emit tenant drift summary (TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" DRIFT_SUMMARY_ROOT="$(DRIFT_SUMMARY_ROOT)" \
+		bash "$(REPO_ROOT)/ops/drift/summary.sh"
+
 .PHONY: compliance.snapshot
 compliance.snapshot: ## Create signed compliance snapshot
 	bash "$(OPS_SCRIPTS_DIR)/compliance-snapshot.sh" "$(ENV)"
@@ -1978,6 +1999,18 @@ phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)
 .PHONY: phase12.part4.accept
 phase12.part4.accept: ## Phase 12 Part 4 acceptance (proposal flow)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part4-accept.sh"
+
+###############################################################################
+# Drift Awareness (Phase 12 Part 5)
+###############################################################################
+
+.PHONY: phase12.part5.entry.check
+phase12.part5.entry.check: ## Phase 12 Part 5 entry checklist (drift awareness)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part5-entry-check.sh"
+
+.PHONY: phase12.part5.accept
+phase12.part5.accept: ## Phase 12 Part 5 acceptance (drift awareness)
+	@bash "$(OPS_SCRIPTS_DIR)/phase12-part5-accept.sh"
 
 ###############################################################################
 # Operator UX (Phase 9)

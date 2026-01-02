@@ -20,6 +20,7 @@ scripts=(
   "policy-docs.sh"
   "policy-security.sh"
   "policy-ai-ops.sh"
+  "policy-drift.sh"
   "policy-bindings-verify.sh"
   "policy-proposals.sh"
 )

@@ -21,6 +21,14 @@ make phase6.entry.check
 
 No service deployment is performed by Phase 6.
 
+## Tenant drift visibility (Phase 12 Part 5)
+
+Tenants receive read-only drift summaries under:
+
+- `artifacts/tenant-status/<tenant>/drift-summary.*`
+
+These summaries are signals only; remediation remains operator-controlled.
+
 ## Proposal flow for binding changes (Phase 12 Part 4)
 
 Binding changes may be submitted via the proposal workflow for operator review and approval.

@@ -1,0 +1,92 @@
+# Phase 12 Part 5 Entry Checklist
+
+Timestamp (UTC): 2026-01-02T06:21:11Z
+
+## Criteria
+- Marker present: acceptance/PHASE12_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART1_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART2_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART3_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE12_PART4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART4_ACCEPTED.md
+  - Result: PASS
+- Marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: docs/drift/overview.md
+  - Command: test -f docs/drift/overview.md
+  - Result: PASS
+- File present: docs/drift/taxonomy.md
+  - Command: test -f docs/drift/taxonomy.md
+  - Result: PASS
+- File present: docs/operator/cookbook.md
+  - Command: test -f docs/operator/cookbook.md
+  - Result: PASS
+- File present: docs/consumers/onboarding.md
+  - Command: test -f docs/consumers/onboarding.md
+  - Result: PASS
+- File present: ops/drift/detect.sh
+  - Command: test -f ops/drift/detect.sh
+  - Result: PASS
+- File present: ops/drift/summary.sh
+  - Command: test -f ops/drift/summary.sh
+  - Result: PASS
+- File present: ops/drift/classify.sh
+  - Command: test -f ops/drift/classify.sh
+  - Result: PASS
+- File present: ops/drift/redact.sh
+  - Command: test -f ops/drift/redact.sh
+  - Result: PASS
+- File present: ops/drift/compare/bindings.sh
+  - Command: test -f ops/drift/compare/bindings.sh
+  - Result: PASS
+- File present: ops/drift/compare/capacity.sh
+  - Command: test -f ops/drift/compare/capacity.sh
+  - Result: PASS
+- File present: ops/drift/compare/security.sh
+  - Command: test -f ops/drift/compare/security.sh
+  - Result: PASS
+- File present: ops/drift/compare/availability.sh
+  - Command: test -f ops/drift/compare/availability.sh
+  - Result: PASS
+- File present: ops/policy/policy-drift.sh
+  - Command: test -f ops/policy/policy-drift.sh
+  - Result: PASS
+- Policy gate wired
+  - Command: rg -n "policy-drift\.sh" ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: drift.detect
+  - Command: rg -n '^drift\.detect:' Makefile
+  - Result: PASS
+- Makefile target present: drift.summary
+  - Command: rg -n '^drift\.summary:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part5.entry.check
+  - Command: rg -n '^phase12\.part5\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase12.part5.accept
+  - Command: rg -n '^phase12\.part5\.accept:' Makefile
+  - Result: PASS
+- Cookbook includes drift.detect
+  - Command: rg -n "drift\.detect" docs/operator/cookbook.md
+  - Result: PASS
+- Cookbook includes drift.summary
+  - Command: rg -n "drift\.summary" docs/operator/cookbook.md
+  - Result: PASS
+- Cookbook includes Phase 12 Part 5 acceptance
+  - Command: rg -n "phase12\.part5\.accept" docs/operator/cookbook.md
+  - Result: PASS
+- CI drift detect wired
+  - Command: rg -n "drift\.detect" .github/workflows/pr-validate.yml
+  - Result: PASS
+- Artifacts gitignored
+  - Command: rg -n "^artifacts/" .gitignore
+  - Result: PASS
