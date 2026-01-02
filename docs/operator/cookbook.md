@@ -1246,6 +1246,23 @@ Stop; do not propagate manifests to downstream systems.
 
 ## Tenant proposals (Phase 12 Part 4)
 
+### Quick CLI + guard flags (summary)
+
+```bash
+# Intake (read-only)
+make proposals.submit FILE=examples/proposals/add-postgres-binding.yml
+make proposals.validate PROPOSAL_ID=add-postgres-binding
+make proposals.review PROPOSAL_ID=add-postgres-binding
+
+# Decision (guarded)
+OPERATOR_APPROVE=1 APPROVER_ID="ops-01" make proposals.approve PROPOSAL_ID=add-postgres-binding
+OPERATOR_REJECT=1  APPROVER_ID="ops-01" make proposals.reject  PROPOSAL_ID=add-postgres-binding
+
+# Apply
+APPLY_DRYRUN=1 make proposals.apply PROPOSAL_ID=add-postgres-binding
+PROPOSAL_APPLY=1 BIND_EXECUTE=1 make proposals.apply PROPOSAL_ID=add-postgres-binding
+```
+
 ### Task: Submit a proposal (read-only intake)
 
 #### Intent
