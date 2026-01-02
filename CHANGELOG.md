@@ -196,6 +196,7 @@ The format is inspired by:
 - Phase 12 validation allows the milestone invariant scan pattern without tripping the insecure TLS guard.
 - Backfilled `acceptance/PHASE1_ACCEPTED.md` with a SHA256 self-hash for marker integrity.
 - Invariant scans now normalize repo-relative paths and allowlist the milestone scan patterns.
+- Recorded the open Phase 1–12 milestone verification blocker in `REQUIRED-FIXES.md`.
 
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
