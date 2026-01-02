@@ -134,6 +134,15 @@ This document records what was fixed, what remains blocked (if anything), and th
   - `ENV=samakia-minio ANSIBLE_FLAGS="--limit minio-1,minio-2,minio-3" make minio.ansible.apply`
   - `ENV=samakia-minio make minio.converged.accept`
 
+### MILESTONE-1-12-PHASE3-PART3-GPG
+- **Description:** `make milestone.phase1-12.verify` failed in Section E during `ENV=samakia-prod make phase3.part3.accept` because the Phase 12 readiness packet test attempted GPG signing without a configured default secret key.
+- **Impact:** Milestone Phase 1–12 verification cannot be completed; milestone acceptance marker cannot be issued.
+- **Root cause:** The readiness packet determinism test inherited `ENV=samakia-prod`, which enables signing unless CI is set, and no default GPG key was configured on the runner.
+- **Required remediation:** Force CI mode for the readiness packet test to avoid signing in deterministic validation runs.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-prod make phase3.part3.accept`
+
 ## Verification Status
 
 Commands executed (local):

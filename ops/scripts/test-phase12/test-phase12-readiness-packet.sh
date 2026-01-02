@@ -9,7 +9,7 @@ packet_dir="${ROOT_DIR}/evidence/release-readiness/phase12/${stamp}"
 
 rm -rf "${packet_dir}"
 
-TENANT=all READINESS_STAMP="${stamp}" \
+TENANT=all READINESS_STAMP="${stamp}" CI=1 \
   bash "${ROOT_DIR}/ops/release/phase12/phase12-readiness-packet.sh"
 
 if [[ ! -f "${packet_dir}/manifest.sha256" ]]; then
