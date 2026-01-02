@@ -59,6 +59,7 @@ fi
 if rg -n "curl -k|--insecure|sslmode=disable" -S \
   --glob '!ops/scripts/phase2-1-entry-check.sh' \
   --glob '!ops/scripts/phase2-2-entry-check.sh' \
+  --glob '!ops/milestones/phase1-12/verify.sh' \
   --glob '!ops/scripts/test-phase12/test-phase12-targets.sh' \
   "${ROOT_DIR}/ops" "${ROOT_DIR}/fabric-ci" "${ROOT_DIR}/Makefile" >/dev/null 2>&1; then
   echo "ERROR: insecure TLS flags detected in scripts" >&2

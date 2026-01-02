@@ -193,6 +193,7 @@ The format is inspired by:
 - Milestone verification/lock tooling under `ops/milestones/phase1-12/`.
 - Evidence packets under `evidence/milestones/phase1-12/<UTC>/`.
 - Make targets: `milestone.phase1-12.verify`, `milestone.phase1-12.lock`.
+- Phase 12 validation allows the milestone invariant scan pattern without tripping the insecure TLS guard.
 
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
