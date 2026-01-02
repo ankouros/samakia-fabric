@@ -19,3 +19,5 @@ Signature: UNSIGNED (no GPG key available on runner; hashed only)
 
 Acceptance statement:
 Phase 1 is ACCEPTED and LOCKED. Any further changes are regressions.
+
+SHA256 (content excluding this line): b561ab214ec920eb8e2c13a1e283206a06160244f63569fef374e71980863c12

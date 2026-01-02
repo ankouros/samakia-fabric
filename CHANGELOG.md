@@ -194,6 +194,7 @@ The format is inspired by:
 - Evidence packets under `evidence/milestones/phase1-12/<UTC>/`.
 - Make targets: `milestone.phase1-12.verify`, `milestone.phase1-12.lock`.
 - Phase 12 validation allows the milestone invariant scan pattern without tripping the insecure TLS guard.
+- Backfilled `acceptance/PHASE1_ACCEPTED.md` with a SHA256 self-hash for marker integrity.
 
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
