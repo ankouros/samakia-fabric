@@ -347,6 +347,7 @@ The format is inspired by:
 - Shared control-plane restart safety: `chrony`, `keepalived`, and `nftables` now enforce systemd restart policies via overrides
 
 ### Changed
+- Refreshed Phase 1–12 milestone lock evidence to `evidence/milestones/phase1-12/2026-01-02T15:02:27Z` and updated the acceptance marker.
 - Migrated Codex remediation log into `CHANGELOG.md` (retired `codex-changelog.md`)
 - Enforced Proxmox API token-only auth in Terraform envs and runner guardrails (password auth variables are no longer supported)
 - Enabled strict SSH host key checking in Ansible (`fabric-core/ansible/ansible.cfg`), requiring explicit known_hosts rotation/enrollment on host replacement

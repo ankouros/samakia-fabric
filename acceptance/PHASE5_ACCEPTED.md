@@ -7,8 +7,8 @@ Acceptance statement:
 Phase 5 is ACCEPTED and LOCKED. Any further changes are regressions.
 
 Repository:
-- Commit: 938de08e30867736b27b4f2cb0b96b043cd27f5b
-- Timestamp (UTC): 20260102T145023Z
+- Commit: 13a7786e837cfe4b48e0e43c15a5ae4c61a0ef94
+- Timestamp (UTC): 20260102T150818Z
 
 Acceptance commands executed:
 - make policy.check
@@ -28,4 +28,4 @@ PASS summary:
 - Firewall checks: PASS
 - SSH rotation dry-run: PASS
 - Secrets interface doctor: PASS
-SHA256 (content excluding this line): 5f458ce542877b425312394dcb0cf00a1e6de8a71fdc51c863ea835aeccd2e2e
+SHA256 (content excluding this line): 860be6f638e181ecd4a6b13c8d2e28f126ccebad49c176e8518716008514f741

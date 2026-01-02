@@ -641,6 +641,7 @@ Status: COMPLETED ✅
 ### Scope (canonical)
 - End-to-end verification target: `make milestone.phase1-12.verify`.
 - Consolidated evidence packet: `evidence/milestones/phase1-12/<UTC>/`.
+- Latest verification evidence: `evidence/milestones/phase1-12/2026-01-02T15:02:27Z`.
 - Milestone lock target: `make milestone.phase1-12.lock`.
 - Acceptance marker: `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md` (self-hash).
 
