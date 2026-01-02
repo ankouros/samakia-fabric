@@ -7,6 +7,8 @@ Start here:
 - `cookbook.md` includes the Phase 1–12 milestone verification and lock tasks
 - `phase12-exposure.md` — one-page Phase 12 exposure flow
 - `exposure.md` — governed exposure choreography (Phase 13)
+- `runtime-ops.md` — runtime operations and signal classification
+- `slo-ownership.md` — SLO ownership and escalation rules
 - `runner-modes.md` — CI vs operator runner contract
 - `ssh-trust.md` — strict SSH trust + known_hosts rotation
 - `networking.md` — MAC/DHCP determinism policy and cutover checklist

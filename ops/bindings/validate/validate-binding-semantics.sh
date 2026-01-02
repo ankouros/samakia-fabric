@@ -75,9 +75,10 @@ for binding_path in bindings:
         continue
 
     tenant_dir = tenants_root / tenant
-    if not tenant_dir.exists():
-        tenant_dir = tenants_root / "examples" / tenant
     tenant_file = tenant_dir / "tenant.yml"
+    if not tenant_file.exists():
+        tenant_dir = tenants_root / "examples" / tenant
+        tenant_file = tenant_dir / "tenant.yml"
     if not tenant_dir.exists():
         errors.append(f"{binding_path}: tenant directory missing {tenant_dir}")
         continue

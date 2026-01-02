@@ -1,0 +1,68 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "RuntimeObservationPolicy",
+  "metadata": {
+    "version": "v1",
+    "owner": "operator"
+  },
+  "spec": {
+    "metrics": {
+      "observed": [
+        {
+          "name": "availability_percent",
+          "source": "slo",
+          "unit": "percent",
+          "description": "Availability percentage from declared SLO metrics."
+        },
+        {
+          "name": "latency_p95_ms",
+          "source": "slo",
+          "unit": "ms",
+          "description": "Rolling p95 latency for the workload."
+        },
+        {
+          "name": "latency_p99_ms",
+          "source": "slo",
+          "unit": "ms",
+          "description": "Rolling p99 latency for the workload."
+        },
+        {
+          "name": "error_rate_percent",
+          "source": "slo",
+          "unit": "percent",
+          "description": "Rolling error rate for the workload."
+        }
+      ],
+      "informational": [
+        {
+          "name": "cpu_utilization_percent",
+          "source": "substrate",
+          "unit": "percent",
+          "description": "Informational only; not used for classification."
+        },
+        {
+          "name": "memory_utilization_percent",
+          "source": "substrate",
+          "unit": "percent",
+          "description": "Informational only; not used for classification."
+        }
+      ],
+      "ignored": [
+        {
+          "name": "debug_latency_ms",
+          "source": "experiment",
+          "unit": "ms",
+          "description": "Debug-only metric; explicitly ignored."
+        }
+      ]
+    },
+    "actions": {
+      "disallowed_triggers": [
+        "cpu_utilization_percent",
+        "memory_utilization_percent",
+        "debug_latency_ms",
+        "experimental_metrics"
+      ]
+    }
+  }
+}

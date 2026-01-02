@@ -1,0 +1,45 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "WorkloadSLO",
+  "metadata": {
+    "tenant": "canary",
+    "workload": "sample",
+    "provider": "postgres",
+    "env": "samakia-dev",
+    "owner": "operator"
+  },
+  "spec": {
+    "scope": {
+      "tenant": "canary",
+      "workload": "sample",
+      "provider": "postgres"
+    },
+    "owner": "operator",
+    "objectives": {
+      "availability": {
+        "target_percent": 99.9
+      },
+      "latency": {
+        "p95_ms": 200,
+        "p99_ms": 400
+      },
+      "error_rate": {
+        "max_percent": 0.5
+      }
+    },
+    "window": {
+      "type": "rolling",
+      "duration": "30m",
+      "evaluation_interval": "5m"
+    },
+    "error_budget": {
+      "percent": 0.1,
+      "policy": "burn_rate"
+    },
+    "severity": {
+      "warn": 1.0,
+      "critical": 2.0
+    },
+    "notes": "Canary baseline SLO for runtime evaluation."
+  }
+}

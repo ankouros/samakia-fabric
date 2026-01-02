@@ -33,6 +33,15 @@ This document records what was implemented for the **Terraform remote state back
 - Rollback removes exposure artifacts and validates baseline status.
 - New Make targets and Part 2/Phase 13 acceptance markers lock the phase.
 
+## Phase 14 Design — Runtime Operations & SLO Ownership (Design Only)
+
+- Defines runtime signals as contractual inputs (drift, SLO, infra) with strict classification.
+- Adds SLO contract schema and sample declarations for tenant workloads.
+- Introduces runtime observation policy to scope which metrics are observed vs ignored.
+- Documents incident lifecycle and evidence layout (design-only; no automation).
+- Adds operator runbooks for runtime operations and SLO ownership.
+- Binding validation now falls back to example tenant contracts when top-level tenant directories lack tenant.yml.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

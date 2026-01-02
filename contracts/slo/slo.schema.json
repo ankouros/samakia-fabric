@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WorkloadSLO",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"const": "WorkloadSLO"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant", "workload"],
+      "properties": {
+        "tenant": {"type": "string"},
+        "workload": {"type": "string"},
+        "provider": {"type": "string"},
+        "env": {"type": "string"},
+        "owner": {"enum": ["operator", "tenant"]}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "owner",
+        "objectives",
+        "window",
+        "error_budget",
+        "severity"
+      ],
+      "properties": {
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tenant", "workload", "provider"],
+          "properties": {
+            "tenant": {"type": "string"},
+            "workload": {"type": "string"},
+            "provider": {"type": "string"}
+          }
+        },
+        "owner": {"enum": ["operator", "tenant"]},
+        "objectives": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["availability", "latency", "error_rate"],
+          "properties": {
+            "availability": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["target_percent"],
+              "properties": {
+                "target_percent": {"type": "number", "minimum": 0, "maximum": 100}
+              }
+            },
+            "latency": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["p95_ms", "p99_ms"],
+              "properties": {
+                "p95_ms": {"type": "number", "minimum": 0},
+                "p99_ms": {"type": "number", "minimum": 0}
+              }
+            },
+            "error_rate": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["max_percent"],
+              "properties": {
+                "max_percent": {"type": "number", "minimum": 0, "maximum": 100}
+              }
+            }
+          }
+        },
+        "window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "duration"],
+          "properties": {
+            "type": {"enum": ["rolling", "tumbling"]},
+            "duration": {"type": "string"},
+            "evaluation_interval": {"type": "string"}
+          }
+        },
+        "error_budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["percent", "policy"],
+          "properties": {
+            "percent": {"type": "number", "minimum": 0, "maximum": 100},
+            "policy": {"type": "string"}
+          }
+        },
+        "severity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["warn", "critical"],
+          "properties": {
+            "warn": {"type": "number", "minimum": 0},
+            "critical": {"type": "number", "minimum": 0}
+          }
+        },
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}

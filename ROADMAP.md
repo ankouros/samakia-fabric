@@ -713,6 +713,36 @@ Non-scope:
 
 ---
 
+## Phase 14 — Runtime Operations & SLO Ownership
+
+Status: DESIGN COMPLETE ✅
+
+### Design (Phase 14)
+- ADR-0032: runtime operations are evidence-driven and contractual.
+- SLO contract schema + sample tenant SLO declarations.
+- Runtime observation contract and signal taxonomy.
+- Incident lifecycle and evidence layout (design only).
+- Operator runtime ops + SLO ownership docs.
+- Phase 14 entry checklist + acceptance plan.
+
+### Part 1 — Runtime signal evaluation (planned)
+- Read-only runtime evaluation engine and evidence packets.
+- Deterministic classification (infra fault, drift, SLO violation, OK).
+
+### Part 2 — SLO ingestion and evaluation (planned)
+- Offline metrics ingestion and windowed SLO evaluation.
+- Error budget accounting and alert readiness (delivery disabled).
+
+### Part 3 — Alert delivery and incident surfacing (planned)
+- Operator-controlled alert delivery and incident tracking.
+- Quiet hours and routing rules enforced; no automation.
+
+Non-scope:
+- Auto-remediation or self-healing
+- CI execution against live systems
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

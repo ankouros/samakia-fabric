@@ -5,6 +5,7 @@ set -euo pipefail
 
 schema_dir="${FABRIC_REPO_ROOT}/contracts/tenants/_schema"
 contracts_root="${FABRIC_REPO_ROOT}/contracts/tenants"
+slo_schema_path="${FABRIC_REPO_ROOT}/contracts/slo/slo.schema.json"
 
 if [[ ! -d "${schema_dir}" ]]; then
   echo "ERROR: schema directory not found: ${schema_dir}" >&2
@@ -18,13 +19,14 @@ if [[ ${#contracts[@]} -eq 0 ]]; then
   exit 1
 fi
 
-SCHEMA_DIR="${schema_dir}" CONTRACTS_LIST="$(printf '%s\n' "${contracts[@]}")" python3 - <<'PY'
+SCHEMA_DIR="${schema_dir}" SLO_SCHEMA="${slo_schema_path}" CONTRACTS_LIST="$(printf '%s\n' "${contracts[@]}")" python3 - <<'PY'
 import json
 import os
 import sys
 from pathlib import Path
 
 schema_dir = Path(os.environ["SCHEMA_DIR"])
+slo_schema = Path(os.environ["SLO_SCHEMA"])
 contracts = [Path(p) for p in os.environ["CONTRACTS_LIST"].splitlines() if p]
 
 schema_map = {
@@ -104,17 +106,21 @@ ok = True
 for contract in contracts:
     filename = contract.name
     schema_name = None
-    if "consumers" in contract.parts and filename == "ready.yml":
-      schema_name = "consumer-binding.schema.json"
+    schema_path = None
+    if "slo" in contract.parts:
+        schema_path = slo_schema
+    elif "consumers" in contract.parts and filename == "ready.yml":
+        schema_name = "consumer-binding.schema.json"
     elif "consumers" in contract.parts and filename == "enabled.yml":
-      schema_name = "enabled-binding.schema.json"
+        schema_name = "enabled-binding.schema.json"
     else:
         schema_name = schema_map.get(filename)
-    if not schema_name:
-        errors.append(f"{contract}: no schema mapping")
-        ok = False
-        continue
-    schema_path = schema_dir / schema_name
+    if schema_path is None:
+        if not schema_name:
+            errors.append(f"{contract}: no schema mapping")
+            ok = False
+            continue
+        schema_path = schema_dir / schema_name
     if not schema_path.exists():
         errors.append(f"{contract}: schema missing {schema_path}")
         ok = False

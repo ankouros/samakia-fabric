@@ -990,6 +990,39 @@ Phase 9 establishes operator UX as a **first-class contract**:
 
 ---
 
+## ADR-0032 — Runtime Operations are Evidence-Driven and Contractual
+
+**Status:** Accepted
+**Date:** 2026-01-03
+
+### Context
+
+- Workloads are exposed after Phase 13 and require day-to-day runtime decisions.
+- Runtime signals must be classified before any action is considered.
+- Drift, SLO violations, and infrastructure faults are distinct and non-overlapping.
+
+### Decision
+
+- Runtime signals are interpreted via contracts (SLO, capacity, drift).
+- Incidents are classified before action.
+- No automation applies fixes or changes infrastructure.
+- Operators decide and act with explicit ownership.
+- Evidence is mandatory for every runtime decision.
+
+### Alternatives considered
+
+- Auto-remediation (rejected)
+- Alert-only without classification (rejected)
+- Ad-hoc operator actions without evidence (rejected)
+
+### Consequences
+
+- Runtime operations are read-only by default.
+- Classification taxonomy and evidence packets are required.
+- Operators are accountable for decisions and documentation.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

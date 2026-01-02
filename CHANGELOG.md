@@ -216,7 +216,18 @@ The format is inspired by:
 - Phase 13 Part 2 entry checklist + acceptance marker.
 - Phase 13 acceptance marker.
 
+#### Runtime operations and SLO ownership (Phase 14 design)
+- ADR-0032 defining evidence-driven runtime operations and contractual SLO ownership.
+- SLO contract schema under `contracts/slo/` with sample tenant SLO declarations.
+- Runtime observation contract under `contracts/runtime-observation/`.
+- Runtime signal taxonomy and incident lifecycle docs under `docs/runtime/`.
+- Operator runtime ops and SLO ownership runbooks under `docs/operator/`.
+- Phase 14 entry checklist + acceptance plan under `acceptance/`.
+
 ### Changed
+#### Tenant binding validation
+- Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).
+
 #### Phase 12 post-actions (hardening)
 - Pinned base digests and apt snapshot sources for image builds; stamped `/etc/samakia-image-version` with provenance metadata.
 - Introduced `RUNNER_MODE=ci|operator` to enforce non-interactive CI behavior and explicit inputs.

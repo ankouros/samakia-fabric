@@ -12,6 +12,7 @@ This directory contains Samakia Fabric documentation.
 - `tenants/`: tenant (project) binding design
 - `bindings/`: tenant binding contracts + connection manifests
 - `exposure/`: exposure semantics, rollback, change windows
+- `runtime/`: runtime signal taxonomy, incident lifecycle, and SLO design
 - `glossary.md`: canonical terminology
 - `PRINCIPLES.md`: non-negotiable principles
 
