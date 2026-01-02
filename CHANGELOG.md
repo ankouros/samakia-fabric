@@ -210,6 +210,12 @@ The format is inspired by:
 - Guarded `exposure.plan` and `exposure.plan.explain` targets (read-only).
 - Phase 13 Part 1 entry checklist + acceptance marker.
 
+#### Production workload exposure (Phase 13 Part 2)
+- Guarded approval/apply/verify/rollback choreography (artifacts-only; no substrate provisioning).
+- New targets: `exposure.approve`, `exposure.apply`, `exposure.verify`, `exposure.rollback`.
+- Phase 13 Part 2 entry checklist + acceptance marker.
+- Phase 13 acceptance marker.
+
 ### Changed
 #### Phase 12 post-actions (hardening)
 - Pinned base digests and apt snapshot sources for image builds; stamped `/etc/samakia-image-version` with provenance metadata.

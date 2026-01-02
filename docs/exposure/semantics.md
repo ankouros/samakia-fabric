@@ -29,6 +29,9 @@ verify -> rollback), not a toggle and not an autonomous action.
 - **Apply**: guarded execution that writes exposure artifacts only after
   approval, signatures, and change window checks pass.
 
-Phase 13 Part 1 ships plan-only; apply/verify/rollback arrive in Part 2.
+## Verify and Rollback
+
+- **Verify**: read-only bindings verification + drift snapshot (live mode is guarded).
+- **Rollback**: removes exposure artifacts only, then verifies baseline drift.
 
 See `docs/operator/exposure.md` for the operator workflow.

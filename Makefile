@@ -1002,6 +1002,38 @@ exposure.plan.explain: ## Explain exposure policy decision (TENANT=<id> WORKLOAD
 		--tenant "$(TENANT)" --workload "$(WORKLOAD)" --env "$(ENV)" \
 		--binding "$(REPO_ROOT)/artifacts/bindings/$(TENANT)/$(WORKLOAD)/connection.json"
 
+.PHONY: exposure.approve
+exposure.approve: ## Approve exposure (guarded) (TENANT=<id> WORKLOAD=<id> ENV=<env>)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" ENV="$(ENV)" \
+		APPROVER_ID="$(APPROVER_ID)" EXPOSE_REASON="$(EXPOSE_REASON)" PLAN_EVIDENCE_REF="$(PLAN_EVIDENCE_REF)" \
+		CHANGE_WINDOW_START="$(CHANGE_WINDOW_START)" CHANGE_WINDOW_END="$(CHANGE_WINDOW_END)" CHANGE_WINDOW_ID="$(CHANGE_WINDOW_ID)" \
+		EXPOSE_SIGN="$(EXPOSE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		APPROVAL_INPUT="$(APPROVAL_INPUT)" APPROVAL_ALLOW_CI="$(APPROVAL_ALLOW_CI)" \
+		bash "$(REPO_ROOT)/ops/exposure/approve/approve.sh" --tenant "$(TENANT)" --workload "$(WORKLOAD)" --env "$(ENV)"
+
+.PHONY: exposure.apply
+exposure.apply: ## Apply exposure artifacts (guarded) (TENANT=<id> WORKLOAD=<id> ENV=<env>)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" ENV="$(ENV)" \
+		APPROVAL_DIR="$(APPROVAL_DIR)" APPROVAL_PATH="$(APPROVAL_PATH)" PLAN_EVIDENCE_REF="$(PLAN_EVIDENCE_REF)" \
+		EXPOSE_EXECUTE="$(EXPOSE_EXECUTE)" EXPOSE_REASON="$(EXPOSE_REASON)" APPROVER_ID="$(APPROVER_ID)" \
+		CHANGE_WINDOW_START="$(CHANGE_WINDOW_START)" CHANGE_WINDOW_END="$(CHANGE_WINDOW_END)" CHANGE_WINDOW_MAX_MINUTES="$(CHANGE_WINDOW_MAX_MINUTES)" \
+		EXPOSE_SIGN="$(EXPOSE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		bash "$(REPO_ROOT)/ops/exposure/apply/apply.sh" --tenant "$(TENANT)" --workload "$(WORKLOAD)" --env "$(ENV)"
+
+.PHONY: exposure.verify
+exposure.verify: ## Verify exposure (read-only; live mode guarded) (TENANT=<id> WORKLOAD=<id> ENV=<env>)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" ENV="$(ENV)" VERIFY_LIVE="$(VERIFY_LIVE)" \
+		EXPOSE_SIGN="$(EXPOSE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		bash "$(REPO_ROOT)/ops/exposure/verify/verify.sh" --tenant "$(TENANT)" --workload "$(WORKLOAD)" --env "$(ENV)"
+
+.PHONY: exposure.rollback
+exposure.rollback: ## Rollback exposure artifacts (guarded) (TENANT=<id> WORKLOAD=<id> ENV=<env>)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" ENV="$(ENV)" \
+		ROLLBACK_EXECUTE="$(ROLLBACK_EXECUTE)" ROLLBACK_REASON="$(ROLLBACK_REASON)" ROLLBACK_REQUESTED_BY="$(ROLLBACK_REQUESTED_BY)" \
+		CHANGE_WINDOW_START="$(CHANGE_WINDOW_START)" CHANGE_WINDOW_END="$(CHANGE_WINDOW_END)" CHANGE_WINDOW_MAX_MINUTES="$(CHANGE_WINDOW_MAX_MINUTES)" \
+		EXPOSE_SIGN="$(EXPOSE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		bash "$(REPO_ROOT)/ops/exposure/rollback/rollback.sh" --tenant "$(TENANT)" --workload "$(WORKLOAD)" --env "$(ENV)"
+
 .PHONY: secrets.doctor
 secrets.doctor: ## Show secrets backend configuration (no secrets)
 	@bash "$(REPO_ROOT)/ops/secrets/secrets.sh" doctor
@@ -2108,6 +2140,22 @@ phase13.part1.entry.check: ## Phase 13 Part 1 entry checklist (exposure plan)
 .PHONY: phase13.part1.accept
 phase13.part1.accept: ## Phase 13 Part 1 acceptance (exposure plan)
 	@bash "$(OPS_SCRIPTS_DIR)/phase13-part1-accept.sh"
+
+###############################################################################
+# Phase 13 Part 2 (Exposure Apply/Verify/Rollback)
+###############################################################################
+
+.PHONY: phase13.part2.entry.check
+phase13.part2.entry.check: ## Phase 13 Part 2 entry checklist (exposure execute guards)
+	@bash "$(OPS_SCRIPTS_DIR)/phase13-part2-entry-check.sh"
+
+.PHONY: phase13.part2.accept
+phase13.part2.accept: ## Phase 13 Part 2 acceptance (guarded apply/verify/rollback)
+	@bash "$(OPS_SCRIPTS_DIR)/phase13-part2-accept.sh"
+
+.PHONY: phase13.accept
+phase13.accept: ## Phase 13 acceptance (umbrella)
+	@bash "$(OPS_SCRIPTS_DIR)/phase13-part2-accept.sh"
 
 ###############################################################################
 # Milestone Phase 1–12 (End-to-End Verification)

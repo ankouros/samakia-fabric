@@ -97,6 +97,16 @@ Tenant binding workflows live in:
     - Plan exposure: `ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.plan`
     - Explain decision: `ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.plan.explain`
     - Entry check: `make phase13.part1.entry.check`
+  - Part 2 (approve/apply/verify/rollback):
+    - Approve: `PLAN_EVIDENCE_REF=... APPROVER_ID=... EXPOSE_REASON=... make exposure.approve`
+    - Apply dry-run: `APPROVAL_DIR=... TENANT=... WORKLOAD=... ENV=... make exposure.apply`
+    - Apply execute (guarded): `EXPOSE_EXECUTE=1 EXPOSE_REASON=... APPROVER_ID=... make exposure.apply`
+    - Verify (offline): `TENANT=... WORKLOAD=... ENV=... make exposure.verify`
+    - Verify live (guarded): `VERIFY_LIVE=1 TENANT=... WORKLOAD=... ENV=... make exposure.verify`
+    - Rollback dry-run: `ROLLBACK_REASON=... ROLLBACK_REQUESTED_BY=... make exposure.rollback`
+    - Rollback execute (guarded): `ROLLBACK_EXECUTE=1 ROLLBACK_REASON=... ROLLBACK_REQUESTED_BY=... make exposure.rollback`
+    - Entry check: `make phase13.part2.entry.check`
+    - Acceptance (dry-run only): `CI=1 make phase13.part2.accept`
 - Milestone Phase 1–12 verification (release manager, read-only):
   - Verify: `make milestone.phase1-12.verify`
   - Lock: `make milestone.phase1-12.lock`

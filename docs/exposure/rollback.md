@@ -21,6 +21,16 @@ returns to the pre-exposure baseline.
 Rollback is guarded and requires explicit flags. For prod, signing and
 change window validation are mandatory.
 
+```bash
+ROLLBACK_EXECUTE=1 ROLLBACK_REASON="window closed" \
+ROLLBACK_REQUESTED_BY="ops-001" \
+ENV=samakia-dev TENANT=canary WORKLOAD=sample \
+make exposure.rollback
+```
+
+Prod additionally requires `CHANGE_WINDOW_START`, `CHANGE_WINDOW_END`,
+`EXPOSE_SIGN=1`, and `EVIDENCE_SIGN_KEY`.
+
 ## Evidence
 
 Rollback must produce evidence under:

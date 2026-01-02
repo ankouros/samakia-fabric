@@ -25,6 +25,14 @@ This document records what was implemented for the **Terraform remote state back
 - Adds guarded Make targets and Part 1 entry/acceptance scripts.
 - Confirms plan-only posture: no exposure artifacts are applied.
 
+## Phase 13 Part 2 — Exposure Apply/Verify/Rollback (Guarded)
+
+- Adds approval, apply, verify, and rollback tooling with explicit execution guards.
+- Apply writes exposure artifacts only; no substrate provisioning or secret materialization.
+- Verify runs bindings verification (offline by default) plus drift snapshot evidence.
+- Rollback removes exposure artifacts and validates baseline status.
+- New Make targets and Part 2/Phase 13 acceptance markers lock the phase.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

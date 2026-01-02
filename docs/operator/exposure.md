@@ -1,9 +1,7 @@
 # Operator Exposure Workflow (Phase 13)
 
 This document is the **canonical operator UX** for governed workload exposure.
-Phase 13 Part 1 implements **plan-only** exposure; apply/verify/rollback are
-introduced in Part 2. Exposure writes **artifacts only** and never provisions
-substrate resources.
+Exposure writes **artifacts only** and never provisions substrate resources.
 
 ## Preconditions
 
@@ -11,6 +9,7 @@ substrate resources.
 - Phase 12 closure accepted (readiness packet exists).
 - Milestone Phase 1-12 lock present.
 - Exposure policy validated.
+- Binding renders present (`make bindings.render TENANT=all`).
 
 ## 1) PLAN (read-only)
 
@@ -29,47 +28,57 @@ TENANT=canary WORKLOAD=sample ENV=samakia-dev make exposure.plan.explain
 Outputs:
 - Evidence: `evidence/exposure-plan/<tenant>/<workload>/<UTC>/`
 
-## 2) APPROVE (operator decision) (Part 2)
+## 2) APPROVE (operator decision)
 
-Not available in Part 1; reserved for the guarded apply workflow.
-
-Create an approval artifact referencing the plan evidence. For prod, approvals
-must be signed and include a change window.
+Create an approval artifact referencing the plan evidence. Approval is required
+for **any** apply (all envs). For prod, approvals must be signed and include a
+change window.
 
 ```bash
+PLAN_EVIDENCE_REF="evidence/exposure-plan/canary/sample/<UTC>" \
 TENANT=canary WORKLOAD=sample ENV=samakia-dev \
-  APPROVER_ID="ops-001" EXPOSE_REASON="canary exposure" \
-  make exposure.approve
+APPROVER_ID="ops-001" EXPOSE_REASON="canary exposure" \
+make exposure.approve
 ```
 
-## 3) APPLY (guarded) (Part 2)
+Outputs:
+- Evidence: `evidence/exposure-approve/<tenant>/<workload>/<UTC>/`
 
-Not available in Part 1; apply is introduced in Phase 13 Part 2.
+## 3) APPLY (guarded)
 
-Apply writes exposure artifacts only. Execution is guarded and opt-in.
+Apply writes exposure artifacts only after approval, policy, and prerequisites
+pass. Default is **dry-run**; execution requires explicit opt-in.
+
+```bash
+APPROVAL_DIR="evidence/exposure-approve/canary/sample/<UTC>" \
+TENANT=canary WORKLOAD=sample ENV=samakia-dev \
+make exposure.apply
+```
+
+Execute (guarded):
 
 ```bash
 EXPOSE_EXECUTE=1 EXPOSE_REASON="canary exposure" APPROVER_ID="ops-001" \
+APPROVAL_DIR="evidence/exposure-approve/canary/sample/<UTC>" \
 ENV=samakia-dev TENANT=canary WORKLOAD=sample \
 make exposure.apply
 ```
 
 Prod requires:
 - `CHANGE_WINDOW_START` + `CHANGE_WINDOW_END`
-- `EXPOSE_SIGN=1`
+- `EXPOSE_SIGN=1` and `EVIDENCE_SIGN_KEY` configured
 - Signed approval artifact
 
 Artifacts:
-- `artifacts/exposure/<env>/<tenant>/<workload>/`
+- `artifacts/exposure/<env>/<tenant>/<workload>/...`
 
 Evidence:
 - `evidence/exposure-apply/<tenant>/<workload>/<UTC>/`
 
-## 4) VERIFY (read-only) (Part 2)
+## 4) VERIFY (read-only)
 
-Not available in Part 1; verification is introduced in Phase 13 Part 2.
-
-Verification is offline by default. Live verification requires explicit guard.
+Verification is offline by default and includes drift snapshots.
+Live verification requires explicit guard and is blocked in CI.
 
 ```bash
 ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.verify
@@ -81,17 +90,35 @@ Live verification (operator-only):
 VERIFY_LIVE=1 ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.verify
 ```
 
-## 5) ROLLBACK (guarded) (Part 2)
+Evidence:
+- `evidence/exposure-verify/<tenant>/<workload>/<UTC>/`
 
-Not available in Part 1; rollback is introduced in Phase 13 Part 2.
+## 5) ROLLBACK (guarded)
 
 Rollback removes exposure artifacts and verifies baseline drift.
+Default is dry-run; execution requires explicit opt-in.
 
 ```bash
-ROLLBACK_EXECUTE=1 ROLLBACK_REASON="canary window closed" \
+ROLLBACK_REASON="canary window closed" ROLLBACK_REQUESTED_BY="ops-001" \
 ENV=samakia-dev TENANT=canary WORKLOAD=sample \
 make exposure.rollback
 ```
+
+Execute (guarded):
+
+```bash
+ROLLBACK_EXECUTE=1 ROLLBACK_REASON="canary window closed" \
+ROLLBACK_REQUESTED_BY="ops-001" \
+ENV=samakia-dev TENANT=canary WORKLOAD=sample \
+make exposure.rollback
+```
+
+Prod rollback requires:
+- `CHANGE_WINDOW_START` + `CHANGE_WINDOW_END`
+- `EXPOSE_SIGN=1` and `EVIDENCE_SIGN_KEY` configured
+
+Evidence:
+- `evidence/exposure-rollback/<tenant>/<workload>/<UTC>/`
 
 ## Blast Radius Strategy
 

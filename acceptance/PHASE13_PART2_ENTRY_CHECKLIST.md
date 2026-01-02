@@ -1,0 +1,146 @@
+# Phase 13 Part 2 Entry Checklist
+
+Timestamp (UTC): 2026-01-02T21:13:52Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE13_ENTRY_CHECKLIST.md
+  - Command: test -f acceptance/PHASE13_ENTRY_CHECKLIST.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE13_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE13_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE12_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/exposure/approval.schema.json
+  - Command: test -f contracts/exposure/approval.schema.json
+  - Result: PASS
+- File present: contracts/exposure/rollback.schema.json
+  - Command: test -f contracts/exposure/rollback.schema.json
+  - Result: PASS
+- File present: ops/exposure/approve/approve.sh
+  - Command: test -f ops/exposure/approve/approve.sh
+  - Result: PASS
+- File present: ops/exposure/approve/reject.sh
+  - Command: test -f ops/exposure/approve/reject.sh
+  - Result: PASS
+- File present: ops/exposure/approve/validate-approval.sh
+  - Command: test -f ops/exposure/approve/validate-approval.sh
+  - Result: PASS
+- File present: ops/exposure/apply/apply.sh
+  - Command: test -f ops/exposure/apply/apply.sh
+  - Result: PASS
+- File present: ops/exposure/apply/validate-apply.sh
+  - Command: test -f ops/exposure/apply/validate-apply.sh
+  - Result: PASS
+- File present: ops/exposure/apply/write-artifacts.sh
+  - Command: test -f ops/exposure/apply/write-artifacts.sh
+  - Result: PASS
+- File present: ops/exposure/apply/evidence.sh
+  - Command: test -f ops/exposure/apply/evidence.sh
+  - Result: PASS
+- File present: ops/exposure/apply/redact.sh
+  - Command: test -f ops/exposure/apply/redact.sh
+  - Result: PASS
+- File present: ops/exposure/verify/verify.sh
+  - Command: test -f ops/exposure/verify/verify.sh
+  - Result: PASS
+- File present: ops/exposure/verify/postcheck.sh
+  - Command: test -f ops/exposure/verify/postcheck.sh
+  - Result: PASS
+- File present: ops/exposure/verify/drift-snapshot.sh
+  - Command: test -f ops/exposure/verify/drift-snapshot.sh
+  - Result: PASS
+- File present: ops/exposure/verify/evidence.sh
+  - Command: test -f ops/exposure/verify/evidence.sh
+  - Result: PASS
+- File present: ops/exposure/rollback/rollback.sh
+  - Command: test -f ops/exposure/rollback/rollback.sh
+  - Result: PASS
+- File present: ops/exposure/rollback/validate-rollback.sh
+  - Command: test -f ops/exposure/rollback/validate-rollback.sh
+  - Result: PASS
+- File present: ops/exposure/rollback/evidence.sh
+  - Command: test -f ops/exposure/rollback/evidence.sh
+  - Result: PASS
+- File present: docs/operator/exposure.md
+  - Command: test -f docs/operator/exposure.md
+  - Result: PASS
+- File present: docs/exposure/semantics.md
+  - Command: test -f docs/exposure/semantics.md
+  - Result: PASS
+- File present: docs/exposure/rollback.md
+  - Command: test -f docs/exposure/rollback.md
+  - Result: PASS
+- File present: docs/exposure/change-window-and-signing.md
+  - Command: test -f docs/exposure/change-window-and-signing.md
+  - Result: PASS
+- Policy gates wired: policy-exposure.sh
+  - Command: rg -n policy-exposure.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: exposure.approve
+  - Command: rg -n '^exposure\.approve:' Makefile
+  - Result: PASS
+- Makefile target present: exposure.apply
+  - Command: rg -n '^exposure\.apply:' Makefile
+  - Result: PASS
+- Makefile target present: exposure.verify
+  - Command: rg -n '^exposure\.verify:' Makefile
+  - Result: PASS
+- Makefile target present: exposure.rollback
+  - Command: rg -n '^exposure\.rollback:' Makefile
+  - Result: PASS
+- Makefile target present: phase13.part2.entry.check
+  - Command: rg -n '^phase13\.part2\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase13.part2.accept
+  - Command: rg -n '^phase13\.part2\.accept:' Makefile
+  - Result: PASS
+- Makefile target present: phase13.accept
+  - Command: rg -n '^phase13\.accept:' Makefile
+  - Result: PASS
+- Apply execute guard present
+  - Command: rg -n EXPOSE_EXECUTE ops/exposure/apply/apply.sh
+  - Result: PASS
+- Rollback execute guard present
+  - Command: rg -n ROLLBACK_EXECUTE ops/exposure/rollback/rollback.sh
+  - Result: PASS
+- Verify live guard present
+  - Command: rg -n VERIFY_LIVE ops/exposure/verify/verify.sh
+  - Result: PASS
+- evidence/ is gitignored
+  - Command: rg -n '^evidence/' .gitignore
+  - Result: PASS
+- artifacts/ is gitignored
+  - Command: rg -n '^artifacts/' .gitignore
+  - Result: PASS
+- Policy check
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Docs operator check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS
+- Bindings validate
+  - Command: make -C /home/aggelos/samakia-fabric bindings.validate TENANT=all
+  - Result: PASS
+- Bindings render
+  - Command: make -C /home/aggelos/samakia-fabric bindings.render TENANT=all
+  - Result: PASS
+- Bindings secrets inspect
+  - Command: make -C /home/aggelos/samakia-fabric bindings.secrets.inspect TENANT=all
+  - Result: PASS
+- Bindings verify offline
+  - Command: make -C /home/aggelos/samakia-fabric bindings.verify.offline TENANT=all
+  - Result: PASS
+- Drift summary
+  - Command: make -C /home/aggelos/samakia-fabric drift.summary TENANT=all
+  - Result: PASS

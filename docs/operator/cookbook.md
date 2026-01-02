@@ -443,6 +443,165 @@ None required (read-only).
 
 ---
 
+### Task: Expose canary workload (non-prod)
+
+#### Intent
+Run the full exposure choreography for a canary workload in non-prod.
+
+#### Preconditions
+- Phase 13 Part 1 accepted
+- Approval author identified
+
+#### Command
+```bash
+ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.plan
+PLAN_EVIDENCE_REF="evidence/exposure-plan/canary/sample/<UTC>" \
+  APPROVER_ID="ops-001" EXPOSE_REASON="canary exposure" \
+  TENANT=canary WORKLOAD=sample ENV=samakia-dev make exposure.approve
+APPROVAL_DIR="evidence/exposure-approve/canary/sample/<UTC>" \
+  EXPOSE_EXECUTE=1 EXPOSE_REASON="canary exposure" APPROVER_ID="ops-001" \
+  TENANT=canary WORKLOAD=sample ENV=samakia-dev make exposure.apply
+TENANT=canary WORKLOAD=sample ENV=samakia-dev make exposure.verify
+ROLLBACK_EXECUTE=1 ROLLBACK_REASON="canary rollback" ROLLBACK_REQUESTED_BY="ops-001" \
+  TENANT=canary WORKLOAD=sample ENV=samakia-dev make exposure.rollback
+```
+
+#### Expected result
+Exposure artifacts created under `artifacts/exposure/` and evidence under `evidence/exposure-*`.
+
+#### Evidence outputs
+`evidence/exposure-plan/<tenant>/<workload>/<UTC>/...`
+`evidence/exposure-approve/<tenant>/<workload>/<UTC>/...`
+`evidence/exposure-apply/<tenant>/<workload>/<UTC>/...`
+`evidence/exposure-verify/<tenant>/<workload>/<UTC>/...`
+`evidence/exposure-rollback/<tenant>/<workload>/<UTC>/...`
+
+#### Failure modes
+- Missing approval or change window requirements
+- Policy denies exposure scope
+
+#### Rollback / safe exit
+`ROLLBACK_EXECUTE=1 ROLLBACK_REASON="..." ROLLBACK_REQUESTED_BY="..." make exposure.rollback`
+
+---
+
+### Task: Expose prod workload (plan only unless window + signing)
+
+#### Intent
+Plan a prod exposure with required change window and signing gates.
+
+#### Preconditions
+- Prod allowlist exists in exposure policy
+- Change window scheduled and signing key available
+
+#### Command
+```bash
+EXPOSURE_SIGN=1 CHANGE_WINDOW_START="2026-01-02T01:00:00Z" CHANGE_WINDOW_END="2026-01-02T02:00:00Z" \
+ENV=samakia-prod TENANT=canary WORKLOAD=sample make exposure.plan
+```
+
+#### Expected result
+Plan evidence written under `evidence/exposure-plan/<tenant>/<workload>/<UTC>/`.
+
+#### Evidence outputs
+`evidence/exposure-plan/<tenant>/<workload>/<UTC>/...`
+
+#### Failure modes
+- Missing signing key or change window
+- Policy denies prod scope
+
+#### Rollback / safe exit
+None required (plan-only).
+
+---
+
+### Task: Phase 13 Part 2 entry check (read-only)
+
+#### Intent
+Validate Part 2 prerequisites and tooling before acceptance.
+
+#### Preconditions
+- Phase 13 Part 1 acceptance present
+- REQUIRED-FIXES.md has no OPEN items
+
+#### Command
+```bash
+make phase13.part2.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE13_PART2_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE13_PART2_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing guards or tooling
+- Policy/doc gates failing
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 13 Part 2 acceptance (read-only)
+
+#### Intent
+Run the Phase 13 Part 2 acceptance suite (dry-run only).
+
+#### Preconditions
+- Phase 13 Part 2 entry check passes
+
+#### Command
+```bash
+CI=1 make phase13.part2.accept
+```
+
+#### Expected result
+Acceptance markers written under `acceptance/PHASE13_PART2_ACCEPTED.md` and `acceptance/PHASE13_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE13_PART2_ACCEPTED.md`
+`acceptance/PHASE13_ACCEPTED.md`
+
+#### Failure modes
+- Guarded apply/rollback invoked in CI
+- Missing approval or plan evidence
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 13 acceptance (umbrella, read-only)
+
+#### Intent
+Run the Phase 13 umbrella acceptance (delegates to Part 2 acceptance).
+
+#### Preconditions
+- Phase 13 Part 2 entry check passes
+
+#### Command
+```bash
+CI=1 make phase13.accept
+```
+
+#### Expected result
+Acceptance markers written under `acceptance/PHASE13_PART2_ACCEPTED.md` and `acceptance/PHASE13_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE13_PART2_ACCEPTED.md`
+`acceptance/PHASE13_ACCEPTED.md`
+
+#### Failure modes
+- Guarded apply/rollback invoked in CI
+- Missing approval or plan evidence
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
 ### Task: Phase 12 Part 6 entry check (read-only)
 
 #### Intent
