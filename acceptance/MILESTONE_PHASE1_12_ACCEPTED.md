@@ -1,9 +1,9 @@
 # Milestone Phase 1–12 Acceptance
 
-Timestamp (UTC): 2026-01-02T15:11:20Z
-Commit: 13a7786e837cfe4b48e0e43c15a5ae4c61a0ef94
+Timestamp (UTC): 2026-01-02T15:31:42Z
+Commit: 9cdc45b0932d188f7d6c001a65d65f0356b7554f
 
-Evidence packet: /home/aggelos/samakia-fabric/evidence/milestones/phase1-12/2026-01-02T15:02:27Z
+Evidence packet: /home/aggelos/samakia-fabric/evidence/milestones/phase1-12/2026-01-02T15:22:32Z
 
 Commands executed:
 - git status --porcelain
@@ -71,4 +71,4 @@ Commands executed:
 Statement:
 All phases 1–12 verified end-to-end. Platform is regression-clean and ready for controlled workload exposure.
 
-Self-hash (sha256 of content above): 9d242a745acf4318191e6b5379853a68fdd9425ec2d9796aaa284c8117522206
+Self-hash (sha256 of content above): 1a3c4ce128cc89be8a250140f920f3aaa67e0e7c8360dd2c087ad9abe95a3157
