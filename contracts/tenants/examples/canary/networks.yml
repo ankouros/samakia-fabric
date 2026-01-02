@@ -1,0 +1,11 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantNetworks",
+  "metadata": {
+    "tenant_id": "canary"
+  },
+  "spec": {
+    "segments": ["tenant-canary-segment"],
+    "cross_tenant_access": false
+  }
+}

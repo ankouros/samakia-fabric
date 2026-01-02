@@ -69,4 +69,5 @@ Any change that violates a contract must be redesigned before merging.
 - Shared observability must satisfy HA policy: replicas >= 2, anti_affinity = true, and placement across at least two hosts.
 - Pre-exposure substrate hardening must pass before Phase 12 workload exposure; acceptance marker and evidence are mandatory.
 - Phase 12 workload exposure requires a redacted release readiness packet and acceptance markers (Part 6 + overall); CI remains read-only.
+- Phase 13 exposure is governed (plan -> approve -> apply -> verify -> rollback); prod requires change windows and signed evidence; CI remains read-only.
 - Milestone Phase 1–12 verification requires deterministic end-to-end evidence packets, `make milestone.phase1-12.verify`, `make milestone.phase1-12.lock`, and an acceptance marker with a self-hash; CI remains read-only.

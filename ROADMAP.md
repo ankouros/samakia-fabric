@@ -681,7 +681,7 @@ Non-scope:
 
 ## Phase 13 — Production Workload Exposure (Governed)
 
-Status: DESIGN COMPLETE (implementation pending)
+Status: PART 1 COMPLETE (Part 2 pending)
 
 ### Design (Phase 13)
 - ADR-0031: governed exposure choreography (plan -> approve -> apply -> verify -> rollback).
@@ -689,8 +689,14 @@ Status: DESIGN COMPLETE (implementation pending)
 - Exposure docs under `docs/exposure/` and `docs/operator/exposure.md`.
 - Phase 13 entry checklist and acceptance plan under `acceptance/`.
 
+### Part 1 — Exposure policy + plan/evidence (read-only)
+
+Status: COMPLETED ✅
+
+- Exposure policy evaluation + planner + evidence packets (read-only).
+- Phase 13 Part 1 entry checklist and acceptance marker.
+
 ### Planned implementation
-- Part 1: Exposure policy evaluation + planner + evidence packets (read-only).
 - Part 2: Guarded apply + rollback choreography.
 - Part 3: Operator UX hardening + regression coverage.
 

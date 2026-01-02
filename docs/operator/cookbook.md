@@ -356,6 +356,93 @@ None required (read-only).
 
 ---
 
+### Task: Phase 13 exposure plan (read-only)
+
+#### Intent
+Generate a governed exposure plan and evidence packet (no apply).
+
+#### Preconditions
+- Phase 12 acceptance marker present
+- Phase 13 exposure policy validated
+
+#### Command
+```bash
+ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.plan
+```
+
+#### Expected result
+Exposure plan evidence written under `evidence/exposure-plan/<tenant>/<workload>/<UTC>/`.
+
+#### Evidence outputs
+`evidence/exposure-plan/<tenant>/<workload>/<UTC>/plan.json`
+
+#### Failure modes
+- Policy denies scope (allowlist or prod signing/change window missing)
+- Binding manifests not rendered
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 13 Part 1 entry check (read-only)
+
+#### Intent
+Validate exposure plan prerequisites before running acceptance.
+
+#### Preconditions
+- Phase 13 entry checklist present
+- REQUIRED-FIXES.md has no OPEN items
+
+#### Command
+```bash
+make phase13.part1.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE13_PART1_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE13_PART1_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing Phase 13 prerequisites or tooling
+- Policy gate failure
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 13 Part 1 acceptance (read-only)
+
+#### Intent
+Run the Phase 13 Part 1 acceptance suite (plan-only).
+
+#### Preconditions
+- Phase 13 Part 1 entry check passes
+
+#### Command
+```bash
+make phase13.part1.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE13_PART1_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE13_PART1_ACCEPTED.md`
+
+#### Failure modes
+- Policy gate failure
+- Exposure plan denied in non-prod
+- Missing evidence/signing for prod plan (when required)
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
 ### Task: Phase 12 Part 6 entry check (read-only)
 
 #### Intent

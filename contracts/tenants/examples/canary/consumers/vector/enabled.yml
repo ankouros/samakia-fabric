@@ -1,0 +1,44 @@
+{
+  "consumer": "vector",
+  "variant": "single",
+  "ha_ready": true,
+  "executor": {
+    "provider": "qdrant",
+    "mode": "dry-run",
+    "plan_only": true
+  },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Single node; DR required for recovery"
+  },
+  "dr": {
+    "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
+    "backup": {
+      "schedule": "<placeholder>",
+      "retention": "<placeholder>"
+    },
+    "restore_verification": {
+      "smoke": "<placeholder>"
+    }
+  },
+  "endpoints": {
+    "host": "vector.canary.internal",
+    "port": 6333,
+    "protocol": "https",
+    "tls_required": true
+  },
+  "secret_ref": "tenants/canary/vector/primary",
+  "resources": {
+    "collections": ["birds_vectors"],
+    "replication_factor": 1,
+    "shard_number": 1,
+    "max_points": 50000,
+    "max_storage_gb": 10
+  }
+}

@@ -29,4 +29,6 @@ verify -> rollback), not a toggle and not an autonomous action.
 - **Apply**: guarded execution that writes exposure artifacts only after
   approval, signatures, and change window checks pass.
 
+Phase 13 Part 1 ships plan-only; apply/verify/rollback arrive in Part 2.
+
 See `docs/operator/exposure.md` for the operator workflow.

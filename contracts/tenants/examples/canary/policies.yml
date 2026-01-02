@@ -1,0 +1,25 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantPolicies",
+  "metadata": {
+    "tenant_id": "canary"
+  },
+  "spec": {
+    "allowed_consumers": ["database", "message-queue", "cache", "vector", "kubernetes"],
+    "allowed_variants": {
+      "database": ["single"],
+      "message-queue": ["single"],
+      "cache": ["single"],
+      "vector": ["single"],
+      "kubernetes": ["single"]
+    },
+    "security_profile": "baseline",
+    "prod_requirements": {
+      "require_change_window": true,
+      "require_evidence_signing": false
+    },
+    "execute_guards": {
+      "require_reason": true
+    }
+  }
+}

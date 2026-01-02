@@ -1,0 +1,42 @@
+{
+  "consumer": "kubernetes",
+  "variant": "single",
+  "ha_ready": true,
+  "executor": {
+    "provider": "kubernetes",
+    "mode": "dry-run",
+    "plan_only": true
+  },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Binding-only; workload HA is upstream"
+  },
+  "dr": {
+    "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
+    "backup": {
+      "schedule": "<placeholder>",
+      "retention": "<placeholder>"
+    },
+    "restore_verification": {
+      "smoke": "<placeholder>"
+    }
+  },
+  "endpoints": {
+    "host": "kube.canary.internal",
+    "port": 6443,
+    "protocol": "https",
+    "tls_required": true
+  },
+  "secret_ref": "tenants/canary/kubernetes/primary",
+  "resources": {
+    "cluster_ref": "birds-cluster",
+    "namespace_prefix": "birds",
+    "max_namespaces": 10
+  }
+}

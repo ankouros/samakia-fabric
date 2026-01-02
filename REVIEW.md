@@ -19,6 +19,12 @@ This document records what was implemented for the **Terraform remote state back
 - Adds exposure contracts, operator docs, and acceptance artifacts.
 - Non-goals: no substrate provisioning, no autonomous execution, no CI apply.
 
+## Phase 13 Part 1 — Exposure Plan & Evidence (Read-Only)
+
+- Implements exposure policy evaluation, plan rendering, and evidence packets.
+- Adds guarded Make targets and Part 1 entry/acceptance scripts.
+- Confirms plan-only posture: no exposure artifacts are applied.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

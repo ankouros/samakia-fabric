@@ -1,0 +1,48 @@
+{
+  "consumer": "message-queue",
+  "variant": "single",
+  "ha_ready": true,
+  "executor": {
+    "provider": "rabbitmq",
+    "mode": "dry-run",
+    "plan_only": true
+  },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Single node; DR restore required"
+  },
+  "dr": {
+    "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
+    "backup": {
+      "schedule": "<placeholder>",
+      "retention": "<placeholder>"
+    },
+    "restore_verification": {
+      "smoke": "<placeholder>"
+    }
+  },
+  "endpoints": {
+    "host": "mq.canary.internal",
+    "port": 15672,
+    "protocol": "https",
+    "tls_required": true
+  },
+  "secret_ref": "tenants/canary/message-queue/primary",
+  "resources": {
+    "vhost": "birds",
+    "user": "birds_app",
+    "max_connections": 200,
+    "max_queues": 300,
+    "max_message_bytes": 1048576,
+    "policy_defaults": {
+      "queue_type": "classic",
+      "ha_mode": "none"
+    }
+  }
+}

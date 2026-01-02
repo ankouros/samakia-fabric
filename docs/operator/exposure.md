@@ -1,7 +1,9 @@
 # Operator Exposure Workflow (Phase 13)
 
 This document is the **canonical operator UX** for governed workload exposure.
-Exposure writes **artifacts only** and never provisions substrate resources.
+Phase 13 Part 1 implements **plan-only** exposure; apply/verify/rollback are
+introduced in Part 2. Exposure writes **artifacts only** and never provisions
+substrate resources.
 
 ## Preconditions
 
@@ -27,7 +29,9 @@ TENANT=canary WORKLOAD=sample ENV=samakia-dev make exposure.plan.explain
 Outputs:
 - Evidence: `evidence/exposure-plan/<tenant>/<workload>/<UTC>/`
 
-## 2) APPROVE (operator decision)
+## 2) APPROVE (operator decision) (Part 2)
+
+Not available in Part 1; reserved for the guarded apply workflow.
 
 Create an approval artifact referencing the plan evidence. For prod, approvals
 must be signed and include a change window.
@@ -38,7 +42,9 @@ TENANT=canary WORKLOAD=sample ENV=samakia-dev \
   make exposure.approve
 ```
 
-## 3) APPLY (guarded)
+## 3) APPLY (guarded) (Part 2)
+
+Not available in Part 1; apply is introduced in Phase 13 Part 2.
 
 Apply writes exposure artifacts only. Execution is guarded and opt-in.
 
@@ -59,7 +65,9 @@ Artifacts:
 Evidence:
 - `evidence/exposure-apply/<tenant>/<workload>/<UTC>/`
 
-## 4) VERIFY (read-only)
+## 4) VERIFY (read-only) (Part 2)
+
+Not available in Part 1; verification is introduced in Phase 13 Part 2.
 
 Verification is offline by default. Live verification requires explicit guard.
 
@@ -73,7 +81,9 @@ Live verification (operator-only):
 VERIFY_LIVE=1 ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.verify
 ```
 
-## 5) ROLLBACK (guarded)
+## 5) ROLLBACK (guarded) (Part 2)
+
+Not available in Part 1; rollback is introduced in Phase 13 Part 2.
 
 Rollback removes exposure artifacts and verifies baseline drift.
 

@@ -205,6 +205,11 @@ The format is inspired by:
 - Exposure operator docs and semantics under `docs/exposure/` and `docs/operator/exposure.md`.
 - Phase 13 entry checklist and acceptance plan under `acceptance/`.
 
+#### Production workload exposure (Phase 13 Part 1)
+- Exposure policy evaluation tooling + plan-only evidence packets.
+- Guarded `exposure.plan` and `exposure.plan.explain` targets (read-only).
+- Phase 13 Part 1 entry checklist + acceptance marker.
+
 ### Changed
 #### Phase 12 post-actions (hardening)
 - Pinned base digests and apt snapshot sources for image builds; stamped `/etc/samakia-image-version` with provenance metadata.

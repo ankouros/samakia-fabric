@@ -1,0 +1,56 @@
+{
+  "apiVersion": "samakia.fabric/v1alpha1",
+  "kind": "TenantEndpoints",
+  "metadata": {
+    "tenant_id": "canary"
+  },
+  "spec": {
+    "endpoints": [
+      {
+        "name": "db-primary",
+        "consumer": "database",
+        "host": "db.canary.internal",
+        "port": 5432,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/canary/db-primary"
+      },
+      {
+        "name": "mq-primary",
+        "consumer": "message-queue",
+        "host": "mq.canary.internal",
+        "port": 5672,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/canary/mq-primary"
+      },
+      {
+        "name": "cache-primary",
+        "consumer": "cache",
+        "host": "cache.canary.internal",
+        "port": 6379,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/canary/cache-primary"
+      },
+      {
+        "name": "vector-primary",
+        "consumer": "vector",
+        "host": "vector.canary.internal",
+        "port": 6333,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/canary/vector-primary"
+      },
+      {
+        "name": "k8s-control",
+        "consumer": "kubernetes",
+        "host": "k8s.canary.internal",
+        "port": 6443,
+        "protocol": "tcp",
+        "tls_required": true,
+        "secret_ref": "secrets/tenants/canary/k8s-control"
+      }
+    ]
+  }
+}

@@ -986,6 +986,22 @@ phase1.accept: ## Run Phase 1 acceptance suite (ENV=...; CI-safe; no prompts)
 policy.check: ## Run policy-as-code gates (terraform + secrets + HA + docs)
 	@bash "$(POLICY_DIR)/policy.sh"
 
+.PHONY: exposure.policy.check
+exposure.policy.check: ## Validate exposure policy (Phase 13 Part 1)
+	@bash "$(REPO_ROOT)/ops/exposure/policy/validate.sh"
+
+.PHONY: exposure.plan
+exposure.plan: ## Exposure plan (read-only) (TENANT=<id> WORKLOAD=<id> ENV=<env>)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" ENV="$(ENV)" \
+		bash "$(REPO_ROOT)/ops/exposure/plan/plan.sh" --tenant "$(TENANT)" --workload "$(WORKLOAD)" --env "$(ENV)"
+
+.PHONY: exposure.plan.explain
+exposure.plan.explain: ## Explain exposure policy decision (TENANT=<id> WORKLOAD=<id> ENV=<env>)
+	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" ENV="$(ENV)" \
+		bash "$(REPO_ROOT)/ops/exposure/policy/explain.sh" \
+		--tenant "$(TENANT)" --workload "$(WORKLOAD)" --env "$(ENV)" \
+		--binding "$(REPO_ROOT)/artifacts/bindings/$(TENANT)/$(WORKLOAD)/connection.json"
+
 .PHONY: secrets.doctor
 secrets.doctor: ## Show secrets backend configuration (no secrets)
 	@bash "$(REPO_ROOT)/ops/secrets/secrets.sh" doctor
@@ -2080,6 +2096,18 @@ phase12.accept: ## Run Phase 12 acceptance suite (read-only)
 	@TENANT="$(TENANT)" ENV="$(ENV)" READINESS_SIGN="$(READINESS_SIGN)" READINESS_STAMP="$(READINESS_STAMP)" \
 		PHASE12_PACKET_ROOT="$(PHASE12_PACKET_ROOT)" \
 		bash "$(REPO_ROOT)/ops/release/phase12/phase12-readiness-packet.sh"
+
+###############################################################################
+# Phase 13 Part 1 (Exposure Plan)
+###############################################################################
+
+.PHONY: phase13.part1.entry.check
+phase13.part1.entry.check: ## Phase 13 Part 1 entry checklist (exposure plan)
+	@bash "$(OPS_SCRIPTS_DIR)/phase13-part1-entry-check.sh"
+
+.PHONY: phase13.part1.accept
+phase13.part1.accept: ## Phase 13 Part 1 acceptance (exposure plan)
+	@bash "$(OPS_SCRIPTS_DIR)/phase13-part1-accept.sh"
 
 ###############################################################################
 # Milestone Phase 1–12 (End-to-End Verification)

@@ -23,6 +23,7 @@ scripts=(
   "policy-drift.sh"
   "policy-bindings-verify.sh"
   "policy-proposals.sh"
+  "policy-exposure.sh"
 )
 
 for script in "${scripts[@]}"; do

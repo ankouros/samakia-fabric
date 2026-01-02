@@ -1,0 +1,47 @@
+{
+  "consumer": "database",
+  "variant": "single",
+  "ha_ready": true,
+  "executor": {
+    "provider": "postgres",
+    "mode": "dry-run",
+    "plan_only": true
+  },
+  "slo": {
+    "tier": "silver",
+    "availability": 99.9
+  },
+  "failure_semantics": {
+    "mode": "spof",
+    "expectations": "Single instance; DR required for recovery"
+  },
+  "dr": {
+    "required_testcases": ["backup_integrity", "restore_smoke"],
+    "rpo_target": "<placeholder>",
+    "rto_target": "<placeholder>",
+    "backup": {
+      "schedule": "<placeholder>",
+      "retention": "<placeholder>"
+    },
+    "restore_verification": {
+      "smoke": "<placeholder>"
+    }
+  },
+  "endpoints": {
+    "host": "db.canary.internal",
+    "port": 5432,
+    "protocol": "tcp",
+    "tls_required": true
+  },
+  "secret_ref": "tenants/canary/database/primary",
+  "resources": {
+    "database": "birds",
+    "user": "birds_app",
+    "schema": "birds",
+    "max_connections": {"soft": 20, "hard": 40},
+    "max_storage_gb": 10,
+    "max_cpu": 2,
+    "max_memory_gb": 2,
+    "statement_timeout_ms": 30000
+  }
+}

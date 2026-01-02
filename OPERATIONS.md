@@ -92,6 +92,11 @@ Tenant binding workflows live in:
   - Semantics: `docs/exposure/semantics.md`
   - Change windows + signing: `docs/exposure/change-window-and-signing.md`
   - Rollback: `docs/exposure/rollback.md`
+  - Part 1 (plan-only):
+    - Validate policy: `make exposure.policy.check`
+    - Plan exposure: `ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.plan`
+    - Explain decision: `ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.plan.explain`
+    - Entry check: `make phase13.part1.entry.check`
 - Milestone Phase 1–12 verification (release manager, read-only):
   - Verify: `make milestone.phase1-12.verify`
   - Lock: `make milestone.phase1-12.lock`
