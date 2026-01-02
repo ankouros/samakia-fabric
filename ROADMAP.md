@@ -631,6 +631,26 @@ Non-scope:
 
 ---
 
+## Milestone — Phase 1–12 End-to-End Verification
+
+Goal: Verify all completed phases remain regression-clean and lock the first
+production-grade substrate milestone.
+
+Status: IN PROGRESS
+
+### Scope (canonical)
+- End-to-end verification target: `make milestone.phase1-12.verify`.
+- Consolidated evidence packet: `evidence/milestones/phase1-12/<UTC>/`.
+- Milestone lock target: `make milestone.phase1-12.lock`.
+- Acceptance marker: `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md` (self-hash).
+
+Non-scope:
+- No infrastructure mutation outside guarded paths
+- No secrets in evidence packets
+- No CI execution beyond read-only checks
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

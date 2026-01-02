@@ -368,6 +368,69 @@ None required; rerun after remediation.
 
 ---
 
+## Milestone Phase 1–12 (end-to-end verification)
+
+### Task: Milestone Phase 1–12 verification (read-only)
+
+#### Intent
+Run the full Phase 1–12 regression sweep and emit a consolidated evidence packet.
+
+#### Preconditions
+- Clean git working tree
+- No OPEN items in REQUIRED-FIXES.md
+- All phase acceptance markers present
+- Runner access to required environments (DNS/MinIO/Shared/Prod)
+
+#### Command
+```bash
+make milestone.phase1-12.verify
+```
+
+#### Expected result
+Evidence packet created under `evidence/milestones/phase1-12/<UTC>/`.
+
+#### Evidence outputs
+`evidence/milestones/phase1-12/<UTC>/...`
+
+#### Failure modes
+- Missing acceptance markers or self-hash metadata
+- Environment access or TLS guard failures
+- Policy/validation regressions in any phase
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Milestone Phase 1–12 lock
+
+#### Intent
+Create the milestone acceptance marker after verification passes.
+
+#### Preconditions
+- `make milestone.phase1-12.verify` PASS
+- Roadmap/review/changelog updated to reflect milestone completion
+
+#### Command
+```bash
+make milestone.phase1-12.lock
+```
+
+#### Expected result
+Acceptance marker `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md` created with self-hash.
+
+#### Evidence outputs
+`acceptance/MILESTONE_PHASE1_12_ACCEPTED.md`
+
+#### Failure modes
+- Verification did not PASS or evidence missing
+- Commit mismatch between evidence and repo
+
+#### Rollback / safe exit
+None required; rerun after remediation.
+
+---
+
 ## Alerting (routing defaults)
 
 ### Task: Validate drift alert routing defaults

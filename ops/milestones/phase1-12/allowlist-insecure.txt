@@ -1,0 +1,9 @@
+# Allowed references to insecure-flag patterns in docs/tests (no runtime usage).
+CHANGELOG.md
+acceptance/PHASE2_ENTRY_CHECKLIST.md
+acceptance/PHASE2_1_ENTRY_CHECKLIST.md
+acceptance/PHASE2_2_ENTRY_CHECKLIST.md
+docs/images/proxmox-template-registration.md
+ops/scripts/phase2-1-entry-check.sh
+ops/scripts/phase2-2-entry-check.sh
+ops/scripts/test-phase12/test-phase12-targets.sh

@@ -189,6 +189,11 @@ The format is inspired by:
 - Phase 12 Part 6 acceptance marker: `acceptance/PHASE12_PART6_ACCEPTED.md`.
 - Phase 12 acceptance marker: `acceptance/PHASE12_ACCEPTED.md`.
 
+#### Milestone Phase 1–12 verification
+- Milestone verification/lock tooling under `ops/milestones/phase1-12/`.
+- Evidence packets under `evidence/milestones/phase1-12/<UTC>/`.
+- Make targets: `milestone.phase1-12.verify`, `milestone.phase1-12.lock`.
+
 #### Security posture hardening (Phase 5)
 - Offline-first secrets interface (optional Vault read-only mode)
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets

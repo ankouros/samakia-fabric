@@ -2037,6 +2037,18 @@ phase12.accept: ## Run Phase 12 acceptance suite (read-only)
 		bash "$(REPO_ROOT)/ops/release/phase12/phase12-readiness-packet.sh"
 
 ###############################################################################
+# Milestone Phase 1–12 (End-to-End Verification)
+###############################################################################
+
+.PHONY: milestone.phase1-12.verify
+milestone.phase1-12.verify: ## Verify end-to-end regression for Phase 1–12 (read-only)
+	@bash "$(REPO_ROOT)/ops/milestones/phase1-12/verify.sh"
+
+.PHONY: milestone.phase1-12.lock
+milestone.phase1-12.lock: ## Lock Phase 1–12 milestone after verify passes
+	@bash "$(REPO_ROOT)/ops/milestones/phase1-12/lock.sh"
+
+###############################################################################
 # Operator UX (Phase 9)
 ###############################################################################
 

@@ -2,6 +2,12 @@
 
 This document records what was implemented for the **Terraform remote state backend (MinIO HA)** and the **DNS infrastructure**, and how to run them **end-to-end**.
 
+## Milestone Phase 1–12 Verification Tooling (In progress)
+
+- Added end-to-end regression verification and lock scripts under `ops/milestones/phase1-12/`.
+- Evidence packets are written to `evidence/milestones/phase1-12/<UTC>/` with summaries and manifests.
+- Milestone lock is gated on a PASS verification and writes `acceptance/MILESTONE_PHASE1_12_ACCEPTED.md`.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

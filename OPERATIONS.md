@@ -84,6 +84,10 @@ Tenant binding workflows live in:
   - CI-safe umbrella: `TENANT=all make phase12.accept`
   - Packet only: `TENANT=all make phase12.readiness.packet`
   - Acceptance markers: `make phase12.part6.accept`
+- Milestone Phase 1–12 verification (release manager, read-only):
+  - Verify: `make milestone.phase1-12.verify`
+  - Lock: `make milestone.phase1-12.lock`
+  - Evidence: `evidence/milestones/phase1-12/<UTC>/`
 
 VM image workflows live in:
 
