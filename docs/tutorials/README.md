@@ -19,5 +19,5 @@ For day-2 operations and governance workflows, see `docs/operator/`.
 ## Notes
 
 - All workflows are deterministic and non-interactive by default.
-- Use strict TLS and a trusted Proxmox CA; never pass `--insecure` or `-k`.
+- Use strict TLS and a trusted Proxmox CA; never disable certificate verification.
 - Evidence and artifacts are written under gitignored `evidence/` and `artifacts/` paths.
