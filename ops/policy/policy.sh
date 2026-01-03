@@ -27,6 +27,7 @@ scripts=(
   "policy-incidents.sh"
   "policy-bindings-verify.sh"
   "policy-proposals.sh"
+  "policy-selfservice.sh"
   "policy-exposure.sh"
 )
 

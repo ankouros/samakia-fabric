@@ -3288,6 +3288,127 @@ Revise contract files and re-run.
 
 ---
 
+## Tenant self-service proposals (Phase 15 Part 1)
+
+### Quick CLI + guard summary
+
+```bash
+# Intake + preview (read-only)
+make selfservice.submit FILE=examples/selfservice/example.yml
+make selfservice.validate PROPOSAL_ID=example
+make selfservice.plan PROPOSAL_ID=example
+make selfservice.review PROPOSAL_ID=example
+```
+
+### Task: Submit a self-service proposal (read-only intake)
+
+#### Intent
+Allow a tenant to submit a proposal without any execution paths.
+
+#### Preconditions
+- Proposal YAML prepared
+- No secrets in proposal
+- Proposal scopes limited to bindings, capacity (increase-only), or exposure intent
+
+#### Command
+```bash
+make selfservice.submit FILE=examples/selfservice/example.yml
+```
+
+#### Expected result
+Proposal stored under `selfservice/inbox/<tenant>/<proposal_id>/proposal.yml`.
+
+#### Evidence outputs
+Inbox entry (gitignored).
+
+#### Failure modes
+- Missing schema
+- Proposal contains secret-like values
+- Proposal expired
+
+#### Rollback / safe exit
+Delete the inbox entry if submitted in error.
+
+### Task: Validate a self-service proposal
+
+#### Intent
+Validate schema + semantics (scope, tenant ownership, capacity increase-only).
+
+#### Preconditions
+- Proposal submitted or example exists
+
+#### Command
+```bash
+make selfservice.validate PROPOSAL_ID=example
+```
+
+#### Expected result
+Validation PASS (no changes applied).
+
+#### Evidence outputs
+None by default (use `VALIDATION_OUT=...` for JSON).
+
+#### Failure modes
+- Invalid scope or expired proposal
+- Capacity change is not an increase
+
+#### Rollback / safe exit
+Fix the proposal and re-run validation.
+
+### Task: Generate a self-service plan preview (read-only)
+
+#### Intent
+Run read-only planning logic and capture policy requirements.
+
+#### Preconditions
+- Proposal validates
+
+#### Command
+```bash
+make selfservice.plan PROPOSAL_ID=example
+```
+
+#### Expected result
+Plan JSON written under `evidence/selfservice/<tenant>/<proposal_id>/plan.json`.
+
+#### Evidence outputs
+`evidence/selfservice/<tenant>/<proposal_id>/plan.json`
+
+#### Failure modes
+- Exposure plan denied by policy
+- Binding or capacity validation failure
+
+#### Rollback / safe exit
+Revise proposal inputs or target environment.
+
+### Task: Review a self-service proposal (diff + impact + plan)
+
+#### Intent
+Generate the tenant-visible review bundle for operator decision.
+
+#### Preconditions
+- Proposal validates
+
+#### Command
+```bash
+make selfservice.review PROPOSAL_ID=example
+```
+
+#### Expected result
+Review bundle written under `evidence/selfservice/<tenant>/<proposal_id>/`.
+
+#### Evidence outputs
+`proposal.yml`, `validation.json`, `diff.md`, `impact.json`, `plan.json`, `summary.md`, `manifest.sha256`
+
+#### Failure modes
+- Missing target contract paths
+- Policy gate failures
+
+#### Rollback / safe exit
+Fix proposal inputs and re-run review.
+
+---
+
 ## VM golden images
 
 ### Task: Validate VM image contracts
@@ -3404,6 +3525,59 @@ Acceptance PASS and markers created.
 
 #### Rollback / safe exit
 Stop; do not proceed to mutation.
+
+### Task: Phase 15 Part 1 entry checklist (self-service proposals)
+
+#### Intent
+Confirm Phase 15 Part 1 entry conditions for self-service proposals.
+
+#### Preconditions
+- Phase 14 Part 3 accepted
+- Required self-service contracts and docs present
+
+#### Command
+```bash
+make phase15.part1.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE15_PART1_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE15_PART1_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing self-service contracts, scripts, or docs
+- Policy or runtime checks failing
+
+#### Rollback / safe exit
+Stop and remediate missing files or failing checks.
+
+### Task: Phase 15 Part 1 acceptance (self-service proposals)
+
+#### Intent
+Run the Phase 15 Part 1 acceptance suite (read-only).
+
+#### Preconditions
+- Phase 15 Part 1 entry checklist passes
+
+#### Command
+```bash
+make phase15.part1.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE15_PART1_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE15_PART1_ACCEPTED.md`
+
+#### Failure modes
+- Self-service validation or plan failures
+- Evidence bundle missing or incomplete
+
+#### Rollback / safe exit
+Fix proposal tooling or docs and re-run acceptance.
 
 ---
 

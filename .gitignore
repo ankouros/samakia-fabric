@@ -119,6 +119,7 @@ temp/
 .cache/
 proposals/inbox/
 proposals/archive/
+selfservice/inbox/
 audit/
 evidence/
 artifacts/

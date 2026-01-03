@@ -2212,6 +2212,37 @@ proposals.apply: ## Apply proposal (guarded; uses existing apply paths)
 		BIND_EXECUTE="$(BIND_EXECUTE)" \
 		bash "$(REPO_ROOT)/ops/proposals/apply.sh"
 
+###############################################################################
+# Self-Service Proposals (Phase 15 Part 1)
+###############################################################################
+
+.PHONY: selfservice.submit
+selfservice.submit: ## Submit self-service proposal into inbox (read-only)
+	@FILE="$(FILE)" bash "$(REPO_ROOT)/ops/selfservice/submit.sh"
+
+.PHONY: selfservice.validate
+selfservice.validate: ## Validate self-service proposal schema + policy
+	@PROPOSAL_ID="$(PROPOSAL_ID)" FILE="$(FILE)" VALIDATION_OUT="$(VALIDATION_OUT)" \
+		bash "$(REPO_ROOT)/ops/selfservice/validate.sh"
+
+.PHONY: selfservice.plan
+selfservice.plan: ## Self-service read-only plan and preview
+	@PROPOSAL_ID="$(PROPOSAL_ID)" FILE="$(FILE)" \
+		bash "$(REPO_ROOT)/ops/selfservice/plan.sh"
+
+.PHONY: selfservice.review
+selfservice.review: ## Self-service review bundle (diff + impact + plan)
+	@PROPOSAL_ID="$(PROPOSAL_ID)" FILE="$(FILE)" \
+		bash "$(REPO_ROOT)/ops/selfservice/review.sh"
+
+.PHONY: phase15.part1.entry.check
+phase15.part1.entry.check: ## Phase 15 Part 1 entry checklist (self-service proposals)
+	@bash "$(OPS_SCRIPTS_DIR)/phase15-part1-entry-check.sh"
+
+.PHONY: phase15.part1.accept
+phase15.part1.accept: ## Phase 15 Part 1 acceptance (self-service proposals)
+	@bash "$(OPS_SCRIPTS_DIR)/phase15-part1-accept.sh"
+
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part4-entry-check.sh"

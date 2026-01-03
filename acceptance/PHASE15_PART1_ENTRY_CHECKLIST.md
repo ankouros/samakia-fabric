@@ -1,0 +1,119 @@
+# Phase 15 Part 1 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T02:13:48Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE14_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE14_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE13_ACCEPTED.md
+  - Command: test -f acceptance/PHASE13_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/selfservice/proposal.schema.json
+  - Command: test -f contracts/selfservice/proposal.schema.json
+  - Result: PASS
+- File present: contracts/selfservice/README.md
+  - Command: test -f contracts/selfservice/README.md
+  - Result: PASS
+- File present: examples/selfservice/example.yml
+  - Command: test -f examples/selfservice/example.yml
+  - Result: PASS
+- File present: ops/selfservice/submit.sh
+  - Command: test -f ops/selfservice/submit.sh
+  - Result: PASS
+- File present: ops/selfservice/validate.sh
+  - Command: test -f ops/selfservice/validate.sh
+  - Result: PASS
+- File present: ops/selfservice/normalize.sh
+  - Command: test -f ops/selfservice/normalize.sh
+  - Result: PASS
+- File present: ops/selfservice/diff.sh
+  - Command: test -f ops/selfservice/diff.sh
+  - Result: PASS
+- File present: ops/selfservice/impact.sh
+  - Command: test -f ops/selfservice/impact.sh
+  - Result: PASS
+- File present: ops/selfservice/plan.sh
+  - Command: test -f ops/selfservice/plan.sh
+  - Result: PASS
+- File present: ops/selfservice/review.sh
+  - Command: test -f ops/selfservice/review.sh
+  - Result: PASS
+- File present: ops/selfservice/redact.sh
+  - Command: test -f ops/selfservice/redact.sh
+  - Result: PASS
+- File present: ops/policy/policy-selfservice.sh
+  - Command: test -f ops/policy/policy-selfservice.sh
+  - Result: PASS
+- File present: docs/tenants/selfservice.md
+  - Command: test -f docs/tenants/selfservice.md
+  - Result: PASS
+- File present: docs/operator/selfservice-review.md
+  - Command: test -f docs/operator/selfservice-review.md
+  - Result: PASS
+- File present: docs/operator/cookbook.md
+  - Command: test -f docs/operator/cookbook.md
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- Policy gates wired: policy-selfservice.sh
+  - Command: rg -n policy-selfservice\.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: selfservice.submit
+  - Command: rg -n '^selfservice\.submit:' Makefile
+  - Result: PASS
+- Makefile target present: selfservice.validate
+  - Command: rg -n '^selfservice\.validate:' Makefile
+  - Result: PASS
+- Makefile target present: selfservice.plan
+  - Command: rg -n '^selfservice\.plan:' Makefile
+  - Result: PASS
+- Makefile target present: selfservice.review
+  - Command: rg -n '^selfservice\.review:' Makefile
+  - Result: PASS
+- Makefile target present: phase15.part1.entry.check
+  - Command: rg -n '^phase15\.part1\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase15.part1.accept
+  - Command: rg -n '^phase15\.part1\.accept:' Makefile
+  - Result: PASS
+- CI wiring: selfservice.validate
+  - Command: rg -n 'selfservice.validate' .github/workflows/pr-validate.yml
+  - Result: PASS
+- Selfservice inbox gitignored
+  - Command: rg -n 'selfservice/inbox/' .gitignore
+  - Result: PASS
+- Operator targets include selfservice
+  - Command: rg -n 'selfservice\.' ops/docs/operator-targets.json
+  - Result: PASS
+- Cookbook includes selfservice review
+  - Command: rg -n 'selfservice\.review' docs/operator/cookbook.md
+  - Result: PASS
+- Policy check
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Runtime evaluate
+  - Command: make -C /home/aggelos/samakia-fabric runtime.evaluate TENANT=all
+  - Result: PASS
+- SLO evaluate
+  - Command: make -C /home/aggelos/samakia-fabric slo.evaluate TENANT=all
+  - Result: PASS
+- Drift summary
+  - Command: make -C /home/aggelos/samakia-fabric drift.summary TENANT=all
+  - Result: PASS

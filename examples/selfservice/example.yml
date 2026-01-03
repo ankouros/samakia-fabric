@@ -1,0 +1,37 @@
+apiVersion: samakia.fabric/v1alpha1
+kind: SelfServiceProposal
+proposal_id: example
+tenant_id: canary
+requested_by: "tenant-admin@canary"
+requested_at: "2026-01-01T00:00:00Z"
+target_env: samakia-dev
+scope:
+  bindings: true
+  capacity: true
+  exposure_request: true
+desired_changes:
+  - kind: binding
+    action: modify
+    target: contracts/bindings/tenants/canary/sample.binding.yml
+    summary: "Extend rotation window for sample database binding"
+    changes:
+      - path: spec.consumers.0.rotation_policy.max_age_days
+        value: 120
+        note: "Increase rotation interval for stability."
+  - kind: capacity
+    action: modify
+    target: contracts/tenants/examples/canary/capacity.yml
+    summary: "Increase postgres storage for the canary tenant"
+    changes:
+      - path: spec.database.postgres.single.max_storage_gb
+        value: 20
+        note: "Increase single instance storage allocation."
+  - kind: exposure_request
+    action: request
+    target: exposure/canary/sample
+    summary: "Request exposure preview for sample workload"
+    exposure:
+      workload: sample
+      notes: "Preview exposure impact for samakia-dev only."
+justification: "Need additional capacity and a longer rotation window; request exposure preview only."
+expires_at: "2030-12-31T00:00:00Z"

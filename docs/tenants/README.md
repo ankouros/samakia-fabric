@@ -15,6 +15,7 @@ offline-first credentials issuance.
 - `docs/tenants/policies-and-quotas.md`
 - `docs/tenants/credentials-and-endpoints.md`
 - `docs/tenants/consumer-bindings.md`
+- `docs/tenants/selfservice.md`
 
 Related:
 

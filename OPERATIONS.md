@@ -81,6 +81,12 @@ Tenant binding workflows live in:
   - Apply dry-run: `APPLY_DRYRUN=1 make proposals.apply PROPOSAL_ID=<id>`
   - Apply execute (guarded): `PROPOSAL_APPLY=1 BIND_EXECUTE=1 make proposals.apply PROPOSAL_ID=<id>`
   - Prod approvals require signed decisions; apply verifies decision signatures for prod.
+- Self-service proposals (Phase 15 Part 1; proposal-only):
+  - Submit proposal: `make selfservice.submit FILE=examples/selfservice/example.yml`
+  - Validate proposal: `make selfservice.validate PROPOSAL_ID=<id>`
+  - Read-only plan preview: `make selfservice.plan PROPOSAL_ID=<id>`
+  - Review bundle (diff + impact + plan): `make selfservice.review PROPOSAL_ID=<id>`
+  - No apply paths are exposed; execution remains operator-controlled.
 - Drift awareness (Phase 12 Part 5; read-only):
   - Detect tenant drift (non-blocking): `TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none make drift.detect`
   - Emit tenant summaries: `TENANT=all make drift.summary`

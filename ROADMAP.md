@@ -745,6 +745,27 @@ Non-scope:
 
 ---
 
+## Phase 15 — Controlled Self-Service (Proposal-Only)
+
+Status: IN PROGRESS
+
+### Part 1 — Proposal intake + read-only planning (COMPLETED ✅)
+- Self-service proposal contract under `contracts/selfservice/`.
+- Read-only submit/validate/plan/review tooling with tenant-visible evidence packets.
+- Policy gate + CI validation for proposal examples (no execution paths).
+- Phase 15 Part 1 entry checklist + acceptance marker.
+
+### Part 2 — Operator approval + execution integration (PLANNED)
+- Guarded approvals and operator-only apply entrypoints.
+- Evidence-backed change windows and signing for prod.
+
+Non-scope (Phase 15 Part 1):
+- Tenant apply or autonomous execution
+- Secret materialization or rotation by tenants
+- CI approval or apply
+
+---
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

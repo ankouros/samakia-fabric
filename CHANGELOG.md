@@ -247,6 +247,12 @@ The format is inspired by:
 - Policy gates: `policy-alerts.sh` and `policy-incidents.sh` wired into `make policy.check`.
 - Make targets: `alerts.validate`, `alerts.deliver`, `incidents.open`, `incidents.update`, `incidents.close`, `phase14.part3.entry.check`, `phase14.part3.accept`.
 
+#### Controlled self-service proposals (Phase 15 Part 1)
+- Self-service proposal contract under `contracts/selfservice/` with example inputs.
+- Read-only submit/validate/plan/review tooling with evidence under `evidence/selfservice/<tenant>/<proposal_id>/`.
+- Policy gate `policy-selfservice.sh` wired into `make policy.check`; CI validates examples.
+- Operator and tenant self-service docs plus Phase 15 Part 1 entry/accept targets.
+
 ### Changed
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).

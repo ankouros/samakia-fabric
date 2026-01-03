@@ -101,6 +101,10 @@ jobs:
         run: |
           make proposals.validate PROPOSAL_ID=example
 
+      - name: Self-service proposal contract checks
+        run: |
+          make selfservice.validate PROPOSAL_ID=example
+
       - name: Substrate contract checks
         run: make substrate.contracts.validate
 

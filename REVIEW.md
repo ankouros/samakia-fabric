@@ -66,6 +66,13 @@ This document records what was implemented for the **Terraform remote state back
 - Wires policy gates and Part 3 entry/acceptance targets.
 - Alerts and incidents are informational only; no automation or self-healing.
 
+## Phase 15 Part 1 — Controlled Self-Service (Proposal-Only)
+
+- Adds tenant-facing self-service proposal contracts and example inputs.
+- Implements read-only submit/validate/plan/review tooling with evidence packets under `evidence/selfservice/`.
+- Wires policy gate + CI validation for self-service proposals; execution remains operator-controlled.
+- Adds tenant/operator docs for proposal lifecycle and review responsibilities.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`
