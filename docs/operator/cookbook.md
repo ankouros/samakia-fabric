@@ -147,6 +147,32 @@ None (policy reference).
 #### Rollback / safe exit
 Stop and document a deterministic replacement plan before proceeding.
 
+### Task: Review shared VLAN IP/VIP allocation contract
+
+#### Intent
+Confirm shared VLAN allocations and VIP registry before reserving new addresses.
+
+#### Preconditions
+- Shared service scope identified (proxy/workload/management/VIP)
+
+#### Command
+```bash
+sed -n '1,200p' docs/network/ipam-shared.md
+```
+
+#### Expected result
+Planned allocations align with the contract and registry.
+
+#### Evidence outputs
+None (policy reference).
+
+#### Failure modes
+- Allocation outside the contract ranges
+- VIP reservation missing from the registry
+
+#### Rollback / safe exit
+Stop and update the contract before proceeding.
+
 ### Task: Plan template upgrades (replace or blue/green only)
 
 #### Intent

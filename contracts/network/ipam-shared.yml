@@ -1,0 +1,90 @@
+# CIDR ranges are allocation blocks within the shared VLAN; the start IP is authoritative.
+network:
+  name: shared
+  vlan_id: 120
+  cidr: 10.10.120.0/24
+
+  ranges:
+
+    management:
+      cidr: 10.10.120.48/28
+      purpose: >
+        Management access for internal service nodes
+        (ssh, ansible, control-plane access).
+      rules:
+        - never used as VIP
+        - never published directly via public DNS
+        - static allocation only
+
+    workload:
+      cidr: 10.10.120.16/27
+      purpose: >
+        Backend service nodes (databases, queues, observability backends).
+      rules:
+        - no direct client exposure
+        - accessed via proxy layers
+        - static allocation only
+
+    proxy:
+      cidr: 10.10.120.8/29
+      purpose: >
+        HAProxy / ingress / protocol termination nodes.
+      rules:
+        - may appear in DNS A records
+        - must not host stateful data
+
+    vip:
+      cidr: 10.10.120.0/29
+      purpose: >
+        Virtual IPs used exclusively by Keepalived / VRRP.
+      rules:
+        - never assigned to a node interface
+        - never used as management IP
+        - never reused
+        - referenced by role, not hostname
+
+vip_registry:
+
+  shared_vlan_gateway:
+    vip: 10.10.120.1
+    role: shared-vlan-gateway
+    keepalived_group: shared-gateway
+    description: >
+      VIP for the shared VLAN gateway (VRRP on shared edge nodes).
+
+  postgres_internal:
+    vip: 10.10.120.2
+    role: postgres-ha-frontend
+    keepalived_group: postgres
+    description: >
+      VIP for internal shared Postgres HAProxy frontend.
+
+  observability_shared:
+    vip: 10.10.120.3
+    role: observability-frontend
+    keepalived_group: observability
+    description: >
+      VIP for shared observability ingress.
+
+dns_policy:
+  proxy_first: true
+
+  rules:
+    - dns_records_must_point_to: proxy
+    - vip_must_not_be_primary_dns_target: true
+    - vip_may_be_used_for:
+        - internal failover only
+
+consumers:
+  internal_services:
+    allowed_ranges:
+      - management
+      - workload
+      - proxy
+
+  tenants:
+    allowed_ranges:
+      - workload
+    restrictions:
+      - no vip usage
+      - no management range usage

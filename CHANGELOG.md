@@ -135,6 +135,11 @@ The format is inspired by:
 - Anti-drift doc tooling + CI gate (`make docs.operator.check`)
 - Phase 9 acceptance marker: `acceptance/PHASE9_ACCEPTED.md`
 
+#### Shared VLAN IP/VIP allocation contract
+- Authoritative shared VLAN IP/VIP registry in `contracts/network/ipam-shared.yml`.
+- Operator + Codex guidance in `docs/network/ipam-shared.md`.
+- Policy gate to prevent VIP misuse and out-of-range allocations.
+
 #### Tutorials (Phase 1-2 onboarding)
 - Tutorial index at `docs/tutorials/README.md` with required order.
 - New tutorials for MinIO backend, DNS plane, and shared services under `docs/tutorials/`.

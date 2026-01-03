@@ -13,6 +13,13 @@ This document records what was implemented for the **Terraform remote state back
 - Post-Phase12 hardening adds image provenance stamps, pinned base digests, and apt snapshot sources.
 - Operator docs now cover SSH trust rotation, networking determinism policy, runner modes, and template upgrade semantics.
 
+## Shared VLAN IP/VIP Allocation Contract
+
+- Added an authoritative shared VLAN IP/VIP allocation contract at `contracts/network/ipam-shared.yml`.
+- Documented range semantics, examples, and Codex guardrails in `docs/network/ipam-shared.md`.
+- Wired policy enforcement to block VIP misuse and out-of-range allocations.
+- No runtime behavior changes; this is contract and documentation governance only.
+
 ## Phase 13 Design — Governed Exposure (Design Only)
 
 - Defines exposure as a governed choreography (plan -> approve -> apply -> verify -> rollback).

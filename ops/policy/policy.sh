@@ -24,6 +24,7 @@ scripts=(
   "policy-ha.sh"
   "policy-docs.sh"
   "policy-security.sh"
+  "policy-ipam.sh"
   "policy-images.sh"
   "policy-observability.sh"
   "policy-runner-mode.sh"

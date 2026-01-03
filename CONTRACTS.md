@@ -56,6 +56,7 @@ Any change that violates a contract must be redesigned before merging.
 - SSH is key-only; root SSH is temporary for bootstrap only.
 - SSH host key rotation is mandatory after replace/recreate; strict host key checking must remain enabled with out-of-band fingerprint verification.
 - Tier-0 network identity is deterministic: MAC pinning or DHCP reservations are required, and IP cutovers must be documented and evidence-backed.
+- Shared VLAN IP/VIP allocation is contract-governed (`contracts/network/ipam-shared.yml`); IPs and VIPs must be allocated exclusively from that contract and never guessed.
 - Phase acceptance requires `make phase<N>.accept` (or phase-equivalent), evidence recording, and acceptance markers.
 - AI operations are read-only by default; any remediation requires explicit guards and evidence packets.
 - AI-assisted analysis is advisory-only: Ollama-only provider, deterministic routing, no external providers, and no execution or mutation paths.

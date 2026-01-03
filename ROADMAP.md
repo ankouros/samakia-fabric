@@ -124,6 +124,7 @@ Status: COMPLETED ✅
   - NTP: `192.168.11.120` (UDP/123)
   - Vault: `192.168.11.121` (TLS/8200)
   - Observability: `192.168.11.122` (TLS/3000, 9090, 9093, 3100)
+- Shared VLAN IP/VIP allocation contract + registry (`contracts/network/ipam-shared.yml`).
 - Internal time authority (chrony servers) + client policy
 - Vault HA (raft) with bootstrap CA + Vault PKI issuance for shared services
 - Observability substrate (Prometheus, Alertmanager, Loki, Grafana)

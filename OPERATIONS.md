@@ -281,9 +281,18 @@ Samakia Fabric uses a remote S3-compatible backend (MinIO) for Terraform state a
   - DNS VIP: `192.168.11.100`
   - MinIO VIP: `192.168.11.101`
 - **Management IPs (ops-only; never service endpoints)**:
-  - MinIO edges: `minio-edge-1=192.168.11.102`, `minio-edge-2=192.168.11.103`
-  - DNS edges: `dns-edge-1=192.168.11.111`, `dns-edge-2=192.168.11.112`
+- MinIO edges: `minio-edge-1=192.168.11.102`, `minio-edge-2=192.168.11.103`
+- DNS edges: `dns-edge-1=192.168.11.111`, `dns-edge-2=192.168.11.112`
 - **Collision rule**: `.100/.101/.102/.103` are reserved for DNS/MinIO VIP + MinIO edge mgmt only.
+
+### Shared VLAN IP/VIP allocation contract
+
+Shared VLAN addresses (VLAN120) must be allocated exclusively from the
+authoritative contract:
+- `contracts/network/ipam-shared.yml`
+- `docs/network/ipam-shared.md`
+
+VIPs are registry-only, and DNS must resolve to proxy nodes (not VIPs).
 
 One-command deployment (non-interactive; requires runner env for Proxmox token + bootstrap SSH key):
 
