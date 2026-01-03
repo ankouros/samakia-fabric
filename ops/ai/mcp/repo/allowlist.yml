@@ -1,0 +1,9 @@
+roots:
+  - ops/
+  - docs/
+  - contracts/
+  - acceptance/
+files:
+  - REVIEW.md
+  - CHANGELOG.md
+  - ROADMAP.md

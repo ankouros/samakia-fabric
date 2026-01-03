@@ -1511,6 +1511,30 @@ ai.index.live: ## AI indexing live run (guarded; TENANT, SOURCE required)
 	@TENANT="$(TENANT)" SOURCE="$(SOURCE)" \
 		bash "$(REPO_ROOT)/ops/ai/indexer/indexer.sh" index --tenant "$(TENANT)" --source "$(SOURCE)" --live
 
+.PHONY: ai.mcp.doctor
+ai.mcp.doctor: ## AI MCP config doctor (read-only)
+	@bash "$(REPO_ROOT)/ops/ai/mcp/doctor.sh"
+
+.PHONY: ai.mcp.repo.start
+ai.mcp.repo.start: ## Start repo MCP server (read-only; local)
+	@MCP_PORT="$(MCP_PORT)" bash "$(REPO_ROOT)/ops/ai/mcp/repo/server.sh"
+
+.PHONY: ai.mcp.evidence.start
+ai.mcp.evidence.start: ## Start evidence MCP server (read-only; local)
+	@MCP_PORT="$(MCP_PORT)" bash "$(REPO_ROOT)/ops/ai/mcp/evidence/server.sh"
+
+.PHONY: ai.mcp.observability.start
+ai.mcp.observability.start: ## Start observability MCP server (read-only; local)
+	@MCP_PORT="$(MCP_PORT)" bash "$(REPO_ROOT)/ops/ai/mcp/observability/server.sh"
+
+.PHONY: ai.mcp.runbooks.start
+ai.mcp.runbooks.start: ## Start runbooks MCP server (read-only; local)
+	@MCP_PORT="$(MCP_PORT)" bash "$(REPO_ROOT)/ops/ai/mcp/runbooks/server.sh"
+
+.PHONY: ai.mcp.qdrant.start
+ai.mcp.qdrant.start: ## Start Qdrant MCP server (read-only; local)
+	@MCP_PORT="$(MCP_PORT)" bash "$(REPO_ROOT)/ops/ai/mcp/qdrant/server.sh"
+
 .PHONY: phase7.entry.check
 phase7.entry.check: ## Phase 7 entry checklist (writes acceptance/PHASE7_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase7-entry-check.sh"
@@ -2285,6 +2309,14 @@ phase16.part2.entry.check: ## Phase 16 Part 2 entry checklist (AI indexing)
 .PHONY: phase16.part2.accept
 phase16.part2.accept: ## Phase 16 Part 2 acceptance (AI indexing)
 	@bash "$(OPS_SCRIPTS_DIR)/phase16-part2-accept.sh"
+
+.PHONY: phase16.part3.entry.check
+phase16.part3.entry.check: ## Phase 16 Part 3 entry checklist (AI MCP)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part3-entry-check.sh"
+
+.PHONY: phase16.part3.accept
+phase16.part3.accept: ## Phase 16 Part 3 acceptance (AI MCP)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part3-accept.sh"
 
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)

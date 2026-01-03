@@ -7,7 +7,7 @@ It never grants AI any execution or remediation capability.
 - Analysis, summarization, and explanation only
 - Read-only inputs (contracts, evidence, runbooks, docs)
 - Deterministic routing and provider configuration
-- MCP access is read-only and introduced in Phase 16 Part 3
+- MCP access is read-only and available in Phase 16 Part 3
 - Indexing is offline-first with guarded live runs (Phase 16 Part 2)
 
 ## Non-goals
@@ -18,4 +18,6 @@ It never grants AI any execution or remediation capability.
 ## References
 - Provider: `provider.md`
 - Routing: `routing.md`
+- Indexing: `indexing.md`
+- MCP services: `mcp.md`
 - Operator usage: `../operator/ai.md`

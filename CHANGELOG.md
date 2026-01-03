@@ -54,6 +54,11 @@ The format is inspired by:
 - Policy gates for Qdrant/indexing + CI offline indexing step
 - Phase 16 Part 2 entry checklist + acceptance marker
 
+#### AI-assisted analysis (Phase 16 Part 3)
+- Read-only MCP services for repo, evidence, observability, runbooks, and Qdrant
+- Explicit allowlists, tenant isolation, and audit logging for every request
+- MCP policy gate + doctor + entry/acceptance scripts and markers
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

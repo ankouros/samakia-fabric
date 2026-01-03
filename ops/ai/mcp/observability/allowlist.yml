@@ -1,0 +1,15 @@
+prometheus:
+  base_url: http://192.168.11.122:9090
+  queries:
+    - name: infra_cpu
+      expr: sum(rate(node_cpu_seconds_total{mode!="idle"}[5m]))
+    - name: infra_memory
+      expr: sum(node_memory_MemAvailable_bytes)
+loki:
+  base_url: http://192.168.11.122:3100
+  queries:
+    - name: syslog_errors
+      expr: '{job="syslog"} |= "error"'
+limits:
+  max_range_seconds: 3600
+  max_step_seconds: 300

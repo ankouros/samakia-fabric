@@ -1,0 +1,146 @@
+# Phase 16 Part 3 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T05:29:33Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE16_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/ai/mcp/common/server.py
+  - Command: test -f ops/ai/mcp/common/server.py
+  - Result: PASS
+- File present: ops/ai/mcp/common/auth.sh
+  - Command: test -f ops/ai/mcp/common/auth.sh
+  - Result: PASS
+- File present: ops/ai/mcp/common/allowlist.sh
+  - Command: test -f ops/ai/mcp/common/allowlist.sh
+  - Result: PASS
+- File present: ops/ai/mcp/common/redact.sh
+  - Command: test -f ops/ai/mcp/common/redact.sh
+  - Result: PASS
+- File present: ops/ai/mcp/common/audit.sh
+  - Command: test -f ops/ai/mcp/common/audit.sh
+  - Result: PASS
+- File present: ops/ai/mcp/common/errors.sh
+  - Command: test -f ops/ai/mcp/common/errors.sh
+  - Result: PASS
+- File present: ops/ai/mcp/repo/server.sh
+  - Command: test -f ops/ai/mcp/repo/server.sh
+  - Result: PASS
+- File present: ops/ai/mcp/repo/handlers.sh
+  - Command: test -f ops/ai/mcp/repo/handlers.sh
+  - Result: PASS
+- File present: ops/ai/mcp/repo/allowlist.yml
+  - Command: test -f ops/ai/mcp/repo/allowlist.yml
+  - Result: PASS
+- File present: ops/ai/mcp/evidence/server.sh
+  - Command: test -f ops/ai/mcp/evidence/server.sh
+  - Result: PASS
+- File present: ops/ai/mcp/evidence/handlers.sh
+  - Command: test -f ops/ai/mcp/evidence/handlers.sh
+  - Result: PASS
+- File present: ops/ai/mcp/evidence/allowlist.yml
+  - Command: test -f ops/ai/mcp/evidence/allowlist.yml
+  - Result: PASS
+- File present: ops/ai/mcp/observability/server.sh
+  - Command: test -f ops/ai/mcp/observability/server.sh
+  - Result: PASS
+- File present: ops/ai/mcp/observability/handlers.sh
+  - Command: test -f ops/ai/mcp/observability/handlers.sh
+  - Result: PASS
+- File present: ops/ai/mcp/observability/allowlist.yml
+  - Command: test -f ops/ai/mcp/observability/allowlist.yml
+  - Result: PASS
+- File present: ops/ai/mcp/observability/fixtures/prometheus.json
+  - Command: test -f ops/ai/mcp/observability/fixtures/prometheus.json
+  - Result: PASS
+- File present: ops/ai/mcp/observability/fixtures/loki.json
+  - Command: test -f ops/ai/mcp/observability/fixtures/loki.json
+  - Result: PASS
+- File present: ops/ai/mcp/runbooks/server.sh
+  - Command: test -f ops/ai/mcp/runbooks/server.sh
+  - Result: PASS
+- File present: ops/ai/mcp/runbooks/handlers.sh
+  - Command: test -f ops/ai/mcp/runbooks/handlers.sh
+  - Result: PASS
+- File present: ops/ai/mcp/runbooks/allowlist.yml
+  - Command: test -f ops/ai/mcp/runbooks/allowlist.yml
+  - Result: PASS
+- File present: ops/ai/mcp/qdrant/server.sh
+  - Command: test -f ops/ai/mcp/qdrant/server.sh
+  - Result: PASS
+- File present: ops/ai/mcp/qdrant/handlers.sh
+  - Command: test -f ops/ai/mcp/qdrant/handlers.sh
+  - Result: PASS
+- File present: ops/ai/mcp/qdrant/allowlist.yml
+  - Command: test -f ops/ai/mcp/qdrant/allowlist.yml
+  - Result: PASS
+- File present: ops/ai/mcp/qdrant/fixtures/search.json
+  - Command: test -f ops/ai/mcp/qdrant/fixtures/search.json
+  - Result: PASS
+- File present: ops/policy/policy-ai-mcp.sh
+  - Command: test -f ops/policy/policy-ai-mcp.sh
+  - Result: PASS
+- File present: docs/ai/mcp.md
+  - Command: test -f docs/ai/mcp.md
+  - Result: PASS
+- File present: docs/operator/ai.md
+  - Command: test -f docs/operator/ai.md
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- Policy gate wired: policy-ai-mcp.sh
+  - Command: rg -n policy-ai-mcp\.sh ops/policy/policy.sh
+  - Result: PASS
+- Audit logging implemented
+  - Command: rg -n mcp-audit ops/ai/mcp/common/server.py
+  - Result: PASS
+- Makefile target present: ai.mcp.doctor
+  - Command: rg -n '^ai\.mcp\.doctor:' Makefile
+  - Result: PASS
+- Makefile target present: ai.mcp.repo.start
+  - Command: rg -n '^ai\.mcp\.repo\.start:' Makefile
+  - Result: PASS
+- Makefile target present: ai.mcp.evidence.start
+  - Command: rg -n '^ai\.mcp\.evidence\.start:' Makefile
+  - Result: PASS
+- Makefile target present: ai.mcp.observability.start
+  - Command: rg -n '^ai\.mcp\.observability\.start:' Makefile
+  - Result: PASS
+- Makefile target present: ai.mcp.runbooks.start
+  - Command: rg -n '^ai\.mcp\.runbooks\.start:' Makefile
+  - Result: PASS
+- Makefile target present: ai.mcp.qdrant.start
+  - Command: rg -n '^ai\.mcp\.qdrant\.start:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part3.entry.check
+  - Command: rg -n '^phase16\.part3\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part3.accept
+  - Command: rg -n '^phase16\.part3\.accept:' Makefile
+  - Result: PASS
+- AI MCP doctor
+  - Command: make -C /home/aggelos/samakia-fabric ai.mcp.doctor
+  - Result: PASS
+- MCP policy check
+  - Command: bash /home/aggelos/samakia-fabric/ops/policy/policy-ai-mcp.sh
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS

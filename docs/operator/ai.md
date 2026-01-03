@@ -2,7 +2,7 @@
 
 AI in Samakia Fabric is advisory only. It **cannot** apply changes or execute actions.
 Provider access is Ollama-only and routing is deterministic.
-Future context access uses read-only MCP services (Phase 16 Part 3).
+Context access uses read-only MCP services (Phase 16 Part 3).
 
 ## Quick checks
 
@@ -46,6 +46,36 @@ make ai.index.live TENANT=platform SOURCE=docs
 
 Evidence output:
 `evidence/ai/indexing/<tenant>/<UTC>/`
+
+## MCP services (Phase 16 Part 3)
+
+Doctor (config + allowlists, read-only):
+
+```bash
+make ai.mcp.doctor
+```
+
+Start servers locally (read-only):
+
+```bash
+make ai.mcp.repo.start
+make ai.mcp.evidence.start
+make ai.mcp.observability.start
+make ai.mcp.runbooks.start
+make ai.mcp.qdrant.start
+```
+
+Requests must include identity + tenant headers:
+
+```bash
+curl -sS -H "X-MCP-Identity: operator" -H "X-MCP-Tenant: platform" \\
+  -H "Content-Type: application/json" \\
+  -d '{"action":"list_files"}' http://127.0.0.1:8781/query
+```
+
+Live access is guarded (never in CI):
+- Observability: `OBS_LIVE=1`
+- Qdrant: `QDRANT_LIVE=1`
 
 ## Design-only workflows (tooling arrives in later Phase 16 parts)
 

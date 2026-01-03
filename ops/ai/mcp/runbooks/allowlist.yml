@@ -1,0 +1,3 @@
+roots:
+  - ops/runbooks/
+  - docs/operator/

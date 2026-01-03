@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "streams",
+    "result": [
+      {
+        "stream": {"job": "syslog"},
+        "values": [["0", "sample log line"]]
+      }
+    ]
+  }
+}

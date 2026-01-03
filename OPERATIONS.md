@@ -1343,12 +1343,28 @@ OLLAMA_ENABLE=1 \
 make ai.index.live TENANT=platform SOURCE=docs
 ```
 
+MCP services (read-only context):
+
+```bash
+make ai.mcp.doctor
+make ai.mcp.repo.start
+make ai.mcp.evidence.start
+make ai.mcp.observability.start
+make ai.mcp.runbooks.start
+make ai.mcp.qdrant.start
+```
+
+Live MCP access is guarded (never in CI):
+- Observability: `OBS_LIVE=1`
+- Qdrant: `QDRANT_LIVE=1`
+
 Documentation:
 - `docs/operator/ai.md`
 - `docs/ai/overview.md`
 - `docs/ai/provider.md`
 - `docs/ai/routing.md`
 - `docs/ai/indexing.md`
+- `docs/ai/mcp.md`
 
 ---
 

@@ -800,8 +800,10 @@ Status: IN PROGRESS
 - Deterministic offline indexing pipeline with fixtures and evidence packets.
 - Tenant isolation model and CI-safe ingestion flows.
 
-### Part 3 — Read-Only MCP Services (Planned)
+### Part 3 — Read-Only MCP Services (COMPLETED ✅)
 - Read-only MCP servers for repo, evidence, observability, runbooks, and Qdrant search.
+- Explicit allowlists, tenant isolation, and audit logging for every request.
+- Policy gate, doctor checks, and acceptance marker.
 - Explicit allowlists, tenant isolation, and audit logs.
 
 ### Part 4 — Analysis UX + Evidence-Bound Reports (Planned)

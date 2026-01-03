@@ -61,6 +61,9 @@ jobs:
       - name: AI indexing offline (fixtures)
         run: make ai.index.offline TENANT=platform SOURCE=docs
 
+      - name: AI MCP doctor
+        run: make ai.mcp.doctor
+
       - name: Hardening checklist validate
         run: make hardening.checklist.validate
 

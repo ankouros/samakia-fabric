@@ -1,0 +1,12 @@
+{
+  "result": [
+    {
+      "id": 1,
+      "score": 0.99,
+      "payload": {
+        "source_type": "docs",
+        "path": "docs/ai/overview.md"
+      }
+    }
+  ]
+}

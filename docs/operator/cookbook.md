@@ -459,6 +459,61 @@ Live indexing runs and writes evidence.
 #### Rollback / safe exit
 Disable live mode and use offline indexing until guards are satisfied.
 
+### Task: AI MCP doctor (read-only)
+
+#### Intent
+Validate MCP allowlists and read-only configuration.
+
+#### Preconditions
+- `FABRIC_REPO_ROOT` set
+
+#### Command
+```bash
+make ai.mcp.doctor
+```
+
+#### Expected result
+All MCP allowlists validate without errors.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- Missing allowlists or MCP scripts
+
+#### Rollback / safe exit
+Fix MCP configuration and rerun the doctor check.
+
+### Task: Start MCP servers (read-only)
+
+#### Intent
+Start read-only MCP servers for local analysis.
+
+#### Preconditions
+- Operator workstation (never in CI)
+
+#### Command
+```bash
+make ai.mcp.repo.start
+make ai.mcp.evidence.start
+make ai.mcp.observability.start
+make ai.mcp.runbooks.start
+make ai.mcp.qdrant.start
+```
+
+#### Expected result
+Each MCP listens on localhost (default ports 8781–8785).
+
+#### Evidence outputs
+`evidence/ai/mcp-audit/<UTC>/...` per request.
+
+#### Failure modes
+- Port already in use
+- Missing allowlists or fixtures
+
+#### Rollback / safe exit
+Stop the local process and re-run with a different `MCP_PORT`.
+
 ### Task: Phase 16 Part 2 acceptance
 
 #### Intent
@@ -481,6 +536,32 @@ Entry checklist and acceptance marker are generated.
 
 #### Failure modes
 - Missing contracts, policies, or fixtures
+
+#### Rollback / safe exit
+Fix missing items and re-run the checks.
+
+### Task: Phase 16 Part 3 acceptance
+
+#### Intent
+Validate Phase 16 Part 3 MCP requirements.
+
+#### Preconditions
+- Phase 16 Part 3 tooling and docs in place
+
+#### Command
+```bash
+make phase16.part3.entry.check
+make phase16.part3.accept
+```
+
+#### Expected result
+Entry checklist and acceptance marker are generated.
+
+#### Evidence outputs
+`acceptance/PHASE16_PART3_ENTRY_CHECKLIST.md` and `acceptance/PHASE16_PART3_ACCEPTED.md`
+
+#### Failure modes
+- Missing MCP servers, allowlists, or policy gates
 
 #### Rollback / safe exit
 Fix missing items and re-run the checks.

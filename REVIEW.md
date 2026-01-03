@@ -110,6 +110,12 @@ This document records what was implemented for the **Terraform remote state back
 - Implements offline-first indexing pipeline with fixtures, redaction, and evidence packets.
 - Wires policy gates and CI offline indexing step; live indexing remains guarded.
 
+## Phase 16 Part 3 — Read-Only MCP Services (Analysis-Only)
+
+- Adds read-only MCP servers for repo, evidence, observability, runbooks, and Qdrant search.
+- Enforces allowlists, tenant isolation, and audit logging for every request.
+- Introduces MCP policy gate, doctor checks, and acceptance markers.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

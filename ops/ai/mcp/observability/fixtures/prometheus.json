@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "matrix",
+    "result": [
+      {
+        "metric": {"job": "node"},
+        "values": [[0, "1"]]
+      }
+    ]
+  }
+}
