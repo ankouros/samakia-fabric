@@ -19,6 +19,7 @@ scripts=(
   "policy-ha.sh"
   "policy-docs.sh"
   "policy-security.sh"
+  "policy-images.sh"
   "policy-ai-ops.sh"
   "policy-ai-provider.sh"
   "policy-ai-routing.sh"

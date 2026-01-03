@@ -112,6 +112,13 @@ The format is inspired by:
 - Read-only template verification + evidence packets (register/verify)
 - Phase 8 Part 2 acceptance marker: `acceptance/PHASE8_PART2_ACCEPTED.md`
 
+#### VM golden images (Phase 8.3)
+- Digest-pinned toolchain base image and snapshot-pinned apt sources.
+- Provenance stamp now includes base image digest + apt snapshot identifiers.
+- Deterministic build evidence under `evidence/images/<image>/<version>/<UTC>/`.
+- Image reproducibility validation scripts wired into `policy.check` + CI.
+- Phase 8.3 acceptance marker: `acceptance/PHASE8_3_ACCEPTED.md`.
+
 #### Operator UX & doc governance (Phase 9)
 - Operator command cookbook and safety model (`docs/operator/*`)
 - Consumer catalog + guided flows (`docs/consumers/catalog.md`, `quickstart.md`, `variants.md`)

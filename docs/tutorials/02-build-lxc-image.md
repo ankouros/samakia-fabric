@@ -87,7 +87,9 @@ This avoids:
 Reproducibility controls:
 - The base image is pinned by digest (no floating tags).
 - APT uses a snapshot mirror during builds.
-- `/etc/samakia-image-version` is stamped with build metadata.
+- `/etc/samakia-image-version` is stamped with:
+  - `IMAGE_NAME`, `IMAGE_VERSION`, `BUILD_UTC`
+  - `GIT_SHA`, `PACKER_TEMPLATE`, `BASE_IMAGE_DIGEST`, `APT_SNAPSHOT`
 
 ---
 

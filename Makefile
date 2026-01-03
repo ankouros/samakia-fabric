@@ -44,6 +44,8 @@ VM_ANSIBLE_PLAYBOOK ?= $(REPO_ROOT)/images/ansible/playbooks/golden-base.yml
 VM_VALIDATE_DIR ?= $(REPO_ROOT)/ops/images/vm/validate
 VM_EVIDENCE_DIR ?= $(REPO_ROOT)/ops/images/vm/evidence
 VM_REGISTER_DIR ?= $(REPO_ROOT)/ops/images/vm/register
+IMAGES_EVIDENCE_DIR ?= $(REPO_ROOT)/ops/images/evidence
+IMAGES_VALIDATE_DIR ?= $(REPO_ROOT)/ops/images/validate
 
 TERRAFORM_ENV_DIR := $(REPO_ROOT)/fabric-core/terraform/envs/$(ENV)
 ANSIBLE_DIR := $(REPO_ROOT)/fabric-core/ansible
@@ -181,6 +183,7 @@ image.build: ## Build golden LXC image (VERSION=N optional; default: next)
 		fi; \
 		fabric_version="v$${next}"; \
 		artifact_basename="$${prefix}-v$${next}"; \
+		build_time="$$(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
 		git_sha="$$(git -C "$(REPO_ROOT)" rev-parse HEAD 2>/dev/null || echo unknown)"; \
 		out="$$dir_abs/$${artifact_basename}.tar.gz"; \
 		if [[ -e "$$out" ]]; then echo "ERROR: artifact already exists (refusing to overwrite): $$out" >&2; exit 1; fi; \
@@ -193,12 +196,24 @@ image.build: ## Build golden LXC image (VERSION=N optional; default: next)
 			-var "artifact_basename=$$artifact_basename" \
 			-var "image_name=$(PACKER_IMAGE_NAME)" \
 			-var "image_version=$$fabric_version" \
-			-var "build_time=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+			-var "build_time=$$build_time" \
 			-var "git_sha=$$git_sha" \
 			-var "packer_template_id=$(PACKER_TEMPLATE_ID)" \
 			-var "apt_snapshot_url=$(APT_SNAPSHOT_URL)" \
 			"$(PACKER_TEMPLATE)"; \
 		if [[ ! -f "$$out" ]]; then echo "ERROR: build completed but artifact not found: $$out" >&2; exit 1; fi; \
+		base_image_digest="$$(rg -n "default = \\\"ubuntu@sha256:[^\\\"]+\\\"" "$(PACKER_TEMPLATE)" | head -n 1 | sed -E "s/.*\\\"(ubuntu@sha256:[^\\\"]+)\\\".*/\\1/")"; \
+		if [[ -z "$$base_image_digest" ]]; then echo "ERROR: unable to resolve base image digest from $(PACKER_TEMPLATE)" >&2; exit 1; fi; \
+		evidence_dir="$$(bash "$(IMAGES_EVIDENCE_DIR)/image-build-evidence.sh" \
+			--image "$(PACKER_IMAGE_NAME)" \
+			--version "$$fabric_version" \
+			--build-time "$$build_time" \
+			--git-sha "$$git_sha" \
+			--packer-template "$(PACKER_TEMPLATE_ID)" \
+			--base-image-digest "$$base_image_digest" \
+			--apt-snapshot "$(APT_SNAPSHOT_URL)" \
+			--image-kind "lxc")"; \
+		echo "Evidence: $$evidence_dir" >&2; \
 		echo "$$out" \
 	'
 
@@ -214,6 +229,7 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 		max="$$((next-1))"; \
 		fabric_version="v$${next}"; \
 		artifact_basename="$${prefix}-v$${next}"; \
+		build_time="$$(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
 		git_sha="$$(git -C "$(REPO_ROOT)" rev-parse HEAD 2>/dev/null || echo unknown)"; \
 		out="$$dir_abs/$${artifact_basename}.tar.gz"; \
 		if [[ -e "$$out" ]]; then \
@@ -231,7 +247,7 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 			-var "artifact_basename=$$artifact_basename" \
 			-var "image_name=$(PACKER_IMAGE_NAME)" \
 			-var "image_version=$$fabric_version" \
-			-var "build_time=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+			-var "build_time=$$build_time" \
 			-var "git_sha=$$git_sha" \
 			-var "packer_template_id=$(PACKER_TEMPLATE_ID)" \
 			-var "apt_snapshot_url=$(APT_SNAPSHOT_URL)" \
@@ -242,12 +258,36 @@ image.build-next: ## Build next image version v{max+1} (deterministic, no overwr
 			ls -lah "$$dir_abs" >&2 || true; \
 			exit 1; \
 		fi; \
+		base_image_digest="$$(rg -n "default = \\\"ubuntu@sha256:[^\\\"]+\\\"" "$(PACKER_TEMPLATE)" | head -n 1 | sed -E "s/.*\\\"(ubuntu@sha256:[^\\\"]+)\\\".*/\\1/")"; \
+		if [[ -z "$$base_image_digest" ]]; then echo "ERROR: unable to resolve base image digest from $(PACKER_TEMPLATE)" >&2; exit 1; fi; \
+		evidence_dir="$$(bash "$(IMAGES_EVIDENCE_DIR)/image-build-evidence.sh" \
+			--image "$(PACKER_IMAGE_NAME)" \
+			--version "$$fabric_version" \
+			--build-time "$$build_time" \
+			--git-sha "$$git_sha" \
+			--packer-template "$(PACKER_TEMPLATE_ID)" \
+			--base-image-digest "$$base_image_digest" \
+			--apt-snapshot "$(APT_SNAPSHOT_URL)" \
+			--image-kind "lxc")"; \
+		echo "Evidence: $$evidence_dir" >&2; \
 			echo "$$out" \
 	'
 
 .PHONY: image.version.test
 image.version.test: ## Unit test image version resolver (no packer, no Proxmox)
 	bash "$(OPS_SCRIPTS_DIR)/test-image-next-version.sh"
+
+.PHONY: images.validate.pinning
+images.validate.pinning: ## Validate image base pinning (Docker + LXC)
+	@bash "$(IMAGES_VALIDATE_DIR)/validate-pinning.sh"
+
+.PHONY: images.validate.apt
+images.validate.apt: ## Validate apt snapshot pinning for image builds
+	@bash "$(IMAGES_VALIDATE_DIR)/validate-apt-snapshot.sh"
+
+.PHONY: images.validate.provenance
+images.validate.provenance: ## Validate image provenance stamping rules
+	@bash "$(IMAGES_VALIDATE_DIR)/validate-provenance.sh"
 
 .PHONY: image.vm.build
 image.vm.build: ## Build VM golden image (IMAGE=ubuntu-24.04|debian-12 VERSION=v1; requires IMAGE_BUILD=1)
@@ -282,6 +322,7 @@ image.vm.build: ## Build VM golden image (IMAGE=ubuntu-24.04|debian-12 VERSION=v
 		cp -a "$$common_dir/scripts" "$$tmp_dir/"; \
 		cp -a "$$vm_dir/"*.pkr.hcl "$$tmp_dir/"; \
 		cp -a "$$vm_dir/$$vars_file" "$$tmp_dir/"; \
+		build_time="$$(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
 		git_sha="$$(git -C "$(REPO_ROOT)" rev-parse HEAD 2>/dev/null || echo unknown)"; \
 		packer_template_id="images/packer/$(IMAGE)/$(VERSION)/image.pkr.hcl"; \
 		packer init "$$tmp_dir"; \
@@ -292,12 +333,26 @@ image.vm.build: ## Build VM golden image (IMAGE=ubuntu-24.04|debian-12 VERSION=v
 			-var "vm_name=$(IMAGE)-$(VERSION)" \
 			-var "image_id=$(IMAGE)" \
 			-var "image_version=$(VERSION)" \
-			-var "build_time=$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+			-var "build_time=$$build_time" \
 			-var "git_sha=$$git_sha" \
 			-var "packer_template_id=$$packer_template_id" \
 			-var "apt_snapshot_url=$$apt_snapshot_url" \
 			-var "apt_snapshot_security_url=$$apt_snapshot_security_url" \
 			"$$tmp_dir"; \
+		base_image_digest="$$(rg -n "^iso_checksum" "$$tmp_dir/$$vars_file" | head -n 1 | sed -E "s/.*\\\"(sha256:[^\\\"]+)\\\".*/\\1/")"; \
+		if [[ -z "$$base_image_digest" ]]; then echo "ERROR: iso_checksum not found in $$vars_file" >&2; exit 1; fi; \
+		evidence_dir="$$(bash "$(IMAGES_EVIDENCE_DIR)/image-build-evidence.sh" \
+			--image "$(IMAGE)" \
+			--version "$(VERSION)" \
+			--build-time "$$build_time" \
+			--git-sha "$$git_sha" \
+			--packer-template "$$packer_template_id" \
+			--base-image-digest "$$base_image_digest" \
+			--apt-snapshot "$$apt_snapshot_url" \
+			--apt-snapshot-security "$$apt_snapshot_security_url" \
+			--ansible-playbook "$(VM_ANSIBLE_PLAYBOOK)" \
+			--image-kind "vm")"; \
+		echo "Evidence: $$evidence_dir" >&2; \
 		echo "$$out_dir" \
 	'
 

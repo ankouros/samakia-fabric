@@ -16,3 +16,6 @@ ansible_playbook_path = "images/ansible/playbooks/golden-base.yml"
 
 image_id      = "ubuntu-24.04"
 image_version = "v1"
+
+apt_snapshot_url = "https://snapshot.ubuntu.com/ubuntu/20260102T000000Z"
+apt_snapshot_security_url = "https://snapshot.ubuntu.com/ubuntu/20260102T000000Z"

@@ -18,9 +18,18 @@ Reproducibility rules:
 - APT sources must use a snapshot mirror during build.
 - Each image must include `/etc/samakia-image-version` with build metadata.
 
+Digest updates:
+- Update the pinned digest intentionally (no `:latest` tags).
+- Record the new digest in code and update the changelog.
+- Do not rely on mutable tags for production builds.
+Tags are forbidden in production builds because they are mutable and break provenance.
+Digests are required to guarantee that identical inputs produce identical images.
+
 ## Evidence packets
 
 Stored under `evidence/images/<name>/<version>/<UTC>/` and include:
-- build manifest
-- sha256 checksum
-- acceptance logs
+- `inputs.json` (base digests + snapshot identifiers)
+- `packer.json` (template + build metadata)
+- `ansible.json` (playbook metadata where applicable)
+- `provenance.txt` (must match `/etc/samakia-image-version`)
+- `manifest.sha256`

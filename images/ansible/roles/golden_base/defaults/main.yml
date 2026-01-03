@@ -4,6 +4,7 @@ golden_base_image_version: "v0"
 golden_base_build_time: "unknown"
 golden_base_git_sha: "unknown"
 golden_base_packer_template_id: "unknown"
+golden_base_base_image_digest: "unknown"
 golden_base_image_dir: "/etc/samakia-image"
 golden_base_apt_snapshot_url: ""
 golden_base_apt_snapshot_security_url: ""
@@ -13,5 +14,6 @@ golden_base_minimal_packages:
   - qemu-guest-agent
   - ca-certificates
   - openssh-server
+  - e2fsprogs
 
 golden_base_sshd_service: "ssh"

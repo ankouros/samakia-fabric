@@ -290,6 +290,13 @@ Goal: Introduce VM golden image contracts as immutable artifacts (no VM lifecycl
 - Read-only template verification + evidence packets
 - Acceptance marker: `acceptance/PHASE8_PART2_ACCEPTED.md`
 
+### Part 3 — Reproducibility Hardening (COMPLETED ✅)
+- Digest-pinned toolchain base images (no floating tags).
+- Snapshot-pinned apt sources for VM and LXC builds.
+- Provenance stamp includes base digest + apt snapshot.
+- Deterministic build evidence under `evidence/images/<image>/<version>/<UTC>/`.
+- Acceptance marker: `acceptance/PHASE8_3_ACCEPTED.md`.
+
 Non-scope:
 - No VM provisioning or scaling
 - No infrastructure mutation

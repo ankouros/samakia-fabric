@@ -16,3 +16,6 @@ ansible_playbook_path = "images/ansible/playbooks/golden-base.yml"
 
 image_id      = "debian-12"
 image_version = "v1"
+
+apt_snapshot_url = "https://snapshot.debian.org/archive/debian/20260102T000000Z"
+apt_snapshot_security_url = "https://snapshot.debian.org/archive/debian-security/20260102T000000Z"

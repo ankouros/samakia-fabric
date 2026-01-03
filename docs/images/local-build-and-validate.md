@@ -64,7 +64,8 @@ IMAGE_BUILD=1 make image.local.full IMAGE=debian-12 VERSION=v1
 Evidence packets are written under:
 
 ```
-evidence/images/vm/<image>/<version>/<UTC>/{build,validate}/
+evidence/images/<image>/<version>/<UTC>/   (build provenance)
+evidence/images/vm/<image>/<version>/<UTC>/validate/  (validation)
 ```
 
 Artifacts and evidence must never be committed to Git.

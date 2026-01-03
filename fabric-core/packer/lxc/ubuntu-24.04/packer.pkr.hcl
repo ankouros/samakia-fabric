@@ -88,7 +88,8 @@ build {
       "SAMAKIA_IMAGE_VERSION=${var.image_version}",
       "SAMAKIA_BUILD_UTC=${var.build_time}",
       "SAMAKIA_GIT_SHA=${var.git_sha}",
-      "SAMAKIA_PACKER_TEMPLATE_ID=${var.packer_template_id}"
+      "SAMAKIA_PACKER_TEMPLATE_ID=${var.packer_template_id}",
+      "SAMAKIA_BASE_IMAGE_DIGEST=${var.ubuntu_image}"
     ]
     scripts = [
       "provision.sh",

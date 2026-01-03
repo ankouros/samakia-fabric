@@ -363,7 +363,7 @@ cluster when the documented guardrails are followed.
 - Reproducibility and provenance are now explicit:
   - Base images pinned by digest.
   - Apt sources use snapshot mirrors during build.
-  - `/etc/samakia-image-version` stamps build UTC + git SHA + template ID.
+  - `/etc/samakia-image-version` stamps base digest + apt snapshot + build metadata.
 
 ### Terraform (Proxmox LXC lifecycle)
 - Strict TLS is enforced; CA trust is explicit.
@@ -430,6 +430,7 @@ cluster when the documented guardrails are followed.
 - Break-glass and recovery flows are documented.
 - Release readiness and compliance evidence have clear workflows.
 - Shared services are guarded and accepted in read-only mode.
+- Image reproducibility is now enforced with digest pinning, snapshot APT, and build evidence.
 
 **Operational sharp edges**
 - DHCP/MAC determinism policy is documented; tier-0 services pin MACs and

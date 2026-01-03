@@ -4138,7 +4138,8 @@ make image.local.full IMAGE=ubuntu-24.04 VERSION=v1
 Local build + validation completes; evidence generated.
 
 #### Evidence outputs
-`evidence/images/vm/<image>/<version>/<UTC>/...`
+`evidence/images/<image>/<version>/<UTC>/` (build provenance)
+`evidence/images/vm/<image>/<version>/<UTC>/validate/` (validation)
 
 #### Failure modes
 - Missing tooling (qemu-img/guestfish)

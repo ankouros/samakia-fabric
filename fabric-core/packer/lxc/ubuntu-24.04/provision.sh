@@ -13,6 +13,8 @@ APT_SNAPSHOT_URL="${APT_SNAPSHOT_URL:-https://snapshot.ubuntu.com/ubuntu/2026010
 # -----------------------------------------------------------------------------
 # Base OS
 # -----------------------------------------------------------------------------
+# Visible in build logs for provenance.
+echo "Using APT snapshot: ${APT_SNAPSHOT_URL}"
 # shellcheck disable=SC1091
 # shellcheck source=/etc/os-release
 . /etc/os-release
@@ -37,6 +39,7 @@ apt-get install -y --no-install-recommends \
   systemd-sysv \
   dbus \
   ca-certificates \
+  e2fsprogs \
   tzdata \
   locales \
   python3 \
@@ -60,16 +63,28 @@ image_name="${SAMAKIA_IMAGE_NAME:-unknown}"
 image_version="${SAMAKIA_IMAGE_VERSION:-unknown}"
 build_utc="${SAMAKIA_BUILD_UTC:-unknown}"
 git_sha="${SAMAKIA_GIT_SHA:-unknown}"
-packer_template_id="${SAMAKIA_PACKER_TEMPLATE_ID:-unknown}"
+packer_template="${SAMAKIA_PACKER_TEMPLATE_ID:-unknown}"
+base_image_digest="${SAMAKIA_BASE_IMAGE_DIGEST:-unknown}"
+if [[ "$base_image_digest" == *"@"* ]]; then
+  base_image_digest="${base_image_digest#*@}"
+fi
+apt_snapshot="${APT_SNAPSHOT_URL:-unknown}"
 
 cat > /etc/samakia-image-version <<EOF
-image_name=${image_name}
-image_version=${image_version}
-build_utc=${build_utc}
-git_sha=${git_sha}
-packer_template_id=${packer_template_id}
+IMAGE_NAME=${image_name}
+IMAGE_VERSION=${image_version}
+BUILD_UTC=${build_utc}
+GIT_SHA=${git_sha}
+PACKER_TEMPLATE=${packer_template}
+BASE_IMAGE_DIGEST=${base_image_digest}
+APT_SNAPSHOT=${apt_snapshot}
 EOF
-chmod 0644 /etc/samakia-image-version
+chmod 0444 /etc/samakia-image-version
+if ! command -v chattr >/dev/null 2>&1; then
+  echo "ERROR: chattr is required to lock /etc/samakia-image-version" >&2
+  exit 1
+fi
+chattr +i /etc/samakia-image-version
 
 # NOTE:
 # - Removed cloud-init: it is not reliably useful in LXC rootfs templates and

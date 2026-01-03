@@ -7,7 +7,7 @@ VM golden images must adhere to the platform security model:
 - Logging enabled (journald + syslog)
 - Minimal package footprint
 - Cloud-init enabled with deterministic datasource
-- `/etc/samakia-image-version` stamped with build metadata
+- `/etc/samakia-image-version` stamped and immutable (name, version, UTC, git SHA, template ID, base digest, apt snapshot)
 
 Operator commands live in `../operator/cookbook.md`.
 

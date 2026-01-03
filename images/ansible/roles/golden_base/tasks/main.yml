@@ -1,4 +1,9 @@
 ---
+- name: Require apt snapshot URL
+  ansible.builtin.fail:
+    msg: "golden_base_apt_snapshot_url must be set to a snapshot mirror"
+  when: golden_base_apt_snapshot_url | length == 0
+
 - name: Configure apt snapshot sources (if provided)
   ansible.builtin.blockinfile:
     path: /etc/apt/apt.conf.d/99snapshot
@@ -25,6 +30,11 @@
       deb {{ golden_base_apt_snapshot_url }} {{ codename }}-updates main restricted universe multiverse
       deb {{ golden_base_apt_snapshot_url }} {{ codename }}-security main restricted universe multiverse
       {% endif %}
+  when: golden_base_apt_snapshot_url | length > 0
+
+- name: Log apt snapshot source
+  ansible.builtin.debug:
+    msg: "Using APT snapshot: {{ golden_base_apt_snapshot_url }}"
   when: golden_base_apt_snapshot_url | length > 0
 
 - name: Ensure minimal packages
@@ -62,7 +72,11 @@
     dest: /etc/samakia-image-version
     owner: root
     group: root
-    mode: "0644"
+    mode: "0444"
+
+- name: Lock image version stamp
+  ansible.builtin.command: chattr +i /etc/samakia-image-version
+  changed_when: false
 
 - name: Ensure journald persistent storage
   ansible.builtin.lineinfile:

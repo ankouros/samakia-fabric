@@ -48,7 +48,7 @@ Any change that violates a contract must be redesigned before merging.
 ## Fabric Contract
 
 - Packer builds golden images only; no users, keys, or environment logic baked in.
-- Golden image inputs are reproducible: base images pinned by digest, apt sources use snapshot mirrors, and `/etc/samakia-image-version` includes image_name, image_version, build_utc, git_sha, and packer_template_id.
+- Golden image inputs are reproducible: base images pinned by digest, apt sources use snapshot mirrors, and `/etc/samakia-image-version` includes `IMAGE_NAME`, `IMAGE_VERSION`, `BUILD_UTC`, `GIT_SHA`, `PACKER_TEMPLATE`, `BASE_IMAGE_DIGEST`, and `APT_SNAPSHOT`.
 - Terraform manages infrastructure lifecycle only; no provisioning or OS config.
 - Ansible handles OS policy and user access; it must remain idempotent.
 - Proxmox automation uses delegated users; `root@pam` is forbidden for automation.
