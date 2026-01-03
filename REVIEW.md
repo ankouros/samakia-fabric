@@ -104,6 +104,12 @@ This document records what was implemented for the **Terraform remote state back
 - Wires policy gates to block external providers and enforce routing.
 - Adds Phase 16 Part 1 entry checklist and acceptance marker.
 
+## Phase 16 Part 2 — AI Indexing + Qdrant (Analysis-Only)
+
+- Adds Qdrant + indexing contracts with collection-per-tenant isolation.
+- Implements offline-first indexing pipeline with fixtures, redaction, and evidence packets.
+- Wires policy gates and CI offline indexing step; live indexing remains guarded.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

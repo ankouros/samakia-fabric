@@ -1327,11 +1327,28 @@ bash ops/ai/ai.sh doctor
 bash ops/ai/ai.sh route ops.analysis
 ```
 
+AI indexing (offline default):
+
+```bash
+make ai.index.offline TENANT=platform SOURCE=docs
+```
+
+Live indexing requires explicit guards:
+
+```bash
+AI_INDEX_EXECUTE=1 \
+AI_INDEX_REASON="ticket-123: refresh docs" \
+QDRANT_ENABLE=1 \
+OLLAMA_ENABLE=1 \
+make ai.index.live TENANT=platform SOURCE=docs
+```
+
 Documentation:
 - `docs/operator/ai.md`
 - `docs/ai/overview.md`
 - `docs/ai/provider.md`
 - `docs/ai/routing.md`
+- `docs/ai/indexing.md`
 
 ---
 

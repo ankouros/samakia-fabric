@@ -352,6 +352,139 @@ Entry checklist and acceptance marker are generated.
 #### Rollback / safe exit
 Fix missing items and re-run the checks.
 
+### Task: AI indexing doctor (read-only)
+
+#### Intent
+Validate indexing contracts and configuration.
+
+#### Preconditions
+- `FABRIC_REPO_ROOT` set
+
+#### Command
+```bash
+make ai.index.doctor
+```
+
+#### Expected result
+Indexing contract validation passes and summary prints.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- Invalid indexing or Qdrant contracts
+
+#### Rollback / safe exit
+Fix contract files and rerun the doctor check.
+
+### Task: AI indexing preview (offline)
+
+#### Intent
+Preview chunking for a source without writing evidence.
+
+#### Preconditions
+- Fixtures present for the source type
+
+#### Command
+```bash
+make ai.index.preview TENANT=platform SOURCE=docs
+```
+
+#### Expected result
+Chunk plan prints to stdout.
+
+#### Evidence outputs
+None (preview only).
+
+#### Failure modes
+- Missing fixtures or invalid source type
+
+#### Rollback / safe exit
+Fix fixtures or source selection and retry.
+
+### Task: AI indexing offline (fixtures)
+
+#### Intent
+Generate indexing evidence without network calls.
+
+#### Preconditions
+- Fixtures present for the source type
+
+#### Command
+```bash
+make ai.index.offline TENANT=platform SOURCE=docs
+```
+
+#### Expected result
+Evidence packet written under `evidence/ai/indexing/`.
+
+#### Evidence outputs
+`evidence/ai/indexing/<tenant>/<UTC>/...`
+
+#### Failure modes
+- Contract validation failure
+
+#### Rollback / safe exit
+Fix contracts and rerun the offline indexer.
+
+### Task: AI indexing live (guarded)
+
+#### Intent
+Index live sources into Qdrant (operator-only, guarded).
+
+#### Preconditions
+- Qdrant reachable
+- Ollama reachable
+- Operator guard flags set
+
+#### Command
+```bash
+AI_INDEX_EXECUTE=1 \
+AI_INDEX_REASON="ticket-123: refresh docs" \
+QDRANT_ENABLE=1 \
+OLLAMA_ENABLE=1 \
+make ai.index.live TENANT=platform SOURCE=docs
+```
+
+#### Expected result
+Live indexing runs and writes evidence.
+
+#### Evidence outputs
+`evidence/ai/indexing/<tenant>/<UTC>/...`
+
+#### Failure modes
+- Guard flags missing
+- Qdrant or Ollama unreachable
+
+#### Rollback / safe exit
+Disable live mode and use offline indexing until guards are satisfied.
+
+### Task: Phase 16 Part 2 acceptance
+
+#### Intent
+Validate Phase 16 Part 2 indexing requirements.
+
+#### Preconditions
+- Phase 16 Part 2 tooling and docs in place
+
+#### Command
+```bash
+make phase16.part2.entry.check
+make phase16.part2.accept
+```
+
+#### Expected result
+Entry checklist and acceptance marker are generated.
+
+#### Evidence outputs
+`acceptance/PHASE16_PART2_ENTRY_CHECKLIST.md` and `acceptance/PHASE16_PART2_ACCEPTED.md`
+
+#### Failure modes
+- Missing contracts, policies, or fixtures
+
+#### Rollback / safe exit
+Fix missing items and re-run the checks.
+
 ---
 
 ## Drift & compliance

@@ -1492,6 +1492,25 @@ ai.runbook.check: ## Validate AI runbook formatting (read-only)
 ai.safe.index.check: ## Validate 03:00-safe allowlist index (read-only)
 	@bash "$(OPS_SCRIPTS_DIR)/ai-safe-index-check.sh"
 
+.PHONY: ai.index.doctor
+ai.index.doctor: ## AI indexing config doctor (read-only)
+	@bash "$(REPO_ROOT)/ops/ai/indexer/indexer.sh" doctor
+
+.PHONY: ai.index.preview
+ai.index.preview: ## AI indexing chunk preview (TENANT, SOURCE required; offline)
+	@TENANT="$(TENANT)" SOURCE="$(SOURCE)" \
+		bash "$(REPO_ROOT)/ops/ai/indexer/indexer.sh" preview --tenant "$(TENANT)" --source "$(SOURCE)"
+
+.PHONY: ai.index.offline
+ai.index.offline: ## AI indexing offline run (TENANT, SOURCE required)
+	@TENANT="$(TENANT)" SOURCE="$(SOURCE)" \
+		bash "$(REPO_ROOT)/ops/ai/indexer/indexer.sh" index --tenant "$(TENANT)" --source "$(SOURCE)" --offline
+
+.PHONY: ai.index.live
+ai.index.live: ## AI indexing live run (guarded; TENANT, SOURCE required)
+	@TENANT="$(TENANT)" SOURCE="$(SOURCE)" \
+		bash "$(REPO_ROOT)/ops/ai/indexer/indexer.sh" index --tenant "$(TENANT)" --source "$(SOURCE)" --live
+
 .PHONY: phase7.entry.check
 phase7.entry.check: ## Phase 7 entry checklist (writes acceptance/PHASE7_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase7-entry-check.sh"
@@ -2254,6 +2273,18 @@ phase16.part1.entry.check: ## Phase 16 Part 1 entry checklist (AI provider + rou
 .PHONY: phase16.part1.accept
 phase16.part1.accept: ## Phase 16 Part 1 acceptance (AI provider + routing)
 	@bash "$(OPS_SCRIPTS_DIR)/phase16-part1-accept.sh"
+
+###############################################################################
+# AI Indexing (Phase 16 Part 2)
+###############################################################################
+
+.PHONY: phase16.part2.entry.check
+phase16.part2.entry.check: ## Phase 16 Part 2 entry checklist (AI indexing)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part2-entry-check.sh"
+
+.PHONY: phase16.part2.accept
+phase16.part2.accept: ## Phase 16 Part 2 acceptance (AI indexing)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part2-accept.sh"
 
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)

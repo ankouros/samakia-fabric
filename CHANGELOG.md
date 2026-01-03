@@ -48,6 +48,12 @@ The format is inspired by:
 - Read-only AI CLI entrypoints for config checks and routing lookup
 - Phase 16 Part 1 entry checklist + acceptance marker
 
+#### AI-assisted analysis (Phase 16 Part 2)
+- Qdrant + indexing contracts for tenant-isolated AI retrieval
+- Offline-first indexing pipeline with fixtures, redaction, and evidence packets
+- Policy gates for Qdrant/indexing + CI offline indexing step
+- Phase 16 Part 2 entry checklist + acceptance marker
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

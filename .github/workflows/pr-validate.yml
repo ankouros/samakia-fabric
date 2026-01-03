@@ -58,6 +58,9 @@ jobs:
       - name: Docs anti-drift checks
         run: make docs.operator.check
 
+      - name: AI indexing offline (fixtures)
+        run: make ai.index.offline TENANT=platform SOURCE=docs
+
       - name: Hardening checklist validate
         run: make hardening.checklist.validate
 

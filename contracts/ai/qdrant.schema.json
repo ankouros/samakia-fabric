@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AIQdrantContract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "base_url",
+    "auth",
+    "tls",
+    "tenant_isolation"
+  ],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"type": "string"},
+    "base_url": {"type": "string"},
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": {"enum": ["none", "token"]},
+        "token_ref": {"type": "string"}
+      }
+    },
+    "tls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "verify"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "verify": {"type": "boolean"}
+      }
+    },
+    "tenant_isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "platform_collection", "tenant_prefix"],
+      "properties": {
+        "mode": {"enum": ["collection-per-tenant", "shared-collection"]},
+        "platform_collection": {"type": "string"},
+        "tenant_prefix": {"type": "string"}
+      }
+    }
+  }
+}

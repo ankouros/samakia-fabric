@@ -795,7 +795,7 @@ Status: IN PROGRESS
 - Read-only AI CLI entrypoints for config checks and routing lookup.
 - Entry checklist + acceptance marker.
 
-### Part 2 — Qdrant Indexing + Ingestion (Planned)
+### Part 2 — Qdrant Indexing + Ingestion (COMPLETED ✅)
 - Shared Qdrant contracts and indexing policy.
 - Deterministic offline indexing pipeline with fixtures and evidence packets.
 - Tenant isolation model and CI-safe ingestion flows.

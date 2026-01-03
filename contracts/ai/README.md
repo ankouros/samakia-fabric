@@ -5,6 +5,8 @@ This directory defines the AI provider and routing contracts for Samakia Fabric.
 Files:
 - `provider.schema.json` / `provider.yml`: Ollama-only provider contract (analysis-only).
 - `routing.schema.json` / `routing.yml`: deterministic model routing policy.
+- `qdrant.schema.json` / `qdrant.yml`: shared vector store contract.
+- `indexing.schema.json` / `indexing.yml`: indexing + redaction policy.
 
 Validation:
 - `bash ops/ai/validate-config.sh`

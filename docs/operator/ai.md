@@ -26,6 +26,27 @@ bash ops/ai/ai.sh route code.review
 Expected result:
 - Prints the model that would be used for the task
 
+## Indexing (Phase 16 Part 2)
+
+Offline (fixtures only):
+
+```bash
+make ai.index.offline TENANT=platform SOURCE=docs
+```
+
+Live (guarded, operator-only):
+
+```bash
+AI_INDEX_EXECUTE=1 \
+AI_INDEX_REASON="ticket-123: refresh docs" \
+QDRANT_ENABLE=1 \
+OLLAMA_ENABLE=1 \
+make ai.index.live TENANT=platform SOURCE=docs
+```
+
+Evidence output:
+`evidence/ai/indexing/<tenant>/<UTC>/`
+
 ## Design-only workflows (tooling arrives in later Phase 16 parts)
 
 - Run AI analysis on evidence packets (read-only, evidence-bound)

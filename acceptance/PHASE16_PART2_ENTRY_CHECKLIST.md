@@ -1,0 +1,140 @@
+# Phase 16 Part 2 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T04:46:47Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE16_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/ai/qdrant.schema.json
+  - Command: test -f contracts/ai/qdrant.schema.json
+  - Result: PASS
+- File present: contracts/ai/qdrant.yml
+  - Command: test -f contracts/ai/qdrant.yml
+  - Result: PASS
+- File present: contracts/ai/indexing.schema.json
+  - Command: test -f contracts/ai/indexing.schema.json
+  - Result: PASS
+- File present: contracts/ai/indexing.yml
+  - Command: test -f contracts/ai/indexing.yml
+  - Result: PASS
+- File present: docs/ai/qdrant.md
+  - Command: test -f docs/ai/qdrant.md
+  - Result: PASS
+- File present: docs/ai/indexing.md
+  - Command: test -f docs/ai/indexing.md
+  - Result: PASS
+- File present: docs/operator/ai.md
+  - Command: test -f docs/operator/ai.md
+  - Result: PASS
+- File present: ops/ai/indexer/indexer.sh
+  - Command: test -f ops/ai/indexer/indexer.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/chunk.sh
+  - Command: test -f ops/ai/indexer/lib/chunk.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/hash.sh
+  - Command: test -f ops/ai/indexer/lib/hash.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/redact.sh
+  - Command: test -f ops/ai/indexer/lib/redact.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/qdrant.sh
+  - Command: test -f ops/ai/indexer/lib/qdrant.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/ollama.sh
+  - Command: test -f ops/ai/indexer/lib/ollama.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/manifest.sh
+  - Command: test -f ops/ai/indexer/lib/manifest.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/json.sh
+  - Command: test -f ops/ai/indexer/lib/json.sh
+  - Result: PASS
+- File present: ops/ai/indexer/sources/docs.sh
+  - Command: test -f ops/ai/indexer/sources/docs.sh
+  - Result: PASS
+- File present: ops/ai/indexer/sources/contracts.sh
+  - Command: test -f ops/ai/indexer/sources/contracts.sh
+  - Result: PASS
+- File present: ops/ai/indexer/sources/runbooks.sh
+  - Command: test -f ops/ai/indexer/sources/runbooks.sh
+  - Result: PASS
+- File present: ops/ai/indexer/sources/evidence.sh
+  - Command: test -f ops/ai/indexer/sources/evidence.sh
+  - Result: PASS
+- File present: ops/ai/indexer/fixtures/sample-docs/overview.md
+  - Command: test -f ops/ai/indexer/fixtures/sample-docs/overview.md
+  - Result: PASS
+- File present: ops/ai/indexer/fixtures/sample-contracts/sample.yml
+  - Command: test -f ops/ai/indexer/fixtures/sample-contracts/sample.yml
+  - Result: PASS
+- File present: ops/ai/indexer/fixtures/sample-evidence/report.md
+  - Command: test -f ops/ai/indexer/fixtures/sample-evidence/report.md
+  - Result: PASS
+- File present: ops/ai/indexer/fixtures/sample-runbooks/runbook.md
+  - Command: test -f ops/ai/indexer/fixtures/sample-runbooks/runbook.md
+  - Result: PASS
+- File present: ops/policy/policy-ai-qdrant.sh
+  - Command: test -f ops/policy/policy-ai-qdrant.sh
+  - Result: PASS
+- File present: ops/policy/policy-ai-indexing.sh
+  - Command: test -f ops/policy/policy-ai-indexing.sh
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- Policy gate wired: policy-ai-qdrant.sh
+  - Command: rg -n policy-ai-qdrant\.sh ops/policy/policy.sh
+  - Result: PASS
+- Policy gate wired: policy-ai-indexing.sh
+  - Command: rg -n policy-ai-indexing\.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: ai.index.doctor
+  - Command: rg -n '^ai\.index\.doctor:' Makefile
+  - Result: PASS
+- Makefile target present: ai.index.preview
+  - Command: rg -n '^ai\.index\.preview:' Makefile
+  - Result: PASS
+- Makefile target present: ai.index.offline
+  - Command: rg -n '^ai\.index\.offline:' Makefile
+  - Result: PASS
+- Makefile target present: ai.index.live
+  - Command: rg -n '^ai\.index\.live:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part2.entry.check
+  - Command: rg -n '^phase16\.part2\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part2.accept
+  - Command: rg -n '^phase16\.part2\.accept:' Makefile
+  - Result: PASS
+- Evidence paths gitignored
+  - Command: rg -n '^evidence/' /home/aggelos/samakia-fabric/.gitignore
+  - Result: PASS
+- CI wiring: ai.index.offline
+  - Command: rg -n 'ai\.index\.offline' /home/aggelos/samakia-fabric/.github/workflows/pr-validate.yml
+  - Result: PASS
+- AI indexing doctor
+  - Command: make -C /home/aggelos/samakia-fabric ai.index.doctor
+  - Result: PASS
+- Policy check
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS

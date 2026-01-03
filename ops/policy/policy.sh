@@ -22,6 +22,8 @@ scripts=(
   "policy-ai-ops.sh"
   "policy-ai-provider.sh"
   "policy-ai-routing.sh"
+  "policy-ai-qdrant.sh"
+  "policy-ai-indexing.sh"
   "policy-drift.sh"
   "policy-runtime-eval.sh"
   "policy-slo.sh"

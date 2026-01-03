@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: AIIndexingContract
+embedding:
+  provider: ollama
+  model: nomic-embed-text
+chunking:
+  chunk_size: 1200
+  overlap: 120
+  max_chars: 200000
+sources:
+  - docs
+  - contracts
+  - runbooks
+  - evidence
+exclusions:
+  patterns:
+    - "(?i)\\.tfvars$"
+    - "(?i)\\.pem$"
+    - "(?i)\\.key$"
+    - "(?i)\\.crt$"
+    - "(?i)\\.kubeconfig$"
+    - "(?i)/secrets/"
+    - "(?i)\\.env$"
+redaction:
+  action: deny
+  deny_patterns:
+    - "(?i)password\\s*[:=]"
+    - "(?i)token\\s*[:=]"
+    - "(?i)client_secret"
+    - "(?i)kubeconfig"
+    - "(?i)BEGIN\\s+PRIVATE\\s+KEY"
+    - "TEST_ONLY_SECRET"

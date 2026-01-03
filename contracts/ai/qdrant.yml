@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: AIQdrantContract
+base_url: http://192.168.11.122:6333
+auth:
+  mode: none
+tls:
+  required: false
+  verify: true
+tenant_isolation:
+  mode: collection-per-tenant
+  platform_collection: kb_platform
+  tenant_prefix: kb_tenant_
