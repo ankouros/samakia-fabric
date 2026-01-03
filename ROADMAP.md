@@ -715,7 +715,7 @@ Non-scope:
 
 ## Phase 14 — Runtime Operations & SLO Ownership
 
-Status: PART 1 COMPLETE ✅
+Status: PART 2 COMPLETE ✅
 
 ### Design (Phase 14)
 - ADR-0032: runtime operations are evidence-driven and contractual.
@@ -730,9 +730,10 @@ Status: PART 1 COMPLETE ✅
 - Deterministic classification (infra fault, drift, SLO violation, OK).
 - Status summaries for operator visibility (artifacts only).
 
-### Part 2 — SLO ingestion and evaluation (planned)
+### Part 2 — SLO ingestion and evaluation (COMPLETED ✅)
 - Offline metrics ingestion and windowed SLO evaluation.
-- Error budget accounting and alert readiness (delivery disabled).
+- Error budget accounting with evidence packets and operator status summaries.
+- Alert readiness rules generated (delivery disabled).
 
 ### Part 3 — Alert delivery and incident surfacing (planned)
 - Operator-controlled alert delivery and incident tracking.

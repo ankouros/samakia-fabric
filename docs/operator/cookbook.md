@@ -658,6 +658,92 @@ None required (read-only).
 
 ---
 
+### Task: SLO metric ingestion (offline, read-only)
+
+#### Intent
+Ingest SLO metrics using offline fixtures (CI-safe).
+
+#### Preconditions
+- SLO contracts exist
+- Observation policy exists
+
+#### Command
+```bash
+make slo.ingest.offline TENANT=all
+```
+
+#### Expected result
+Metrics written under `artifacts/slo-metrics/<tenant>/<workload>/metrics.json`.
+
+#### Evidence outputs
+`artifacts/slo-metrics/<tenant>/<workload>/metrics.json`
+
+#### Failure modes
+- Missing SLO contracts
+- Missing fixtures
+- Observation policy missing or empty
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: SLO evaluation (read-only)
+
+#### Intent
+Evaluate SLOs over the declared window and emit evidence packets.
+
+#### Preconditions
+- SLO metrics ingested
+
+#### Command
+```bash
+make slo.evaluate TENANT=all
+```
+
+#### Expected result
+Evidence packets written under `evidence/slo/<tenant>/<workload>/<UTC>/`.
+
+#### Evidence outputs
+`evidence/slo/<tenant>/<workload>/<UTC>/summary.md`
+
+#### Failure modes
+- Missing SLO metrics
+- Missing observation policy
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: SLO alert readiness rules (disabled)
+
+#### Intent
+Generate alert rules without enabling delivery.
+
+#### Preconditions
+- SLO contracts exist
+
+#### Command
+```bash
+make slo.alerts.generate TENANT=all
+```
+
+#### Expected result
+Rules written under `artifacts/slo-alerts/<tenant>/<workload>/rules.yaml`.
+
+#### Evidence outputs
+`artifacts/slo-alerts/<tenant>/<workload>/manifest.sha256`
+
+#### Failure modes
+- Invalid rule schema
+- Delivery accidentally enabled
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
 ### Task: Phase 14 Part 1 entry check (read-only)
 
 #### Intent
@@ -709,6 +795,63 @@ Acceptance marker written under `acceptance/PHASE14_PART1_ACCEPTED.md`.
 #### Failure modes
 - Runtime evaluation tooling errors
 - Missing evidence inputs
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 14 Part 2 entry check (read-only)
+
+#### Intent
+Validate Part 2 prerequisites and wiring before acceptance.
+
+#### Preconditions
+- Phase 14 Part 1 accepted
+- REQUIRED-FIXES.md has no OPEN items
+
+#### Command
+```bash
+make phase14.part2.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE14_PART2_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE14_PART2_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing SLO evaluation tooling
+- Policy or docs gates failing
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 14 Part 2 acceptance (read-only)
+
+#### Intent
+Run the Phase 14 Part 2 acceptance suite.
+
+#### Preconditions
+- Phase 14 Part 2 entry check passes
+
+#### Command
+```bash
+make phase14.part2.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE14_PART2_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE14_PART2_ACCEPTED.md`
+
+#### Failure modes
+- SLO evaluation tooling errors
+- Missing metrics fixtures or evidence inputs
 
 #### Rollback / safe exit
 None required (read-only).

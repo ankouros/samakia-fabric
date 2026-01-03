@@ -232,6 +232,14 @@ The format is inspired by:
 - Make targets: `runtime.evaluate`, `runtime.status`, `phase14.part1.entry.check`, `phase14.part1.accept`.
 - Phase 14 Part 1 entry checklist + acceptance marker.
 
+#### SLO ingestion and evaluation (Phase 14 Part 2)
+- Read-only SLO ingestion + evaluation tooling under `ops/slo/` (windows, error budgets, redaction, evidence).
+- SLO evidence packets under `evidence/slo/<tenant>/<workload>/<UTC>/` with status summaries under `artifacts/slo-status/`.
+- Alert readiness rules generated under `artifacts/slo-alerts/<tenant>/<workload>/` with delivery disabled by default.
+- Policy gate: `policy-slo.sh` wired into `make policy.check`.
+- Make targets: `slo.ingest.offline`, `slo.ingest.live`, `slo.evaluate`, `slo.alerts.generate`, `phase14.part2.entry.check`, `phase14.part2.accept`.
+- Operator runbook updates for SLO measurement and runtime operations.
+
 ### Changed
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).

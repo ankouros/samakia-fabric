@@ -22,6 +22,7 @@ scripts=(
   "policy-ai-ops.sh"
   "policy-drift.sh"
   "policy-runtime-eval.sh"
+  "policy-slo.sh"
   "policy-bindings-verify.sh"
   "policy-proposals.sh"
   "policy-exposure.sh"

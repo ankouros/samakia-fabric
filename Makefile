@@ -778,6 +778,40 @@ runtime.status: ## Emit runtime status summaries (TENANT required)
 		RUNTIME_EVIDENCE_ROOT="$(RUNTIME_EVIDENCE_ROOT)" RUNTIME_STATUS_ROOT="$(RUNTIME_STATUS_ROOT)" \
 		bash "$(REPO_ROOT)/ops/runtime/status.sh"
 
+.PHONY: slo.ingest.offline
+slo.ingest.offline: ## Ingest SLO metrics offline (TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required (use TENANT=all for all SLO contracts)"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" \
+		SLO_LIVE=0 SLO_METRICS_ROOT="$(SLO_METRICS_ROOT)" FIXTURES_ROOT="$(FIXTURES_ROOT)" \
+		OBSERVATION_PATH="$(OBSERVATION_PATH)" \
+		bash "$(REPO_ROOT)/ops/slo/ingest.sh"
+
+.PHONY: slo.ingest.live
+slo.ingest.live: ## Ingest SLO metrics live (guarded; TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required (use TENANT=all for all SLO contracts)"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" \
+		SLO_LIVE=1 PROM_URL="$(PROM_URL)" PROM_QUERY_FILE="$(PROM_QUERY_FILE)" \
+		SLO_METRICS_ROOT="$(SLO_METRICS_ROOT)" FIXTURES_ROOT="$(FIXTURES_ROOT)" \
+		OBSERVATION_PATH="$(OBSERVATION_PATH)" \
+		bash "$(REPO_ROOT)/ops/slo/ingest.sh"
+
+.PHONY: slo.evaluate
+slo.evaluate: ## Evaluate SLOs and emit evidence (TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required (use TENANT=all for all SLO contracts)"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" \
+		SLO_EVIDENCE_ROOT="$(SLO_EVIDENCE_ROOT)" SLO_STATUS_ROOT="$(SLO_STATUS_ROOT)" \
+		SLO_METRICS_ROOT="$(SLO_METRICS_ROOT)" OBSERVATION_PATH="$(OBSERVATION_PATH)" \
+		bash "$(REPO_ROOT)/ops/slo/evaluate.sh"
+
+.PHONY: slo.alerts.generate
+slo.alerts.generate: ## Generate SLO alert readiness rules (TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required (use TENANT=all for all SLO contracts)"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" \
+		SLO_ALERTS_ROOT="$(SLO_ALERTS_ROOT)" \
+		bash "$(REPO_ROOT)/ops/slo/alerting/rules-generate.sh"
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" SLO_ALERTS_ROOT="$(SLO_ALERTS_ROOT)" \
+		bash "$(REPO_ROOT)/ops/slo/alerting/rules-validate.sh"
+
 .PHONY: phase14.part1.entry.check
 phase14.part1.entry.check: ## Phase 14 Part 1 entry checklist
 	@bash "$(OPS_SCRIPTS_DIR)/phase14-part1-entry-check.sh"
@@ -785,6 +819,14 @@ phase14.part1.entry.check: ## Phase 14 Part 1 entry checklist
 .PHONY: phase14.part1.accept
 phase14.part1.accept: ## Phase 14 Part 1 acceptance
 	@bash "$(OPS_SCRIPTS_DIR)/phase14-part1-accept.sh"
+
+.PHONY: phase14.part2.entry.check
+phase14.part2.entry.check: ## Phase 14 Part 2 entry checklist
+	@bash "$(OPS_SCRIPTS_DIR)/phase14-part2-entry-check.sh"
+
+.PHONY: phase14.part2.accept
+phase14.part2.accept: ## Phase 14 Part 2 acceptance
+	@bash "$(OPS_SCRIPTS_DIR)/phase14-part2-accept.sh"
 
 .PHONY: compliance.snapshot
 compliance.snapshot: ## Create signed compliance snapshot

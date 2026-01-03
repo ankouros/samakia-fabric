@@ -1,0 +1,107 @@
+# Phase 14 Part 2 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T00:44:33Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE14_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE14_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE13_ACCEPTED.md
+  - Command: test -f acceptance/PHASE13_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/slo/ingest.sh
+  - Command: test -f ops/slo/ingest.sh
+  - Result: PASS
+- File present: ops/slo/evaluate.sh
+  - Command: test -f ops/slo/evaluate.sh
+  - Result: PASS
+- File present: ops/slo/windows.sh
+  - Command: test -f ops/slo/windows.sh
+  - Result: PASS
+- File present: ops/slo/error-budget.sh
+  - Command: test -f ops/slo/error-budget.sh
+  - Result: PASS
+- File present: ops/slo/normalize.sh
+  - Command: test -f ops/slo/normalize.sh
+  - Result: PASS
+- File present: ops/slo/redact.sh
+  - Command: test -f ops/slo/redact.sh
+  - Result: PASS
+- File present: ops/slo/evidence.sh
+  - Command: test -f ops/slo/evidence.sh
+  - Result: PASS
+- File present: ops/slo/alerting/rules-generate.sh
+  - Command: test -f ops/slo/alerting/rules-generate.sh
+  - Result: PASS
+- File present: ops/slo/alerting/rules-validate.sh
+  - Command: test -f ops/slo/alerting/rules-validate.sh
+  - Result: PASS
+- File present: ops/policy/policy-slo.sh
+  - Command: test -f ops/policy/policy-slo.sh
+  - Result: PASS
+- File present: contracts/slo/slo.schema.json
+  - Command: test -f contracts/slo/slo.schema.json
+  - Result: PASS
+- File present: contracts/runtime-observation/observation.yml
+  - Command: test -f contracts/runtime-observation/observation.yml
+  - Result: PASS
+- File present: docs/operator/slo.md
+  - Command: test -f docs/operator/slo.md
+  - Result: PASS
+- File present: docs/operator/runtime-ops.md
+  - Command: test -f docs/operator/runtime-ops.md
+  - Result: PASS
+- File present: docs/runtime/signal-taxonomy.md
+  - Command: test -f docs/runtime/signal-taxonomy.md
+  - Result: PASS
+- Policy gates wired: policy-slo.sh
+  - Command: rg -n policy-slo.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: slo.ingest.offline
+  - Command: rg -n '^slo\.ingest\.offline:' Makefile
+  - Result: PASS
+- Makefile target present: slo.ingest.live
+  - Command: rg -n '^slo\.ingest\.live:' Makefile
+  - Result: PASS
+- Makefile target present: slo.evaluate
+  - Command: rg -n '^slo\.evaluate:' Makefile
+  - Result: PASS
+- Makefile target present: slo.alerts.generate
+  - Command: rg -n '^slo\.alerts\.generate:' Makefile
+  - Result: PASS
+- Makefile target present: phase14.part2.entry.check
+  - Command: rg -n '^phase14\.part2\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase14.part2.accept
+  - Command: rg -n '^phase14\.part2\.accept:' Makefile
+  - Result: PASS
+- CI wiring: slo.ingest.offline
+  - Command: rg -n 'slo.ingest.offline' .github/workflows/pr-validate.yml
+  - Result: PASS
+- CI wiring: slo.evaluate
+  - Command: rg -n 'slo.evaluate' .github/workflows/pr-validate.yml
+  - Result: PASS
+- CI wiring: slo.alerts.generate
+  - Command: rg -n 'slo.alerts.generate' .github/workflows/pr-validate.yml
+  - Result: PASS
+- No remediation or delivery enablement
+  - Command: ! rg -n 'alertmanager|pagerduty|opsgenie|slack|webhook|remediate|self-heal' ops/slo
+  - Result: PASS
+- Policy check
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Docs operator check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS
+- Runtime evaluate
+  - Command: make -C /home/aggelos/samakia-fabric runtime.evaluate TENANT=all
+  - Result: PASS

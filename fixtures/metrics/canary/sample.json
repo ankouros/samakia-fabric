@@ -1,0 +1,9 @@
+{
+  "timestamp_utc": "2026-01-03T00:00:00Z",
+  "values": {
+    "availability_percent": 99.95,
+    "latency_p95_ms": 120,
+    "latency_p99_ms": 240,
+    "error_rate_percent": 0.05
+  }
+}

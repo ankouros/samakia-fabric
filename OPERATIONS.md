@@ -113,10 +113,15 @@ Tenant binding workflows live in:
   - Signal taxonomy: `docs/runtime/signal-taxonomy.md`
   - Incident lifecycle: `docs/runtime/incident-lifecycle.md`
   - Operator runbook: `docs/operator/runtime-ops.md`
+  - SLO measurement: `docs/operator/slo.md`
   - SLO ownership: `docs/operator/slo-ownership.md`
   - Runtime evaluation (read-only):
     - `make runtime.evaluate TENANT=<id|all>`
     - `make runtime.status TENANT=<id|all>`
+  - SLO evaluation (read-only):
+    - `make slo.ingest.offline TENANT=<id|all>`
+    - `make slo.evaluate TENANT=<id|all>`
+    - `make slo.alerts.generate TENANT=<id|all>`
 - Milestone Phase 1–12 verification (release manager, read-only):
   - Verify: `make milestone.phase1-12.verify`
   - Lock: `make milestone.phase1-12.lock`

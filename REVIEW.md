@@ -50,6 +50,14 @@ This document records what was implemented for the **Terraform remote state back
 - Adds policy gate and Make targets for runtime evaluation and status.
 - No remediation or automation paths were introduced.
 
+## Phase 14 Part 2 — SLO Ingestion & Evaluation (Read-Only)
+
+- Adds `ops/slo/` tooling for offline ingestion, windowed evaluation, and error budget accounting.
+- Emits SLO evidence packets under `evidence/slo/<tenant>/<workload>/<UTC>/` plus status summaries under `artifacts/slo-status/`.
+- Generates alert readiness rules under `artifacts/slo-alerts/` with delivery disabled by default.
+- Wires a new policy gate and Part 2 entry/acceptance targets.
+- No alert delivery or remediation paths were introduced.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

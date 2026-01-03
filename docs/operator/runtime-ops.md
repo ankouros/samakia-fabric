@@ -1,4 +1,4 @@
-# Runtime Operations (Phase 14 Part 1)
+# Runtime Operations (Phase 14)
 
 Runtime operations are evidence-driven and read-only by default.
 No automation performs remediation or execution.
@@ -33,6 +33,28 @@ Update status summaries from latest evidence:
 
 ```bash
 make runtime.status TENANT=<id|all>
+```
+
+## SLO evaluation (Phase 14 Part 2)
+
+SLO measurement and alert readiness are documented in `docs/operator/slo.md`.
+
+Offline ingestion (CI-safe):
+
+```bash
+make slo.ingest.offline TENANT=<id|all>
+```
+
+Evaluate SLOs and generate evidence:
+
+```bash
+make slo.evaluate TENANT=<id|all>
+```
+
+Generate alert readiness rules (delivery disabled):
+
+```bash
+make slo.alerts.generate TENANT=<id|all>
 ```
 
 ## Evidence layout

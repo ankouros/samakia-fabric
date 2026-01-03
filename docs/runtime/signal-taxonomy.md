@@ -69,3 +69,13 @@ Classification order is deterministic:
 2) Drift
 3) SLO Violation
 4) OK
+
+## SLO evaluation (Phase 14 Part 2)
+
+SLOs are evaluated independently of drift classification:
+
+- `make slo.ingest.offline TENANT=<id|all>`
+- `make slo.evaluate TENANT=<id|all>`
+
+Evidence is written under `evidence/slo/<tenant>/<workload>/<UTC>/` with
+windowed evaluation, error budget accounting, and SLO state outputs.

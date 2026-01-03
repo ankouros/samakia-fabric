@@ -130,6 +130,15 @@ jobs:
       - name: Runtime status summaries
         run: make runtime.status TENANT=all
 
+      - name: SLO ingestion (offline)
+        run: make slo.ingest.offline TENANT=all
+
+      - name: SLO evaluation (read-only)
+        run: make slo.evaluate TENANT=all
+
+      - name: SLO alert readiness rules
+        run: make slo.alerts.generate TENANT=all
+
       - name: Drift alert routing validation
         run: make substrate.alert.validate
 
