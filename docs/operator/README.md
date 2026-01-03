@@ -12,6 +12,7 @@ Start here:
 - `slo-ownership.md` — SLO ownership and escalation rules
 - `alerts.md` — controlled alert delivery and routing
 - `incidents.md` — incident record lifecycle (open/update/close)
+- `ai.md` — AI analysis posture and operator usage (analysis-only)
 - `selfservice-review.md` — tenant self-service proposal review (proposal-only)
 - `selfservice-approval.md` — approval/delegation design (Phase 15 Part 2)
 - `selfservice-governance.md` — autonomy guardrails and stop rules (Phase 15 Part 3)

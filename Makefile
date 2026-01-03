@@ -2243,6 +2243,18 @@ phase15.part1.entry.check: ## Phase 15 Part 1 entry checklist (self-service prop
 phase15.part1.accept: ## Phase 15 Part 1 acceptance (self-service proposals)
 	@bash "$(OPS_SCRIPTS_DIR)/phase15-part1-accept.sh"
 
+###############################################################################
+# AI Analysis (Phase 16 Part 1)
+###############################################################################
+
+.PHONY: phase16.part1.entry.check
+phase16.part1.entry.check: ## Phase 16 Part 1 entry checklist (AI provider + routing)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part1-entry-check.sh"
+
+.PHONY: phase16.part1.accept
+phase16.part1.accept: ## Phase 16 Part 1 acceptance (AI provider + routing)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part1-accept.sh"
+
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part4-entry-check.sh"

@@ -14,6 +14,7 @@ This directory contains Samakia Fabric documentation.
 - `exposure/`: exposure semantics, rollback, change windows
 - `runtime/`: runtime signal taxonomy, incident lifecycle, and SLO design
 - `selfservice/`: self-service proposal lifecycle and governance design
+- `ai/`: AI analysis contracts, routing, and governance
 - `glossary.md`: canonical terminology
 - `PRINCIPLES.md`: non-negotiable principles
 

@@ -1,0 +1,95 @@
+# Phase 16 Part 1 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T04:03:28Z
+
+## Criteria
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE13_ACCEPTED.md
+  - Command: test -f acceptance/PHASE13_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/ai/provider.schema.json
+  - Command: test -f contracts/ai/provider.schema.json
+  - Result: PASS
+- File present: contracts/ai/provider.yml
+  - Command: test -f contracts/ai/provider.yml
+  - Result: PASS
+- File present: contracts/ai/routing.schema.json
+  - Command: test -f contracts/ai/routing.schema.json
+  - Result: PASS
+- File present: contracts/ai/routing.yml
+  - Command: test -f contracts/ai/routing.yml
+  - Result: PASS
+- File present: contracts/ai/README.md
+  - Command: test -f contracts/ai/README.md
+  - Result: PASS
+- File present: docs/ai/overview.md
+  - Command: test -f docs/ai/overview.md
+  - Result: PASS
+- File present: docs/ai/provider.md
+  - Command: test -f docs/ai/provider.md
+  - Result: PASS
+- File present: docs/ai/routing.md
+  - Command: test -f docs/ai/routing.md
+  - Result: PASS
+- File present: docs/operator/ai.md
+  - Command: test -f docs/operator/ai.md
+  - Result: PASS
+- File present: ops/ai/ai.sh
+  - Command: test -f ops/ai/ai.sh
+  - Result: PASS
+- File present: ops/ai/validate-config.sh
+  - Command: test -f ops/ai/validate-config.sh
+  - Result: PASS
+- File present: ops/policy/policy-ai-provider.sh
+  - Command: test -f ops/policy/policy-ai-provider.sh
+  - Result: PASS
+- File present: ops/policy/policy-ai-routing.sh
+  - Command: test -f ops/policy/policy-ai-routing.sh
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- AI contracts validate
+  - Command: bash /home/aggelos/samakia-fabric/ops/ai/validate-config.sh
+  - Result: PASS
+- AI CLI is action-free
+  - Command: rg -n "apply|remediate|execute" ops/ai/ai.sh
+  - Result: PASS
+- No external AI endpoints referenced
+  - Command: rg -n --glob '!ops/policy/policy-ai-provider.sh' --glob '!ops/scripts/phase16-part1-entry-check.sh' --glob '!acceptance/**' "api\.openai\.com|api\.anthropic\.com|generativelanguage\.googleapis\.com|aiplatform\.googleapis\.com|api\.cohere\.ai|api\.mistral\.ai|api\.groq\.com|openai\.azure\.com" /home/aggelos/samakia-fabric
+  - Result: PASS
+- No external AI API keys referenced
+  - Command: rg -n --glob '!ops/policy/policy-ai-provider.sh' --glob '!ops/scripts/phase16-part1-entry-check.sh' --glob '!acceptance/**' "OPENAI_API_KEY|ANTHROPIC_API_KEY|GEMINI_API_KEY|COHERE_API_KEY|MISTRAL_API_KEY|GROQ_API_KEY|AZURE_OPENAI" /home/aggelos/samakia-fabric
+  - Result: PASS
+- Policy gate wired: policy-ai-provider.sh
+  - Command: rg -n policy-ai-provider\.sh ops/policy/policy.sh
+  - Result: PASS
+- Policy gate wired: policy-ai-routing.sh
+  - Command: rg -n policy-ai-routing\.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: phase16.part1.entry.check
+  - Command: rg -n '^phase16\.part1\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part1.accept
+  - Command: rg -n '^phase16\.part1\.accept:' Makefile
+  - Result: PASS
+- Policy check
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS

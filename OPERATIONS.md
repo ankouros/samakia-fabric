@@ -1316,6 +1316,25 @@ make phase7.accept
 
 ---
 
+## AI Analysis (Phase 16)
+
+AI analysis is **advisory only**. It cannot execute actions or apply changes.
+
+Operator entrypoints (read-only, no network):
+
+```bash
+bash ops/ai/ai.sh doctor
+bash ops/ai/ai.sh route ops.analysis
+```
+
+Documentation:
+- `docs/operator/ai.md`
+- `docs/ai/overview.md`
+- `docs/ai/provider.md`
+- `docs/ai/routing.md`
+
+---
+
 ## Operational Philosophy
 
 Samakia Fabric follows a rebuild-over-repair philosophy.

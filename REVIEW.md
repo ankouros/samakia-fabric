@@ -97,6 +97,13 @@ This document records what was implemented for the **Terraform remote state back
 - Defines governance ownership, risk ledger, and exception framework.
 - Documents phase interaction guarantees and Phase 15 lock semantics.
 
+## Phase 16 Part 1 — AI Provider + Routing (Analysis-Only)
+
+- Adds Ollama-only provider contract and deterministic routing policy.
+- Introduces read-only AI CLI entrypoints (doctor + route).
+- Wires policy gates to block external providers and enforce routing.
+- Adds Phase 16 Part 1 entry checklist and acceptance marker.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

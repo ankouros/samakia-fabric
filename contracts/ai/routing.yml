@@ -1,0 +1,17 @@
+defaults:
+  ops: gpt-oss:20b
+  code: starcoder2:15b
+  embeddings: nomic-embed-text
+routes:
+  - task: ops.analysis
+    model: gpt-oss:20b
+  - task: ops.summary
+    model: gpt-oss:20b
+  - task: ops.incident
+    model: gpt-oss:20b
+  - task: code.review
+    model: starcoder2:15b
+  - task: code.generate
+    model: starcoder2:15b
+  - task: embeddings
+    model: nomic-embed-text

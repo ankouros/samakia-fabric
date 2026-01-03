@@ -1,0 +1,5 @@
+provider: ollama
+base_url: http://192.168.11.30:11434
+allow_external_providers: false
+network_scope: 192.168.11.0/24
+mode: analysis-only

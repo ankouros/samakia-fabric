@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AIProviderContract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "provider",
+    "base_url",
+    "allow_external_providers",
+    "network_scope",
+    "mode"
+  ],
+  "properties": {
+    "apiVersion": {"type": "string"},
+    "kind": {"type": "string"},
+    "provider": {"const": "ollama"},
+    "base_url": {"type": "string"},
+    "allow_external_providers": {"const": false},
+    "network_scope": {"type": "string"},
+    "mode": {"const": "analysis-only"}
+  }
+}

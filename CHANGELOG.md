@@ -42,6 +42,12 @@ The format is inspired by:
 - Safe-run allowlist with evidence wrapper packets
 - Phase 7 acceptance marker: `acceptance/PHASE7_ACCEPTED.md`
 
+#### AI-assisted analysis (Phase 16 Part 1)
+- Ollama-only provider contract + deterministic routing policy (analysis-only)
+- Policy gates for provider/routing enforcement (no external AI providers)
+- Read-only AI CLI entrypoints for config checks and routing lookup
+- Phase 16 Part 1 entry checklist + acceptance marker
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

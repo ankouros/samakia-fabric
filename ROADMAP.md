@@ -785,6 +785,41 @@ Non-scope (Phase 15 Part 1):
 
 ---
 
+## Phase 16 — AI-Assisted Analysis (Ollama-Only)
+
+Status: IN PROGRESS
+
+### Part 1 — Provider + Routing + Read-Only Guardrails (COMPLETED ✅)
+- Ollama-only provider contract and deterministic routing policy.
+- Policy gates for provider/routing enforcement (no external AI providers).
+- Read-only AI CLI entrypoints for config checks and routing lookup.
+- Entry checklist + acceptance marker.
+
+### Part 2 — Qdrant Indexing + Ingestion (Planned)
+- Shared Qdrant contracts and indexing policy.
+- Deterministic offline indexing pipeline with fixtures and evidence packets.
+- Tenant isolation model and CI-safe ingestion flows.
+
+### Part 3 — Read-Only MCP Services (Planned)
+- Read-only MCP servers for repo, evidence, observability, runbooks, and Qdrant search.
+- Explicit allowlists, tenant isolation, and audit logs.
+
+### Part 4 — Analysis UX + Evidence-Bound Reports (Planned)
+- Structured analysis contract and guarded analysis tooling.
+- Deterministic prompts, evidence-bound reports, and redaction.
+
+### Part 5 — Governance Closure (Planned)
+- AI governance model, risk ledger, and stop rules.
+- Regression guardrails to prevent capability creep.
+
+### Part 6 — Operator UX Consolidation (Planned)
+- Unified AI ops entrypoint and evidence index.
+- AI regression and drift protection.
+
+### Part 7 — Invariant Lock (Planned)
+- AI invariants manifest and invariant enforcement tests.
+- Phase boundary policy to prevent scope creep.
+
 ## Non-Goals
 
 The following are explicitly NOT goals:

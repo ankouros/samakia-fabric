@@ -172,6 +172,188 @@ Stop; do not apply.
 
 ---
 
+## AI analysis (Phase 16)
+
+### Task: AI config doctor (analysis-only)
+
+#### Intent
+Validate AI provider and routing contracts without network calls.
+
+#### Preconditions
+- `FABRIC_REPO_ROOT` set
+
+#### Command
+```bash
+bash ops/ai/ai.sh doctor
+```
+
+#### Expected result
+AI contracts validate and a configuration summary prints.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- Missing or invalid AI contracts
+
+#### Rollback / safe exit
+Fix the contract files and rerun the doctor check.
+
+### Task: Check AI model routing for a task
+
+#### Intent
+Confirm deterministic routing for an AI task.
+
+#### Preconditions
+- `FABRIC_REPO_ROOT` set
+
+#### Command
+```bash
+bash ops/ai/ai.sh route ops.analysis
+```
+
+#### Expected result
+Printed model matches the routing policy.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- Unknown task or missing routing entry
+
+#### Rollback / safe exit
+Fix routing policy and re-run the route check.
+
+### Task: Run AI analysis on an evidence packet (design-only)
+
+#### Intent
+Plan an AI analysis run against evidence (analysis-only).
+
+#### Preconditions
+- Phase 16 Part 4 tooling available
+
+#### Command
+```bash
+make ai.analyze.plan FILE=examples/analysis/drift_explain.yml
+```
+
+#### Expected result
+Dry-run plan prints the bounded context and prompt template.
+
+#### Evidence outputs
+None (plan-only).
+
+#### Failure modes
+- Analysis contract missing or invalid
+
+#### Rollback / safe exit
+Fix the analysis contract and rerun the plan.
+
+### Task: Run AI review on plan output (read-only)
+
+#### Intent
+Generate a read-only plan review packet for AI analysis.
+
+#### Preconditions
+- Terraform plan output available as a text file
+
+#### Command
+```bash
+PLAN_PATH=/path/to/terraform-plan.txt ENV=samakia-prod make ai.plan.review
+```
+
+#### Expected result
+Plan review evidence packet written under `evidence/ai/plan-review/`.
+
+#### Evidence outputs
+`evidence/ai/plan-review/<env>/<UTC>/...`
+
+#### Failure modes
+- Missing plan file
+
+#### Rollback / safe exit
+Fix the plan file path and rerun.
+
+### Task: Validate AI allowlists (read-only)
+
+#### Intent
+Confirm AI allowlist indexes and runbook formatting are valid.
+
+#### Preconditions
+- `FABRIC_REPO_ROOT` set
+
+#### Command
+```bash
+make ai.safe.index.check
+make ai.runbook.check
+```
+
+#### Expected result
+Allowlist and runbook checks PASS.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- Invalid allowlist entries
+- Runbook formatting errors
+
+#### Rollback / safe exit
+Fix allowlist/runbook formatting and rerun.
+
+### Task: Phase 7 AI operations acceptance (read-only)
+
+#### Intent
+Re-validate Phase 7 AI operations safety gates.
+
+#### Preconditions
+- Phase 7 tooling present
+
+#### Command
+```bash
+make ai.accept
+```
+
+#### Expected result
+Phase 7 acceptance PASS with no execution paths enabled.
+
+#### Evidence outputs
+`acceptance/PHASE7_ACCEPTED.md`
+
+#### Failure modes
+- Policy or doc gate failures
+
+#### Rollback / safe exit
+Fix failed gates and rerun.
+
+### Task: Phase 16 Part 1 acceptance
+
+#### Intent
+Validate Phase 16 Part 1 entry and acceptance requirements.
+
+#### Preconditions
+- Phase 16 Part 1 tooling and docs in place
+
+#### Command
+```bash
+make phase16.part1.entry.check
+make phase16.part1.accept
+```
+
+#### Expected result
+Entry checklist and acceptance marker are generated.
+
+#### Evidence outputs
+`acceptance/PHASE16_PART1_ENTRY_CHECKLIST.md` and `acceptance/PHASE16_PART1_ACCEPTED.md`
+
+#### Failure modes
+- Missing contracts, policies, or docs
+
+#### Rollback / safe exit
+Fix missing items and re-run the checks.
+
+---
+
 ## Drift & compliance
 
 ### Task: Drift packet generation (read-only)
