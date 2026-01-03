@@ -3,6 +3,7 @@
 This directory defines the AI provider and routing contracts for Samakia Fabric.
 
 Files:
+- `INVARIANTS.md`: authoritative AI capability invariants (analysis-only, no execution).
 - `provider.schema.json` / `provider.yml`: Ollama-only provider contract (analysis-only).
 - `routing.schema.json` / `routing.yml`: deterministic model routing policy.
 - `qdrant.schema.json` / `qdrant.yml`: shared vector store contract.

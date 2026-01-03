@@ -1,0 +1,89 @@
+# Phase 16 Part 7 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T07:37:24Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE16_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART5_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART6_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART6_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/ai/INVARIANTS.md
+  - Command: test -f contracts/ai/INVARIANTS.md
+  - Result: PASS
+- File present: docs/platform/PLATFORM_MANIFEST.md
+  - Command: test -f docs/platform/PLATFORM_MANIFEST.md
+  - Result: PASS
+- File present: ops/policy/policy-ai-phase-boundary.sh
+  - Command: test -f ops/policy/policy-ai-phase-boundary.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai-invariants/test-no-exec-paths.sh
+  - Command: test -f ops/scripts/test-ai-invariants/test-no-exec-paths.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai-invariants/test-no-apply-hooks.sh
+  - Command: test -f ops/scripts/test-ai-invariants/test-no-apply-hooks.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai-invariants/test-no-external-ai.sh
+  - Command: test -f ops/scripts/test-ai-invariants/test-no-external-ai.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai-invariants/test-routing-immutable.sh
+  - Command: test -f ops/scripts/test-ai-invariants/test-routing-immutable.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai-invariants/test-mcp-readonly.sh
+  - Command: test -f ops/scripts/test-ai-invariants/test-mcp-readonly.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai-invariants/test-ai-contracts-locked.sh
+  - Command: test -f ops/scripts/test-ai-invariants/test-ai-contracts-locked.sh
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- AI invariant tests wired in validate.sh
+  - Command: rg -n test-ai-invariants fabric-ci/scripts/validate.sh
+  - Result: PASS
+- Phase-boundary policy wired
+  - Command: rg -n policy-ai-phase-boundary.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: phase16.part7.entry.check
+  - Command: rg -n '^phase16\.part7\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part7.accept
+  - Command: rg -n '^phase16\.part7\.accept:' Makefile
+  - Result: PASS
+- AI-related code has no TODOs
+  - Command: rg -n "TODO" ops/ai contracts/ai docs/ai docs/platform
+  - Result: PASS
+- Policy gates
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS

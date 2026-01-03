@@ -2364,6 +2364,18 @@ phase16.part6.entry.check: ## Phase 16 Part 6 entry checklist (AI ops UX)
 phase16.part6.accept: ## Phase 16 Part 6 acceptance (AI ops UX)
 	@bash "$(OPS_SCRIPTS_DIR)/phase16-part6-accept.sh"
 
+###############################################################################
+# AI Invariant Lock (Phase 16 Part 7)
+###############################################################################
+
+.PHONY: phase16.part7.entry.check
+phase16.part7.entry.check: ## Phase 16 Part 7 entry checklist (AI invariants)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part7-entry-check.sh"
+
+.PHONY: phase16.part7.accept
+phase16.part7.accept: ## Phase 16 Part 7 acceptance (AI invariants)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part7-accept.sh"
+
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part4-entry-check.sh"

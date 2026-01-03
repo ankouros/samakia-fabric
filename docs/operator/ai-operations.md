@@ -51,6 +51,11 @@ bash ops/ai/ops.sh analyze.run FILE=examples/analysis/drift_explain.yml
 - Use external AI providers
 - Override policy gates or MCP allowlists
 
+## Authoritative references
+
+- AI invariants: `contracts/ai/INVARIANTS.md`
+- Platform manifest: `docs/platform/PLATFORM_MANIFEST.md`
+
 ## Evidence locations
 
 - `evidence/ai/analysis/<analysis_id>/<UTC>/`

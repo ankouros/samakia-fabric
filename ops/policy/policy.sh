@@ -25,6 +25,7 @@ scripts=(
   "policy-ai-qdrant.sh"
   "policy-ai-indexing.sh"
   "policy-ai-analysis.sh"
+  "policy-ai-phase-boundary.sh"
   "policy-ai-mcp.sh"
   "policy-drift.sh"
   "policy-runtime-eval.sh"

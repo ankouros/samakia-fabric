@@ -9,6 +9,7 @@ This directory contains Samakia Fabric documentation.
 - `tutorials/README.md`: tutorial index and required order
 - `operator/`: canonical operator UX and cookbook
 - `consumers/`: consumer catalog and variants
+- `platform/`: platform manifest and executive invariants
 - `tenants/`: tenant (project) binding design
 - `bindings/`: tenant binding contracts + connection manifests
 - `exposure/`: exposure semantics, rollback, change windows

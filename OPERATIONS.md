@@ -1419,6 +1419,18 @@ Documentation:
 
 ---
 
+## AI Invariants (Phase 16 Lock)
+
+AI behavior is locked as a platform invariant and remains advisory-only.
+Authoritative statements live in:
+- `contracts/ai/INVARIANTS.md`
+- `docs/platform/PLATFORM_MANIFEST.md` (AI capability statement)
+
+Any expansion of AI capabilities requires a new Phase (>= 17), an ADR, and an
+acceptance plan. The phase-boundary policy blocks unapproved scope changes.
+
+---
+
 ## Operational Philosophy
 
 Samakia Fabric follows a rebuild-over-repair philosophy.

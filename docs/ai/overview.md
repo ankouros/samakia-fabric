@@ -17,6 +17,7 @@ It never grants AI any execution or remediation capability.
 - No secrets in prompts or outputs
 
 ## References
+- AI invariants (authoritative): `../../contracts/ai/INVARIANTS.md`
 - Provider: `provider.md`
 - Routing: `routing.md`
 - Indexing: `indexing.md`

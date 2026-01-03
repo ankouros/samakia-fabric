@@ -134,6 +134,12 @@ This document records what was implemented for the **Terraform remote state back
 - Introduces ops regression checks for UX and evidence determinism.
 - Adds Phase 16 Part 6 entry checklist and acceptance marker.
 
+## Phase 16 Part 7 — Invariant Lock (Analysis-Only)
+
+- Adds AI invariants manifest and platform capability statement.
+- Introduces invariant enforcement tests and phase-boundary policy guard.
+- Locks Phase 16 acceptance with an invariant statement and acceptance marker.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

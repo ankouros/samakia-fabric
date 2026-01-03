@@ -74,6 +74,11 @@ The format is inspired by:
 - Ops regression tests for UX and evidence drift protection
 - Phase 16 Part 6 entry checklist + acceptance marker
 
+#### AI-assisted analysis (Phase 16 Part 7)
+- AI invariants manifest + platform capability statement
+- Invariant enforcement tests and phase-boundary policy gate
+- Phase 16 Part 7 entry checklist + acceptance marker
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

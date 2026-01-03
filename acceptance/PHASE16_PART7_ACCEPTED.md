@@ -1,4 +1,4 @@
-# Phase 16 Acceptance (Invariant Lock)
+# Phase 16 Part 7 Acceptance
 
 Timestamp (UTC): 2026-01-03T07:35:26Z
 Commit: 3fd248b38525ac096309baf03bbe8ee281a6f049
@@ -16,11 +16,15 @@ Commands executed:
 - ops/scripts/test-ai-invariants/test-mcp-readonly.sh
 - ops/scripts/test-ai-invariants/test-ai-contracts-locked.sh
 - ops/policy/policy-ai-phase-boundary.sh
+- rg -n "Phase 16.*LOCKED" ROADMAP.md
+- rg -n "Phase 16" CHANGELOG.md
+- rg -n "Phase 16" REVIEW.md
+- rg -n "AI invariants" OPERATIONS.md
 - simulated policy violation check
 
 Result: PASS
 
 Statement:
-AI-assisted analysis is permanently advisory; AI behavior is locked as an invariant and cannot act without a new phase.
+AI behavior is locked as an invariant; any future change requires a new phase.
 
-Self-hash (sha256 of content above): a3d5e1819dcd2d8e75924b67b2ab2f6f7b7b3e02df44f20727426cd2e90b54c4
+Self-hash (sha256 of content above): e764959da5580fd237e6cad5725f7a57913fddbecee1abba1836aff22d5a30f4

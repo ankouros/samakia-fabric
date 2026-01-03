@@ -58,6 +58,9 @@ Any change that violates a contract must be redesigned before merging.
 - Tier-0 network identity is deterministic: MAC pinning or DHCP reservations are required, and IP cutovers must be documented and evidence-backed.
 - Phase acceptance requires `make phase<N>.accept` (or phase-equivalent), evidence recording, and acceptance markers.
 - AI operations are read-only by default; any remediation requires explicit guards and evidence packets.
+- AI-assisted analysis is advisory-only: Ollama-only provider, deterministic routing, no external providers, and no execution or mutation paths.
+- AI context access is read-only and tenant-scoped (MCP + Qdrant); indexing and analysis runs must emit evidence packets and remain CI-safe (offline/stub by default).
+- AI invariants are codified in `contracts/ai/INVARIANTS.md`; any expansion of AI capabilities requires a new phase, ADR, and acceptance plan.
 - VM golden images are contract-governed; canonical reference is storage_path + sha256; Fabric does not manage VM lifecycle.
 - Operator UX is a first-class contract: `docs/operator/cookbook.md` is canonical, and operator-visible commands must be documented or explicitly waived by policy.
 - Template upgrades are replace/blue-green only; Terraform never upgrades existing CTs in-place.

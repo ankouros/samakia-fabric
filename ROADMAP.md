@@ -787,7 +787,9 @@ Non-scope (Phase 15 Part 1):
 
 ## Phase 16 — AI-Assisted Analysis (Ollama-Only)
 
-Status: IN PROGRESS (Part 7 pending)
+Status: COMPLETED and LOCKED ✅
+
+Narrative: Phase 16 marks the point where AI becomes infrastructure literacy, not control.
 
 ### Part 1 — Provider + Routing + Read-Only Guardrails (COMPLETED ✅)
 - Ollama-only provider contract and deterministic routing policy.
@@ -818,7 +820,7 @@ Status: IN PROGRESS (Part 7 pending)
 - Unified AI ops entrypoint and evidence index.
 - AI regression and drift protection.
 
-### Part 7 — Invariant Lock (Planned)
+### Part 7 — Invariant Lock (COMPLETED ✅)
 - AI invariants manifest and invariant enforcement tests.
 - Phase boundary policy to prevent scope creep.
 
