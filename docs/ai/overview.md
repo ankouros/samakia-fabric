@@ -9,6 +9,7 @@ It never grants AI any execution or remediation capability.
 - Deterministic routing and provider configuration
 - MCP access is read-only and available in Phase 16 Part 3
 - Indexing is offline-first with guarded live runs (Phase 16 Part 2)
+- Analysis UX and evidence-bound reports (Phase 16 Part 4)
 
 ## Non-goals
 - No automation or apply paths
@@ -20,4 +21,6 @@ It never grants AI any execution or remediation capability.
 - Routing: `routing.md`
 - Indexing: `indexing.md`
 - MCP services: `mcp.md`
+- Analysis contract: `analysis.md`
+- Analysis examples: `examples.md`
 - Operator usage: `../operator/ai.md`

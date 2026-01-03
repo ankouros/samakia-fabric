@@ -7,6 +7,7 @@ Files:
 - `routing.schema.json` / `routing.yml`: deterministic model routing policy.
 - `qdrant.schema.json` / `qdrant.yml`: shared vector store contract.
 - `indexing.schema.json` / `indexing.yml`: indexing + redaction policy.
+- `analysis.schema.json` / `analysis.yml`: structured analysis requests and evidence bounds.
 
 Validation:
 - `bash ops/ai/validate-config.sh`

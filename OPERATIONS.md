@@ -1358,13 +1358,31 @@ Live MCP access is guarded (never in CI):
 - Observability: `OBS_LIVE=1`
 - Qdrant: `QDRANT_LIVE=1`
 
+AI analysis (evidence-bound, read-only by default):
+
+```bash
+make ai.analyze.plan FILE=examples/analysis/drift_explain.yml
+```
+
+Guarded live run (operator-only):
+
+```bash
+AI_ANALYZE_EXECUTE=1 make ai.analyze.run FILE=examples/analysis/drift_explain.yml
+```
+
+Evidence output:
+`evidence/ai/analysis/<analysis_id>/<UTC>/`
+
 Documentation:
 - `docs/operator/ai.md`
+- `docs/operator/ai-analysis.md`
 - `docs/ai/overview.md`
 - `docs/ai/provider.md`
 - `docs/ai/routing.md`
 - `docs/ai/indexing.md`
 - `docs/ai/mcp.md`
+- `docs/ai/analysis.md`
+- `docs/ai/examples.md`
 
 ---
 

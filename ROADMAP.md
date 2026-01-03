@@ -806,7 +806,7 @@ Status: IN PROGRESS
 - Policy gate, doctor checks, and acceptance marker.
 - Explicit allowlists, tenant isolation, and audit logs.
 
-### Part 4 — Analysis UX + Evidence-Bound Reports (Planned)
+### Part 4 — Analysis UX + Evidence-Bound Reports (COMPLETED ✅)
 - Structured analysis contract and guarded analysis tooling.
 - Deterministic prompts, evidence-bound reports, and redaction.
 

@@ -1,0 +1,101 @@
+# Phase 16 Part 4 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T06:04:31Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE16_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/ai/analysis.schema.json
+  - Command: test -f contracts/ai/analysis.schema.json
+  - Result: PASS
+- File present: contracts/ai/analysis.yml
+  - Command: test -f contracts/ai/analysis.yml
+  - Result: PASS
+- File present: ops/ai/analysis/analyze.sh
+  - Command: test -f ops/ai/analysis/analyze.sh
+  - Result: PASS
+- File present: ops/ai/analysis/assemble-context.sh
+  - Command: test -f ops/ai/analysis/assemble-context.sh
+  - Result: PASS
+- File present: ops/ai/analysis/call-ollama.sh
+  - Command: test -f ops/ai/analysis/call-ollama.sh
+  - Result: PASS
+- File present: ops/ai/analysis/evidence.sh
+  - Command: test -f ops/ai/analysis/evidence.sh
+  - Result: PASS
+- File present: ops/ai/analysis/redact.sh
+  - Command: test -f ops/ai/analysis/redact.sh
+  - Result: PASS
+- File present: ops/ai/analysis/prompts/drift_explain.md
+  - Command: test -f ops/ai/analysis/prompts/drift_explain.md
+  - Result: PASS
+- File present: ops/ai/analysis/prompts/slo_explain.md
+  - Command: test -f ops/ai/analysis/prompts/slo_explain.md
+  - Result: PASS
+- File present: ops/ai/analysis/prompts/incident_summary.md
+  - Command: test -f ops/ai/analysis/prompts/incident_summary.md
+  - Result: PASS
+- File present: ops/ai/analysis/prompts/plan_review.md
+  - Command: test -f ops/ai/analysis/prompts/plan_review.md
+  - Result: PASS
+- File present: ops/ai/analysis/prompts/change_impact.md
+  - Command: test -f ops/ai/analysis/prompts/change_impact.md
+  - Result: PASS
+- File present: ops/ai/analysis/prompts/compliance_summary.md
+  - Command: test -f ops/ai/analysis/prompts/compliance_summary.md
+  - Result: PASS
+- File present: ops/policy/policy-ai-analysis.sh
+  - Command: test -f ops/policy/policy-ai-analysis.sh
+  - Result: PASS
+- File present: docs/ai/analysis.md
+  - Command: test -f docs/ai/analysis.md
+  - Result: PASS
+- File present: docs/ai/examples.md
+  - Command: test -f docs/ai/examples.md
+  - Result: PASS
+- File present: docs/operator/ai-analysis.md
+  - Command: test -f docs/operator/ai-analysis.md
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- Policy gate wired: policy-ai-analysis.sh
+  - Command: rg -n policy-ai-analysis\.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: ai.analyze.plan
+  - Command: rg -n '^ai.analyze.plan:' Makefile
+  - Result: PASS
+- Makefile target present: ai.analyze.run
+  - Command: rg -n '^ai.analyze.run:' Makefile
+  - Result: PASS
+- Makefile target present: ai.analyze.compare
+  - Command: rg -n '^ai.analyze.compare:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part4.entry.check
+  - Command: rg -n '^phase16.part4.entry.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part4.accept
+  - Command: rg -n '^phase16.part4.accept:' Makefile
+  - Result: PASS
+- AI analysis policy
+  - Command: bash /home/aggelos/samakia-fabric/ops/policy/policy-ai-analysis.sh
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS

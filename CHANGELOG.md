@@ -59,6 +59,11 @@ The format is inspired by:
 - Explicit allowlists, tenant isolation, and audit logging for every request
 - MCP policy gate + doctor + entry/acceptance scripts and markers
 
+#### AI-assisted analysis (Phase 16 Part 4)
+- Structured AI analysis contract and guarded analysis tooling
+- Deterministic prompts, evidence-bound reports, and redaction controls
+- AI analysis policy gate, entry checklist, and acceptance marker
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

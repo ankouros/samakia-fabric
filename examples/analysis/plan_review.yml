@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: AIAnalysis
+analysis_id: plan-review-platform
+requester_role: operator
+tenant:
+  id: platform
+  scope: platform
+analysis_type: plan_review
+inputs:
+  evidence_refs:
+    - evidence/ai/analysis/platform/fixtures/plan.txt
+  time_window:
+    start_utc: "2026-01-01T00:00:00Z"
+    end_utc: "2026-01-02T00:00:00Z"
+output_format: markdown
+max_tokens: 1500

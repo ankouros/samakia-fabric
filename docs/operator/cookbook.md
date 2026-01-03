@@ -199,6 +199,135 @@ None (stdout only).
 #### Rollback / safe exit
 Fix the contract files and rerun the doctor check.
 
+### Task: AI analysis plan (dry-run)
+
+#### Intent
+Generate a read-only analysis packet from evidence without executing AI.
+
+#### Preconditions
+- Evidence MCP available
+- Analysis file prepared (see `examples/analysis/`)
+
+#### Command
+```bash
+make ai.analyze.plan FILE=examples/analysis/drift_explain.yml
+```
+
+#### Expected result
+Evidence packet written under `evidence/ai/analysis/<analysis_id>/<UTC>/`.
+
+#### Evidence outputs
+`evidence/ai/analysis/<analysis_id>/<UTC>/`
+
+#### Failure modes
+- Missing evidence MCP
+- Evidence refs outside `evidence/`
+
+#### Rollback / safe exit
+Stop and fix the analysis input or evidence.
+
+### Task: AI analysis run (guarded)
+
+#### Intent
+Run a live analysis against evidence with explicit guards.
+
+#### Preconditions
+- Evidence MCP available
+- Operator approval for live analysis
+
+#### Command
+```bash
+AI_ANALYZE_EXECUTE=1 make ai.analyze.run FILE=examples/analysis/drift_explain.yml
+```
+
+#### Expected result
+Evidence packet written under `evidence/ai/analysis/<analysis_id>/<UTC>/`.
+
+#### Evidence outputs
+`evidence/ai/analysis/<analysis_id>/<UTC>/`
+
+#### Failure modes
+- `AI_ANALYZE_EXECUTE` missing
+- CI environment blocks execution
+
+#### Rollback / safe exit
+Stop; do not attempt to force execution without guards.
+
+### Task: AI analysis compare
+
+#### Intent
+Compare two analysis requests for scope and input differences.
+
+#### Preconditions
+- Analysis files prepared
+
+#### Command
+```bash
+make ai.analyze.compare FILE_A=examples/analysis/drift_explain.yml FILE_B=examples/analysis/incident_summary.yml
+```
+
+#### Expected result
+Printed summary of differences between the two analysis requests.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- Missing analysis files
+
+#### Rollback / safe exit
+Stop and correct the analysis inputs.
+
+### Task: Phase 16 Part 4 entry checklist
+
+#### Intent
+Verify AI analysis prerequisites before acceptance.
+
+#### Preconditions
+- Phase 16 Part 3 accepted
+
+#### Command
+```bash
+make phase16.part4.entry.check
+```
+
+#### Expected result
+Entry checklist written to `acceptance/PHASE16_PART4_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE16_PART4_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing contracts or policy gates
+
+#### Rollback / safe exit
+Stop and fix the missing prerequisites.
+
+### Task: Phase 16 Part 4 acceptance
+
+#### Intent
+Run the full AI analysis acceptance suite.
+
+#### Preconditions
+- Entry checklist completed
+
+#### Command
+```bash
+make phase16.part4.accept
+```
+
+#### Expected result
+Acceptance marker written to `acceptance/PHASE16_PART4_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE16_PART4_ACCEPTED.md`
+
+#### Failure modes
+- Policy or analysis validation failures
+
+#### Rollback / safe exit
+Stop and remediate the failing step.
+
 ### Task: Check AI model routing for a task
 
 #### Intent

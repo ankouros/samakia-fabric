@@ -77,7 +77,24 @@ Live access is guarded (never in CI):
 - Observability: `OBS_LIVE=1`
 - Qdrant: `QDRANT_LIVE=1`
 
-## Design-only workflows (tooling arrives in later Phase 16 parts)
+## AI analysis (Phase 16 Part 4)
+
+Dry-run (CI-safe):
+
+```bash
+make ai.analyze.plan FILE=examples/analysis/drift_explain.yml
+```
+
+Guarded run (operator-only):
+
+```bash
+AI_ANALYZE_EXECUTE=1 make ai.analyze.run FILE=examples/analysis/drift_explain.yml
+```
+
+Evidence output:
+`evidence/ai/analysis/<analysis_id>/<UTC>/`
+
+## Design-only workflows (future Phase 16 parts)
 
 - Run AI analysis on evidence packets (read-only, evidence-bound)
 - Run AI review on plan output (read-only, evidence-bound)

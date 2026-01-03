@@ -116,6 +116,12 @@ This document records what was implemented for the **Terraform remote state back
 - Enforces allowlists, tenant isolation, and audit logging for every request.
 - Introduces MCP policy gate, doctor checks, and acceptance markers.
 
+## Phase 16 Part 4 — AI Analysis UX + Evidence Reports (Analysis-Only)
+
+- Adds structured analysis contract and guarded analysis tooling (plan/run/compare).
+- Introduces deterministic prompts, evidence packets, and tenant redaction.
+- Wires AI analysis policy gate, entry checklist, and acceptance marker.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

@@ -1535,6 +1535,20 @@ ai.mcp.runbooks.start: ## Start runbooks MCP server (read-only; local)
 ai.mcp.qdrant.start: ## Start Qdrant MCP server (read-only; local)
 	@MCP_PORT="$(MCP_PORT)" bash "$(REPO_ROOT)/ops/ai/mcp/qdrant/server.sh"
 
+.PHONY: ai.analyze.plan
+ai.analyze.plan: ## AI analysis dry-run (FILE required)
+	@FILE="$(FILE)" bash "$(REPO_ROOT)/ops/ai/analysis/analyze.sh" plan --file "$(FILE)"
+
+.PHONY: ai.analyze.run
+ai.analyze.run: ## AI analysis run (guarded; FILE required)
+	@FILE="$(FILE)" AI_ANALYZE_EXECUTE="$(AI_ANALYZE_EXECUTE)" \
+		bash "$(REPO_ROOT)/ops/ai/analysis/analyze.sh" run --file "$(FILE)"
+
+.PHONY: ai.analyze.compare
+ai.analyze.compare: ## AI analysis comparison (FILE_A/FILE_B required)
+	@FILE_A="$(FILE_A)" FILE_B="$(FILE_B)" \
+		bash "$(REPO_ROOT)/ops/ai/analysis/analyze.sh" compare --file-a "$(FILE_A)" --file-b "$(FILE_B)"
+
 .PHONY: phase7.entry.check
 phase7.entry.check: ## Phase 7 entry checklist (writes acceptance/PHASE7_ENTRY_CHECKLIST.md)
 	@bash "$(OPS_SCRIPTS_DIR)/phase7-entry-check.sh"
@@ -2317,6 +2331,14 @@ phase16.part3.entry.check: ## Phase 16 Part 3 entry checklist (AI MCP)
 .PHONY: phase16.part3.accept
 phase16.part3.accept: ## Phase 16 Part 3 acceptance (AI MCP)
 	@bash "$(OPS_SCRIPTS_DIR)/phase16-part3-accept.sh"
+
+.PHONY: phase16.part4.entry.check
+phase16.part4.entry.check: ## Phase 16 Part 4 entry checklist (AI analysis)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part4-entry-check.sh"
+
+.PHONY: phase16.part4.accept
+phase16.part4.accept: ## Phase 16 Part 4 acceptance (AI analysis)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part4-accept.sh"
 
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)
