@@ -31,6 +31,19 @@ This document records what was fixed, what remains blocked (if anything), and th
 
 ---
 
+## Phase 14 Part 3 Remediation Status
+
+### PHASE14-PART3-INCIDENT-ENV
+- **Description:** `make phase14.part3.accept` failed at the incident open step with `command not found`.
+- **Impact:** Phase 14 Part 3 acceptance could not complete; acceptance marker not generated.
+- **Root cause:** `ops/scripts/phase14-part3-accept.sh` passed env assignments directly into `run_step`, which executes `"$@"`; the env assignments were treated as the command.
+- **Required remediation:** Prefix the incident open/close steps with `env` so assignments apply to `make`.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `make phase14.part3.accept` (PASS)
+
+---
+
 ## Fixed
 
 - **Proxmox SDN planes are applied after creation (required for immediate use)**

@@ -715,7 +715,7 @@ Non-scope:
 
 ## Phase 14 — Runtime Operations & SLO Ownership
 
-Status: PART 2 COMPLETE ✅
+Status: COMPLETED ✅
 
 ### Design (Phase 14)
 - ADR-0032: runtime operations are evidence-driven and contractual.
@@ -735,9 +735,9 @@ Status: PART 2 COMPLETE ✅
 - Error budget accounting with evidence packets and operator status summaries.
 - Alert readiness rules generated (delivery disabled).
 
-### Part 3 — Alert delivery and incident surfacing (planned)
-- Operator-controlled alert delivery and incident tracking.
-- Quiet hours and routing rules enforced; no automation.
+### Part 3 — Alert delivery and incident surfacing (COMPLETED ✅)
+- Operator-controlled alert delivery and incident tracking (no automation).
+- Quiet hours, rate limits, and routing rules enforced.
 
 Non-scope:
 - Auto-remediation or self-healing

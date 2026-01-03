@@ -139,6 +139,9 @@ jobs:
       - name: SLO alert readiness rules
         run: make slo.alerts.generate TENANT=all
 
+      - name: Alert routing + formatting validation
+        run: make alerts.validate
+
       - name: Drift alert routing validation
         run: make substrate.alert.validate
 

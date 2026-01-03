@@ -858,6 +858,204 @@ None required (read-only).
 
 ---
 
+### Task: Alert routing + formatting validation (read-only)
+
+#### Intent
+Validate alert routing policy and formatting output.
+
+#### Preconditions
+- Routing policy exists under `contracts/alerting/routing.yml`
+
+#### Command
+```bash
+make alerts.validate
+```
+
+#### Expected result
+Alert routing and format scripts validate successfully.
+
+#### Evidence outputs
+None (validation only).
+
+#### Failure modes
+- Invalid routing policy
+- Formatting output invalid
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Alert delivery dry-run (read-only)
+
+#### Intent
+Generate alert evidence without delivery.
+
+#### Preconditions
+- Runtime and SLO evidence present
+
+#### Command
+```bash
+ALERTS_ENABLE=0 ALERT_SINK=slack make alerts.deliver TENANT=canary WORKLOAD=sample
+```
+
+#### Expected result
+Alert evidence written under `evidence/alerts/<tenant>/<UTC>/`.
+
+#### Evidence outputs
+`evidence/alerts/<tenant>/<UTC>/decision.json`
+
+#### Failure modes
+- Missing alert inputs
+- Routing policy blocks delivery
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Incident open (read-only)
+
+#### Intent
+Create an incident record without automation.
+
+#### Preconditions
+- Evidence references available
+
+#### Command
+```bash
+INCIDENT_ID=INC-123 TENANT=canary WORKLOAD=sample SIGNAL_TYPE=slo SEVERITY=WARN OWNER=operator \
+EVIDENCE_REFS=\"evidence/alerts/canary/20260103T000000Z\" make incidents.open
+```
+
+#### Expected result
+Incident record created under `evidence/incidents/<incident_id>/open.json`.
+
+#### Evidence outputs
+`evidence/incidents/<incident_id>/open.json`
+
+#### Failure modes
+- Missing required fields
+- Schema validation failure
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Incident update (read-only)
+
+#### Intent
+Append an incident update record.
+
+#### Preconditions
+- Incident open record exists
+
+#### Command
+```bash
+INCIDENT_ID=INC-123 UPDATE_SUMMARY=\"Investigating latency\" make incidents.update
+```
+
+#### Expected result
+Update record written under `evidence/incidents/<incident_id>/updates/`.
+
+#### Evidence outputs
+`evidence/incidents/<incident_id>/updates/<UTC>.json`
+
+#### Failure modes
+- Incident not found
+- Schema validation failure
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Incident close (read-only)
+
+#### Intent
+Close an incident record.
+
+#### Preconditions
+- Incident open record exists
+
+#### Command
+```bash
+INCIDENT_ID=INC-123 RESOLUTION_SUMMARY=\"Issue resolved\" make incidents.close
+```
+
+#### Expected result
+Incident close record written under `evidence/incidents/<incident_id>/close.json`.
+
+#### Evidence outputs
+`evidence/incidents/<incident_id>/close.json`
+
+#### Failure modes
+- Incident not found
+- Schema validation failure
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 14 Part 3 entry check (read-only)
+
+#### Intent
+Validate Part 3 prerequisites and wiring before acceptance.
+
+#### Preconditions
+- Phase 14 Part 2 accepted
+- REQUIRED-FIXES.md has no OPEN items
+
+#### Command
+```bash
+make phase14.part3.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE14_PART3_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE14_PART3_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing alert or incident tooling
+- Policy gates failing
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 14 Part 3 acceptance (read-only)
+
+#### Intent
+Run the Phase 14 Part 3 acceptance suite.
+
+#### Preconditions
+- Phase 14 Part 3 entry check passes
+
+#### Command
+```bash
+make phase14.part3.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE14_PART3_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE14_PART3_ACCEPTED.md`
+
+#### Failure modes
+- Alert delivery tooling errors
+- Incident record validation failure
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
 ### Task: Phase 12 Part 6 entry check (read-only)
 
 #### Intent

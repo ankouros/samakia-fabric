@@ -812,6 +812,54 @@ slo.alerts.generate: ## Generate SLO alert readiness rules (TENANT required)
 	@FABRIC_REPO_ROOT="$(REPO_ROOT)" SLO_ALERTS_ROOT="$(SLO_ALERTS_ROOT)" \
 		bash "$(REPO_ROOT)/ops/slo/alerting/rules-validate.sh"
 
+.PHONY: alerts.validate
+alerts.validate: ## Validate alert routing + formatting
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" \
+		bash "$(REPO_ROOT)/ops/alerts/validate.sh"
+
+.PHONY: alerts.deliver
+alerts.deliver: ## Deliver alerts (guarded; TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required (use TENANT=all for all tenants)"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" \
+		ALERTS_ENABLE="$(ALERTS_ENABLE)" ALERT_SINK="$(ALERT_SINK)" ALERTS_STAMP="$(ALERTS_STAMP)" \
+		ALERTS_EVIDENCE_ROOT="$(ALERTS_EVIDENCE_ROOT)" RUNTIME_EVIDENCE_ROOT="$(RUNTIME_EVIDENCE_ROOT)" \
+		SLO_EVIDENCE_ROOT="$(SLO_EVIDENCE_ROOT)" SLO_ALERTS_ROOT="$(SLO_ALERTS_ROOT)" \
+		ALERTS_ROUTING_PATH="$(ALERTS_ROUTING_PATH)" \
+		bash "$(REPO_ROOT)/ops/alerts/deliver.sh"
+
+.PHONY: incidents.open
+incidents.open: ## Open incident record (INCIDENT_ID required)
+	@test -n "$(INCIDENT_ID)" || (echo "ERROR: INCIDENT_ID is required"; exit 1)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required"; exit 1)
+	@test -n "$(WORKLOAD)" || (echo "ERROR: WORKLOAD is required"; exit 1)
+	@test -n "$(SIGNAL_TYPE)" || (echo "ERROR: SIGNAL_TYPE is required"; exit 1)
+	@test -n "$(SEVERITY)" || (echo "ERROR: SEVERITY is required"; exit 1)
+	@test -n "$(OWNER)" || (echo "ERROR: OWNER is required"; exit 1)
+	@test -n "$(EVIDENCE_REFS)" || (echo "ERROR: EVIDENCE_REFS is required"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" INCIDENT_ID="$(INCIDENT_ID)" TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" \
+		SIGNAL_TYPE="$(SIGNAL_TYPE)" SEVERITY="$(SEVERITY)" OWNER="$(OWNER)" \
+		EVIDENCE_REFS="$(EVIDENCE_REFS)" OPENED_AT="$(OPENED_AT)" STATUS="$(STATUS)" \
+		RESOLUTION_SUMMARY="$(RESOLUTION_SUMMARY)" INCIDENT_EVIDENCE_ROOT="$(INCIDENT_EVIDENCE_ROOT)" \
+		bash "$(REPO_ROOT)/ops/incidents/open.sh"
+
+.PHONY: incidents.update
+incidents.update: ## Update incident record (INCIDENT_ID required)
+	@test -n "$(INCIDENT_ID)" || (echo "ERROR: INCIDENT_ID is required"; exit 1)
+	@test -n "$(UPDATE_SUMMARY)" || (echo "ERROR: UPDATE_SUMMARY is required"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" INCIDENT_ID="$(INCIDENT_ID)" UPDATE_SUMMARY="$(UPDATE_SUMMARY)" \
+		UPDATED_AT="$(UPDATED_AT)" STATUS="$(STATUS)" UPDATE_NOTES="$(UPDATE_NOTES)" \
+		EVIDENCE_REFS="$(EVIDENCE_REFS)" INCIDENT_EVIDENCE_ROOT="$(INCIDENT_EVIDENCE_ROOT)" \
+		bash "$(REPO_ROOT)/ops/incidents/update.sh"
+
+.PHONY: incidents.close
+incidents.close: ## Close incident record (INCIDENT_ID required)
+	@test -n "$(INCIDENT_ID)" || (echo "ERROR: INCIDENT_ID is required"; exit 1)
+	@test -n "$(RESOLUTION_SUMMARY)" || (echo "ERROR: RESOLUTION_SUMMARY is required"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" INCIDENT_ID="$(INCIDENT_ID)" RESOLUTION_SUMMARY="$(RESOLUTION_SUMMARY)" \
+		CLOSED_AT="$(CLOSED_AT)" STATUS="$(STATUS)" EVIDENCE_REFS="$(EVIDENCE_REFS)" \
+		INCIDENT_EVIDENCE_ROOT="$(INCIDENT_EVIDENCE_ROOT)" \
+		bash "$(REPO_ROOT)/ops/incidents/close.sh"
+
 .PHONY: phase14.part1.entry.check
 phase14.part1.entry.check: ## Phase 14 Part 1 entry checklist
 	@bash "$(OPS_SCRIPTS_DIR)/phase14-part1-entry-check.sh"
@@ -827,6 +875,14 @@ phase14.part2.entry.check: ## Phase 14 Part 2 entry checklist
 .PHONY: phase14.part2.accept
 phase14.part2.accept: ## Phase 14 Part 2 acceptance
 	@bash "$(OPS_SCRIPTS_DIR)/phase14-part2-accept.sh"
+
+.PHONY: phase14.part3.entry.check
+phase14.part3.entry.check: ## Phase 14 Part 3 entry checklist
+	@bash "$(OPS_SCRIPTS_DIR)/phase14-part3-entry-check.sh"
+
+.PHONY: phase14.part3.accept
+phase14.part3.accept: ## Phase 14 Part 3 acceptance
+	@bash "$(OPS_SCRIPTS_DIR)/phase14-part3-accept.sh"
 
 .PHONY: compliance.snapshot
 compliance.snapshot: ## Create signed compliance snapshot

@@ -240,6 +240,13 @@ The format is inspired by:
 - Make targets: `slo.ingest.offline`, `slo.ingest.live`, `slo.evaluate`, `slo.alerts.generate`, `phase14.part2.entry.check`, `phase14.part2.accept`.
 - Operator runbook updates for SLO measurement and runtime operations.
 
+#### Alert delivery and incident surfacing (Phase 14 Part 3)
+- Controlled alert delivery tooling under `ops/alerts/` with routing, formatting, redaction, and evidence packets.
+- Incident record tooling under `ops/incidents/` with schema validation and evidence manifests.
+- Alert evidence packets under `evidence/alerts/<tenant>/<UTC>/` and incident evidence under `evidence/incidents/<incident_id>/`.
+- Policy gates: `policy-alerts.sh` and `policy-incidents.sh` wired into `make policy.check`.
+- Make targets: `alerts.validate`, `alerts.deliver`, `incidents.open`, `incidents.update`, `incidents.close`, `phase14.part3.entry.check`, `phase14.part3.accept`.
+
 ### Changed
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).

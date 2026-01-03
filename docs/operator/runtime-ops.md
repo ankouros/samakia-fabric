@@ -82,6 +82,13 @@ artifacts/runtime-status/<tenant>/<workload>/
   status.md
 ```
 
+## Alerts and incidents
+
+Alert delivery and incident tracking are documented in:
+
+- `docs/operator/alerts.md`
+- `docs/operator/incidents.md`
+
 ## Escalation guidance
 
 - Infrastructure Fault: notify platform operations and substrate owners.

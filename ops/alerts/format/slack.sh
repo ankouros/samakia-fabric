@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${IN_PATH:-}" || -z "${OUT_PATH:-}" ]]; then
+  echo "ERROR: IN_PATH and OUT_PATH are required" >&2
+  exit 2
+fi
+
+python3 - "${IN_PATH}" "${OUT_PATH}" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+inp = Path(sys.argv[1])
+out = Path(sys.argv[2])
+
+alert = json.loads(inp.read_text())
+severity = alert.get("severity_mapped") or alert.get("severity")
+summary = alert.get("summary") or "Alert"
+
+lines = [
+    f"[{severity}] {alert.get('tenant')}/{alert.get('workload')} {alert.get('signal_type')}",
+    summary,
+    f"Environment: {alert.get('env')}",
+    f"Timestamp: {alert.get('timestamp_utc')}",
+    f"Evidence: {alert.get('evidence_ref')}",
+]
+
+payload = {"text": "\n".join([line for line in lines if line])}
+
+out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+PY

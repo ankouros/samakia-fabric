@@ -122,6 +122,13 @@ Tenant binding workflows live in:
     - `make slo.ingest.offline TENANT=<id|all>`
     - `make slo.evaluate TENANT=<id|all>`
     - `make slo.alerts.generate TENANT=<id|all>`
+  - Alert delivery (guarded; no remediation):
+    - `make alerts.validate`
+    - `ALERTS_ENABLE=1 ALERT_SINK=slack make alerts.deliver TENANT=<id|all>`
+  - Incident records (read-only tracking):
+    - `make incidents.open INCIDENT_ID=... TENANT=... WORKLOAD=... SIGNAL_TYPE=... SEVERITY=... OWNER=... EVIDENCE_REFS=...`
+    - `make incidents.update INCIDENT_ID=... UPDATE_SUMMARY=...`
+    - `make incidents.close INCIDENT_ID=... RESOLUTION_SUMMARY=...`
 - Milestone Phase 1–12 verification (release manager, read-only):
   - Verify: `make milestone.phase1-12.verify`
   - Lock: `make milestone.phase1-12.lock`

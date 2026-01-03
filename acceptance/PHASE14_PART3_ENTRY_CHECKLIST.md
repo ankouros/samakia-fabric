@@ -1,0 +1,119 @@
+# Phase 14 Part 3 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T01:26:40Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE14_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE14_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE14_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE14_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE13_ACCEPTED.md
+  - Command: test -f acceptance/PHASE13_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/alerts/deliver.sh
+  - Command: test -f ops/alerts/deliver.sh
+  - Result: PASS
+- File present: ops/alerts/validate.sh
+  - Command: test -f ops/alerts/validate.sh
+  - Result: PASS
+- File present: ops/alerts/route.sh
+  - Command: test -f ops/alerts/route.sh
+  - Result: PASS
+- File present: ops/alerts/redact.sh
+  - Command: test -f ops/alerts/redact.sh
+  - Result: PASS
+- File present: ops/alerts/evidence.sh
+  - Command: test -f ops/alerts/evidence.sh
+  - Result: PASS
+- File present: ops/alerts/format/slack.sh
+  - Command: test -f ops/alerts/format/slack.sh
+  - Result: PASS
+- File present: ops/alerts/format/webhook.sh
+  - Command: test -f ops/alerts/format/webhook.sh
+  - Result: PASS
+- File present: ops/alerts/format/email.sh
+  - Command: test -f ops/alerts/format/email.sh
+  - Result: PASS
+- File present: ops/incidents/open.sh
+  - Command: test -f ops/incidents/open.sh
+  - Result: PASS
+- File present: ops/incidents/update.sh
+  - Command: test -f ops/incidents/update.sh
+  - Result: PASS
+- File present: ops/incidents/close.sh
+  - Command: test -f ops/incidents/close.sh
+  - Result: PASS
+- File present: ops/incidents/validate.sh
+  - Command: test -f ops/incidents/validate.sh
+  - Result: PASS
+- File present: contracts/incidents/incident.schema.json
+  - Command: test -f contracts/incidents/incident.schema.json
+  - Result: PASS
+- File present: contracts/alerting/routing.yml
+  - Command: test -f contracts/alerting/routing.yml
+  - Result: PASS
+- File present: docs/operator/alerts.md
+  - Command: test -f docs/operator/alerts.md
+  - Result: PASS
+- File present: docs/operator/incidents.md
+  - Command: test -f docs/operator/incidents.md
+  - Result: PASS
+- File present: docs/runtime/incident-lifecycle.md
+  - Command: test -f docs/runtime/incident-lifecycle.md
+  - Result: PASS
+- File present: ops/policy/policy-alerts.sh
+  - Command: test -f ops/policy/policy-alerts.sh
+  - Result: PASS
+- File present: ops/policy/policy-incidents.sh
+  - Command: test -f ops/policy/policy-incidents.sh
+  - Result: PASS
+- Policy gates wired: policy-alerts.sh
+  - Command: rg -n policy-alerts.sh ops/policy/policy.sh
+  - Result: PASS
+- Policy gates wired: policy-incidents.sh
+  - Command: rg -n policy-incidents.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: alerts.validate
+  - Command: rg -n '^alerts\.validate:' Makefile
+  - Result: PASS
+- Makefile target present: alerts.deliver
+  - Command: rg -n '^alerts\.deliver:' Makefile
+  - Result: PASS
+- Makefile target present: incidents.open
+  - Command: rg -n '^incidents\.open:' Makefile
+  - Result: PASS
+- Makefile target present: incidents.update
+  - Command: rg -n '^incidents\.update:' Makefile
+  - Result: PASS
+- Makefile target present: incidents.close
+  - Command: rg -n '^incidents\.close:' Makefile
+  - Result: PASS
+- Makefile target present: phase14.part3.entry.check
+  - Command: rg -n '^phase14\.part3\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase14.part3.accept
+  - Command: rg -n '^phase14\.part3\.accept:' Makefile
+  - Result: PASS
+- CI wiring: alerts.validate
+  - Command: rg -n 'alerts.validate' .github/workflows/pr-validate.yml
+  - Result: PASS
+- No automation hooks
+  - Command: ! rg -n 'remediate|self-heal|auto-remediate|autoscale|auto-scale' ops/alerts ops/incidents
+  - Result: PASS
+- Policy check
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Runtime evaluate
+  - Command: make -C /home/aggelos/samakia-fabric runtime.evaluate TENANT=all
+  - Result: PASS
+- SLO evaluate
+  - Command: make -C /home/aggelos/samakia-fabric slo.evaluate TENANT=all
+  - Result: PASS

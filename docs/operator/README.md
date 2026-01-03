@@ -10,6 +10,8 @@ Start here:
 - `runtime-ops.md` — runtime operations and signal classification
 - `slo.md` — SLO measurement, evaluation, and alert readiness
 - `slo-ownership.md` — SLO ownership and escalation rules
+- `alerts.md` — controlled alert delivery and routing
+- `incidents.md` — incident record lifecycle (open/update/close)
 - `runner-modes.md` — CI vs operator runner contract
 - `ssh-trust.md` — strict SSH trust + known_hosts rotation
 - `networking.md` — MAC/DHCP determinism policy and cutover checklist

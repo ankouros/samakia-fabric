@@ -1,4 +1,4 @@
-# Runtime Incident Lifecycle (Design)
+# Runtime Incident Lifecycle (Phase 14)
 
 Runtime incidents are managed as a deterministic, evidence-driven workflow.
 No automation executes changes.
@@ -12,15 +12,24 @@ No automation executes changes.
 - Classify the signal as Drift, SLO Violation, or Infrastructure Fault.
 - Do not mix classifications.
 
-3) Evidence collection
-- Gather inputs, evaluation results, and operator notes.
+3) Alert delivery (controlled)
+- Alerts are generated from classified signals and SLO states.
+- Delivery is explicit, guarded, and evidence-backed.
+- CI never delivers alerts.
+
+4) Evidence collection
+- Gather inputs, evaluation results, alert outputs, and operator notes.
 - Preserve deterministic manifests.
 
-4) Decision
+5) Decision
 - Decide one of: no action, investigate, or rollback (if exposure artifacts exist).
 - Any action is operator-controlled and documented.
 
-5) Closure
+6) Incident record
+- Open/update/close incidents as bookkeeping records.
+- Incident records do not modify infrastructure.
+
+7) Closure
 - Record the outcome and close the incident.
 
 ## Decision tree (read-only, no automation)
@@ -48,3 +57,25 @@ evidence/runtime-eval/<tenant>/<workload>/<UTC>/
 ```
 
 Evidence is redacted, deterministic, and secrets-free.
+
+Alert evidence packets are written under:
+
+```
+evidence/alerts/<tenant>/<UTC>/
+  signals.json
+  slo.json
+  routing.json
+  decision.json
+  delivery.json
+  manifest.sha256
+```
+
+Incident records are written under:
+
+```
+evidence/incidents/<incident_id>/
+  open.json
+  updates/
+  close.json
+  manifest.sha256
+```

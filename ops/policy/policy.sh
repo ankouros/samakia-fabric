@@ -23,6 +23,8 @@ scripts=(
   "policy-drift.sh"
   "policy-runtime-eval.sh"
   "policy-slo.sh"
+  "policy-alerts.sh"
+  "policy-incidents.sh"
   "policy-bindings-verify.sh"
   "policy-proposals.sh"
   "policy-exposure.sh"

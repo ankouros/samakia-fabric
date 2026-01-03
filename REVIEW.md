@@ -58,6 +58,14 @@ This document records what was implemented for the **Terraform remote state back
 - Wires a new policy gate and Part 2 entry/acceptance targets.
 - No alert delivery or remediation paths were introduced.
 
+## Phase 14 Part 3 — Alert Delivery & Incident Surfacing (Guarded)
+
+- Adds controlled alert delivery tooling under `ops/alerts/` with routing and formatting validation.
+- Generates alert evidence packets under `evidence/alerts/<tenant>/<UTC>/` without remediation.
+- Introduces incident record tooling under `ops/incidents/` with schema validation and evidence manifests.
+- Wires policy gates and Part 3 entry/acceptance targets.
+- Alerts and incidents are informational only; no automation or self-healing.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

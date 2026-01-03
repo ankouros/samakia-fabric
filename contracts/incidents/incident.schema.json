@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IncidentRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "incident_id",
+    "tenant",
+    "workload",
+    "signal_type",
+    "severity",
+    "opened_at",
+    "status",
+    "owner",
+    "evidence_refs",
+    "resolution_summary"
+  ],
+  "properties": {
+    "incident_id": {"type": "string"},
+    "tenant": {"type": "string"},
+    "workload": {"type": "string"},
+    "signal_type": {"enum": ["drift", "slo", "infra"]},
+    "severity": {"enum": ["WARN", "CRITICAL"]},
+    "opened_at": {"type": "string"},
+    "updated_at": {"type": "string"},
+    "status": {"enum": ["open", "investigating", "mitigated", "closed"]},
+    "owner": {"type": "string"},
+    "evidence_refs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1
+    },
+    "resolution_summary": {"type": "string"},
+    "event": {"enum": ["open", "update", "close"]},
+    "notes": {"type": "string"}
+  }
+}
