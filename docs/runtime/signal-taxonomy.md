@@ -55,3 +55,17 @@ A signal must be classified into one class only:
 
 If multiple inputs exist, the classification order is enforced by tooling and
 recorded in evidence.
+
+## Reference implementation (Phase 14 Part 1)
+
+Runtime evaluation is implemented as a read-only engine:
+
+- `make runtime.evaluate TENANT=<id|all>`
+- `make runtime.status TENANT=<id|all>`
+
+Classification order is deterministic:
+
+1) Infrastructure Fault
+2) Drift
+3) SLO Violation
+4) OK

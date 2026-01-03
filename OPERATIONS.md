@@ -109,11 +109,14 @@ Tenant binding workflows live in:
     - Rollback execute (guarded): `ROLLBACK_EXECUTE=1 ROLLBACK_REASON=... ROLLBACK_REQUESTED_BY=... make exposure.rollback`
     - Entry check: `make phase13.part2.entry.check`
     - Acceptance (dry-run only): `CI=1 make phase13.part2.accept`
-- Phase 14 runtime operations (design-only; read-only):
+- Phase 14 runtime operations (read-only):
   - Signal taxonomy: `docs/runtime/signal-taxonomy.md`
   - Incident lifecycle: `docs/runtime/incident-lifecycle.md`
   - Operator runbook: `docs/operator/runtime-ops.md`
   - SLO ownership: `docs/operator/slo-ownership.md`
+  - Runtime evaluation (read-only):
+    - `make runtime.evaluate TENANT=<id|all>`
+    - `make runtime.status TENANT=<id|all>`
 - Milestone Phase 1–12 verification (release manager, read-only):
   - Verify: `make milestone.phase1-12.verify`
   - Lock: `make milestone.phase1-12.lock`

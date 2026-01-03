@@ -42,6 +42,14 @@ This document records what was implemented for the **Terraform remote state back
 - Adds operator runbooks for runtime operations and SLO ownership.
 - Binding validation now falls back to example tenant contracts when top-level tenant directories lack tenant.yml.
 
+## Phase 14 Part 1 — Runtime Signal Evaluation (Read-Only)
+
+- Implements `ops/runtime/` evaluation tooling (load, normalize, classify, redact, evidence).
+- Emits runtime evidence packets under `evidence/runtime-eval/<tenant>/<workload>/<UTC>/`.
+- Generates operator status summaries under `artifacts/runtime-status/<tenant>/<workload>/`.
+- Adds policy gate and Make targets for runtime evaluation and status.
+- No remediation or automation paths were introduced.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

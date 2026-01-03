@@ -757,6 +757,35 @@ drift.summary: ## Emit tenant drift summary (TENANT required)
 	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" DRIFT_SUMMARY_ROOT="$(DRIFT_SUMMARY_ROOT)" \
 		bash "$(REPO_ROOT)/ops/drift/summary.sh"
 
+###############################################################################
+# Runtime operations (Phase 14)
+###############################################################################
+
+.PHONY: runtime.evaluate
+runtime.evaluate: ## Evaluate runtime signals (TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required (use TENANT=all for all tenants)"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" \
+		RUNTIME_EVIDENCE_ROOT="$(RUNTIME_EVIDENCE_ROOT)" RUNTIME_STATUS_ROOT="$(RUNTIME_STATUS_ROOT)" \
+		DRIFT_EVIDENCE_ROOT="$(DRIFT_EVIDENCE_ROOT)" VERIFY_EVIDENCE_ROOT="$(VERIFY_EVIDENCE_ROOT)" \
+		TENANT_EVIDENCE_ROOT="$(TENANT_EVIDENCE_ROOT)" \
+		METRICS_SOURCE_DIR="$(METRICS_SOURCE_DIR)" METRICS_SOURCE="$(METRICS_SOURCE)" \
+		bash "$(REPO_ROOT)/ops/runtime/evaluate.sh"
+
+.PHONY: runtime.status
+runtime.status: ## Emit runtime status summaries (TENANT required)
+	@test -n "$(TENANT)" || (echo "ERROR: TENANT is required (use TENANT=all for all tenants)"; exit 1)
+	@FABRIC_REPO_ROOT="$(REPO_ROOT)" TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" \
+		RUNTIME_EVIDENCE_ROOT="$(RUNTIME_EVIDENCE_ROOT)" RUNTIME_STATUS_ROOT="$(RUNTIME_STATUS_ROOT)" \
+		bash "$(REPO_ROOT)/ops/runtime/status.sh"
+
+.PHONY: phase14.part1.entry.check
+phase14.part1.entry.check: ## Phase 14 Part 1 entry checklist
+	@bash "$(OPS_SCRIPTS_DIR)/phase14-part1-entry-check.sh"
+
+.PHONY: phase14.part1.accept
+phase14.part1.accept: ## Phase 14 Part 1 acceptance
+	@bash "$(OPS_SCRIPTS_DIR)/phase14-part1-accept.sh"
+
 .PHONY: compliance.snapshot
 compliance.snapshot: ## Create signed compliance snapshot
 	bash "$(OPS_SCRIPTS_DIR)/compliance-snapshot.sh" "$(ENV)"

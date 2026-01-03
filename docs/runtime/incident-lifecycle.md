@@ -30,16 +30,20 @@ No automation executes changes.
 - Else if SLO thresholds are violated, classify as SLO Violation.
 - Else, classify as OK and record no action.
 
-## Evidence layout (design only)
+## Evidence layout
 
 Runtime evidence packets are written under:
 
 ```
-evidence/runtime/<tenant>/<workload>/<UTC>/
-  signals.json
+evidence/runtime-eval/<tenant>/<workload>/<UTC>/
+  inputs/
+    drift.json
+    verify.json
+    slo.yml
+    observation.yml
+  evaluation.json
   classification.json
-  slo-evaluation.json
-  decision.md
+  summary.md
   manifest.sha256
 ```
 

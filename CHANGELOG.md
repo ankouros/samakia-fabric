@@ -224,6 +224,14 @@ The format is inspired by:
 - Operator runtime ops and SLO ownership runbooks under `docs/operator/`.
 - Phase 14 entry checklist + acceptance plan under `acceptance/`.
 
+#### Runtime signal evaluation (Phase 14 Part 1)
+- Read-only runtime evaluation engine under `ops/runtime/` (load, normalize, classify, redact, evidence).
+- Deterministic evidence packets under `evidence/runtime-eval/<tenant>/<workload>/<UTC>/`.
+- Operator status summaries under `artifacts/runtime-status/<tenant>/<workload>/`.
+- Policy gate: `policy-runtime-eval.sh` wired into `make policy.check`.
+- Make targets: `runtime.evaluate`, `runtime.status`, `phase14.part1.entry.check`, `phase14.part1.accept`.
+- Phase 14 Part 1 entry checklist + acceptance marker.
+
 ### Changed
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).

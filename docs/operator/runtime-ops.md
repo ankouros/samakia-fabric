@@ -1,4 +1,4 @@
-# Runtime Operations (Design)
+# Runtime Operations (Phase 14 Part 1)
 
 Runtime operations are evidence-driven and read-only by default.
 No automation performs remediation or execution.
@@ -21,18 +21,44 @@ No automation performs remediation or execution.
 
 Classification order is strict and deterministic. Do not mix categories.
 
-## Evidence layout (design only)
+## How to run runtime evaluation
+
+Run evaluation (read-only):
+
+```bash
+make runtime.evaluate TENANT=<id|all>
+```
+
+Update status summaries from latest evidence:
+
+```bash
+make runtime.status TENANT=<id|all>
+```
+
+## Evidence layout
 
 ```
-evidence/runtime/<tenant>/<workload>/<UTC>/
-  signals.json
+evidence/runtime-eval/<tenant>/<workload>/<UTC>/
+  inputs/
+    drift.json
+    verify.json
+    slo.yml
+    observation.yml
+  evaluation.json
   classification.json
-  slo-evaluation.json
-  decision.md
+  summary.md
   manifest.sha256
 ```
 
 Evidence is redacted, deterministic, and secrets-free.
+
+Runtime status summaries are written to:
+
+```
+artifacts/runtime-status/<tenant>/<workload>/
+  status.json
+  status.md
+```
 
 ## Escalation guidance
 

@@ -1,0 +1,101 @@
+# Phase 14 Part 1 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T00:07:43Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE14_ENTRY_CHECKLIST.md
+  - Command: test -f acceptance/PHASE14_ENTRY_CHECKLIST.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE13_ACCEPTED.md
+  - Command: test -f acceptance/PHASE13_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Command: test -f acceptance/PHASE11_HARDENING_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/runtime/evaluate.sh
+  - Command: test -f ops/runtime/evaluate.sh
+  - Result: PASS
+- File present: ops/runtime/load/signals.sh
+  - Command: test -f ops/runtime/load/signals.sh
+  - Result: PASS
+- File present: ops/runtime/load/slo.sh
+  - Command: test -f ops/runtime/load/slo.sh
+  - Result: PASS
+- File present: ops/runtime/load/observation.sh
+  - Command: test -f ops/runtime/load/observation.sh
+  - Result: PASS
+- File present: ops/runtime/classify/infra.sh
+  - Command: test -f ops/runtime/classify/infra.sh
+  - Result: PASS
+- File present: ops/runtime/classify/drift.sh
+  - Command: test -f ops/runtime/classify/drift.sh
+  - Result: PASS
+- File present: ops/runtime/classify/slo.sh
+  - Command: test -f ops/runtime/classify/slo.sh
+  - Result: PASS
+- File present: ops/runtime/normalize/metrics.sh
+  - Command: test -f ops/runtime/normalize/metrics.sh
+  - Result: PASS
+- File present: ops/runtime/normalize/time.sh
+  - Command: test -f ops/runtime/normalize/time.sh
+  - Result: PASS
+- File present: ops/runtime/redact.sh
+  - Command: test -f ops/runtime/redact.sh
+  - Result: PASS
+- File present: ops/runtime/evidence.sh
+  - Command: test -f ops/runtime/evidence.sh
+  - Result: PASS
+- File present: ops/policy/policy-runtime-eval.sh
+  - Command: test -f ops/policy/policy-runtime-eval.sh
+  - Result: PASS
+- File present: contracts/slo/slo.schema.json
+  - Command: test -f contracts/slo/slo.schema.json
+  - Result: PASS
+- File present: contracts/runtime-observation/observation.yml
+  - Command: test -f contracts/runtime-observation/observation.yml
+  - Result: PASS
+- File present: docs/operator/runtime-ops.md
+  - Command: test -f docs/operator/runtime-ops.md
+  - Result: PASS
+- File present: docs/runtime/signal-taxonomy.md
+  - Command: test -f docs/runtime/signal-taxonomy.md
+  - Result: PASS
+- Policy gates wired: policy-runtime-eval.sh
+  - Command: rg -n policy-runtime-eval.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: runtime.evaluate
+  - Command: rg -n '^runtime\.evaluate:' Makefile
+  - Result: PASS
+- Makefile target present: runtime.status
+  - Command: rg -n '^runtime\.status:' Makefile
+  - Result: PASS
+- Makefile target present: phase14.part1.entry.check
+  - Command: rg -n '^phase14\.part1\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase14.part1.accept
+  - Command: rg -n '^phase14\.part1\.accept:' Makefile
+  - Result: PASS
+- CI wiring: runtime.evaluate
+  - Command: rg -n 'runtime.evaluate' .github/workflows/pr-validate.yml
+  - Result: PASS
+- CI wiring: runtime.status
+  - Command: rg -n 'runtime.status' .github/workflows/pr-validate.yml
+  - Result: PASS
+- No remediation code paths
+  - Command: ! rg -n 'remediate|self-heal|auto-remediate' ops/runtime
+  - Result: PASS
+- Policy check
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Docs operator check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS
+- Drift summary
+  - Command: make -C /home/aggelos/samakia-fabric drift.summary TENANT=all
+  - Result: PASS

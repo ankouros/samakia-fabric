@@ -602,6 +602,119 @@ None required (read-only).
 
 ---
 
+### Task: Runtime evaluation (read-only)
+
+#### Intent
+Evaluate runtime signals and classify the current state.
+
+#### Preconditions
+- SLO contracts and observation policy present
+- Drift and bindings verification evidence available
+
+#### Command
+```bash
+make runtime.evaluate TENANT=all
+```
+
+#### Expected result
+Runtime evaluation evidence written under `evidence/runtime-eval/<tenant>/<workload>/<UTC>/`.
+
+#### Evidence outputs
+`evidence/runtime-eval/<tenant>/<workload>/<UTC>/...`
+
+#### Failure modes
+- Missing SLO contracts
+- Missing evidence inputs
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Runtime status summary (read-only)
+
+#### Intent
+Write operator summaries from the latest runtime evidence.
+
+#### Preconditions
+- Runtime evaluation evidence exists
+
+#### Command
+```bash
+make runtime.status TENANT=all
+```
+
+#### Expected result
+Status summaries written under `artifacts/runtime-status/<tenant>/<workload>/`.
+
+#### Evidence outputs
+`artifacts/runtime-status/<tenant>/<workload>/status.md`
+
+#### Failure modes
+- Missing runtime evaluation evidence
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 14 Part 1 entry check (read-only)
+
+#### Intent
+Validate Part 1 prerequisites and wiring before acceptance.
+
+#### Preconditions
+- Phase 14 entry checklist present
+- REQUIRED-FIXES.md has no OPEN items
+
+#### Command
+```bash
+make phase14.part1.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE14_PART1_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE14_PART1_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing runtime evaluation tooling
+- Policy or docs gates failing
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
+### Task: Phase 14 Part 1 acceptance (read-only)
+
+#### Intent
+Run the Phase 14 Part 1 acceptance suite.
+
+#### Preconditions
+- Phase 14 Part 1 entry check passes
+
+#### Command
+```bash
+make phase14.part1.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE14_PART1_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE14_PART1_ACCEPTED.md`
+
+#### Failure modes
+- Runtime evaluation tooling errors
+- Missing evidence inputs
+
+#### Rollback / safe exit
+None required (read-only).
+
+---
+
 ### Task: Phase 12 Part 6 entry check (read-only)
 
 #### Intent

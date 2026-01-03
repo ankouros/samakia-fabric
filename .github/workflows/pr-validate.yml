@@ -124,6 +124,12 @@ jobs:
       - name: Tenant drift summaries
         run: TENANT=all make drift.summary
 
+      - name: Runtime evaluation (read-only)
+        run: make runtime.evaluate TENANT=all
+
+      - name: Runtime status summaries
+        run: make runtime.status TENANT=all
+
       - name: Drift alert routing validation
         run: make substrate.alert.validate
 
