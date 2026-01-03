@@ -14,6 +14,7 @@ Start here:
 - `incidents.md` — incident record lifecycle (open/update/close)
 - `selfservice-review.md` — tenant self-service proposal review (proposal-only)
 - `selfservice-approval.md` — approval/delegation design (Phase 15 Part 2)
+- `selfservice-governance.md` — autonomy guardrails and stop rules (Phase 15 Part 3)
 - `runner-modes.md` — CI vs operator runner contract
 - `ssh-trust.md` — strict SSH trust + known_hosts rotation
 - `networking.md` — MAC/DHCP determinism policy and cutover checklist

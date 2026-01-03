@@ -761,7 +761,14 @@ Status: IN PROGRESS
 - Execution mapping to Phase 13 guardrails (design-only).
 - Evidence/audit model and operator UX for approvals/delegations.
 
-### Part 3 — Guarded execution integration (PLANNED)
+### Part 3 — Guardrails, risk budgets, and stop rules (COMPLETED ✅)
+- Autonomy levels model and explicit out-of-scope levels.
+- Risk budget model (advisory-only design).
+- Stop rules and kill switches for autonomy freezes.
+- Guardrail mapping across Phase 11–14 invariants.
+- Accountability model and operator governance guidance.
+
+### Part 4 — Guarded execution integration (PLANNED)
 - Operator-only apply/rollback wiring with approvals + delegations.
 - Change windows and signing enforced for prod.
 

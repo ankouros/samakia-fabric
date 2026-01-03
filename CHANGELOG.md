@@ -259,6 +259,11 @@ The format is inspired by:
 - Audit model and operator approval/delegation runbook (design-only).
 - Phase 15 Part 2 entry checklist and acceptance plan (design-only).
 
+#### Controlled self-service autonomy guardrails (Phase 15 Part 3 design)
+- Autonomy levels, risk budgets, and stop rules under `docs/selfservice/`.
+- Guardrail mapping to Phase 11–14 and accountability model (design-only).
+- Operator governance guidance and Phase 15 Part 3 entry/acceptance plan docs.
+
 ### Changed
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).

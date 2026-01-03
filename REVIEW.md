@@ -80,6 +80,12 @@ This document records what was implemented for the **Terraform remote state back
 - Maps approvals/delegations to Phase 13 execution guardrails (design-only).
 - Documents audit model and operator approval/delegation UX (no tooling added).
 
+## Phase 15 Part 3 — Autonomy Guardrails (Design Only)
+
+- Defines autonomy levels, risk budgets, and stop rules (design-only).
+- Maps guardrails to Phase 11–14 invariants and operator intervention points.
+- Adds accountability model and operator governance guidance.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

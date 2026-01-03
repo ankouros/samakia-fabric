@@ -94,6 +94,13 @@ Tenant binding workflows live in:
   - Execution mapping: `docs/selfservice/execution-mapping.md`
   - Audit model: `docs/selfservice/audit-model.md`
   - Operator UX: `docs/operator/selfservice-approval.md`
+- Autonomy guardrails (Phase 15 Part 3; design-only):
+  - Autonomy levels: `docs/selfservice/autonomy-levels.md`
+  - Risk budgets: `docs/selfservice/risk-budgets.md`
+  - Stop rules: `docs/selfservice/stop-rules.md`
+  - Guardrail mapping: `docs/selfservice/guardrail-mapping.md`
+  - Accountability: `docs/selfservice/accountability.md`
+  - Operator governance: `docs/operator/selfservice-governance.md`
 - Drift awareness (Phase 12 Part 5; read-only):
   - Detect tenant drift (non-blocking): `TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none make drift.detect`
   - Emit tenant summaries: `TENANT=all make drift.summary`
