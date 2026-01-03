@@ -45,3 +45,4 @@ Files:
 See also:
 - `docs/operator/cookbook.md`
 - `docs/tenants/selfservice.md`
+- `docs/operator/selfservice-approval.md`

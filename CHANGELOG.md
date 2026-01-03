@@ -253,6 +253,12 @@ The format is inspired by:
 - Policy gate `policy-selfservice.sh` wired into `make policy.check`; CI validates examples.
 - Operator and tenant self-service docs plus Phase 15 Part 1 entry/accept targets.
 
+#### Controlled self-service approval & delegation (Phase 15 Part 2 design)
+- Proposal lifecycle state machine and execution mapping under `docs/selfservice/`.
+- Approval and delegation schema examples under `contracts/selfservice/`.
+- Audit model and operator approval/delegation runbook (design-only).
+- Phase 15 Part 2 entry checklist and acceptance plan (design-only).
+
 ### Changed
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).

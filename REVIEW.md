@@ -73,6 +73,13 @@ This document records what was implemented for the **Terraform remote state back
 - Wires policy gate + CI validation for self-service proposals; execution remains operator-controlled.
 - Adds tenant/operator docs for proposal lifecycle and review responsibilities.
 
+## Phase 15 Part 2 — Approval & Delegation Design (Design Only)
+
+- Defines proposal lifecycle state machine with explicit evidence transitions.
+- Adds approval and delegation schemas + examples under `contracts/selfservice/`.
+- Maps approvals/delegations to Phase 13 execution guardrails (design-only).
+- Documents audit model and operator approval/delegation UX (no tooling added).
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

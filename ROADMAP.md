@@ -755,9 +755,15 @@ Status: IN PROGRESS
 - Policy gate + CI validation for proposal examples (no execution paths).
 - Phase 15 Part 1 entry checklist + acceptance marker.
 
-### Part 2 — Operator approval + execution integration (PLANNED)
-- Guarded approvals and operator-only apply entrypoints.
-- Evidence-backed change windows and signing for prod.
+### Part 2 — Approval + delegation design (COMPLETED ✅)
+- Proposal lifecycle state machine with explicit evidence transitions.
+- Approval + delegation contract schemas and examples.
+- Execution mapping to Phase 13 guardrails (design-only).
+- Evidence/audit model and operator UX for approvals/delegations.
+
+### Part 3 — Guarded execution integration (PLANNED)
+- Operator-only apply/rollback wiring with approvals + delegations.
+- Change windows and signing enforced for prod.
 
 Non-scope (Phase 15 Part 1):
 - Tenant apply or autonomous execution

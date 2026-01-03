@@ -1,0 +1,22 @@
+proposal_id: example
+approved_by: "ops-01"
+approved_at: "2026-01-03T00:00:00Z"
+approved_scope:
+  - bindings
+  - capacity
+  - exposure_intent
+approved_envs:
+  - samakia-dev
+constraints:
+  max_delta:
+    capacity:
+      database.postgres.single.max_storage_gb: 10
+  providers_allowlist:
+    - postgres
+    - dragonfly
+  variant_allowlist:
+    - single
+  expiration: "2026-02-01T00:00:00Z"
+  change_window_ref: "change-window/2026-01-03"
+  signature_ref: "signatures/approval-example.asc"
+notes: "Design-only example approval artifact."

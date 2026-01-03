@@ -87,6 +87,13 @@ Tenant binding workflows live in:
   - Read-only plan preview: `make selfservice.plan PROPOSAL_ID=<id>`
   - Review bundle (diff + impact + plan): `make selfservice.review PROPOSAL_ID=<id>`
   - No apply paths are exposed; execution remains operator-controlled.
+- Self-service governance (Phase 15 Part 2; design-only):
+  - Proposal lifecycle: `docs/selfservice/proposal-lifecycle.md`
+  - Approval contract: `contracts/selfservice/approval.schema.json`
+  - Delegation contract: `contracts/selfservice/delegation.schema.json`
+  - Execution mapping: `docs/selfservice/execution-mapping.md`
+  - Audit model: `docs/selfservice/audit-model.md`
+  - Operator UX: `docs/operator/selfservice-approval.md`
 - Drift awareness (Phase 12 Part 5; read-only):
   - Detect tenant drift (non-blocking): `TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none make drift.detect`
   - Emit tenant summaries: `TENANT=all make drift.summary`

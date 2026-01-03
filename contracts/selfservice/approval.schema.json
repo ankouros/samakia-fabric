@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SelfServiceApproval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proposal_id",
+    "approved_by",
+    "approved_at",
+    "approved_scope",
+    "approved_envs",
+    "constraints"
+  ],
+  "properties": {
+    "proposal_id": {"type": "string"},
+    "approved_by": {"type": "string"},
+    "approved_at": {"type": "string"},
+    "approved_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"enum": ["bindings", "capacity", "exposure_intent"]}
+    },
+    "approved_envs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"}
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_delta",
+        "providers_allowlist",
+        "variant_allowlist",
+        "expiration",
+        "change_window_ref",
+        "signature_ref"
+      ],
+      "properties": {
+        "max_delta": {"type": "object"},
+        "providers_allowlist": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "variant_allowlist": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "expiration": {"type": "string"},
+        "change_window_ref": {"type": "string"},
+        "signature_ref": {"type": "string"}
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}

@@ -20,6 +20,13 @@ elif [[ "${proposal_id}" == "example" ]]; then
   while IFS= read -r path; do
     collect_files+=("${path}")
   done < <(find "${FABRIC_REPO_ROOT}/examples/selfservice" -type f -name "*.yml" -print | sort)
+elif [[ "${proposal_id}" == "all" ]]; then
+  while IFS= read -r path; do
+    collect_files+=("${path}")
+  done < <(find "${FABRIC_REPO_ROOT}/examples/selfservice" -type f -name "*.yml" -print | sort)
+  while IFS= read -r path; do
+    collect_files+=("${path}")
+  done < <(find "${FABRIC_REPO_ROOT}/selfservice/inbox" -type f -name "proposal.yml" -print | sort)
 elif [[ -n "${proposal_id}" ]]; then
   inbox_match=$(find "${FABRIC_REPO_ROOT}/selfservice/inbox" -type f -name "proposal.yml" -path "*/${proposal_id}/*" 2>/dev/null | head -n1 || true)
   if [[ -n "${inbox_match}" ]]; then

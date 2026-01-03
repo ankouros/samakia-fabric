@@ -71,3 +71,4 @@ Evidence includes:
 See also:
 - `docs/operator/selfservice-review.md`
 - `docs/operator/cookbook.md`
+- `docs/selfservice/proposal-lifecycle.md`

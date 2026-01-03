@@ -1,0 +1,12 @@
+proposal_id: example
+delegated_to:
+  operator_role: "platform-operator"
+  automation_role: "selfservice-automation"
+allowed_actions:
+  - plan
+  - apply
+valid_from: "2026-01-03T00:00:00Z"
+valid_until: "2026-01-03T06:00:00Z"
+env: "samakia-dev"
+reason: "Design-only delegation window for approved proposal."
+notes: "Delegation is revocable and never grants secret access."
