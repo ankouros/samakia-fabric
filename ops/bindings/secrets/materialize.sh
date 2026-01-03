@@ -14,7 +14,7 @@ Usage:
   materialize.sh TENANT=<id|all>
 
 Environment:
-  BIND_SECRETS_BACKEND=file|vault (policy default: vault; set explicitly)
+  BIND_SECRETS_BACKEND=file|vault (default: vault)
   MATERIALIZE_EXECUTE=1 to perform writes (default: dry-run)
   BIND_SECRET_INPUT_FILE=<path> (JSON map of secret_ref -> object) for operator_input
   SECRETS_GENERATE=1 to allow generated credentials
@@ -31,7 +31,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
 fi
 
 tenant_filter="${TENANT:-all}"
-backend="${BIND_SECRETS_BACKEND:-file}"
+backend="${BIND_SECRETS_BACKEND:-vault}"
 backend_script="${FABRIC_REPO_ROOT}/ops/bindings/secrets/backends/${backend}.sh"
 file_backend="${FABRIC_REPO_ROOT}/ops/bindings/secrets/backends/file.sh"
 vault_backend="${FABRIC_REPO_ROOT}/ops/bindings/secrets/backends/vault.sh"

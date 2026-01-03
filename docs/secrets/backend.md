@@ -17,9 +17,8 @@ CI fixtures, or explicit local use).
   - `SECRETS_BACKEND=file`
   - `BIND_SECRETS_BACKEND=file`
 
-Policy note: existing scripts still default to the file backend when the
-backend variables are unset. Operators must set the backend explicitly to avoid
-implicit file usage.
+Runtime defaults use Vault when backend variables are unset. Operators must
+set file backend explicitly for exceptions.
 
 ## Comparison
 

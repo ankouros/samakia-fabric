@@ -19,7 +19,7 @@ Commands:
   doctor              Show backend configuration (no secrets)
 
 Backend selection:
-  SECRETS_BACKEND=vault  Vault backend (default by policy; set explicitly)
+  SECRETS_BACKEND=vault  Vault backend (default)
   SECRETS_BACKEND=file   Offline encrypted file (explicit exception)
 EOT
 }
@@ -32,7 +32,7 @@ if [[ -z "${cmd}" || "${cmd}" == "-h" || "${cmd}" == "--help" ]]; then
   exit 0
 fi
 
-backend="${SECRETS_BACKEND:-file}"
+backend="${SECRETS_BACKEND:-vault}"
 
 case "${backend}" in
   file)

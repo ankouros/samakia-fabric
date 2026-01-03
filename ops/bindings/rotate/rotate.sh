@@ -46,7 +46,7 @@ if [[ -z "${ROTATE_REASON:-}" ]]; then
   exit 2
 fi
 
-backend="${BIND_SECRETS_BACKEND:-file}"
+backend="${BIND_SECRETS_BACKEND:-vault}"
 backend_script="${FABRIC_REPO_ROOT}/ops/bindings/secrets/backends/${backend}.sh"
 file_backend="${FABRIC_REPO_ROOT}/ops/bindings/secrets/backends/file.sh"
 

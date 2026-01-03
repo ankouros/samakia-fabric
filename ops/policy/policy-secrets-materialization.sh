@@ -47,8 +47,8 @@ if ! rg -n "MATERIALIZE_EXECUTE" "${materialize}" >/dev/null; then
   exit 1
 fi
 
-if ! rg -n "BIND_SECRETS_BACKEND:-file" "${materialize}" >/dev/null; then
-  echo "ERROR: materialize default backend must be file" >&2
+if ! rg -n "BIND_SECRETS_BACKEND:-vault" "${materialize}" >/dev/null; then
+  echo "ERROR: materialize default backend must be vault" >&2
   exit 1
 fi
 

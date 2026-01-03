@@ -8,7 +8,7 @@ source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
 require_ci_mode
 
 
-backend="${BIND_SECRETS_BACKEND:-file}"
+backend="${BIND_SECRETS_BACKEND:-vault}"
 backend_script="${FABRIC_REPO_ROOT}/ops/bindings/secrets/backends/${backend}.sh"
 
 if [[ ! -x "${backend_script}" ]]; then

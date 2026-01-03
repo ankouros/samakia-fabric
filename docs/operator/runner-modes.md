@@ -27,9 +27,8 @@ Samakia Fabric uses a single, explicit runner contract for all automation.
   - `BIND_SECRETS_BACKEND=file`
   - documented rationale in evidence or review artifacts.
 
-Note: current scripts still default to file when unset, so operators must set
-backend variables explicitly (`BIND_SECRETS_BACKEND` and `SECRETS_BACKEND`)
-to avoid implicit file usage.
+Defaults now resolve to Vault when unset; set `BIND_SECRETS_BACKEND=file` or
+`SECRETS_BACKEND=file` explicitly for exceptions.
 
 ## Usage examples
 

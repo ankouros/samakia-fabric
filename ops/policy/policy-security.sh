@@ -29,9 +29,9 @@ require_exec() {
   fi
 }
 
-# Secrets interface defaults to offline file backend.
-if ! rg -n "SECRETS_BACKEND:-file" "${FABRIC_REPO_ROOT}/ops/secrets/secrets.sh" >/dev/null; then
-  echo "ERROR: secrets default backend must be file (offline-first)" >&2
+# Secrets interface defaults to Vault backend.
+if ! rg -n "SECRETS_BACKEND:-vault" "${FABRIC_REPO_ROOT}/ops/secrets/secrets.sh" >/dev/null; then
+  echo "ERROR: secrets default backend must be vault" >&2
   exit 1
 fi
 

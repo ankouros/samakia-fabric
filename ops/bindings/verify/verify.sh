@@ -9,7 +9,7 @@ require_ci_mode
 
 
 mode="${VERIFY_MODE:-offline}"
-backend="${BIND_SECRETS_BACKEND:-file}"
+backend="${BIND_SECRETS_BACKEND:-vault}"
 artifact_root="${BINDINGS_ARTIFACT_ROOT:-${FABRIC_REPO_ROOT}/artifacts/bindings}"
 
 usage() {

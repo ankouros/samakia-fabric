@@ -37,8 +37,8 @@ Vault is the **default secrets backend** for operator and production workflows.
 The encrypted file backend is a **documented exception** for bootstrap/CI/local
 use. See `docs/secrets/backend.md` for the normative policy.
 
-Note: current scripts still default to the file backend when unset; always set
-`BIND_SECRETS_BACKEND` explicitly to avoid implicit file usage.
+Defaults now resolve to Vault when unset; set `BIND_SECRETS_BACKEND=file`
+explicitly for exceptions.
 
 - Vault backend (default, read-only for bindings):
   - `BIND_SECRETS_BACKEND=vault`

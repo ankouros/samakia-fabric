@@ -1076,8 +1076,8 @@ See `OPERATIONS_AUDIT_LOGGING.md` for retention guidance and evidence export.
 
 Default backend is **Vault** (HA, shared control plane). The offline encrypted
 file backend is an explicit exception for bootstrap/CI/local use. Set
-`SECRETS_BACKEND` explicitly to avoid implicit file usage.
-This is a design clarification only; no runtime behavior changed and no secrets were moved.
+`SECRETS_BACKEND=file` explicitly for exceptions.
+Runtime defaults now resolve to Vault; no secrets were migrated.
 
 Commands:
 ```bash

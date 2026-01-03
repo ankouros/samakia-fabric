@@ -566,7 +566,7 @@ Phase 2.x and Phase 3 behavior remain unchanged; Phase 4 adds governance and evi
 ## Phase 5 — Advanced Security & Compliance
 
 Phase 5 strengthens security posture while preserving offline operability:
-- Vault-default secrets backend with explicit file backend exceptions (design clarification only; no runtime changes or secret migrations).
+- Vault-default secrets backend with explicit file backend exceptions (runtime defaults updated; no secret migrations).
 - Guarded SSH key rotation workflows (operator + break-glass) with evidence packets.
 - Default-off firewall profiles with explicit apply guards and read-only validation.
 - Compliance profile evaluation mapped to the control catalog (baseline/hardened).

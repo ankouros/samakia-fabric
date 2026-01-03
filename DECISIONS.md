@@ -1092,7 +1092,7 @@ No cross-tenant, open-ended, or CI-executed actions are allowed.
 
 - No automatic database provisioning.
 - No secrets migration or rekeying as part of this change.
-- No runtime behavior changes to existing scripts.
+- No changes to existing secret material.
 
 ### Audit & governance
 

@@ -173,7 +173,7 @@ PY
 openssl enc -aes-256-cbc -pbkdf2 -in "${plaintext_tmp}" -out "${secrets_file}" "${pass_arg[@]}"
 chmod 600 "${secrets_file}"
 
-if [[ "${SECRETS_BACKEND:-file}" == "vault" && "${VAULT_WRITE:-0}" == "1" ]]; then
+if [[ "${SECRETS_BACKEND:-vault}" == "vault" && "${VAULT_WRITE:-0}" == "1" ]]; then
   if ! command -v vault >/dev/null 2>&1; then
     echo "ERROR: vault CLI not found (required for VAULT_WRITE=1)" >&2
     exit 2
