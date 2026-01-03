@@ -99,6 +99,18 @@ This document records what was fixed, what remains blocked (if anything), and th
 ## Still Blocked (if any)
 
 - Milestone Phase 1–12 verification (see MILESTONE-1-12-PHASE2-1-SHARED-POLICY).
+- Phase 17 Step 4 real canary exposure (see PHASE17-STEP4-CANARY-VERIFY-SECRET).
+
+## Phase 17 Step 4 Blockers
+
+### PHASE17-STEP4-CANARY-VERIFY-SECRET
+- **Description:** `VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample` failed with `failed to read secret_ref tenants/canary/database/sample via backend file`.
+- **Impact:** Phase 17 Step 4 cannot complete because live verification requires real secret material to validate TLS connectivity.
+- **Root cause:** Local secrets backend file (`~/.config/samakia-fabric/secrets.enc`) is missing or unseeded for the canary `secret_ref`.
+- **Required remediation:** Seed the file backend with the `tenants/canary/database/sample` secret (or configure the Vault backend) and rerun the verify step; ensure `SECRETS_PASSPHRASE` or `SECRETS_PASSPHRASE_FILE` is set for the runner.
+- **Resolution status:** **OPEN**
+- **Verification command(s):**
+  - `VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
 
 ## Milestone Phase 1–12 Blockers
 
