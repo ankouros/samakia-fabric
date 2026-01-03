@@ -23,6 +23,7 @@ This tutorial does NOT cover:
 - Tutorial 06 completed (remote state backend ready)
 - Proxmox internal CA installed on the runner host
 - Runner env file installed at `~/.config/samakia-fabric/env.sh`
+- For local exception workflows, set `SECRETS_BACKEND=file` and `BIND_SECRETS_BACKEND=file` in the env file
 
 ---
 

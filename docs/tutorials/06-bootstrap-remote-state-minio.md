@@ -25,6 +25,7 @@ This tutorial does NOT cover:
 - Tutorials 01 through 05 completed
 - Proxmox internal CA installed on the runner host
 - Runner env file installed at `~/.config/samakia-fabric/env.sh`
+- For local exception workflows, set `SECRETS_BACKEND=file` and `BIND_SECRETS_BACKEND=file` in the env file
 - Delegated Proxmox API token available (no root automation)
 
 ---

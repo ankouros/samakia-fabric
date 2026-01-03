@@ -21,6 +21,7 @@ It contains exports needed for:
   - Terraform (Proxmox + S3 backend for MinIO)
   - Packer template upload (PM_* vars)
   - SSH bootstrap keys (TF_VAR_ssh_public_keys JSON list)
+  - Optional local secrets backend overrides (file backend only)
 
 Security rules:
   - Never prints token secrets.
@@ -236,6 +237,10 @@ export TF_BACKEND_S3_CA_SRC=$(single_quote "${s3_ca_src}")
 # MinIO credentials (used by terraform backend via standard AWS env vars)
 export AWS_ACCESS_KEY_ID=$(single_quote "${aws_access_key_id}")
 export AWS_SECRET_ACCESS_KEY=$(single_quote "${aws_secret_access_key}")
+
+# Secrets backend (default: Vault). Uncomment only for local exceptions.
+# export SECRETS_BACKEND=file
+# export BIND_SECRETS_BACKEND=file
 EOF
 
 install -m 0600 "${tmp}" "${env_file}"
