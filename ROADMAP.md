@@ -787,7 +787,7 @@ Non-scope (Phase 15 Part 1):
 
 ## Phase 16 — AI-Assisted Analysis (Ollama-Only)
 
-Status: IN PROGRESS (Parts 6-7 pending)
+Status: IN PROGRESS (Part 7 pending)
 
 ### Part 1 — Provider + Routing + Read-Only Guardrails (COMPLETED ✅)
 - Ollama-only provider contract and deterministic routing policy.
@@ -814,7 +814,7 @@ Status: IN PROGRESS (Parts 6-7 pending)
 - AI governance model, risk ledger, and stop rules.
 - Regression guardrails to prevent capability creep.
 
-### Part 6 — Operator UX Consolidation (Planned)
+### Part 6 — Operator UX Consolidation (COMPLETED ✅)
 - Unified AI ops entrypoint and evidence index.
 - AI regression and drift protection.
 

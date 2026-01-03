@@ -63,6 +63,9 @@ bash "$ROOT_DIR/ops/scripts/test-ai/test-no-external-provider.sh"
 bash "$ROOT_DIR/ops/scripts/test-ai/test-routing-locked.sh"
 bash "$ROOT_DIR/ops/scripts/test-ai/test-mcp-readonly.sh"
 bash "$ROOT_DIR/ops/scripts/test-ai/test-ci-safety.sh"
+bash "$ROOT_DIR/ops/scripts/test-ai/test-ai-ux.sh"
+bash "$ROOT_DIR/ops/scripts/test-ai/test-ai-evidence.sh"
+bash "$ROOT_DIR/ops/scripts/test-ai/test-ai-no-new-capabilities.sh"
 
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 

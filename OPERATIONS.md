@@ -1342,6 +1342,12 @@ bash ops/ai/ai.sh doctor
 bash ops/ai/ai.sh route ops.analysis
 ```
 
+Unified operator entrypoint:
+
+```bash
+bash ops/ai/ops.sh doctor
+```
+
 AI indexing (offline default):
 
 ```bash
@@ -1388,9 +1394,17 @@ AI_ANALYZE_EXECUTE=1 make ai.analyze.run FILE=examples/analysis/drift_explain.ym
 Evidence output:
 `evidence/ai/analysis/<analysis_id>/<UTC>/`
 
+Evidence index:
+
+```bash
+bash ops/ai/evidence/rebuild-index.sh
+bash ops/ai/evidence/validate-index.sh
+```
+
 Documentation:
 - `docs/operator/ai.md`
 - `docs/operator/ai-analysis.md`
+- `docs/operator/ai-operations.md`
 - `docs/ai/overview.md`
 - `docs/ai/provider.md`
 - `docs/ai/routing.md`
@@ -1398,6 +1412,7 @@ Documentation:
 - `docs/ai/mcp.md`
 - `docs/ai/analysis.md`
 - `docs/ai/examples.md`
+- `docs/ai/operations.md`
 - `docs/ai/governance.md`
 - `docs/ai/stop-rules.md`
 - `docs/ai/risk-ledger.md`

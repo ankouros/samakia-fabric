@@ -124,6 +124,9 @@ audit/
 evidence/**
 !evidence/ai/
 evidence/ai/**
+!evidence/ai/README.md
+!evidence/ai/index.json
+!evidence/ai/index.md
 !evidence/ai/risk-ledger/
 evidence/ai/risk-ledger/**
 !evidence/ai/risk-ledger/README.md

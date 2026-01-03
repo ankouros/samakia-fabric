@@ -1,0 +1,92 @@
+# Phase 16 Part 6 Entry Checklist
+
+Timestamp (UTC): 2026-01-03T07:06:40Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE16_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART5_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/ai/ops.sh
+  - Command: test -f ops/ai/ops.sh
+  - Result: PASS
+- File present: ops/ai/evidence/rebuild-index.sh
+  - Command: test -f ops/ai/evidence/rebuild-index.sh
+  - Result: PASS
+- File present: ops/ai/evidence/validate-index.sh
+  - Command: test -f ops/ai/evidence/validate-index.sh
+  - Result: PASS
+- File present: evidence/ai/README.md
+  - Command: test -f evidence/ai/README.md
+  - Result: PASS
+- File present: evidence/ai/index.json
+  - Command: test -f evidence/ai/index.json
+  - Result: PASS
+- File present: evidence/ai/index.md
+  - Command: test -f evidence/ai/index.md
+  - Result: PASS
+- File present: docs/operator/ai-operations.md
+  - Command: test -f docs/operator/ai-operations.md
+  - Result: PASS
+- File present: docs/ai/operations.md
+  - Command: test -f docs/ai/operations.md
+  - Result: PASS
+- File present: ops/scripts/test-ai/test-ai-ux.sh
+  - Command: test -f ops/scripts/test-ai/test-ai-ux.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai/test-ai-evidence.sh
+  - Command: test -f ops/scripts/test-ai/test-ai-evidence.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai/test-ai-no-new-capabilities.sh
+  - Command: test -f ops/scripts/test-ai/test-ai-no-new-capabilities.sh
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- AI ops regression tests wired in validate.sh
+  - Command: rg -n test-ai fabric-ci/scripts/validate.sh
+  - Result: PASS
+- Makefile target present: phase16.part6.entry.check
+  - Command: rg -n '^phase16\.part6\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part6.accept
+  - Command: rg -n '^phase16\.part6\.accept:' Makefile
+  - Result: PASS
+- AI-related code has no TODOs
+  - Command: rg -n "TODO" ops/ai contracts/ai docs/ai
+  - Result: PASS
+- Policy gates
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS
+- Evidence index validation
+  - Command: bash /home/aggelos/samakia-fabric/ops/ai/evidence/validate-index.sh
+  - Result: PASS

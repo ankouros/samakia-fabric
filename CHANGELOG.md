@@ -69,6 +69,11 @@ The format is inspired by:
 - Regression guardrail tests for AI safety + CI wiring
 - Phase 16 closure entry checklist + Part 5 acceptance marker
 
+#### AI-assisted analysis (Phase 16 Part 6)
+- Unified AI ops entrypoint and evidence index tooling
+- Ops regression tests for UX and evidence drift protection
+- Phase 16 Part 6 entry checklist + acceptance marker
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

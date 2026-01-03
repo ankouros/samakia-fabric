@@ -26,4 +26,5 @@ It never grants AI any execution or remediation capability.
 - Governance: `governance.md`
 - Stop rules: `stop-rules.md`
 - Risk ledger: `risk-ledger.md`
+- Operations: `operations.md`
 - Operator usage: `../operator/ai.md`

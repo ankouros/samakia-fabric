@@ -1,4 +1,4 @@
-# Phase 16 Acceptance (Operations UX)
+# Phase 16 Part 6 Acceptance
 
 Timestamp (UTC): 2026-01-03T07:04:38Z
 Commit: 352f8452a950a62fca90b086f52ff32ea1bdb0bb
@@ -10,6 +10,11 @@ Commands executed:
 - make policy.check
 - bash ops/ai/ops.sh doctor
 - make phase16.part6.entry.check
+- ops/scripts/test-ai/test-no-exec.sh
+- ops/scripts/test-ai/test-no-external-provider.sh
+- ops/scripts/test-ai/test-routing-locked.sh
+- ops/scripts/test-ai/test-mcp-readonly.sh
+- ops/scripts/test-ai/test-ci-safety.sh
 - ops/scripts/test-ai/test-ai-ux.sh
 - ops/scripts/test-ai/test-ai-evidence.sh
 - ops/scripts/test-ai/test-ai-no-new-capabilities.sh
@@ -19,6 +24,6 @@ Commands executed:
 Result: PASS
 
 Statement:
-Phase 16 AI-assisted analysis is permanently advisory and evidence-bound.
+Phase 16 AI-assisted analysis is complete and locked; AI is advisory only.
 
-Self-hash (sha256 of content above): 9b544dc658807ba5b938bb517aa3124f064ab65e9f010a10af3a60eb37ec337a
+Self-hash (sha256 of content above): bf8d845d87f2338ce5c17daa86a3b42263296edfc5d73fcd7e9aff4c0a696e89

@@ -128,6 +128,12 @@ This document records what was implemented for the **Terraform remote state back
 - Introduces regression guardrails to prevent AI capability creep.
 - Adds Phase 16 closure checklist and acceptance marker.
 
+## Phase 16 Part 6 — Operator UX + Evidence Index (Analysis-Only)
+
+- Adds unified AI ops entrypoint and evidence index tooling.
+- Introduces ops regression checks for UX and evidence determinism.
+- Adds Phase 16 Part 6 entry checklist and acceptance marker.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

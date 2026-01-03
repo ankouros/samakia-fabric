@@ -174,6 +174,8 @@ Stop; do not apply.
 
 ## AI analysis (Phase 16)
 
+See `docs/operator/ai-operations.md` for the unified AI ops workflow.
+
 ### Task: AI config doctor (analysis-only)
 
 #### Intent
@@ -376,6 +378,58 @@ Acceptance markers written to `acceptance/PHASE16_PART5_ACCEPTED.md` and `accept
 #### Failure modes
 - Regression guardrail failures
 - Policy gate or validation failures
+
+#### Rollback / safe exit
+Stop and remediate the failing step.
+
+### Task: Phase 16 Part 6 entry checklist
+
+#### Intent
+Verify AI operations UX and evidence index prerequisites before acceptance.
+
+#### Preconditions
+- Phase 16 Part 5 accepted
+
+#### Command
+```bash
+make phase16.part6.entry.check
+```
+
+#### Expected result
+Entry checklist written to `acceptance/PHASE16_PART6_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE16_PART6_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing ops entrypoint or evidence index
+- Regression test failures
+
+#### Rollback / safe exit
+Stop and remediate the missing prerequisites.
+
+### Task: Phase 16 Part 6 acceptance
+
+#### Intent
+Run Phase 16 operations UX acceptance.
+
+#### Preconditions
+- Phase 16 Part 6 entry checklist completed
+
+#### Command
+```bash
+make phase16.part6.accept
+```
+
+#### Expected result
+Acceptance marker written to `acceptance/PHASE16_PART6_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE16_PART6_ACCEPTED.md`
+
+#### Failure modes
+- Evidence index validation failures
+- Regression guardrail failures
 
 #### Rollback / safe exit
 Stop and remediate the failing step.
