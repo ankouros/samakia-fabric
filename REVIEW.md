@@ -146,6 +146,8 @@ This document records what was implemented for the **Terraform remote state back
 - Adds autonomy action contract schema under `contracts/ai/autonomy/`.
 - Defines safety envelope, rollout stages, and audit evidence expectations.
 - No execution tooling or policy relaxation is introduced.
+- Step 4 canary exposure attempt executed (plan/approve/apply/rollback); live verify blocked by `db.canary.internal` DNS resolution (see `REQUIRED-FIXES.md`).
+- Secrets file/vault helpers now parse decrypted payloads via temp files; ops secrets scripts are tracked to ensure operator tooling is available.
 
 ## MinIO HA Backend — What was implemented
 

@@ -130,6 +130,7 @@ Tenant binding workflows live in:
   - Semantics: `docs/exposure/semantics.md`
   - Change windows + signing: `docs/exposure/change-window-and-signing.md`
   - Rollback: `docs/exposure/rollback.md`
+  - Canary runbook + prerequisites: `docs/exposure/canary.md`
   - Part 1 (plan-only):
     - Validate policy: `make exposure.policy.check`
     - Plan exposure: `ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.plan`

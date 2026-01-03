@@ -334,6 +334,16 @@ The format is inspired by:
 - Phase interaction guarantees and Phase 15 acceptance plan/lock marker.
 
 ### Changed
+#### Documentation
+- Consolidated Phase 14 CODEX-SUITE notes into `CODEX-SUITE/Codex-Phase14-implemetation.md`.
+- Consolidated Phase 15 CODEX-SUITE notes into `CODEX-SUITE/Codex-Phase15-implemetation.md`.
+- Consolidated Phase 16 CODEX-SUITE notes into `CODEX-SUITE/Codex-Phase16-implemetation.md`.
+
+#### Operations
+- Added a canary exposure runbook and documented runner-local secret materialization prerequisites.
+- Fixed secrets file/vault helpers to parse decrypted payloads via temp files; tracked ops secrets scripts explicitly.
+- Recorded the Phase 17 Step 4 canary DNS blocker in `REQUIRED-FIXES.md`.
+
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).
 

@@ -99,7 +99,7 @@ This document records what was fixed, what remains blocked (if anything), and th
 ## Still Blocked (if any)
 
 - Milestone Phase 1–12 verification (see MILESTONE-1-12-PHASE2-1-SHARED-POLICY).
-- Phase 17 Step 4 real canary exposure (see PHASE17-STEP4-CANARY-VERIFY-SECRET).
+- Phase 17 Step 4 real canary exposure (see PHASE17-STEP4-CANARY-VERIFY-DNS).
 
 ## Phase 17 Step 4 Blockers
 
@@ -108,9 +108,19 @@ This document records what was fixed, what remains blocked (if anything), and th
 - **Impact:** Phase 17 Step 4 cannot complete because live verification requires real secret material to validate TLS connectivity.
 - **Root cause:** Local secrets backend file (`~/.config/samakia-fabric/secrets.enc`) is missing or unseeded for the canary `secret_ref`.
 - **Required remediation:** Seed the file backend with the `tenants/canary/database/sample` secret (or configure the Vault backend) and rerun the verify step; ensure `SECRETS_PASSPHRASE` or `SECRETS_PASSPHRASE_FILE` is set for the runner.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `FABRIC_REPO_ROOT=/home/aggelos/samakia-fabric SECRETS_PASSPHRASE_FILE=/home/aggelos/.config/samakia-fabric/secrets-passphrase ops/secrets/secrets-file.sh list`
+  - `SECRETS_PASSPHRASE_FILE=/home/aggelos/.config/samakia-fabric/secrets-passphrase BIND_SECRETS_BACKEND=file VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
+
+### PHASE17-STEP4-CANARY-VERIFY-DNS
+- **Description:** `VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample` failed during live TCP/TLS probe with `tcp connect failed: [Errno -2] Name or service not known` for `db.canary.internal`.
+- **Impact:** Phase 17 Step 4 cannot complete because live verification cannot reach the canary database endpoint.
+- **Root cause:** Runner DNS does not resolve `db.canary.internal` (canary endpoint unreachable).
+- **Required remediation:** Ensure `db.canary.internal` resolves on the runner (DNS record or permitted resolver) and the endpoint is reachable on port 5432, then rerun live verification.
 - **Resolution status:** **OPEN**
 - **Verification command(s):**
-  - `VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
+  - `SECRETS_PASSPHRASE_FILE=/home/aggelos/.config/samakia-fabric/secrets-passphrase BIND_SECRETS_BACKEND=file VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
 
 ## Milestone Phase 1–12 Blockers
 

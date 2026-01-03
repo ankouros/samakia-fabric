@@ -49,6 +49,11 @@ vault.json
 *.vault
 *.secrets
 secrets/
+!ops/secrets/
+!ops/secrets/*.sh
+!ops/bindings/secrets/
+!ops/bindings/secrets/**/
+!ops/bindings/secrets/**/*.sh
 ops/secrets/*.enc
 ops/secrets/*.key
 ops/secrets/*.pass
