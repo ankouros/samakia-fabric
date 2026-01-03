@@ -1,0 +1,8 @@
+{
+  "lxc_inventory": {
+    "value": {
+      "obs_1": {"hostname": "obs-1", "node": "proxmox2", "vmid": 3305},
+      "obs_2": {"hostname": "obs-2", "node": "proxmox3", "vmid": 3306}
+    }
+  }
+}

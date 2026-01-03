@@ -90,6 +90,11 @@ The format is inspired by:
 - CI-safe tests and policy gate to prevent interactive prompts.
 - Operator docs updated with explicit runner mode guidance.
 
+#### Shared observability policy guard (Phase 17 Step 3)
+- Observability policy contract + validators for replicas, anti-affinity, and host distribution.
+- CI regression test and policy gate for shared observability enforcement.
+- Shared acceptance/apply flows now hard-fail on policy violations.
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

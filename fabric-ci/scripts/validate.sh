@@ -39,6 +39,9 @@ bash "$ROOT_DIR/ops/scripts/test-runner/test-no-prompts.sh"
 bash "$ROOT_DIR/ops/scripts/test-runner/test-ci-default.sh"
 bash "$ROOT_DIR/ops/scripts/test-runner/test-operator-explicit.sh"
 
+# Observability policy guardrails (offline).
+bash "$ROOT_DIR/ops/scripts/test-observability/test-policy-enforced.sh"
+
 # MinIO quorum guard decision logic unit test (offline; no Proxmox/MinIO).
 bash "$ROOT_DIR/ops/scripts/test-minio-quorum-guard.sh"
 

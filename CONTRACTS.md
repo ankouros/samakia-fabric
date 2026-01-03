@@ -48,7 +48,7 @@ Any change that violates a contract must be redesigned before merging.
 ## Fabric Contract
 
 - Packer builds golden images only; no users, keys, or environment logic baked in.
-- Golden image inputs are reproducible: base images pinned by digest, apt sources use snapshot mirrors, and `/etc/samakia-image-version` includes `IMAGE_NAME`, `IMAGE_VERSION`, `BUILD_UTC`, `GIT_SHA`, `PACKER_TEMPLATE`, `BASE_IMAGE_DIGEST`, and `APT_SNAPSHOT`.
+- Golden image inputs are reproducible: base images pinned by digest, apt sources use snapshot mirrors, and `/etc/samakia-image-version` includes image_name, image_version, build_utc, git_sha, and packer_template_id.
 - Terraform manages infrastructure lifecycle only; no provisioning or OS config.
 - Ansible handles OS policy and user access; it must remain idempotent.
 - Proxmox automation uses delegated users; `root@pam` is forbidden for automation.
@@ -70,6 +70,7 @@ Any change that violates a contract must be redesigned before merging.
 - Substrate runtime observability and drift classification are read-only; evidence is mandatory and drift never auto-remediates or fails CI by itself.
 - Drift alert routing defaults are evidence-only; external delivery is disabled unless explicitly enabled and allowed.
 - Shared observability must satisfy HA policy: replicas >= 2, anti_affinity = true, and placement across at least two hosts.
+- Shared observability policy is contract-bound under `contracts/observability/policy.yml` and enforced by repo validators (CI + acceptance fail on violation).
 - Pre-exposure substrate hardening must pass before Phase 12 workload exposure; acceptance marker and evidence are mandatory.
 - Phase 12 workload exposure requires a redacted release readiness packet and acceptance markers (Part 6 + overall); CI remains read-only.
 - Phase 13 exposure is governed (plan -> approve -> apply -> verify -> rollback); prod requires change windows and signed evidence; CI remains read-only.

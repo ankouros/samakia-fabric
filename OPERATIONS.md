@@ -39,6 +39,8 @@ Operator commands and task flows are defined in:
 - `docs/operator/networking.md`
 - `docs/operator/safety-model.md`
 - `docs/operator/evidence-and-artifacts.md`
+- `docs/operator/observability.md`
+- `docs/observability/policy.md`
 
 Consumer workflows live in:
 
@@ -510,6 +512,12 @@ Granular acceptance checks:
 - `make shared.vault.accept ENV=samakia-shared`
 - `make shared.pki.accept ENV=samakia-shared`
 - `make shared.obs.accept ENV=samakia-shared`
+
+Shared observability policy (hard gate; no warnings):
+
+```bash
+make shared.obs.policy ENV=samakia-shared
+```
 
 Local credentials and CA material (runner-only, never committed):
 - Vault init + root token: `~/.config/samakia-fabric/vault/init.json` and `~/.config/samakia-fabric/vault/root-token`

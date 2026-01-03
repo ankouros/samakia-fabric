@@ -330,7 +330,8 @@ This review focuses on correctness, operability, and audit readiness.
 Current strengths include layered ownership (Packer/Terraform/Ansible),
 delegated Proxmox access, and deterministic acceptance workflows.
 Recent hardening closes the prior gaps around image reproducibility,
-known_hosts rotation, and runner-mode enforcement. The remaining
+known_hosts rotation, runner-mode enforcement, and shared observability
+policy drift. The remaining
 risks are mostly operational discipline issues (staging parity and
 replace/blue-green cutovers).
 
@@ -446,7 +447,7 @@ cluster when the documented guardrails are followed.
 
 **Update**
 - Added operator docs for SSH trust rotation, networking determinism, runner
-  modes, and template upgrade semantics.
+  modes, shared observability policy, and template upgrade semantics.
 
 ---
 

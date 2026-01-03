@@ -52,6 +52,7 @@ ANSIBLE_DIR := $(REPO_ROOT)/fabric-core/ansible
 
 OPS_SCRIPTS_DIR := $(REPO_ROOT)/ops/scripts
 POLICY_DIR := $(REPO_ROOT)/ops/policy
+OBS_VALIDATE_DIR := $(REPO_ROOT)/ops/observability/validate
 FABRIC_CI_DIR := $(REPO_ROOT)/fabric-ci/scripts
 
 # Runner host env file (canonical)
@@ -708,6 +709,7 @@ tf.apply: ## Terraform apply for ENV
 			terraform -chdir="$(TERRAFORM_ENV_DIR)" validate; \
 			terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -input=false -lock-timeout="$(TF_LOCK_TIMEOUT)" $$auto_approve $(TF_APPLY_FLAGS); \
 			terraform -chdir="$(TERRAFORM_ENV_DIR)" output -json > "$(TERRAFORM_ENV_DIR)/terraform-output.json"; \
+			if [[ "$(ENV)" = "samakia-shared" ]]; then $(MAKE) shared.obs.policy ENV="$(ENV)"; fi; \
 		'
 
 ###############################################################################
@@ -2124,9 +2126,17 @@ shared.pki.accept: ## Shared PKI acceptance (Vault PKI engine)
 	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
 	@bash "$(OPS_SCRIPTS_DIR)/shared-pki-accept.sh"
 
+.PHONY: shared.obs.policy
+shared.obs.policy: ## Shared observability policy validation (replicas/anti-affinity/hosts)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OBS_VALIDATE_DIR)/validate-policy.sh"
+	@ENV="$(ENV)" bash "$(OBS_VALIDATE_DIR)/validate-replicas.sh"
+	@ENV="$(ENV)" bash "$(OBS_VALIDATE_DIR)/validate-affinity.sh"
+
 .PHONY: shared.obs.accept
 shared.obs.accept: ## Shared observability acceptance (Grafana/Prometheus/Alertmanager/Loki)
 	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@ENV="$(ENV)" $(MAKE) shared.obs.policy
 	@bash "$(OPS_SCRIPTS_DIR)/shared-obs-accept.sh"
 
 .PHONY: shared.obs.ingest.accept

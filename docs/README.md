@@ -16,6 +16,7 @@ This directory contains Samakia Fabric documentation.
 - `runtime/`: runtime signal taxonomy, incident lifecycle, and SLO design
 - `selfservice/`: self-service proposal lifecycle and governance design
 - `ai/`: AI analysis contracts, routing, and governance
+- `observability/`: shared observability policy and enforcement
 - `glossary.md`: canonical terminology
 - `PRINCIPLES.md`: non-negotiable principles
 

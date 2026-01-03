@@ -1,0 +1,10 @@
+version: 1
+shared_observability:
+  replicas_min: 2
+  anti_affinity_required: true
+  min_hosts: 2
+  scope:
+    - prometheus
+    - alertmanager
+    - grafana
+    - loki

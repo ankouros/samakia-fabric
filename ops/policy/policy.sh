@@ -25,6 +25,7 @@ scripts=(
   "policy-docs.sh"
   "policy-security.sh"
   "policy-images.sh"
+  "policy-observability.sh"
   "policy-runner-mode.sh"
   "policy-ai-ops.sh"
   "policy-ai-provider.sh"

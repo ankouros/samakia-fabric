@@ -850,6 +850,7 @@ Scope (design-only):
 Follow-up steps (safety prerequisites):
 - Step 1 (Phase 8.3 image reproducibility hardening): **COMPLETED**
 - Step 2 (global non-interactive runner contract): **COMPLETED**
+- Step 3 (shared observability policy regression guard): **COMPLETED**
 
 Non-scope:
 - No execution tooling.

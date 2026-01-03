@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Samakia Fabric Observability Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "shared_observability"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "shared_observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["replicas_min", "anti_affinity_required", "min_hosts", "scope"],
+      "properties": {
+        "replicas_min": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "anti_affinity_required": {
+          "type": "boolean",
+          "const": true
+        },
+        "min_hosts": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
