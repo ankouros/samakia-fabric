@@ -328,6 +328,58 @@ Acceptance marker written to `acceptance/PHASE16_PART4_ACCEPTED.md`.
 #### Rollback / safe exit
 Stop and remediate the failing step.
 
+### Task: Phase 16 Part 5 entry checklist
+
+#### Intent
+Verify AI governance closure prerequisites before acceptance.
+
+#### Preconditions
+- Phase 16 Part 4 accepted
+
+#### Command
+```bash
+make phase16.part5.entry.check
+```
+
+#### Expected result
+Entry checklist written to `acceptance/PHASE16_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE16_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing governance docs or regression tests
+- Operator docs check failure
+
+#### Rollback / safe exit
+Stop and remediate the missing prerequisites.
+
+### Task: Phase 16 Part 5 acceptance
+
+#### Intent
+Run Phase 16 governance closure acceptance.
+
+#### Preconditions
+- Phase 16 entry checklist completed
+
+#### Command
+```bash
+make phase16.part5.accept
+```
+
+#### Expected result
+Acceptance markers written to `acceptance/PHASE16_PART5_ACCEPTED.md` and `acceptance/PHASE16_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE16_PART5_ACCEPTED.md` and `acceptance/PHASE16_ACCEPTED.md`
+
+#### Failure modes
+- Regression guardrail failures
+- Policy gate or validation failures
+
+#### Rollback / safe exit
+Stop and remediate the failing step.
+
 ### Task: Check AI model routing for a task
 
 #### Intent

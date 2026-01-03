@@ -1319,6 +1319,21 @@ make phase7.accept
 ## AI Analysis (Phase 16)
 
 AI analysis is **advisory only**. It cannot execute actions or apply changes.
+Governance and stop rules are documented in:
+- `docs/ai/governance.md`
+- `docs/ai/stop-rules.md`
+- `docs/ai/risk-ledger.md`
+
+Risk ledger entries are stored under:
+`evidence/ai/risk-ledger/`
+
+Kill switches (operator-only):
+
+```bash
+export AI_ANALYZE_DISABLE=1
+export AI_ANALYZE_BLOCK_TYPES="plan_review,change_impact"
+export AI_ANALYZE_BLOCK_MODELS="gpt-oss:20b"
+```
 
 Operator entrypoints (read-only, no network):
 
@@ -1383,6 +1398,9 @@ Documentation:
 - `docs/ai/mcp.md`
 - `docs/ai/analysis.md`
 - `docs/ai/examples.md`
+- `docs/ai/governance.md`
+- `docs/ai/stop-rules.md`
+- `docs/ai/risk-ledger.md`
 
 ---
 

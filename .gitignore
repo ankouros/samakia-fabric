@@ -121,7 +121,12 @@ proposals/inbox/
 proposals/archive/
 selfservice/inbox/
 audit/
-evidence/
+evidence/**
+!evidence/ai/
+evidence/ai/**
+!evidence/ai/risk-ledger/
+evidence/ai/risk-ledger/**
+!evidence/ai/risk-ledger/README.md
 artifacts/
 !ops/consumers/evidence/
 !ops/consumers/evidence/consumer-readiness.sh

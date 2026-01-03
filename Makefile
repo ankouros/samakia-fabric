@@ -2340,6 +2340,18 @@ phase16.part4.entry.check: ## Phase 16 Part 4 entry checklist (AI analysis)
 phase16.part4.accept: ## Phase 16 Part 4 acceptance (AI analysis)
 	@bash "$(OPS_SCRIPTS_DIR)/phase16-part4-accept.sh"
 
+###############################################################################
+# AI Governance (Phase 16 Part 5)
+###############################################################################
+
+.PHONY: phase16.part5.entry.check
+phase16.part5.entry.check: ## Phase 16 Part 5 entry checklist (AI governance)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part5-entry-check.sh"
+
+.PHONY: phase16.part5.accept
+phase16.part5.accept: ## Phase 16 Part 5 acceptance (AI governance)
+	@bash "$(OPS_SCRIPTS_DIR)/phase16-part5-accept.sh"
+
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part4-entry-check.sh"

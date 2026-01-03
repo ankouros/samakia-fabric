@@ -23,4 +23,7 @@ It never grants AI any execution or remediation capability.
 - MCP services: `mcp.md`
 - Analysis contract: `analysis.md`
 - Analysis examples: `examples.md`
+- Governance: `governance.md`
+- Stop rules: `stop-rules.md`
+- Risk ledger: `risk-ledger.md`
 - Operator usage: `../operator/ai.md`

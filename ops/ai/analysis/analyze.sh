@@ -157,6 +157,21 @@ PY
       tenant_id_display="redacted"
     fi
 
+    if [[ "${AI_ANALYZE_DISABLE:-0}" == "1" ]]; then
+      echo "ERROR: AI analysis is disabled by operator kill switch" >&2
+      exit 1
+    fi
+
+    if [[ -n "${AI_ANALYZE_BLOCK_TYPES:-}" ]]; then
+      IFS=',' read -r -a blocked_types <<<"${AI_ANALYZE_BLOCK_TYPES}"
+      for blocked in "${blocked_types[@]}"; do
+        if [[ "${analysis_type}" == "${blocked}" ]]; then
+          echo "ERROR: analysis type blocked by operator kill switch: ${analysis_type}" >&2
+          exit 1
+        fi
+      done
+    fi
+
     case "${analysis_type}" in
       drift_explain)
         prompt_template="${analysis_root}/prompts/drift_explain.md"
@@ -284,8 +299,26 @@ payload = {
     "base_url": provider.get("base_url"),
 }
 
-print(json.dumps(payload, indent=2, sort_keys=True))
+    print(json.dumps(payload, indent=2, sort_keys=True))
 PY
+
+    model_name="$(python3 - "${model_meta}" <<'PY'
+import json
+import sys
+payload = json.load(open(sys.argv[1], "r", encoding="utf-8"))
+print(payload.get("model", ""))
+PY
+)"
+
+    if [[ -n "${AI_ANALYZE_BLOCK_MODELS:-}" ]]; then
+      IFS=',' read -r -a blocked_models <<<"${AI_ANALYZE_BLOCK_MODELS}"
+      for blocked in "${blocked_models[@]}"; do
+        if [[ "${model_name}" == "${blocked}" ]]; then
+          echo "ERROR: model blocked by operator kill switch: ${model_name}" >&2
+          exit 1
+        fi
+      done
+    fi
 
     prompt_md="${out_dir}/prompt.md"
     TEMPLATE_PATH="${prompt_template}" CONTEXT_PATH="${context_md}" \

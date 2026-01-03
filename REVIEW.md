@@ -122,6 +122,12 @@ This document records what was implemented for the **Terraform remote state back
 - Introduces deterministic prompts, evidence packets, and tenant redaction.
 - Wires AI analysis policy gate, entry checklist, and acceptance marker.
 
+## Phase 16 Part 5 — Governance Closure (Analysis-Only)
+
+- Adds governance, stop rules, and risk ledger documentation for AI analysis.
+- Introduces regression guardrails to prevent AI capability creep.
+- Adds Phase 16 closure checklist and acceptance marker.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

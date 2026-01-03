@@ -1,0 +1,80 @@
+# Phase 16 Entry Checklist (Closure)
+
+Timestamp (UTC): 2026-01-03T06:42:12Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE16_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART4_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: docs/ai/governance.md
+  - Command: test -f docs/ai/governance.md
+  - Result: PASS
+- File present: docs/ai/risk-ledger.md
+  - Command: test -f docs/ai/risk-ledger.md
+  - Result: PASS
+- File present: docs/ai/stop-rules.md
+  - Command: test -f docs/ai/stop-rules.md
+  - Result: PASS
+- File present: evidence/ai/risk-ledger/README.md
+  - Command: test -f evidence/ai/risk-ledger/README.md
+  - Result: PASS
+- File present: ops/scripts/test-ai/test-no-exec.sh
+  - Command: test -f ops/scripts/test-ai/test-no-exec.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai/test-no-external-provider.sh
+  - Command: test -f ops/scripts/test-ai/test-no-external-provider.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai/test-routing-locked.sh
+  - Command: test -f ops/scripts/test-ai/test-routing-locked.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai/test-mcp-readonly.sh
+  - Command: test -f ops/scripts/test-ai/test-mcp-readonly.sh
+  - Result: PASS
+- File present: ops/scripts/test-ai/test-ci-safety.sh
+  - Command: test -f ops/scripts/test-ai/test-ci-safety.sh
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- AI regression tests wired in validate.sh
+  - Command: rg -n test-ai fabric-ci/scripts/validate.sh
+  - Result: PASS
+- Makefile target present: phase16.part5.entry.check
+  - Command: rg -n '^phase16\.part5\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase16.part5.accept
+  - Command: rg -n '^phase16\.part5\.accept:' Makefile
+  - Result: PASS
+- AI-related code has no TODOs
+  - Command: rg -n "TODO" ops/ai contracts/ai docs/ai
+  - Result: PASS
+- Policy gates
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS

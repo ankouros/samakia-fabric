@@ -787,7 +787,7 @@ Non-scope (Phase 15 Part 1):
 
 ## Phase 16 — AI-Assisted Analysis (Ollama-Only)
 
-Status: IN PROGRESS
+Status: IN PROGRESS (Parts 6-7 pending)
 
 ### Part 1 — Provider + Routing + Read-Only Guardrails (COMPLETED ✅)
 - Ollama-only provider contract and deterministic routing policy.
@@ -810,7 +810,7 @@ Status: IN PROGRESS
 - Structured analysis contract and guarded analysis tooling.
 - Deterministic prompts, evidence-bound reports, and redaction.
 
-### Part 5 — Governance Closure (Planned)
+### Part 5 — Governance Closure (COMPLETED ✅)
 - AI governance model, risk ledger, and stop rules.
 - Regression guardrails to prevent capability creep.
 

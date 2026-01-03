@@ -64,6 +64,11 @@ The format is inspired by:
 - Deterministic prompts, evidence-bound reports, and redaction controls
 - AI analysis policy gate, entry checklist, and acceptance marker
 
+#### AI-assisted analysis (Phase 16 Part 5)
+- AI governance model, stop rules, and risk ledger documentation
+- Regression guardrail tests for AI safety + CI wiring
+- Phase 16 closure entry checklist + Part 5 acceptance marker
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

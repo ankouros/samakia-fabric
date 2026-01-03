@@ -57,6 +57,13 @@ bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-docs-generated.sh"
 bash "$ROOT_DIR/ops/scripts/test-phase12/test-phase12-readiness-packet.sh"
 bash "$ROOT_DIR/ops/scripts/test-milestone/test-wrapper-exit-semantics.sh"
 
+# AI regression guardrails (offline).
+bash "$ROOT_DIR/ops/scripts/test-ai/test-no-exec.sh"
+bash "$ROOT_DIR/ops/scripts/test-ai/test-no-external-provider.sh"
+bash "$ROOT_DIR/ops/scripts/test-ai/test-routing-locked.sh"
+bash "$ROOT_DIR/ops/scripts/test-ai/test-mcp-readonly.sh"
+bash "$ROOT_DIR/ops/scripts/test-ai/test-ci-safety.sh"
+
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 
 for env_dir in "$TERRAFORM_ENVS_DIR"/*; do
