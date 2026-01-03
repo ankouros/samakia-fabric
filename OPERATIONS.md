@@ -108,6 +108,13 @@ Tenant binding workflows live in:
   - Autonomy unlock criteria: `docs/selfservice/autonomy-unlock-criteria.md`
   - Conflict resolution: `docs/selfservice/conflict-resolution.md`
   - Operator UX: `docs/operator/selfservice-governance-ux.md`
+- Self-service governance closure (Phase 15 Part 5; design-only):
+  - Governance model: `docs/selfservice/governance-model.md`
+  - Risk ledger: `docs/selfservice/risk-ledger.md`
+  - Exceptions: `docs/selfservice/exceptions.md`
+  - Phase interactions: `docs/selfservice/phase-interactions.md`
+  - Phase 15 acceptance plan: `acceptance/PHASE15_ACCEPTANCE_PLAN.md`
+  - Phase 15 lock marker: `acceptance/PHASE15_ACCEPTED.md`
 - Drift awareness (Phase 12 Part 5; read-only):
   - Detect tenant drift (non-blocking): `TENANT=all DRIFT_OFFLINE=1 DRIFT_NON_BLOCKING=1 DRIFT_FAIL_ON=none make drift.detect`
   - Emit tenant summaries: `TENANT=all make drift.summary`

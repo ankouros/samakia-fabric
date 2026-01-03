@@ -92,6 +92,11 @@ This document records what was implemented for the **Terraform remote state back
 - Adds UX safeguards against policy erosion and autonomy unlock criteria.
 - Documents conflict resolution and operator UX review guidance.
 
+## Phase 15 Part 5 — Governance Closure (Design Only)
+
+- Defines governance ownership, risk ledger, and exception framework.
+- Documents phase interaction guarantees and Phase 15 lock semantics.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

@@ -747,7 +747,7 @@ Non-scope:
 
 ## Phase 15 — Controlled Self-Service (Proposal-Only)
 
-Status: IN PROGRESS
+Status: DESIGN COMPLETE
 
 ### Part 1 — Proposal intake + read-only planning (COMPLETED ✅)
 - Self-service proposal contract under `contracts/selfservice/`.
@@ -773,7 +773,7 @@ Status: IN PROGRESS
 - UX safeguards against policy erosion and autonomy unlock criteria.
 - Operator UX guidance and conflict resolution workflows.
 
-### Part 5 — Governance closure and phase lock (PLANNED)
+### Part 5 — Governance closure and phase lock (COMPLETED ✅)
 - Long-term governance and risk accounting models.
 - Exception handling framework and phase interaction guarantees.
 - Phase 15 acceptance plan and lock marker.

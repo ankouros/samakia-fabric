@@ -269,6 +269,10 @@ The format is inspired by:
 - Autonomy unlock criteria and conflict resolution guidance.
 - Operator UX guidance for self-service governance.
 
+#### Controlled self-service governance closure (Phase 15 Part 5 design)
+- Governance model, risk ledger, and exception framework (design-only).
+- Phase interaction guarantees and Phase 15 acceptance plan/lock marker.
+
 ### Changed
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).
