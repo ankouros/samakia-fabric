@@ -768,9 +768,15 @@ Status: IN PROGRESS
 - Guardrail mapping across Phase 11–14 invariants.
 - Accountability model and operator governance guidance.
 
-### Part 4 — Guarded execution integration (PLANNED)
-- Operator-only apply/rollback wiring with approvals + delegations.
-- Change windows and signing enforced for prod.
+### Part 4 — Tenant UX, trust boundaries, and unlock criteria (COMPLETED ✅)
+- Tenant UX contract and trust boundary mapping.
+- UX safeguards against policy erosion and autonomy unlock criteria.
+- Operator UX guidance and conflict resolution workflows.
+
+### Part 5 — Governance closure and phase lock (PLANNED)
+- Long-term governance and risk accounting models.
+- Exception handling framework and phase interaction guarantees.
+- Phase 15 acceptance plan and lock marker.
 
 Non-scope (Phase 15 Part 1):
 - Tenant apply or autonomous execution

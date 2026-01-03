@@ -86,6 +86,12 @@ This document records what was implemented for the **Terraform remote state back
 - Maps guardrails to Phase 11–14 invariants and operator intervention points.
 - Adds accountability model and operator governance guidance.
 
+## Phase 15 Part 4 — Tenant UX & Trust Boundaries (Design Only)
+
+- Defines tenant-facing UX contract and trust boundary model.
+- Adds UX safeguards against policy erosion and autonomy unlock criteria.
+- Documents conflict resolution and operator UX review guidance.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

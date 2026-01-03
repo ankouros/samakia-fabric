@@ -264,6 +264,11 @@ The format is inspired by:
 - Guardrail mapping to Phase 11–14 and accountability model (design-only).
 - Operator governance guidance and Phase 15 Part 3 entry/acceptance plan docs.
 
+#### Controlled self-service UX + trust boundaries (Phase 15 Part 4 design)
+- Tenant UX contract, trust boundary mapping, and UX safeguards (design-only).
+- Autonomy unlock criteria and conflict resolution guidance.
+- Operator UX guidance for self-service governance.
+
 ### Changed
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).
