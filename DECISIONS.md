@@ -1023,6 +1023,66 @@ Phase 9 establishes operator UX as a **first-class contract**:
 
 ---
 
+## ADR-0033 — Conditional, Bounded Autonomy for Specific Remediation Tasks
+
+**Status:** Proposed (Conditional / If Ever)
+**Date:** 2026-01-03
+
+### Context
+
+Phase 16 locks AI to analysis-only with no execution paths. Phase 17 exists only
+to document a possible, explicitly bounded relaxation of that invariant if
+operator pain cannot be solved by UX, tooling, or staffing.
+
+### Decision
+
+Design a contract-first, strictly bounded autonomy model that can be evaluated
+later. This ADR does not enable execution. Any autonomy would require a future
+phase, explicit approval, and new acceptance markers.
+
+### Explicit scope (design only)
+
+Candidate actions are limited to:
+- single-tenant, single-workload, reversible steps
+- explicit, deterministic triggers and preconditions
+- human override and kill switches
+
+No cross-tenant, open-ended, or CI-executed actions are allowed.
+
+### Risk analysis
+
+- **Blast radius:** limited to a single workload and tenant.
+- **Worst case:** a reversible change is applied unexpectedly; rollback must be
+  immediate and documented.
+- **Controls:** action allowlists, precondition verification, rate limits, and
+  audit evidence.
+
+### Alternatives rejected
+
+- Hiring more operators (insufficient for 24/7 coverage alone).
+- Better dashboards and alerts (helpful, but not always enough).
+- Faster alert routing without guardrails (risk of panic-driven changes).
+
+### Rollback strategy
+
+- Global autonomy kill switch.
+- Per-action kill switch.
+- Operator-run rollback procedure referenced in the action contract.
+
+### Sunset clause
+
+If any autonomy action violates scope or produces policy regressions, revert to
+Phase 16 behavior by disabling all autonomy and retiring the action contract
+until a new phase explicitly re-approves it.
+
+### Consequences
+
+- Autonomy remains design-only and prohibited by default.
+- Any execution requires a future phase with explicit acceptance gates.
+- Documentation and evidence must prove reversibility and auditability.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

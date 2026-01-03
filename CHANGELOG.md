@@ -79,6 +79,12 @@ The format is inspired by:
 - Invariant enforcement tests and phase-boundary policy gate
 - Phase 16 Part 7 entry checklist + acceptance marker
 
+#### Conditional autonomy design (Phase 17)
+- ADR-0033 defining conditional, bounded autonomy (design-only)
+- Autonomy action contract schema under `contracts/ai/autonomy/`
+- Safety envelope, rollout model, and audit expectations under `docs/ai/`
+- Phase 17 entry checklist + acceptance plan (design-only)
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

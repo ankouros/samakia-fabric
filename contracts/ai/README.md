@@ -9,6 +9,7 @@ Files:
 - `qdrant.schema.json` / `qdrant.yml`: shared vector store contract.
 - `indexing.schema.json` / `indexing.yml`: indexing + redaction policy.
 - `analysis.schema.json` / `analysis.yml`: structured analysis requests and evidence bounds.
+- `autonomy/action.schema.json`: design-only contract for conditional autonomy actions (Phase 17).
 
 Validation:
 - `bash ops/ai/validate-config.sh`

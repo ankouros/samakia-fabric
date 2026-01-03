@@ -140,6 +140,13 @@ This document records what was implemented for the **Terraform remote state back
 - Introduces invariant enforcement tests and phase-boundary policy guard.
 - Locks Phase 16 acceptance with an invariant statement and acceptance marker.
 
+## Phase 17 — Conditional Autonomy (Design Only)
+
+- Documents conditional, bounded autonomy as a future-only design path.
+- Adds autonomy action contract schema under `contracts/ai/autonomy/`.
+- Defines safety envelope, rollout stages, and audit evidence expectations.
+- No execution tooling or policy relaxation is introduced.
+
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`

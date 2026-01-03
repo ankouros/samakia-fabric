@@ -1431,6 +1431,20 @@ acceptance plan. The phase-boundary policy blocks unapproved scope changes.
 
 ---
 
+## Phase 17 Conditional Autonomy (Design Only)
+
+Phase 17 documents a **conditional, bounded autonomy** model only. It does not
+enable execution. Autonomy remains opt-in, scoped, reversible, and guarded by
+kill switches.
+
+References:
+- `contracts/ai/autonomy/action.schema.json`
+- `docs/ai/autonomy-safety.md`
+- `docs/ai/autonomy-rollout.md`
+- `docs/ai/autonomy-audit.md`
+
+---
+
 ## Operational Philosophy
 
 Samakia Fabric follows a rebuild-over-repair philosophy.

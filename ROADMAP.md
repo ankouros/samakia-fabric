@@ -824,6 +824,27 @@ Narrative: Phase 16 marks the point where AI becomes infrastructure literacy, no
 - AI invariants manifest and invariant enforcement tests.
 - Phase boundary policy to prevent scope creep.
 
+---
+
+## Phase 17 — Conditional Autonomy (If Ever)
+
+Status: **CONDITIONAL / IF EVER**
+
+Goal: Document a strictly bounded autonomy model that could be evaluated in the
+future without enabling execution today.
+
+Scope (design-only):
+- ADR-0033 defining conditional, bounded autonomy.
+- Action contract schema under `contracts/ai/autonomy/`.
+- Safety envelope and rollout stages under `docs/ai/`.
+- Audit evidence model under `docs/ai/`.
+- Entry checklist + acceptance plan for design validation.
+
+Non-scope:
+- No execution tooling.
+- No policy relaxation.
+- No CI live operations.
+
 ## Non-Goals
 
 The following are explicitly NOT goals:
