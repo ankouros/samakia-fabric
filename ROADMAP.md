@@ -314,6 +314,7 @@ Status: COMPLETED ✅
 - Operator safety model + evidence guidance docs
 - Consumer UX catalog + quickstart + variants
 - Anti-drift doc tooling + CI gate (`make docs.operator.check`)
+- Vault-default secrets backend clarification with file-backend exceptions (design-only governance; no runtime changes or secret migrations).
 - Phase 9 acceptance marker: `acceptance/PHASE9_ACCEPTED.md`
 
 Non-scope:

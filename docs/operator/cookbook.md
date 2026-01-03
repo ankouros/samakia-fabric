@@ -2186,11 +2186,12 @@ Stop; fix contracts or input map.
 ### Task: Materialize binding secrets (execute, guarded)
 
 #### Intent
-Write secrets to the offline file backend using operator-provided input.
+Write secrets to the file backend using operator-provided input (explicit exception).
 
 #### Preconditions
 - `BIND_SECRET_INPUT_FILE` prepared and validated
 - Guard flags set
+- File backend exception documented
 
 #### Command
 ```bash
@@ -2201,7 +2202,7 @@ make bindings.secrets.materialize TENANT=project-birds
 ```
 
 #### Expected result
-Secrets written to the file backend; redacted evidence generated.
+Secrets written to the file backend (explicit exception); redacted evidence generated.
 
 #### Evidence outputs
 `evidence/bindings/<tenant>/<UTC>/secrets/...`
@@ -2266,11 +2267,12 @@ Stop; fix contracts.
 ### Task: Rotate binding secrets (execute, guarded)
 
 #### Intent
-Write a new secret version to the file backend and emit evidence.
+Write a new secret version to the file backend and emit evidence (explicit exception).
 
 #### Preconditions
 - `ROTATE_INPUT_FILE` prepared or generation allowlisted
 - Guard flags set
+- File backend exception documented
 
 #### Command
 ```bash
@@ -2282,7 +2284,7 @@ make bindings.secrets.rotate TENANT=project-birds
 ```
 
 #### Expected result
-New secret version written; evidence generated.
+New secret version written to the file backend; evidence generated.
 
 #### Evidence outputs
 `evidence/bindings/<tenant>/<UTC>/rotation/...`
@@ -2757,7 +2759,7 @@ Execute tenant substrate enablement for enabled contracts with explicit guards a
 
 #### Preconditions
 - Enabled contracts are valid (`make substrate.contracts.validate`).
-- Secrets resolved via `secret_ref` are available locally (offline-first secrets).
+- Secrets resolved via the default backend (Vault) or an explicit file override are available.
 - Execute policy allowlists include the tenant/env/provider.
 - Capacity guard passes (`make substrate.capacity.guard`).
 
@@ -2985,7 +2987,7 @@ Fix bindings or re-run render; no mutation occurs.
 Validate workload-side connectivity with secret resolution (read-only, guarded).
 
 #### Preconditions
-- Secrets backend configured
+- Secrets backend configured (Vault default; file backend requires explicit override)
 - Not running in CI
 - Explicit live-mode guard set
 
@@ -3460,10 +3462,10 @@ Acceptance PASS and marker written.
 #### Rollback / safe exit
 Stop; do not claim acceptance until gates PASS.
 
-### Task: Issue tenant credentials (offline-first)
+### Task: Issue tenant credentials (file backend exception)
 
 #### Intent
-Create tenant credentials in an encrypted local store (no secrets in Git).
+Create tenant credentials in an encrypted local store (explicit exception).
 
 #### Preconditions
 - Tenant endpoints declared

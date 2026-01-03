@@ -18,6 +18,7 @@ make bindings.verify.offline TENANT=all
 
 ### Live (guarded)
 - Resolves `secret_ref` via the configured bindings secrets backend.
+- Vault is the default backend; file usage requires an explicit override.
 - Performs read-only probes to endpoints.
 - Requires explicit opt-in and is **not allowed in CI**.
 

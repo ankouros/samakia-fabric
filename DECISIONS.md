@@ -697,7 +697,7 @@ Canonical rules:
 
 ---
 
-## ADR-0022 — Phase 5 Security Posture (Offline-First Secrets, Guarded Rotation, Default-Off Firewall)
+## ADR-0022 — Phase 5 Security Posture (Vault-First Secrets, Guarded Rotation, Default-Off Firewall)
 
 **Status:** Accepted
 **Date:** 2026-01-16
@@ -706,22 +706,25 @@ Canonical rules:
 
 Phase 5 introduces security hardening that **preserves offline operability**:
 
-- Secrets interface defaults to **offline encrypted file**.
-- Optional Vault integration is **read-only** and **opt-in**.
+- Vault is the **default secrets backend** for operator and production workflows.
+- Offline encrypted file backend remains a **documented exception** (bootstrap/CI/local).
+- Vault integration for bindings remains **read-only** and **opt-in** for writes.
 - SSH key rotation is **guarded** (dry-run default; explicit execute flags).
 - Firewall profiles are **default-off** and require explicit enable/execute flags.
 - Compliance profiles map to the control catalog with deterministic evaluation outputs.
 
 ### Rationale
 
-- Operators must be able to run the control plane without external dependencies.
+- Operators must be able to bootstrap and test without external dependencies.
+- Vault is part of the control plane and is HA; defaulting to it removes ambiguity.
 - Guarded rotation prevents accidental lockout.
 - Default-off firewall avoids unexpected connectivity loss in LXC environments.
 - Compliance evaluation must be auditable and secrets-safe.
 
 ### Consequences
 
-- Vault is never required for bootstrap or core operations.
+- Vault is assumed for operator/prod workflows; file backend requires explicit override.
+- Vault is not required for bootstrap/CI/local exceptions.
 - Evidence packets are generated locally and are never committed.
 - Policy gates enforce guardrails in CI and local validation.
 
@@ -876,7 +879,8 @@ Phase 9 establishes operator UX as a **first-class contract**:
 
 - Phase 10 Part 2 introduces **guarded execute mode** for tenant bindings.
 - `enabled.yml` is allowed only under strict policy allowlists and explicit guard flags.
-- Execution is **offline-first** and secrets are stored locally via the Phase 5 secrets interface.
+- Execution is evidence-first; secrets are resolved via the Phase 5 secrets interface
+  with Vault as default and explicit file backend exceptions.
 - Production execution requires a change window and evidence signing.
 - CI remains read-only and never runs execute mode.
 
@@ -1058,6 +1062,42 @@ No cross-tenant, open-ended, or CI-executed actions are allowed.
   audit evidence.
 
 ### Alternatives rejected
+
+---
+
+## ADR-0034 — Vault as Default Secrets Backend
+
+**Status:** Accepted
+**Date:** 2026-01-03
+
+### Context
+
+- Vault is HA and already part of the shared control plane (VIP `192.168.11.121`).
+- The file backend exists for bootstrap, CI fixtures, and explicit local exceptions.
+- Phase 17 surfaced ambiguity in operator choices when "file vs vault" was treated as a default decision.
+
+### Decision
+
+- Vault is the **default secrets backend** for operator and production workflows.
+- The file backend is a **documented exception** that requires explicit opt-in.
+- Codex prompts and operator UX assume Vault unless explicitly overridden.
+
+### Consequences
+
+- Operators must set `BIND_SECRETS_BACKEND=file` or `SECRETS_BACKEND=file` to use the file backend.
+- Evidence packets must show when a file-backend override was used.
+- Documentation and prompts treat Vault as the default assumption.
+
+### Non-goals
+
+- No automatic database provisioning.
+- No secrets migration or rekeying as part of this change.
+- No runtime behavior changes to existing scripts.
+
+### Audit & governance
+
+- File backend usage requires an explicit override and documented rationale.
+- Overrides must be visible in evidence and review artifacts.
 
 - Hiring more operators (insufficient for 24/7 coverage alone).
 - Better dashboards and alerts (helpful, but not always enough).

@@ -14,7 +14,7 @@ Usage:
   materialize.sh TENANT=<id|all>
 
 Environment:
-  BIND_SECRETS_BACKEND=file|vault (default: file)
+  BIND_SECRETS_BACKEND=file|vault (policy default: vault; set explicitly)
   MATERIALIZE_EXECUTE=1 to perform writes (default: dry-run)
   BIND_SECRET_INPUT_FILE=<path> (JSON map of secret_ref -> object) for operator_input
   SECRETS_GENERATE=1 to allow generated credentials

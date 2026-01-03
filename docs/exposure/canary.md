@@ -17,9 +17,8 @@ low-risk canary tenant/workload.
 ## Runner prerequisites (secrets-safe)
 
 Live verification requires a seeded secrets backend and resolvable canary
-endpoint. Secrets remain local and are never committed.
-
-Local file backend (required for canary verify in this run):
+endpoint. Secrets remain local and are never committed. Vault is the default
+backend; this run used an explicit local file backend exception:
 - Encrypted secrets file: `~/.config/samakia-fabric/secrets.enc`
 - Passphrase file: `~/.config/samakia-fabric/secrets-passphrase`
 - Operator input file: `~/.config/samakia-fabric/secrets-input-canary.json`

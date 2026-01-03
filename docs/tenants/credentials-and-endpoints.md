@@ -2,13 +2,13 @@
 
 Endpoints are **metadata only** in Phase 10. Secrets are not stored in Git.
 Use `secret_ref` to reference external secret material. Enabled bindings
-may issue credentials **offline-first** with explicit guards.
+may issue credentials with explicit guards; Vault is the default backend.
 
 Production execution requires a change window and evidence signing per
 execute policy.
 
-Optional Vault integration is supported when explicitly configured; the
-offline file-backed secrets path remains the default.
+The file-backed secrets path is a documented exception only (bootstrap/CI/local).
+See `docs/secrets/backend.md`.
 
 ## Endpoint rules
 

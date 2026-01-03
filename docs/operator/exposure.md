@@ -90,6 +90,9 @@ Live verification (operator-only):
 VERIFY_LIVE=1 ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.verify
 ```
 
+Vault is the default backend for live verification; file backend usage requires
+an explicit override and documented rationale.
+
 Evidence:
 - `evidence/exposure-verify/<tenant>/<workload>/<UTC>/`
 

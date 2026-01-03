@@ -33,15 +33,19 @@ No secret values are stored in Git.
 
 ## Secret backends
 
-Default backend is **offline file** (encrypted) via `ops/secrets/`.
-Optional Vault integration is **read-only** and requires explicit enablement.
+Vault is the **default secrets backend** for operator and production workflows.
+The encrypted file backend is a **documented exception** for bootstrap/CI/local
+use. See `docs/secrets/backend.md` for the normative policy.
 
-- File backend (default):
-  - `BIND_SECRETS_BACKEND=file`
-  - `SECRETS_PASSPHRASE` or `SECRETS_PASSPHRASE_FILE`
-- Vault backend (read-only):
+Note: current scripts still default to the file backend when unset; always set
+`BIND_SECRETS_BACKEND` explicitly to avoid implicit file usage.
+
+- Vault backend (default, read-only for bindings):
   - `BIND_SECRETS_BACKEND=vault`
   - `VAULT_ENABLE=1`
+- File backend (exception, explicit override):
+  - `BIND_SECRETS_BACKEND=file`
+  - `SECRETS_PASSPHRASE` or `SECRETS_PASSPHRASE_FILE`
 
 ## Materialization (operator-controlled)
 
@@ -51,7 +55,7 @@ Dry-run (evidence only):
 make bindings.secrets.materialize.dryrun TENANT=all
 ```
 
-Execute (writes to file backend only; guarded):
+Execute (writes to file backend only; guarded, explicit exception):
 
 ```bash
 MATERIALIZE_EXECUTE=1 \
@@ -79,7 +83,7 @@ Rotation dry-run (evidence only):
 make bindings.secrets.rotate.dryrun TENANT=all
 ```
 
-Execute rotation (writes new secret version only):
+Execute rotation (writes new secret version only; explicit exception):
 
 ```bash
 ROTATE_EXECUTE=1 \

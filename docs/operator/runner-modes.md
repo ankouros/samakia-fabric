@@ -20,6 +20,17 @@ Samakia Fabric uses a single, explicit runner contract for all automation.
 - If it prompts in CI, it is a bug.
 - Do not export `RUNNER_MODE=operator` globally; set it per command.
 
+## Secrets Backend Resolution
+
+- If `BIND_SECRETS_BACKEND` is unset, **Vault is assumed** by policy.
+- Using the file backend requires:
+  - `BIND_SECRETS_BACKEND=file`
+  - documented rationale in evidence or review artifacts.
+
+Note: current scripts still default to file when unset, so operators must set
+backend variables explicitly (`BIND_SECRETS_BACKEND` and `SECRETS_BACKEND`)
+to avoid implicit file usage.
+
 ## Usage examples
 
 Non-interactive (default):

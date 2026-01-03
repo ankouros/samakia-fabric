@@ -66,6 +66,7 @@ Tenant binding workflows live in:
   - Verify (live, guarded): `VERIFY_MODE=live VERIFY_LIVE=1 make bindings.verify.live TENANT=<tenant>`
   - Apply (guarded): `make bindings.apply TENANT=<tenant> WORKLOAD=<id>`
 - Binding secrets (Phase 12 Part 2; operator-controlled):
+  - Default backend is Vault; file backend requires explicit override for write paths.
   - Inspect refs (read-only): `make bindings.secrets.inspect TENANT=all`
   - Materialize (dry-run): `make bindings.secrets.materialize.dryrun TENANT=all`
   - Materialize (execute, guarded):
@@ -1071,18 +1072,21 @@ See `OPERATIONS_AUDIT_LOGGING.md` for retention guidance and evidence export.
 
 ---
 
-## Secrets Interface (offline-first)
+## Secrets Interface (Vault default)
 
-Default backend is **offline encrypted file** (runner-local). Optional Vault is supported but never required.
+Default backend is **Vault** (HA, shared control plane). The offline encrypted
+file backend is an explicit exception for bootstrap/CI/local use. Set
+`SECRETS_BACKEND` explicitly to avoid implicit file usage.
+This is a design clarification only; no runtime behavior changed and no secrets were moved.
 
 Commands:
 ```bash
 # Show configuration (no secrets)
 make secrets.doctor
 
-# Fetch a value (offline default)
-SECRETS_PASSPHRASE_FILE=~/.config/samakia-fabric/secrets.pass \
-  ops/secrets/secrets.sh get <key> [field]
+# Fetch a value (Vault default)
+SECRETS_BACKEND=vault VAULT_ADDR=https://vault.example \
+  VAULT_TOKEN=... ops/secrets/secrets.sh get <key> [field]
 ```
 
 Encrypted file format:
@@ -1090,10 +1094,10 @@ Encrypted file format:
 - JSON object (keys at top-level)
 - Stored under `~/.config/samakia-fabric/secrets.enc`
 
-Vault mode (optional):
+File mode (explicit exception):
 ```bash
-SECRETS_BACKEND=vault VAULT_ADDR=https://vault.example \
-  VAULT_TOKEN=... ops/secrets/secrets.sh list
+SECRETS_BACKEND=file SECRETS_PASSPHRASE_FILE=~/.config/samakia-fabric/secrets-passphrase \
+  ops/secrets/secrets.sh list
 ```
 
 ---

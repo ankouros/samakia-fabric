@@ -58,6 +58,9 @@ make proposals.review PROPOSAL_ID=add-postgres-binding
 ```
 
 ### Secret materialization / rotation (Phase 12 Part 2; guarded)
+Vault is the default backend. Materialization and rotation write to the file
+backend only and require an explicit exception (`BIND_SECRETS_BACKEND=file`).
+
 ```bash
 # Materialize (execute, guarded)
 MATERIALIZE_EXECUTE=1 BIND_SECRETS_BACKEND=file \

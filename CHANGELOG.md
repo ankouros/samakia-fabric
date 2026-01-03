@@ -338,6 +338,7 @@ The format is inspired by:
 - Consolidated Phase 14 CODEX-SUITE notes into `CODEX-SUITE/Codex-Phase14-implemetation.md`.
 - Consolidated Phase 15 CODEX-SUITE notes into `CODEX-SUITE/Codex-Phase15-implemetation.md`.
 - Consolidated Phase 16 CODEX-SUITE notes into `CODEX-SUITE/Codex-Phase16-implemetation.md`.
+- Clarified Vault as the default secrets backend and documented file backend exceptions (design clarification only; no runtime changes or secret migrations).
 
 #### Operations
 - Added a canary exposure runbook and documented runner-local secret materialization prerequisites.

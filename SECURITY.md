@@ -191,10 +191,12 @@ Evidence handling:
 
 ---
 
-## 12. Secrets Handling (offline-first)
+## 12. Secrets Handling (Vault default)
 
-- Default secrets backend is an **encrypted local file** on the runner.
-- Vault integration is **optional** and **read-only**; never required for bootstrap.
+- Default secrets backend is **Vault** (HA control plane).
+- File backend is an explicit exception for bootstrap/CI/local use.
+- Backend overrides must be explicit and documented.
+- Vault integration for bindings is **read-only** in current tooling.
 - Secrets are never committed to Git and never printed in logs.
 - Passphrases are provided via environment or local passphrase files.
 

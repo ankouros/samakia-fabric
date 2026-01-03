@@ -1,9 +1,9 @@
-# Tenant credentials format (offline-first)
+# Tenant credentials format (file backend exception)
 
 This directory stores **operator-local**, encrypted tenant credentials.
 No secrets are committed to Git.
 
-## Default storage
+## Local file backend (exception)
 
 - Path: `~/.config/samakia-fabric/tenants/<tenant>/creds.enc`
 - Encryption: AES-256-CBC (PBKDF2), compatible with `openssl enc`
@@ -30,7 +30,7 @@ No secrets are committed to Git.
 }
 ```
 
-## Vault (optional)
+## Vault (default)
 
 If `SECRETS_BACKEND=vault` and `VAULT_WRITE=1`, credentials may be written to:
 
@@ -38,4 +38,5 @@ If `SECRETS_BACKEND=vault` and `VAULT_WRITE=1`, credentials may be written to:
 vault://tenants/<tenant>/<consumer>
 ```
 
-Vault integration is **optional** and **never required** for acceptance.
+Vault is the default backend; writes require `VAULT_WRITE=1`.
+File backend usage is an explicit exception.

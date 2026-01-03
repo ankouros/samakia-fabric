@@ -19,8 +19,8 @@ Commands:
   doctor              Show backend configuration (no secrets)
 
 Backend selection:
-  SECRETS_BACKEND=file   Offline encrypted file (default)
-  SECRETS_BACKEND=vault  Optional Vault read-only mode
+  SECRETS_BACKEND=vault  Vault backend (default by policy; set explicitly)
+  SECRETS_BACKEND=file   Offline encrypted file (explicit exception)
 EOT
 }
 

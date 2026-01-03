@@ -15,7 +15,8 @@ Follow the canonical operator cookbook tasks:
 - “Phase 10 Part 2 entry checklist” and “Phase 10 Part 2 acceptance”
 
 Phase 10 Part 2 adds **guarded execute mode** for enabled bindings and
-credential issuance. These remain opt-in and offline-first.
+credential issuance. These remain opt-in; Vault is default and file usage is
+an explicit exception.
 
 Phase 10 Part 2 acceptance is documented in the operator cookbook.
 

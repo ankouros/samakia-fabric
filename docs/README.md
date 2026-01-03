@@ -12,6 +12,7 @@ This directory contains Samakia Fabric documentation.
 - `platform/`: platform manifest and executive invariants
 - `tenants/`: tenant (project) binding design
 - `bindings/`: tenant binding contracts + connection manifests
+- `secrets/`: secrets backend expectations and defaults
 - `exposure/`: exposure semantics, rollback, change windows
 - `runtime/`: runtime signal taxonomy, incident lifecycle, and SLO design
 - `selfservice/`: self-service proposal lifecycle and governance design
