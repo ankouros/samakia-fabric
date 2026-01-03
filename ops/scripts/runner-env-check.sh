@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 DEFAULT_ENV_FILE="${HOME}/.config/samakia-fabric/env.sh"
 BACKEND_CA_DST="/usr/local/share/ca-certificates/samakia-fabric-s3-backend-ca.crt"
 

@@ -847,6 +847,10 @@ Scope (design-only):
 - Audit evidence model under `docs/ai/`.
 - Entry checklist + acceptance plan for design validation.
 
+Follow-up steps (safety prerequisites):
+- Step 1 (Phase 8.3 image reproducibility hardening): **COMPLETED**
+- Step 2 (global non-interactive runner contract): **COMPLETED**
+
 Non-scope:
 - No execution tooling.
 - No policy relaxation.

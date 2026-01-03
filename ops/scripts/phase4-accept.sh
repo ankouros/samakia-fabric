@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 require_cmd() {
   local name="$1"
   if ! command -v "${name}" >/dev/null 2>&1; then

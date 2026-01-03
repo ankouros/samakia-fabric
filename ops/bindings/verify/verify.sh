@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 mode="${VERIFY_MODE:-offline}"
 backend="${BIND_SECRETS_BACKEND:-file}"
 artifact_root="${BINDINGS_ARTIFACT_ROOT:-${FABRIC_REPO_ROOT}/artifacts/bindings}"

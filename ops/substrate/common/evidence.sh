@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 write_manifest() {
   local dir="$1"
   (cd "${dir}" && find . -type f ! -name "manifest.sha256" -print0 | sort -z | xargs -0 sha256sum > manifest.sha256)

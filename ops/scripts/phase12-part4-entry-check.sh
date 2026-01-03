@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 out_file="${FABRIC_REPO_ROOT}/acceptance/PHASE12_PART4_ENTRY_CHECKLIST.md"
 stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 

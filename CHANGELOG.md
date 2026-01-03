@@ -85,6 +85,11 @@ The format is inspired by:
 - Safety envelope, rollout model, and audit expectations under `docs/ai/`
 - Phase 17 entry checklist + acceptance plan (design-only)
 
+#### Runner mode contract (Phase 17 Step 2)
+- Global runner guard enforcing `RUNNER_MODE=ci|operator` across `ops/**/*.sh`.
+- CI-safe tests and policy gate to prevent interactive prompts.
+- Operator docs updated with explicit runner mode guidance.
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

@@ -1,36 +1,46 @@
-# Runner Modes (CI vs Operator)
+# Runner Modes
 
-Samakia Fabric enforces a runner contract to keep automation deterministic
-and safe.
+Samakia Fabric uses a single, explicit runner contract for all automation.
 
-## RUNNER_MODE
+## Modes
 
-- `RUNNER_MODE=ci` (default): non-interactive, read-only by default
-- `RUNNER_MODE=operator`: interactive prompts allowed when explicitly required
+- `RUNNER_MODE=ci` (default)
+  - Non-interactive.
+  - Prompts are forbidden and must fail fast.
+  - Missing inputs must fail (no questions asked).
 
-## CI mode rules
+- `RUNNER_MODE=operator` (explicit)
+  - Interactive prompts are allowed only where documented.
+  - Use this mode only when a workflow explicitly requires input.
 
-When `RUNNER_MODE=ci`:
+## Rules
 
-- Any prompt must fail fast with a non-zero exit code.
-- Scripts require explicit inputs (e.g., `IMAGE=...`, `SNAPSHOT_DIR=...`).
-- Do not rely on terminal interaction or selection menus.
+- Default is `ci` when `RUNNER_MODE` is unset.
+- `CI=1` forces `RUNNER_MODE=ci`.
+- If it prompts in CI, it is a bug.
+- Do not export `RUNNER_MODE=operator` globally; set it per command.
 
-## Operator mode rules
+## Usage examples
 
-When `RUNNER_MODE=operator`:
-
-- Interactive selection is allowed if guardrails permit it.
-- Destructive actions still require explicit flags and approvals.
-
-## Recommended usage
+Non-interactive (default):
 
 ```bash
-RUNNER_MODE=ci CI=1 make policy.check
-RUNNER_MODE=operator make image.upload IMAGE=/path/to/rootfs.tar.gz
+make tf.plan ENV=samakia-prod
 ```
 
-## Notes
+Explicit operator mode for a documented prompt:
 
-The runner mode is enforced by Make targets and scripts.
-If you see a prompt in CI mode, treat it as a bug.
+```bash
+RUNNER_MODE=operator bash ops/scripts/runner-env-install.sh
+```
+
+CI-safe non-interactive path:
+
+```bash
+RUNNER_MODE=ci bash ops/scripts/runner-env-install.sh --non-interactive
+```
+
+## Guard implementation
+
+All `ops/**/*.sh` scripts source `ops/runner/guard.sh` and declare their
+required mode with `require_ci_mode` or `require_operator_mode`.

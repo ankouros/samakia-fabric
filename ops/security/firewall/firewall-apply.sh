@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 if [[ "${FIREWALL_ENABLE:-0}" -ne 1 || "${FIREWALL_EXECUTE:-0}" -ne 1 ]]; then
   echo "ERROR: firewall apply requires FIREWALL_ENABLE=1 and FIREWALL_EXECUTE=1" >&2
   exit 2

@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 profile="${FIREWALL_PROFILE:-baseline}"
 profile_path="${FABRIC_REPO_ROOT}/ops/security/firewall/profiles/${profile}.nft"
 allowlist_path="${FIREWALL_ALLOWLIST:-${FABRIC_REPO_ROOT}/ops/security/firewall/allowlist.nft}"

@@ -34,6 +34,35 @@ None (policy output only).
 #### Rollback / safe exit
 Stop and fix policy failures; do not proceed with mutations.
 
+### Task: Select runner mode (CI vs operator)
+
+#### Intent
+Keep automation non-interactive by default and make operator prompts explicit.
+
+#### Preconditions
+- None
+
+#### Command
+```bash
+# Default (non-interactive)
+RUNNER_MODE=ci make tf.plan ENV=samakia-prod
+
+# Operator-only prompts (explicit opt-in)
+RUNNER_MODE=operator bash ops/scripts/runner-env-install.sh
+```
+
+#### Expected result
+CI paths never prompt; operator prompts appear only in documented flows.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- A prompt appears in CI or automation.
+
+#### Rollback / safe exit
+Unset `RUNNER_MODE` or set `RUNNER_MODE=ci`, then rerun.
+
 ---
 
 ## Daily operations

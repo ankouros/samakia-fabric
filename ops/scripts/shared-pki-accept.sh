@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 ENV_FILE="${HOME}/.config/samakia-fabric/env.sh"
 VAULT_LOCAL_ADDR="https://10.10.120.21:8200"
 ROOT_TOKEN_FILE="${HOME}/.config/samakia-fabric/vault/root-token"

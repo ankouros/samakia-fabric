@@ -34,6 +34,11 @@ bash "$ROOT_DIR/ops/images/validate/validate-pinning.sh"
 bash "$ROOT_DIR/ops/images/validate/validate-apt-snapshot.sh"
 bash "$ROOT_DIR/ops/images/validate/validate-provenance.sh"
 
+# Runner mode guardrails (offline).
+bash "$ROOT_DIR/ops/scripts/test-runner/test-no-prompts.sh"
+bash "$ROOT_DIR/ops/scripts/test-runner/test-ci-default.sh"
+bash "$ROOT_DIR/ops/scripts/test-runner/test-operator-explicit.sh"
+
 # MinIO quorum guard decision logic unit test (offline; no Proxmox/MinIO).
 bash "$ROOT_DIR/ops/scripts/test-minio-quorum-guard.sh"
 

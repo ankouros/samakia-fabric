@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 analysis_dir="${FABRIC_REPO_ROOT}/ops/ai/analysis"
 
 if rg -n "terraform apply|ansible-playbook|kubectl|pveam|pct|qm" "${analysis_dir}" >/dev/null 2>&1; then

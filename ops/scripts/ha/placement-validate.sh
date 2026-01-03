@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 POLICY_FILE="${FABRIC_REPO_ROOT}/fabric-core/ha/placement-policy.yml"
 INVENTORY_SCRIPT="${FABRIC_REPO_ROOT}/fabric-core/ansible/inventory/terraform.py"
 TF_ENVS_DIR="${FABRIC_REPO_ROOT}/fabric-core/terraform/envs"

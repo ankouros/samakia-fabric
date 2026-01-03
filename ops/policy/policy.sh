@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 policy_dir="${FABRIC_REPO_ROOT}/ops/policy"
 env_file="${RUNNER_ENV_FILE:-${HOME}/.config/samakia-fabric/env.sh}"
 
@@ -20,6 +25,7 @@ scripts=(
   "policy-docs.sh"
   "policy-security.sh"
   "policy-images.sh"
+  "policy-runner-mode.sh"
   "policy-ai-ops.sh"
   "policy-ai-provider.sh"
   "policy-ai-routing.sh"

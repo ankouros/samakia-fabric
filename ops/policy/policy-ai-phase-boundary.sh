@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 root="${POLICY_AI_BOUNDARY_ROOT:-${FABRIC_REPO_ROOT}}"
 
 analysis_schema="${root}/contracts/ai/analysis.schema.json"

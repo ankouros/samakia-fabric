@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 ops_script="${FABRIC_REPO_ROOT}/ops/ai/ops.sh"
 if [[ ! -x "${ops_script}" ]]; then
   echo "ERROR: ops.sh missing or not executable: ${ops_script}" >&2

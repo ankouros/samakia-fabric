@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 if [[ "${CI:-0}" == "1" ]]; then
   echo "ERROR: selfservice submission is not allowed in CI" >&2
   exit 1

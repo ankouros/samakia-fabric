@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 acceptance_dir="${FABRIC_REPO_ROOT}/acceptance"
 marker_part2="${acceptance_dir}/PHASE13_PART2_ACCEPTED.md"
 marker_phase13="${acceptance_dir}/PHASE13_ACCEPTED.md"

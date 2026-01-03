@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 usage() {
   echo "usage: evidence.sh --tenant <id> --workload <id> --env <env> --verify <verify.json> --drift <drift.json> --decision <decision.json>" >&2
 }

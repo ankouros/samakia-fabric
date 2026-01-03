@@ -251,7 +251,8 @@ bash "$FABRIC_REPO_ROOT/ops/scripts/runner-env-check.sh"
 Samakia Fabric enforces a runner contract to keep automation deterministic.
 
 - `RUNNER_MODE=ci` (default): prompts are forbidden; scripts must fail fast.
-- `RUNNER_MODE=operator`: prompts allowed when guardrails permit them.
+- `RUNNER_MODE=operator`: prompts allowed only where documented and explicitly opted in.
+- `CI=1` enforces `RUNNER_MODE=ci`; if it prompts in CI, it is a bug.
 - For CI or automation, pass `--non-interactive` where supported (for example, `runner-env-install.sh`).
 
 See `docs/operator/runner-modes.md` for details and usage examples.

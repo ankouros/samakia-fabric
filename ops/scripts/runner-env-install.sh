@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+: "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
+
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+
 DEFAULT_ENV_FILE="${HOME}/.config/samakia-fabric/env.sh"
 
 usage() {
@@ -26,6 +31,7 @@ Non-interactive mode:
 
 Runner mode:
   RUNNER_MODE=ci forbids prompts; use --non-interactive.
+  RUNNER_MODE=operator is required for prompts.
 EOF
 }
 
@@ -39,10 +45,7 @@ read_secret() {
   local prompt="$1"
   local out_var="$2"
   local value=""
-  if [[ "${runner_mode}" == "ci" ]]; then
-    echo "ERROR: RUNNER_MODE=ci forbids interactive prompts (use --non-interactive)." >&2
-    exit 2
-  fi
+  require_operator_mode
   read -r -s -p "${prompt}" value
   echo >&2
   printf -v "${out_var}" '%s' "${value}"
@@ -53,10 +56,7 @@ read_default() {
   local default="$2"
   local out_var="$3"
   local value=""
-  if [[ "${runner_mode}" == "ci" ]]; then
-    echo "ERROR: RUNNER_MODE=ci forbids interactive prompts (use --non-interactive)." >&2
-    exit 2
-  fi
+  require_operator_mode
   read -r -p "${prompt} [${default}]: " value
   if [[ -z "${value}" ]]; then
     value="${default}"
@@ -74,7 +74,6 @@ require_env() {
 
 env_file="${DEFAULT_ENV_FILE}"
 non_interactive=0
-runner_mode="${RUNNER_MODE:-ci}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -98,9 +97,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ "${runner_mode}" == "ci" && "${non_interactive}" -ne 1 ]]; then
-  echo "ERROR: RUNNER_MODE=ci requires --non-interactive (no prompts allowed)." >&2
-  exit 2
+if [[ "${non_interactive}" -eq 1 ]]; then
+  require_ci_mode
+else
+  require_operator_mode
 fi
 
 mkdir -p "$(dirname "${env_file}")"

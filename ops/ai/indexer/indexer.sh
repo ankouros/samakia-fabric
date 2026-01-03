@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 indexing_file="${FABRIC_REPO_ROOT}/contracts/ai/indexing.yml"
 indexing_schema="${FABRIC_REPO_ROOT}/contracts/ai/indexing.schema.json"
 qdrant_file="${FABRIC_REPO_ROOT}/contracts/ai/qdrant.yml"

@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
+: "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
+
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
 
 if [[ -z "${SLO_PATH:-}" || -z "${METRICS_PATH:-}" || -z "${OUT_PATH:-}" ]]; then
   echo "ERROR: SLO_PATH, METRICS_PATH, and OUT_PATH are required" >&2

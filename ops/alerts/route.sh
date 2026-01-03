@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 if [[ -z "${TENANT:-}" || -z "${ENV_ID:-}" || -z "${PROVIDER:-}" || -z "${SEVERITY:-}" || -z "${OUT_PATH:-}" ]]; then
   echo "ERROR: TENANT, ENV_ID, PROVIDER, SEVERITY, and OUT_PATH are required" >&2
   exit 2

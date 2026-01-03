@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 if rg -n "openai|anthropic|gemini|cohere|api\.openai" "${FABRIC_REPO_ROOT}/contracts/ai" "${FABRIC_REPO_ROOT}/ops/ai" "${FABRIC_REPO_ROOT}/docs/ai" >/dev/null 2>&1; then
   echo "ERROR: external AI provider reference found" >&2
   exit 1

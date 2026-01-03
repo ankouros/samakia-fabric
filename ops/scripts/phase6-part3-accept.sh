@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 commit_hash="$(git -C "${FABRIC_REPO_ROOT}" rev-parse HEAD)"
 marker_path="${FABRIC_REPO_ROOT}/acceptance/PHASE6_PART3_ACCEPTED.md"

@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 SUBSTRATE_ROOT="${FABRIC_REPO_ROOT}/ops/substrate"
 TENANTS_ROOT_DEFAULT="${FABRIC_REPO_ROOT}/contracts/tenants/examples"
 TENANTS_ROOT="${TENANTS_ROOT:-${TENANTS_ROOT_DEFAULT}}"

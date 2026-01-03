@@ -3,6 +3,11 @@ set -euo pipefail
 
 : "${FABRIC_REPO_ROOT:?FABRIC_REPO_ROOT must be set}"
 
+# shellcheck disable=SC1091
+source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
+require_ci_mode
+
+
 evidence_root="${FABRIC_REPO_ROOT}/evidence/ai"
 out_dir="${AI_EVIDENCE_INDEX_OUT:-${evidence_root}}"
 if [[ "${out_dir}" != /* ]]; then

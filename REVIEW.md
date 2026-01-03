@@ -330,7 +330,7 @@ This review focuses on correctness, operability, and audit readiness.
 Current strengths include layered ownership (Packer/Terraform/Ansible),
 delegated Proxmox access, and deterministic acceptance workflows.
 Recent hardening closes the prior gaps around image reproducibility,
-known_hosts rotation, and non-interactive runner behavior. The remaining
+known_hosts rotation, and runner-mode enforcement. The remaining
 risks are mostly operational discipline issues (staging parity and
 replace/blue-green cutovers).
 
@@ -457,8 +457,8 @@ cluster when the documented guardrails are followed.
 - Evidence workflows are deterministic and read-only by default.
 
 **Update**
-- Runner mode contract reduces prompt risk; new entrypoints must continue to
-  honor `RUNNER_MODE=ci` defaults.
+- Runner mode guardrails are enforced globally; prompts in CI now fail fast and
+  policy/tests prevent bypasses.
 
 ---
 
@@ -475,7 +475,6 @@ cluster when the documented guardrails are followed.
 
 ### Short-term (next 1-2 iterations)
 - Keep apt snapshot/digest policy current for image builds.
-- Ensure new scripts honor `RUNNER_MODE=ci` non-interactive behavior.
 - Maintain tier-0 MAC/DHCP reservations when adding services.
 - Document cutover windows for replace/blue-green upgrades.
 
