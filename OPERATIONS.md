@@ -35,6 +35,7 @@ Operator commands and task flows are defined in:
 - `docs/operator/runtime-ops.md` (runtime operations and signal classification)
 - `docs/operator/slo-ownership.md` (SLO ownership and escalation rules)
 - `docs/operator/runner-modes.md`
+- `docs/operator/secrets-rotation.md`
 - `docs/operator/ssh-trust.md`
 - `docs/operator/networking.md`
 - `docs/operator/safety-model.md`
@@ -75,6 +76,12 @@ Tenant binding workflows live in:
   - Rotation dry-run: `make bindings.secrets.rotate.dryrun TENANT=all`
   - Rotation execute (guarded):
     - `ROTATE_EXECUTE=1 ROTATE_REASON="..." BIND_SECRETS_BACKEND=file ROTATE_INPUT_FILE=./rotation-input.json make bindings.secrets.rotate TENANT=<tenant>`
+  - Rotation cutover plan (read-only):
+    - `make rotation.cutover.plan FILE=contracts/rotation/examples/cutover-nonprod.yml`
+  - Rotation cutover apply (guarded):
+    - `ROTATE_EXECUTE=1 CUTOVER_EXECUTE=1 ROTATE_REASON="..." make rotation.cutover.apply FILE=contracts/rotation/examples/cutover-nonprod.yml`
+  - Rotation cutover rollback (guarded):
+    - `ROLLBACK_EXECUTE=1 ROTATE_REASON="..." CUTOVER_EVIDENCE_DIR="evidence/rotation/<tenant>/<workload>/<UTC>" make rotation.cutover.rollback FILE=contracts/rotation/examples/cutover-nonprod.yml`
 - Proposal workflow (Phase 12 Part 4; optional, operator-controlled):
   - Submit proposal (intake only): `make proposals.submit FILE=examples/proposals/add-postgres-binding.yml`
   - Validate proposal: `make proposals.validate PROPOSAL_ID=<id>`

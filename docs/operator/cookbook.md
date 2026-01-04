@@ -173,6 +173,93 @@ None (policy reference).
 #### Rollback / safe exit
 Stop and update the contract before proceeding.
 
+### Task: Secrets rotation cutover (plan)
+
+#### Intent
+Plan a binding cutover from an old `secret_ref` to a new `secret_ref` and emit evidence.
+
+#### Preconditions
+- New secret material is available in the secrets backend
+- Cutover contract exists (see `contracts/rotation/`)
+
+#### Command
+```bash
+make rotation.cutover.plan FILE=contracts/rotation/examples/cutover-nonprod.yml
+```
+
+#### Expected result
+Plan evidence is written under `evidence/rotation/<tenant>/<workload>/<UTC>/`.
+
+#### Evidence outputs
+`cutover.yml.redacted`, `plan.json`, `diff.md`, `decision.json`, `verify.json`, `manifest.sha256`.
+
+#### Failure modes
+- Missing secret refs in the configured backend
+- Binding file missing the old `secret_ref`
+
+#### Rollback / safe exit
+None required (plan-only).
+
+### Task: Secrets rotation cutover (apply + rollback)
+
+#### Intent
+Apply the cutover and verify, with rollback available on failure.
+
+#### Preconditions
+- Plan has been reviewed
+- Guard flags are set explicitly
+- Production cutovers have an approved change window and evidence signing enabled
+
+#### Command
+```bash
+ROTATE_EXECUTE=1 CUTOVER_EXECUTE=1 ROTATE_REASON="Rotate canary DB" \
+make rotation.cutover.apply FILE=contracts/rotation/examples/cutover-nonprod.yml
+```
+
+#### Expected result
+Bindings are updated to the new `secret_ref` and verification completes.
+
+#### Evidence outputs
+`evidence/rotation/<tenant>/<workload>/<UTC>/` plus `manifest.sha256`.
+
+#### Failure modes
+- Verification failure after cutover
+- Guard flags missing or CI execution attempted
+
+#### Rollback / safe exit
+```bash
+ROLLBACK_EXECUTE=1 ROTATE_REASON="Rollback after failed verify" \
+CUTOVER_EVIDENCE_DIR="evidence/rotation/<tenant>/<workload>/<UTC>" \
+make rotation.cutover.rollback FILE=contracts/rotation/examples/cutover-nonprod.yml
+```
+
+### Task: Phase 17 Step 5 entry + acceptance (CI-safe)
+
+#### Intent
+Generate the entry checklist and acceptance marker for the cutover helper.
+
+#### Preconditions
+- Phase 17 Step 4 accepted
+- Working tree clean
+
+#### Command
+```bash
+make phase17.step5.entry.check
+CI=1 make phase17.step5.accept
+```
+
+#### Expected result
+Entry checklist and acceptance marker are created under `acceptance/`.
+
+#### Evidence outputs
+`acceptance/PHASE17_STEP5_ENTRY_CHECKLIST.md` and `acceptance/PHASE17_STEP5_ACCEPTED.md`.
+
+#### Failure modes
+- Missing prerequisites or policy gate failures
+
+#### Rollback / safe exit
+Fix failed prerequisites and rerun the acceptance steps.
+
 ---
 
 ## Internal Shared Postgres (Patroni)

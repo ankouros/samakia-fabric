@@ -859,6 +859,8 @@ Follow-up steps (safety prerequisites):
   - Acceptance markers:
     - `acceptance/INTERNAL_POSTGRES_PATRONI_ACCEPTED.md`
     - `acceptance/PHASE17_STEP4_ACCEPTED.md`
+- Step 5 (secrets rotation cutover helper): **COMPLETED**
+  - Acceptance marker: `acceptance/PHASE17_STEP5_ACCEPTED.md`
 
 Non-scope:
 - No execution tooling.

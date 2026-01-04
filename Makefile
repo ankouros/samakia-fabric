@@ -2322,6 +2322,31 @@ bindings.secrets.rotate: ## Rotate binding secrets (guarded; execute with ROTATE
 		MAINT_WINDOW_START="$(MAINT_WINDOW_START)" MAINT_WINDOW_END="$(MAINT_WINDOW_END)" \
 		bash "$(REPO_ROOT)/ops/bindings/rotate/rotate.sh"
 
+.PHONY: rotation.cutover.plan
+rotation.cutover.plan: ## Plan binding secret cutover (read-only)
+	@FILE="$(FILE)" CUTOVER_STAMP="$(CUTOVER_STAMP)" \
+		BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" SECRETS_FILE="$(SECRETS_FILE)" \
+		SECRETS_PASSPHRASE="$(SECRETS_PASSPHRASE)" SECRETS_PASSPHRASE_FILE="$(SECRETS_PASSPHRASE_FILE)" \
+		bash "$(REPO_ROOT)/ops/bindings/rotate/cutover-plan.sh" --file "$(FILE)" --emit-evidence
+
+.PHONY: rotation.cutover.apply
+rotation.cutover.apply: ## Apply binding secret cutover (guarded)
+	@FILE="$(FILE)" CUTOVER_STAMP="$(CUTOVER_STAMP)" ROTATE_EXECUTE="$(ROTATE_EXECUTE)" CUTOVER_EXECUTE="$(CUTOVER_EXECUTE)" \
+		ROTATE_REASON="$(ROTATE_REASON)" VERIFY_LIVE="$(VERIFY_LIVE)" \
+		BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" SECRETS_FILE="$(SECRETS_FILE)" \
+		SECRETS_PASSPHRASE="$(SECRETS_PASSPHRASE)" SECRETS_PASSPHRASE_FILE="$(SECRETS_PASSPHRASE_FILE)" \
+		EVIDENCE_SIGN="$(EVIDENCE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		bash "$(REPO_ROOT)/ops/bindings/rotate/cutover-apply.sh" --file "$(FILE)"
+
+.PHONY: rotation.cutover.rollback
+rotation.cutover.rollback: ## Rollback binding secret cutover (guarded)
+	@FILE="$(FILE)" CUTOVER_EVIDENCE_DIR="$(CUTOVER_EVIDENCE_DIR)" ROLLBACK_EXECUTE="$(ROLLBACK_EXECUTE)" \
+		ROTATE_REASON="$(ROTATE_REASON)" VERIFY_LIVE="$(VERIFY_LIVE)" \
+		BIND_SECRETS_BACKEND="$(BIND_SECRETS_BACKEND)" SECRETS_FILE="$(SECRETS_FILE)" \
+		SECRETS_PASSPHRASE="$(SECRETS_PASSPHRASE)" SECRETS_PASSPHRASE_FILE="$(SECRETS_PASSPHRASE_FILE)" \
+		EVIDENCE_SIGN="$(EVIDENCE_SIGN)" EVIDENCE_SIGN_KEY="$(EVIDENCE_SIGN_KEY)" \
+		bash "$(REPO_ROOT)/ops/bindings/rotate/cutover-rollback.sh" --file "$(FILE)" --evidence "$(CUTOVER_EVIDENCE_DIR)"
+
 .PHONY: bindings.verify.offline
 bindings.verify.offline: ## Verify bindings (offline; read-only)
 	@TENANT="$(TENANT)" WORKLOAD="$(WORKLOAD)" VERIFY_MODE=offline \
@@ -2500,6 +2525,14 @@ phase16.part7.entry.check: ## Phase 16 Part 7 entry checklist (AI invariants)
 .PHONY: phase16.part7.accept
 phase16.part7.accept: ## Phase 16 Part 7 acceptance (AI invariants)
 	@bash "$(OPS_SCRIPTS_DIR)/phase16-part7-accept.sh"
+
+.PHONY: phase17.step5.entry.check
+phase17.step5.entry.check: ## Phase 17 Step 5 entry checklist (secrets rotation cutover)
+	@bash "$(OPS_SCRIPTS_DIR)/phase17-step5-entry-check.sh"
+
+.PHONY: phase17.step5.accept
+phase17.step5.accept: ## Phase 17 Step 5 acceptance (secrets rotation cutover)
+	@bash "$(OPS_SCRIPTS_DIR)/phase17-step5-accept.sh"
 
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)

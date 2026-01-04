@@ -18,6 +18,7 @@ Start here:
 - `selfservice-governance.md` — autonomy guardrails and stop rules (Phase 15 Part 3)
 - `selfservice-governance-ux.md` — operator UX for tenant self-service (Phase 15 Part 4)
 - `runner-modes.md` — CI vs operator runner contract
+- `secrets-rotation.md` — secrets rotation cutover (Phase 17 Step 5)
 - `ssh-trust.md` — strict SSH trust + known_hosts rotation
 - `networking.md` — MAC/DHCP determinism policy and cutover checklist
 - `safety-model.md` — read-only default, execute guards, evidence posture

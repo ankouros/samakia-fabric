@@ -22,6 +22,7 @@ scripts=(
   "policy-secrets-nonempty.sh"
   "policy-secrets-materialization.sh"
   "policy-secrets-rotation.sh"
+  "policy-rotation-cutover.sh"
   "policy-ha.sh"
   "policy-docs.sh"
   "policy-security.sh"

@@ -1,0 +1,17 @@
+apiVersion: samakia.fabric/v1alpha1
+kind: BindingSecretCutover
+metadata:
+  tenant: canary
+  env: dev
+  workload_id: sample
+spec:
+  consumer:
+    type: database
+    provider: postgres
+    variant: single
+  old_secret_ref: tenants/canary/database/sample
+  new_secret_ref: tenants/canary/database/sample-v2
+  bindings:
+    - contracts/bindings/tenants/canary/sample.binding.yml
+  verify_mode: offline
+  reason: "Non-prod cutover example (plan-only)"

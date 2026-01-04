@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Binding secret cutover contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "samakia.fabric/v1alpha1"
+    },
+    "kind": {
+      "const": "BindingSecretCutover"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenant",
+        "env",
+        "workload_id"
+      ],
+      "properties": {
+        "tenant": {
+          "type": "string",
+          "minLength": 1
+        },
+        "env": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workload_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer",
+        "old_secret_ref",
+        "new_secret_ref",
+        "bindings",
+        "verify_mode",
+        "reason"
+      ],
+      "properties": {
+        "consumer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "provider",
+            "variant"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "database",
+                "message-queue",
+                "cache",
+                "vector"
+              ]
+            },
+            "provider": {
+              "type": "string",
+              "enum": [
+                "postgres",
+                "mariadb",
+                "rabbitmq",
+                "dragonfly",
+                "qdrant"
+              ]
+            },
+            "variant": {
+              "type": "string",
+              "enum": [
+                "single",
+                "cluster"
+              ]
+            }
+          }
+        },
+        "old_secret_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "new_secret_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bindings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^contracts/bindings/tenants/"
+          }
+        },
+        "verify_mode": {
+          "type": "string",
+          "enum": [
+            "offline",
+            "live"
+          ]
+        },
+        "change_window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start",
+            "end"
+          ],
+          "properties": {
+            "start": {
+              "type": "string",
+              "minLength": 1
+            },
+            "end": {
+              "type": "string",
+              "minLength": 1
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

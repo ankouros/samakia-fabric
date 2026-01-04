@@ -1,0 +1,101 @@
+# Phase 17 Step 5 Entry Checklist
+
+Timestamp (UTC): 2026-01-04T05:47:05Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE12_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE12_PART3_ACCEPTED.md
+  - Command: test -f acceptance/PHASE12_PART3_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE13_ACCEPTED.md
+  - Command: test -f acceptance/PHASE13_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE17_STEP4_ACCEPTED.md
+  - Command: test -f acceptance/PHASE17_STEP4_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: contracts/rotation/cutover.schema.json
+  - Command: test -f contracts/rotation/cutover.schema.json
+  - Result: PASS
+- File present: contracts/rotation/README.md
+  - Command: test -f contracts/rotation/README.md
+  - Result: PASS
+- File present: contracts/rotation/examples/cutover-nonprod.yml
+  - Command: test -f contracts/rotation/examples/cutover-nonprod.yml
+  - Result: PASS
+- File present: ops/bindings/rotate/cutover-plan.sh
+  - Command: test -f ops/bindings/rotate/cutover-plan.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/cutover-apply.sh
+  - Command: test -f ops/bindings/rotate/cutover-apply.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/cutover-rollback.sh
+  - Command: test -f ops/bindings/rotate/cutover-rollback.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/cutover-validate.sh
+  - Command: test -f ops/bindings/rotate/cutover-validate.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/cutover-evidence.sh
+  - Command: test -f ops/bindings/rotate/cutover-evidence.sh
+  - Result: PASS
+- File present: ops/bindings/rotate/redact.sh
+  - Command: test -f ops/bindings/rotate/redact.sh
+  - Result: PASS
+- File present: ops/policy/policy-rotation-cutover.sh
+  - Command: test -f ops/policy/policy-rotation-cutover.sh
+  - Result: PASS
+- File present: docs/operator/secrets-rotation.md
+  - Command: test -f docs/operator/secrets-rotation.md
+  - Result: PASS
+- File present: docs/operator/cookbook.md
+  - Command: test -f docs/operator/cookbook.md
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- Cutover policy wired
+  - Command: rg -n policy-rotation-cutover.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: rotation.cutover.plan
+  - Command: rg -n '^rotation\.cutover\.plan:' Makefile
+  - Result: PASS
+- Makefile target present: rotation.cutover.apply
+  - Command: rg -n '^rotation\.cutover\.apply:' Makefile
+  - Result: PASS
+- Makefile target present: rotation.cutover.rollback
+  - Command: rg -n '^rotation\.cutover\.rollback:' Makefile
+  - Result: PASS
+- Makefile target present: phase17.step5.entry.check
+  - Command: rg -n '^phase17\.step5\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase17.step5.accept
+  - Command: rg -n '^phase17\.step5\.accept:' Makefile
+  - Result: PASS
+- Policy gates
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Bindings validate
+  - Command: make -C /home/aggelos/samakia-fabric bindings.validate TENANT=all
+  - Result: PASS
+- Bindings render
+  - Command: make -C /home/aggelos/samakia-fabric bindings.render TENANT=all
+  - Result: PASS
+- Bindings secrets inspect
+  - Command: make -C /home/aggelos/samakia-fabric bindings.secrets.inspect TENANT=all
+  - Result: PASS
+- Bindings verify (offline)
+  - Command: make -C /home/aggelos/samakia-fabric bindings.verify.offline TENANT=all
+  - Result: PASS

@@ -128,6 +128,11 @@ The format is inspired by:
 - Consolidated evidence under `evidence/exposure-canary/canary/sample/2026-01-04T04:40:26Z`.
 - Added acceptance marker: `acceptance/PHASE17_STEP4_ACCEPTED.md`.
 
+#### Secrets rotation cutover helper (Phase 17 Step 5)
+- Cutover contract schema + example for binding secret ref transitions.
+- Guarded cutover plan/apply/rollback tooling with evidence packets and rollback backups.
+- Policy gate, operator docs, and acceptance marker for the cutover workflow.
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)
