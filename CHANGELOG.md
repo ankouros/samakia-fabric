@@ -371,8 +371,9 @@ The format is inspired by:
 
 #### Operations
 - Added a canary exposure runbook and documented runner-local secret materialization prerequisites.
+- Documented Vault TLS/CA requirements for internal Postgres canary verification.
 - Fixed secrets file/vault helpers to parse decrypted payloads via temp files; tracked ops secrets scripts explicitly.
-- Recorded the Phase 17 Step 4 canary DNS blocker in `REQUIRED-FIXES.md`.
+- Recorded the Phase 17 Step 4 canary credentials blocker in `REQUIRED-FIXES.md`.
 
 #### Tenant binding validation
 - Binding semantics validation now falls back to example tenant contracts when a top-level tenant directory lacks `tenant.yml` (supports SLO-only directories).

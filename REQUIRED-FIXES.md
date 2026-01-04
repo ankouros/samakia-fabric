@@ -99,7 +99,7 @@ This document records what was fixed, what remains blocked (if anything), and th
 ## Still Blocked (if any)
 
 - Milestone Phase 1–12 verification (see MILESTONE-1-12-PHASE2-1-SHARED-POLICY).
-- Phase 17 Step 4 real canary exposure (see PHASE17-STEP4-CANARY-VERIFY-DNS).
+- Phase 17 Step 4 real canary exposure (see PHASE17-STEP4-CANARY-VERIFY-CREDENTIALS).
 
 ## Phase 17 Step 4 Blockers
 
@@ -182,6 +182,15 @@ This document records what was fixed, what remains blocked (if anything), and th
 - **Resolution status:** **FIXED**
 - **Verification command(s):**
   - `ENV=samakia-shared ANSIBLE_FLAGS="--limit ntp-*" make shared.ansible.apply`
+  - `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
+
+### PHASE17-STEP4-CANARY-VERIFY-CREDENTIALS
+- **Description:** `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample` failed because the Vault secret `tenants/canary/database/sample` has an empty `password` value, causing the Postgres probe to error with `missing username/password in secret`.
+- **Impact:** Phase 17 Step 4 cannot complete; live verification cannot authenticate to the canary database.
+- **Root cause:** Vault secret `tenants/canary/database/sample` was seeded with an empty `password`.
+- **Required remediation:** Update the Vault secret to include a non-empty password for the canary database user (or point the binding to a secret that has credentials), then rerun live verification.
+- **Resolution status:** **OPEN**
+- **Verification command(s):**
   - `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
 
 ### PHASE17-POSTGRES-INTERNAL-TLS-PASSTHROUGH

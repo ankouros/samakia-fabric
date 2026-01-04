@@ -154,7 +154,7 @@ This document records what was implemented for the **Terraform remote state back
 - Defines safety envelope, rollout stages, and audit evidence expectations.
 - No execution tooling or policy relaxation is introduced.
 - Internal Postgres HA prerequisite implemented (Patroni + HAProxy/VIP + DNS alias), providing `db.internal.shared` and `db.canary.internal`.
-- Step 4 canary verify now targets the internal shared Postgres service (Vault-backed secrets required).
+- Step 4 canary verify now targets the internal shared Postgres service (Vault-backed secrets required); verify is currently blocked because `tenants/canary/database/sample` has an empty `password` (see `REQUIRED-FIXES.md`).
 - Internal Postgres bootstrap hardened with etcd v2 enablement, ip:port host rendering, and a guarded reset flag for cluster rebootstrap.
 - Internal Postgres acceptance aligns HAProxy primary backend with Patroni leader via HAProxy stats.
 - Internal Postgres HAProxy allowlist now includes `FABRIC_ADMIN_CIDRS` (default `192.168.11.0/24`) for operator verification access.

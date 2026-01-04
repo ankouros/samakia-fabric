@@ -21,6 +21,9 @@ endpoint. Secrets remain local and are never committed. Vault is the default
 backend; ensure the runner has:
 - `VAULT_ADDR` and `VAULT_TOKEN` configured
 - `~/.config/samakia-fabric/pki/shared-bootstrap-ca.crt` for Vault TLS
+- `ops/ca/postgres-internal-ca.crt` available (can be a runner-local symlink to
+  `~/.config/samakia-fabric/pki/postgres-internal-ca.crt`) so `ca_ref` lookups
+  succeed during TLS verification
 
 Connectivity requirements:
 - `db.canary.internal` must resolve on the runner (CNAME to `db.internal.shared`).
@@ -35,11 +38,13 @@ Sequence:
 - Plan: `evidence/exposure-plan/canary/sample/2026-01-03T19:44:28Z`
 - Approve: `evidence/exposure-approve/canary/sample/2026-01-03T19:44:34Z`
 - Apply: `evidence/exposure-apply/canary/sample/2026-01-03T19:44:40Z`
-- Verify (live): `evidence/exposure-verify/canary/sample/2026-01-04T02:13:42Z` (PASS)
+- Verify (live): failed (Vault secret missing password)
 
 Blocker:
-- None (latest live verify succeeded).
+- Vault secret `tenants/canary/database/sample` has an empty `password` value,
+  causing the Postgres probe to fail with `missing username/password in secret`.
 
 Next steps:
-- Rerun the full plan/approve/apply/verify/rollback sequence when needed for
-  Phase 17 Step 4 completion evidence.
+- Update the Vault secret to include a non-empty password (or point the binding
+  at a secret that contains credentials), then rerun live verify and the
+  rollback confirmation to complete Phase 17 Step 4.
