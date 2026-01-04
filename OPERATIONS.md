@@ -362,17 +362,23 @@ DNS becomes unblocked after the backend is available:
 make dns.up ENV=samakia-dns
 ```
 
-### MinIO SDN Acceptance
+### MinIO SDN Acceptance (legacy plane)
 
-Validates the MinIO **stateful SDN plane** (zminio/vminio/VLAN140) and the expected LXC wiring signals in a **read-only**, **non-destructive** way.
+MinIO is an internal shared service; governance requires `zshared`/`vshared`.
+The current MinIO SDN plane (`zminio`/`vminio`/VLAN140) is **legacy** and must
+not be extended. Migration is planned and explicit (see
+`docs/network/sdn-governance.md`).
+
+This check validates the **legacy SDN plane** and expected LXC wiring signals
+in a **read-only**, **non-destructive** way.
 
 ```bash
 ENV=samakia-minio make minio.sdn.accept
 ```
 
 Prerequisite:
-- The runner’s Proxmox API token must have permission to read SDN primitives, and the SDN plane must already exist.
-- If `zminio` does not exist and your token lacks `SDN.Allocate`, the test will fail loudly by design (the plane must be created by an operator with `SDN.Allocate`).
+- The runner’s Proxmox API token must have permission to read SDN primitives, and the legacy plane must already exist.
+- If `zminio` does not exist and your token lacks `SDN.Allocate`, the test will fail loudly by design (the legacy plane must be created by an operator with `SDN.Allocate`).
 
 What it checks (best-effort):
 - Proxmox SDN primitives exist and match the contract (zone/vnet/subnet/gateway VIP).
@@ -490,12 +496,14 @@ make dns.accept
 
 Expected behavior:
 - Exactly one edge holds `192.168.11.100` at any time.
-- Exactly one edge holds VLAN gateway VIP `10.10.100.1` at any time.
+- Exactly one edge holds the legacy VLAN gateway VIP `10.10.100.1` at any time.
 - Queries for `infra.samakia.net` are answered authoritatively (dnsdist → PowerDNS).
 - All other queries recurse via unbound (dnsdist → unbound).
 
 Notes:
-- Proxmox SDN objects for VLAN100 are created/validated during `terraform apply` (token-only via Proxmox API).
+- DNS is an internal shared service and must ultimately live on `zshared`/`vshared`.
+- The current VLAN100 plane (`zonedns`/`vlandns`) is **legacy** and must not be extended.
+- Proxmox SDN objects for the legacy VLAN100 plane are created/validated during `terraform apply` (token-only via Proxmox API).
 - `dns-auth-*` are VLAN-only; Ansible connects via `ProxyJump` through `dns-edge` (no DNS dependency).
 
 ---
@@ -503,7 +511,9 @@ Notes:
 ## Shared Control Plane Services (Phase 2.1)
 
 Shared services provide internal time, PKI, secrets, and observability as reusable primitives.
-They run on a dedicated SDN plane (VLAN120, `zshared`/`vshared`, `10.10.120.0/24`).
+They run on the single internal shared SDN plane (VLAN120, `zshared`/`vshared`,
+`10.10.120.0/24`). Service-specific SDN planes are legacy and must not be
+extended.
 
 Service endpoints (VIPs on LAN):
 - NTP: `192.168.11.120` (UDP/123)

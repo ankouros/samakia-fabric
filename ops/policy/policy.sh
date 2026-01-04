@@ -27,6 +27,7 @@ scripts=(
   "policy-docs.sh"
   "policy-security.sh"
   "policy-ipam.sh"
+  "policy-sdn-shared-plane.sh"
   "policy-images.sh"
   "policy-observability.sh"
   "policy-runner-mode.sh"

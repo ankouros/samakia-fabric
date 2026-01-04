@@ -20,6 +20,12 @@ The format is inspired by:
 - Secret validation guard to fail fast on empty required fields before live verification probes.
 - Policy gate for non-empty live-verify secrets (skips when secrets backend is not configured).
 
+#### Shared SDN plane governance
+- Shared-plane contract (`contracts/network/shared-plane.yml`) declaring `zshared`/`vshared` as the single internal plane.
+- SDN governance doc + operator guidance; legacy service-specific planes marked migration-only.
+- Policy gate enforcing shared-plane usage and legacy allowlists.
+- Codex SDN rule added to agent governance.
+
 #### Platform consumers (Phase 6 design)
 - Consumer contract schema + ready/enabled manifests for kubernetes/database/message-queue/cache
 - Phase 6 entry checklist + acceptance plan (design-only; no deployments)

@@ -82,7 +82,7 @@ Terraform relies on API connectivity.
 Create a dedicated role for Terraform with **least-privilege**, but sufficient for:
 - LXC lifecycle (create/config/start/stop)
 - Storage allocation (templates + rootfs volumes)
-- SDN plane creation/validation (for `zonedns/vlandns` and `zminio/vminio`)
+- SDN plane creation/validation (for the shared plane `zshared/vshared`)
 - Read-only inspection needed for inventory + acceptance (e.g., tag reads)
 
 This role is designed to be **Proxmox 9 safe** and aligned with Samakia Fabric’s contracts:
@@ -129,9 +129,9 @@ Notes:
   - `Sys.Console`
   - `Sys.Modify`
   even if your Terraform does not explicitly use console actions.
-- `SDN.Allocate` is required for **one-command** DNS/MinIO bootstrap because Samakia Fabric creates/ensures SDN objects via `/cluster/sdn/*`.
+- `SDN.Allocate` is required for **one-command** shared-plane bootstrap because Samakia Fabric creates/ensures SDN objects via `/cluster/sdn/*`.
 - If you intentionally want a Terraform token that cannot create SDN:
-  - you must pre-create the SDN planes (`zonedns/vlandns` and `zminio/vminio`) using an operator account that has `SDN.Allocate`, and
+  - you must pre-create the shared SDN plane (`zshared/vshared`) using an operator account that has `SDN.Allocate`, and
   - the Terraform token still needs `SDN.Audit` to validate/read SDN primitives.
 
 If the user/role already exists and you need to update privileges:
@@ -191,7 +191,7 @@ pveum aclmod /vms -user terraform-prov@pve -role TerraformProv
 # Storage used for rootfs and templates (adjust storage name)
 pveum aclmod /storage/pve-nfs -user terraform-prov@pve -role TerraformProv
 
-# SDN plane management (required for zminio/zonedns automation)
+# SDN plane management (required for shared-plane automation)
 pveum aclmod /sdn -user terraform-prov@pve -role TerraformProv
 ```
 
@@ -287,10 +287,10 @@ ip link show vmbr0
 ```
 
 SDN note (Samakia Fabric usage):
-- DNS and MinIO environments use Proxmox SDN VLAN planes (IaC-managed):
-  - DNS: `zonedns` / `vlandns` (VLAN100, `10.10.100.0/24`)
-  - MinIO: `zminio` / `vminio` (VLAN140, `10.10.140.0/24`)
-- If your Terraform token lacks `SDN.Allocate`, you must pre-create these SDN objects manually (then automation will validate and proceed).
+- Internal shared services attach to the shared SDN plane:
+  - `zshared` / `vshared` (VLAN120, `10.10.120.0/24`)
+- Legacy service-specific planes (`zonedns`/`vlandns`, `zminio`/`vminio`) are migration-only and must not be extended.
+- If your Terraform token lacks `SDN.Allocate`, you must pre-create the shared SDN objects manually (then automation will validate and proceed).
 - Proxmox SDN changes are **not active until applied** cluster-wide. Equivalent operator action:
   - `pvesh set /cluster/sdn`
   - Samakia Fabric automation performs this apply step when it creates/updates SDN primitives.

@@ -20,6 +20,13 @@ This document records what was implemented for the **Terraform remote state back
 - Wired policy enforcement to block VIP misuse and out-of-range allocations.
 - No runtime behavior changes; this is contract and documentation governance only.
 
+## Shared SDN Plane Governance (Update)
+
+- Declared `zshared`/`vshared` as the single internal shared SDN plane.
+- Marked service-specific planes (`zonedns`/`vlandns`, `zminio`/`vminio`) as legacy and migration-only.
+- Added a shared-plane contract, SDN governance doc, and policy gate for enforcement.
+- Updated operator and operations docs to align with the shared-plane rule.
+
 ## Phase 17 Step 4 — Real Canary Exposure (Completed)
 
 - Executed plan/approve/apply/verify/rollback for the canary `sample` workload in `samakia-dev`.
@@ -194,7 +201,7 @@ This document records what was implemented for the **Terraform remote state back
 ## MinIO HA Backend — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-minio/`
-  - Proxmox **SDN stateful VLAN plane** ensure step (zminio/vminio/VLAN140 + `10.10.140.0/24`, gw VIP `10.10.140.1`) via API-token-only script `ops/scripts/proxmox-sdn-ensure-stateful-plane.sh`.
+  - Proxmox **legacy SDN stateful VLAN plane** ensure step (zminio/vminio/VLAN140 + `10.10.140.0/24`, gw VIP `10.10.140.1`) via API-token-only script `ops/scripts/proxmox-sdn-ensure-stateful-plane.sh`.
   - Five LXCs with deterministic placement + static IPs:
     - `minio-edge-1` (`proxmox1`): LAN `192.168.11.102`, VLAN `10.10.140.2`
     - `minio-edge-2` (`proxmox2`): LAN `192.168.11.103`, VLAN `10.10.140.3`
@@ -220,7 +227,7 @@ This document records what was implemented for the **Terraform remote state back
 
 Additional SDN-plane validation is available (read-only):
 - `ENV=samakia-minio make minio.sdn.accept`
-- Guarantees after PASS (best-effort): SDN primitives exist (zminio/vminio/VLAN140/subnet/gateway VIP), MinIO nodes are VLAN-only and default-route via `10.10.140.1`, and edge gateway VIP/NAT signals are present when edges are reachable.
+- Guarantees after PASS (best-effort): legacy SDN primitives exist (zminio/vminio/VLAN140/subnet/gateway VIP), MinIO nodes are VLAN-only and default-route via `10.10.140.1`, and edge gateway VIP/NAT signals are present when edges are reachable.
 - Note: if the Proxmox API token cannot read SDN primitives (or the SDN plane is not created yet), this check fails loudly by design.
 
 ### MinIO Convergence Guarantees
@@ -302,7 +309,7 @@ Fix:
 ## DNS Infrastructure — What was implemented
 
 - **Terraform env**: `fabric-core/terraform/envs/samakia-dns/`
-  - Proxmox **SDN VLAN plane** ensure step (zonedns/vlandns/VLAN100 + `10.10.100.0/24`, gw VIP `10.10.100.1`) via API-token-only script `ops/scripts/proxmox-sdn-ensure-dns-plane.sh`.
+  - Proxmox **legacy SDN VLAN plane** ensure step (zonedns/vlandns/VLAN100 + `10.10.100.0/24`, gw VIP `10.10.100.1`) via API-token-only script `ops/scripts/proxmox-sdn-ensure-dns-plane.sh`.
   - Four LXCs with deterministic placement + static IPs:
     - `dns-edge-1` (`proxmox1`): LAN `192.168.11.111`, VLAN `10.10.100.11`
     - `dns-edge-2` (`proxmox2`): LAN `192.168.11.112`, VLAN `10.10.100.12`
@@ -326,7 +333,7 @@ Fix:
 
 Read-only SDN-plane validation is available:
 - `ENV=samakia-dns make dns.sdn.accept`
-- Guarantees after PASS: SDN primitives exist (zonedns/vlandns/VLAN100/subnet/gateway VIP) and match canonical values.
+- Guarantees after PASS: legacy SDN primitives exist (zonedns/vlandns/VLAN100/subnet/gateway VIP) and match canonical values.
 
 ## DNS Infrastructure — How to run (one command)
 

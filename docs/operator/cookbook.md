@@ -202,6 +202,32 @@ None (policy reference).
 #### Rollback / safe exit
 Stop and update the contract before proceeding.
 
+### Task: Review shared SDN plane governance
+
+#### Intent
+Confirm that internal shared services use the `zshared` / `vshared` plane and
+legacy service-specific zones are not extended.
+
+#### Preconditions
+- Shared service scope identified
+
+#### Command
+```bash
+sed -n '1,200p' docs/network/sdn-governance.md
+```
+
+#### Expected result
+Plan aligns with the shared-plane rule and migration policy.
+
+#### Evidence outputs
+None (policy reference).
+
+#### Failure modes
+- Service-specific SDN zones reused or extended
+
+#### Rollback / safe exit
+Stop and re-scope the plan to the shared plane.
+
 ### Task: Secrets rotation cutover (plan)
 
 #### Intent

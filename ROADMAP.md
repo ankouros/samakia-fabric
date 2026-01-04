@@ -120,6 +120,7 @@ Status: COMPLETED ✅
 
 ### Completed (canonical)
 - Shared services SDN plane (VLAN120, `zshared`/`vshared`, subnet `10.10.120.0/24`, GW VIP `10.10.120.1`)
+- Governance: internal shared services use `zshared`/`vshared`; service-specific SDN planes are legacy and migration-only
 - Shared edge VIPs on LAN:
   - NTP: `192.168.11.120` (UDP/123)
   - Vault: `192.168.11.121` (TLS/8200)

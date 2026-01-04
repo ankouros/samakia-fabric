@@ -1,9 +1,11 @@
 # Shared VLAN IP/VIP Allocation Contract
 
 This document explains the shared VLAN IP/VIP allocation contract for Samakia
-Fabric. The authoritative source of truth is:
+Fabric. The shared VLAN is the internal shared SDN plane (`zshared`/`vshared`).
+The authoritative source of truth is:
 
 - `contracts/network/ipam-shared.yml`
+- `contracts/network/shared-plane.yml`
 
 No IP or VIP allocations are valid unless they are derived from that contract.
 
@@ -25,6 +27,8 @@ Notes:
 - Proxy nodes may appear in DNS A records; VIPs must not be primary DNS targets.
 - Workload nodes are accessed through proxy layers and are not direct client
   endpoints.
+- Internal shared services must attach to `zshared`/`vshared`; service-specific
+  SDN zones are legacy only (see `docs/network/sdn-governance.md`).
 
 ## DNS policy (short form)
 

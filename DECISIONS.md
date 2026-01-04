@@ -1123,6 +1123,38 @@ until a new phase explicitly re-approves it.
 
 ---
 
+## ADR-0035 — Shared SDN Plane Governance (zshared/vshared)
+
+**Status:** Accepted
+**Date:** 2026-01-04
+
+### Decision
+
+Internal shared services use a **single SDN plane**:
+- Zone: `zshared`
+- VNet: `vshared`
+- VLAN: `120`
+
+Service-specific SDN zones/vnets for internal shared services are forbidden.
+Legacy planes (`zonedns`/`vlandns`, `zminio`/`vminio`) are migration-only.
+
+### Rationale
+
+- Reduces SDN sprawl and conceptual duplication.
+- Prevents false isolation assumptions (segmentation is policy-driven).
+- Keeps internal control-plane services governed by a single, explicit contract.
+
+### Consequences
+
+- New internal shared services MUST attach to `zshared`/`vshared`.
+- Legacy DNS/MinIO planes are **not** to be extended; migration must be planned,
+  explicit, and executed via Terraform/Ansible (no manual SDN mutations).
+- Existing VIP/gateway patterns from ADR-0013 and ADR-0014 remain canonical, but
+  their service-specific SDN plane assignments are legacy until migration.
+- Governance is enforced via `contracts/network/shared-plane.yml` and policy gates.
+
+---
+
 ## How to Add a New Decision
 
 1. Add a new ADR entry

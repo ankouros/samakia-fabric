@@ -1,0 +1,31 @@
+# Shared SDN plane contract for internal services.
+shared_plane:
+  zone: zshared
+  vnet: vshared
+  vlan: 120
+  purpose: >
+    Single internal shared infrastructure plane.
+    Hosts foundational platform services.
+  rules:
+    - all internal services MUST attach here
+    - no service-specific zones allowed
+    - no tenant workloads allowed
+    - isolation is logical (policy), not SDN-based
+
+legacy_zones:
+  - zone: zonedns
+    vnet: vlandns
+    vlan: 100
+    status: legacy
+    notes: >
+      Legacy DNS plane. Do not extend; migrate to zshared/vshared.
+  - zone: zminio
+    vnet: vminio
+    vlan: 140
+    status: legacy
+    notes: >
+      Legacy MinIO plane. Do not extend; migrate to zshared/vshared.
+
+prohibited_patterns:
+  - creating zones named after services (e.g. zminio, zonedns)
+  - creating vnets for internal services
