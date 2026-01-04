@@ -372,6 +372,8 @@ The format is inspired by:
 #### Operations
 - Added a canary exposure runbook and documented runner-local secret materialization prerequisites.
 - Documented Vault TLS/CA requirements for internal Postgres canary verification.
+- Updated the canary runbook with the latest rollback evidence and credential blocker details.
+- Refreshed the canary runbook with the latest rollback evidence and consolidated attempt record.
 - Fixed secrets file/vault helpers to parse decrypted payloads via temp files; tracked ops secrets scripts explicitly.
 - Recorded the Phase 17 Step 4 canary credentials blocker in `REQUIRED-FIXES.md`.
 

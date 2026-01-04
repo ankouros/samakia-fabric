@@ -39,6 +39,8 @@ Sequence:
 - Approve: `evidence/exposure-approve/canary/sample/2026-01-03T19:44:34Z`
 - Apply: `evidence/exposure-apply/canary/sample/2026-01-03T19:44:40Z`
 - Verify (live): failed (Vault secret missing password)
+- Rollback: `evidence/exposure-rollback/canary/sample/2026-01-04T03:02:39Z`
+- Consolidated evidence: `evidence/exposure-canary/canary/sample/2026-01-04T03:03:55Z`
 
 Blocker:
 - Vault secret `tenants/canary/database/sample` has an empty `password` value,

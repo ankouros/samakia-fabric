@@ -192,6 +192,7 @@ This document records what was fixed, what remains blocked (if anything), and th
 - **Resolution status:** **OPEN**
 - **Verification command(s):**
   - `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
+  - Latest attempt evidence: `evidence/exposure-canary/canary/sample/2026-01-04T03:03:55Z` (verify failed; rollback: `evidence/exposure-rollback/canary/sample/2026-01-04T03:02:39Z`)
 
 ### PHASE17-POSTGRES-INTERNAL-TLS-PASSTHROUGH
 - **Description:** Live verify failed because Postgres clients could not negotiate SSL through HAProxy (TLS termination expected a direct TLS handshake instead of PostgreSQL SSLRequest).
