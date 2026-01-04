@@ -124,6 +124,16 @@ Security is documented in:
 
 ---
 
+## Production
+
+Production usage is locked by a go-live acceptance marker and a single operator
+happy path. See:
+
+- `docs/operator/PRODUCTION_PLAYBOOK.md`
+- `acceptance/GO_LIVE_ACCEPTED.md`
+
+---
+
 ## Getting Started
 
 - Read `docs/README.md` for the documentation map.

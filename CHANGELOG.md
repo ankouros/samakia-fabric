@@ -144,6 +144,11 @@ The format is inspired by:
 - CI-safe MCP test harness (fixtures + audit evidence checks).
 - Policy gate updates + acceptance marker for Step 7.
 
+#### Production convergence (Phase 17 Step 8)
+- Single production playbook with explicit evidence expectations.
+- Deterministic evidence index (markdown + JSON) with rebuild/validate tooling.
+- Platform regression suite plus go-live policy gate and acceptance marker.
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

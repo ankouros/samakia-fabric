@@ -1,0 +1,431 @@
+{
+  "acceptance_markers": [
+    {
+      "commit": "42ab7179e061e39dd2c512dfc14dcee5f19692d7",
+      "id": "GO_LIVE_ACCEPTED",
+      "path": "acceptance/GO_LIVE_ACCEPTED.md",
+      "timestamp": "2026-01-04T08:15:11Z"
+    },
+    {
+      "commit": "36c74f43e49f9f5e564d2d7e683ebf8950fc5a88",
+      "id": "INTERNAL_POSTGRES_PATRONI_ACCEPTED",
+      "path": "acceptance/INTERNAL_POSTGRES_PATRONI_ACCEPTED.md",
+      "timestamp": "2026-01-04T02:23:09Z"
+    },
+    {
+      "commit": "5404414ca3804b9f7840c7615284fcbc1ec5a34a",
+      "id": "MILESTONE_PHASE1_12_ACCEPTED",
+      "path": "acceptance/MILESTONE_PHASE1_12_ACCEPTED.md",
+      "timestamp": "2026-01-02T17:43:56Z"
+    },
+    {
+      "commit": "59f2fec84246bc3679aa02bec037287b49ec2687",
+      "id": "PHASE0_ACCEPTED",
+      "path": "acceptance/PHASE0_ACCEPTED.md",
+      "timestamp": "2025-12-30T15:13:18Z"
+    },
+    {
+      "commit": "e40d9a530e0cee88c89f943a4dff3b54a9c15e2b",
+      "id": "PHASE10_PART1_ACCEPTED",
+      "path": "acceptance/PHASE10_PART1_ACCEPTED.md",
+      "timestamp": "2025-12-31T22:00:26Z"
+    },
+    {
+      "commit": "07c6ef2ea47db284d7cdb79099e26400a75fc17d",
+      "id": "PHASE10_PART2_ACCEPTED",
+      "path": "acceptance/PHASE10_PART2_ACCEPTED.md",
+      "timestamp": "2025-12-31T22:58:30Z"
+    },
+    {
+      "commit": "0f9564026ba8eef653602bb7476ef7c19c9d8beb",
+      "id": "PHASE11_ACCEPTED",
+      "path": "acceptance/PHASE11_ACCEPTED.md",
+      "timestamp": "2025-12-31T23:51:54Z"
+    },
+    {
+      "commit": "b5a6ea67913fced9632b3e69226177bc3edc9bfe",
+      "id": "PHASE11_HARDENING_ACCEPTED",
+      "path": "acceptance/PHASE11_HARDENING_ACCEPTED.md",
+      "timestamp": "2026-01-01T13:37:06Z"
+    },
+    {
+      "commit": "0ce3587462954f51e37e47a7291db8c61feceb15",
+      "id": "PHASE11_HARDENING_JSON_ACCEPTED",
+      "path": "acceptance/PHASE11_HARDENING_JSON_ACCEPTED.md",
+      "timestamp": "2026-01-01T14:15:39Z"
+    },
+    {
+      "commit": "8e82ecb0b92556f7256e1bcaf06fdb9c744e4e61",
+      "id": "PHASE11_PART1_ACCEPTED",
+      "path": "acceptance/PHASE11_PART1_ACCEPTED.md",
+      "timestamp": "2026-01-02T02:11:22Z"
+    },
+    {
+      "commit": "c4b1f299ccd4858baaa066adfed209dd759fdb81",
+      "id": "PHASE11_PART2_ACCEPTED",
+      "path": "acceptance/PHASE11_PART2_ACCEPTED.md",
+      "timestamp": "2026-01-01T10:47:20Z"
+    },
+    {
+      "commit": "1e13236c68f709759c8dd90e7b809474765924c7",
+      "id": "PHASE11_PART3_ACCEPTED",
+      "path": "acceptance/PHASE11_PART3_ACCEPTED.md",
+      "timestamp": "2026-01-01T12:04:38Z"
+    },
+    {
+      "commit": "8a1e64fc0e0b0290f48fb1ed68d2484cc7ab3f2d",
+      "id": "PHASE11_PART4_ACCEPTED",
+      "path": "acceptance/PHASE11_PART4_ACCEPTED.md",
+      "timestamp": "2026-01-01T12:44:19Z"
+    },
+    {
+      "commit": "75eca89461bbe89c7644d7fef797a3d99417ebd2",
+      "id": "PHASE11_PART5_ROUTING_ACCEPTED",
+      "path": "acceptance/PHASE11_PART5_ROUTING_ACCEPTED.md",
+      "timestamp": "2026-01-01T13:04:02Z"
+    },
+    {
+      "commit": "8708a263b4da4d36e37d561a3c577e53dd3c7103",
+      "id": "PHASE12_ACCEPTED",
+      "path": "acceptance/PHASE12_ACCEPTED.md",
+      "timestamp": "2026-01-02T08:02:00Z"
+    },
+    {
+      "commit": "121619d485621a88bf9afdecbf7cad42250f578d",
+      "id": "PHASE12_PART1_ACCEPTED",
+      "path": "acceptance/PHASE12_PART1_ACCEPTED.md",
+      "timestamp": "2026-01-01T15:20:30Z"
+    },
+    {
+      "commit": "1b3829acc10d172f52abdd50530092f38f5e3032",
+      "id": "PHASE12_PART2_ACCEPTED",
+      "path": "acceptance/PHASE12_PART2_ACCEPTED.md",
+      "timestamp": "2026-01-02T01:36:03Z"
+    },
+    {
+      "commit": "c2eb6577d39d3c77fa069858de00fe4fad9c2e38",
+      "id": "PHASE12_PART3_ACCEPTED",
+      "path": "acceptance/PHASE12_PART3_ACCEPTED.md",
+      "timestamp": "2026-01-02T03:16:04Z"
+    },
+    {
+      "commit": "fdf7b3b9814e1b225deffa4091bb6665080b4cef",
+      "id": "PHASE12_PART4_ACCEPTED",
+      "path": "acceptance/PHASE12_PART4_ACCEPTED.md",
+      "timestamp": "2026-01-02T04:20:27Z"
+    },
+    {
+      "commit": "9fbc9306c27b2640bce69988473544061f83bfac",
+      "id": "PHASE12_PART5_ACCEPTED",
+      "path": "acceptance/PHASE12_PART5_ACCEPTED.md",
+      "timestamp": "2026-01-02T06:21:11Z"
+    },
+    {
+      "commit": "8708a263b4da4d36e37d561a3c577e53dd3c7103",
+      "id": "PHASE12_PART6_ACCEPTED",
+      "path": "acceptance/PHASE12_PART6_ACCEPTED.md",
+      "timestamp": "2026-01-02T08:02:00Z"
+    },
+    {
+      "commit": "ba1c5088aae279cd30adfd87795459649ae757e6",
+      "id": "PHASE13_ACCEPTED",
+      "path": "acceptance/PHASE13_ACCEPTED.md",
+      "timestamp": "2026-01-02T21:09:07Z"
+    },
+    {
+      "commit": "54556dd1ead06b80a94f15006510975157fb1ba1",
+      "id": "PHASE13_PART1_ACCEPTED",
+      "path": "acceptance/PHASE13_PART1_ACCEPTED.md",
+      "timestamp": "2026-01-02T19:21:06Z"
+    },
+    {
+      "commit": "ba1c5088aae279cd30adfd87795459649ae757e6",
+      "id": "PHASE13_PART2_ACCEPTED",
+      "path": "acceptance/PHASE13_PART2_ACCEPTED.md",
+      "timestamp": "2026-01-02T21:09:07Z"
+    },
+    {
+      "commit": "b4755dc2d880b81ea978231c7c5d1e4289dc41ae",
+      "id": "PHASE14_PART1_ACCEPTED",
+      "path": "acceptance/PHASE14_PART1_ACCEPTED.md",
+      "timestamp": "2026-01-03T00:05:42Z"
+    },
+    {
+      "commit": "acba7302264bb3f57cde902081e9e82184defda0",
+      "id": "PHASE14_PART2_ACCEPTED",
+      "path": "acceptance/PHASE14_PART2_ACCEPTED.md",
+      "timestamp": "2026-01-03T00:42:39Z"
+    },
+    {
+      "commit": "b2d991a00642495c9250c30ea1a457b1db244a8c",
+      "id": "PHASE14_PART3_ACCEPTED",
+      "path": "acceptance/PHASE14_PART3_ACCEPTED.md",
+      "timestamp": "2026-01-03T01:24:47Z"
+    },
+    {
+      "commit": "3f5626f8b529fa399cdf1fd1f993fcedf7f63995",
+      "id": "PHASE15_ACCEPTED",
+      "path": "acceptance/PHASE15_ACCEPTED.md",
+      "timestamp": "2026-01-03T02:49:54Z"
+    },
+    {
+      "commit": "afdcdb016be60904cc6ff9630250a0bfb62555c1",
+      "id": "PHASE15_PART1_ACCEPTED",
+      "path": "acceptance/PHASE15_PART1_ACCEPTED.md",
+      "timestamp": "2026-01-03T02:11:57Z"
+    },
+    {
+      "commit": "c17cc9df9d4e021121a38becccc36d1904bcac70",
+      "id": "PHASE15_PART2_ACCEPTED",
+      "path": "acceptance/PHASE15_PART2_ACCEPTED.md",
+      "timestamp": "2026-01-03T02:31:52Z"
+    },
+    {
+      "commit": "533ea954f98f04ac9d37224b2ef2b08332068fc8",
+      "id": "PHASE15_PART3_ACCEPTED",
+      "path": "acceptance/PHASE15_PART3_ACCEPTED.md",
+      "timestamp": "2026-01-03T02:40:02Z"
+    },
+    {
+      "commit": "b8c79dfddeb893c62e0b241bb4abfb37d96f7c8c",
+      "id": "PHASE15_PART4_ACCEPTED",
+      "path": "acceptance/PHASE15_PART4_ACCEPTED.md",
+      "timestamp": "2026-01-03T02:45:55Z"
+    },
+    {
+      "commit": "3fd248b38525ac096309baf03bbe8ee281a6f049",
+      "id": "PHASE16_ACCEPTED",
+      "path": "acceptance/PHASE16_ACCEPTED.md",
+      "timestamp": "2026-01-03T07:35:26Z"
+    },
+    {
+      "commit": "3f5626f8b529fa399cdf1fd1f993fcedf7f63995",
+      "id": "PHASE16_PART1_ACCEPTED",
+      "path": "acceptance/PHASE16_PART1_ACCEPTED.md",
+      "timestamp": "2026-01-03T04:01:39Z"
+    },
+    {
+      "commit": "bc5b55e75dedaeca6186d5ae0cd8fe06ed4b5027",
+      "id": "PHASE16_PART2_ACCEPTED",
+      "path": "acceptance/PHASE16_PART2_ACCEPTED.md",
+      "timestamp": "2026-01-03T04:44:50Z"
+    },
+    {
+      "commit": "6ee6c476616d262facc37d4172a843b0a18d3cc6",
+      "id": "PHASE16_PART3_ACCEPTED",
+      "path": "acceptance/PHASE16_PART3_ACCEPTED.md",
+      "timestamp": "2026-01-03T05:27:37Z"
+    },
+    {
+      "commit": "1fc2d23bf18423840844449e68179b8bff57ebff",
+      "id": "PHASE16_PART4_ACCEPTED",
+      "path": "acceptance/PHASE16_PART4_ACCEPTED.md",
+      "timestamp": "2026-01-03T06:02:18Z"
+    },
+    {
+      "commit": "93adec85431a450c252abe8758b92f2b7ea078d7",
+      "id": "PHASE16_PART5_ACCEPTED",
+      "path": "acceptance/PHASE16_PART5_ACCEPTED.md",
+      "timestamp": "2026-01-03T06:40:13Z"
+    },
+    {
+      "commit": "352f8452a950a62fca90b086f52ff32ea1bdb0bb",
+      "id": "PHASE16_PART6_ACCEPTED",
+      "path": "acceptance/PHASE16_PART6_ACCEPTED.md",
+      "timestamp": "2026-01-03T07:04:38Z"
+    },
+    {
+      "commit": "3fd248b38525ac096309baf03bbe8ee281a6f049",
+      "id": "PHASE16_PART7_ACCEPTED",
+      "path": "acceptance/PHASE16_PART7_ACCEPTED.md",
+      "timestamp": "2026-01-03T07:35:26Z"
+    },
+    {
+      "commit": "1671d4da8e420c7fae14acded13537d2936f4212",
+      "id": "PHASE17_STEP2_ACCEPTED",
+      "path": "acceptance/PHASE17_STEP2_ACCEPTED.md",
+      "timestamp": "2026-01-03T18:15:37Z"
+    },
+    {
+      "commit": "556732cf6703d15ead755cc7c068d658cbfe353e",
+      "id": "PHASE17_STEP3_ACCEPTED",
+      "path": "acceptance/PHASE17_STEP3_ACCEPTED.md",
+      "timestamp": "2026-01-03T18:57:16Z"
+    },
+    {
+      "commit": "1ae0ef5b3c13d28f2413fbd3703f55da3c55334b",
+      "id": "PHASE17_STEP4_ACCEPTED",
+      "path": "acceptance/PHASE17_STEP4_ACCEPTED.md",
+      "timestamp": "2026-01-04T04:45:36Z"
+    },
+    {
+      "commit": "1ae0ef5b3c13d28f2413fbd3703f55da3c55334b",
+      "id": "PHASE17_STEP5_ACCEPTED",
+      "path": "acceptance/PHASE17_STEP5_ACCEPTED.md",
+      "timestamp": "2026-01-04T05:44:55Z"
+    },
+    {
+      "commit": "0eb3bc890267a6a95068852858ebefeb36b96af7",
+      "id": "PHASE17_STEP6_ACCEPTED",
+      "path": "acceptance/PHASE17_STEP6_ACCEPTED.md",
+      "timestamp": "2026-01-04T07:05:40Z"
+    },
+    {
+      "commit": "7f809a902d8e76f1175ba0453b5bb36556e072f9",
+      "id": "PHASE17_STEP7_ACCEPTED",
+      "path": "acceptance/PHASE17_STEP7_ACCEPTED.md",
+      "timestamp": "2026-01-04T07:41:49Z"
+    },
+    {
+      "commit": "59f2fec84246bc3679aa02bec037287b49ec2687",
+      "id": "PHASE1_ACCEPTED",
+      "path": "acceptance/PHASE1_ACCEPTED.md",
+      "timestamp": "2025-12-30T15:08:33Z"
+    },
+    {
+      "commit": "f637914d31d4dd24b4dce86869291ed535710af2",
+      "id": "PHASE2_1_ACCEPTED",
+      "path": "acceptance/PHASE2_1_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "892bb34548a0ffa8d3a948acb5c467cf08adfc99",
+      "id": "PHASE2_2_ACCEPTED",
+      "path": "acceptance/PHASE2_2_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "1e265f6bd79ad3f46cb32c91cb3de634651b8e16",
+      "id": "PHASE2_ACCEPTED",
+      "path": "acceptance/PHASE2_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "a4706efa1b787a5d6a385dc788a142ee447f016d",
+      "id": "PHASE3_PART1_ACCEPTED",
+      "path": "acceptance/PHASE3_PART1_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "149c45dadb7adc0db2e2f2f2f8cc0145634d54ec",
+      "id": "PHASE3_PART2_ACCEPTED",
+      "path": "acceptance/PHASE3_PART2_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "f69147a9449572b4e3b3f373d5925a7824ac69a7",
+      "id": "PHASE3_PART3_ACCEPTED",
+      "path": "acceptance/PHASE3_PART3_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "a15a180f8cf692050bcc0b80d4218dd59046a5c3",
+      "id": "PHASE4_ACCEPTED",
+      "path": "acceptance/PHASE4_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "080b501bdae09b38974a40bad2d64a3e829dfd4e",
+      "id": "PHASE5_ACCEPTED",
+      "path": "acceptance/PHASE5_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "080b501bdae09b38974a40bad2d64a3e829dfd4e",
+      "id": "PHASE6_PART1_ACCEPTED",
+      "path": "acceptance/PHASE6_PART1_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "080b501bdae09b38974a40bad2d64a3e829dfd4e",
+      "id": "PHASE6_PART2_ACCEPTED",
+      "path": "acceptance/PHASE6_PART2_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "080b501bdae09b38974a40bad2d64a3e829dfd4e",
+      "id": "PHASE6_PART3_ACCEPTED",
+      "path": "acceptance/PHASE6_PART3_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "81f89da701e84dee37299c314cfe823899244fcb",
+      "id": "PHASE7_ACCEPTED",
+      "path": "acceptance/PHASE7_ACCEPTED.md",
+      "timestamp": "unknown"
+    },
+    {
+      "commit": "7b41d59b9b78dab5b040a335ca136f5c4db456bc",
+      "id": "PHASE8_3_ACCEPTED",
+      "path": "acceptance/PHASE8_3_ACCEPTED.md",
+      "timestamp": "2026-01-03T17:47:39Z"
+    },
+    {
+      "commit": "edbe8d43bb906a52a8675c7462dd5a9343c7fd2b",
+      "id": "PHASE8_PART1_1_ACCEPTED",
+      "path": "acceptance/PHASE8_PART1_1_ACCEPTED.md",
+      "timestamp": "2025-12-31T19:01:28Z"
+    },
+    {
+      "commit": "74410f327c6ace3305df1e44972055459839725e",
+      "id": "PHASE8_PART1_2_ACCEPTED",
+      "path": "acceptance/PHASE8_PART1_2_ACCEPTED.md",
+      "timestamp": "2025-12-31T19:39:33Z"
+    },
+    {
+      "commit": "5404414ca3804b9f7840c7615284fcbc1ec5a34a",
+      "id": "PHASE8_PART1_ACCEPTED",
+      "path": "acceptance/PHASE8_PART1_ACCEPTED.md",
+      "timestamp": "2026-01-02T17:39:07Z"
+    },
+    {
+      "commit": "5b527b7b028e13bec52c70148270cf667503fdf3",
+      "id": "PHASE8_PART2_ACCEPTED",
+      "path": "acceptance/PHASE8_PART2_ACCEPTED.md",
+      "timestamp": "2025-12-31T20:12:15Z"
+    },
+    {
+      "commit": "5b527b7b028e13bec52c70148270cf667503fdf3",
+      "id": "PHASE9_ACCEPTED",
+      "path": "acceptance/PHASE9_ACCEPTED.md",
+      "timestamp": "2025-12-31T21:02:11Z"
+    }
+  ],
+  "evidence_directories": [
+    {
+      "name": "exposure",
+      "paths": [
+        "evidence/exposure-plan",
+        "evidence/exposure-approve",
+        "evidence/exposure-apply",
+        "evidence/exposure-verify",
+        "evidence/exposure-rollback",
+        "evidence/exposure-canary"
+      ]
+    },
+    {
+      "name": "rotation",
+      "paths": [
+        "evidence/rotation"
+      ]
+    },
+    {
+      "name": "drift",
+      "paths": [
+        "evidence/drift"
+      ]
+    },
+    {
+      "name": "runtime-eval",
+      "paths": [
+        "evidence/runtime-eval"
+      ]
+    },
+    {
+      "name": "ai-analysis",
+      "paths": [
+        "evidence/ai"
+      ]
+    }
+  ]
+}

@@ -31,6 +31,7 @@ This document does NOT cover:
 Operator commands and task flows are defined in:
 
 - `docs/operator/cookbook.md` (canonical command cookbook)
+- `docs/operator/PRODUCTION_PLAYBOOK.md` (single production happy path)
 - `docs/operator/exposure.md` (governed exposure choreography)
 - `docs/operator/runtime-ops.md` (runtime operations and signal classification)
 - `docs/operator/slo-ownership.md` (SLO ownership and escalation rules)
@@ -1542,6 +1543,33 @@ References:
 - `docs/ai/autonomy-safety.md`
 - `docs/ai/autonomy-rollout.md`
 - `docs/ai/autonomy-audit.md`
+
+---
+
+## Production Convergence (Go-Live)
+
+Go-live is locked by a deterministic acceptance marker and platform regression
+suite. Operators should use the production playbook as the single happy path.
+
+Read-only regression and go-live entry:
+
+```bash
+RUNNER_MODE=ci make platform.regression
+make go-live.entry.check
+```
+
+Go-live acceptance (creates `acceptance/GO_LIVE_ACCEPTED.md`):
+
+```bash
+CI=1 make go-live.accept
+```
+
+Evidence index (tracked, deterministic):
+
+```bash
+bash ops/evidence/rebuild-index.sh
+bash ops/evidence/validate-index.sh
+```
 
 ---
 

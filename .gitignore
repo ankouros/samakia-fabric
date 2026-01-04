@@ -130,6 +130,8 @@ proposals/archive/
 selfservice/inbox/
 audit/
 evidence/**
+!evidence/INDEX.md
+!evidence/index.json
 !evidence/ai/
 evidence/ai/**
 !evidence/ai/README.md

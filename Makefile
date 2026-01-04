@@ -2575,6 +2575,22 @@ phase17.step7.entry.check: ## Phase 17 Step 7 entry checklist (MCP services)
 phase17.step7.accept: ## Phase 17 Step 7 acceptance (MCP services)
 	@bash "$(OPS_SCRIPTS_DIR)/phase17-step7-accept.sh"
 
+.PHONY: platform.regression
+platform.regression: ## Platform regression suite (offline)
+	@bash "$(OPS_SCRIPTS_DIR)/platform-regression.sh"
+
+.PHONY: platform.doctor
+platform.doctor: ## Platform health check (offline)
+	@bash "$(OPS_SCRIPTS_DIR)/platform-doctor.sh"
+
+.PHONY: go-live.entry.check
+go-live.entry.check: ## Go-live entry checklist (production lock)
+	@bash "$(OPS_SCRIPTS_DIR)/go-live-entry-check.sh"
+
+.PHONY: go-live.accept
+go-live.accept: ## Go-live acceptance (production lock)
+	@bash "$(OPS_SCRIPTS_DIR)/go-live-accept.sh"
+
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)
 	@bash "$(OPS_SCRIPTS_DIR)/phase12-part4-entry-check.sh"

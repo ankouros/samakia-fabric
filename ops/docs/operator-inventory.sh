@@ -30,7 +30,7 @@ if not out_json:
     print("OUT_JSON not set", file=sys.stderr)
     sys.exit(1)
 
-include = re.compile(r"^(phase[0-9]+|policy\.|ai\.|ha\.|consumers\.|tenants\.|bindings\.|substrate\.|proposals\.|selfservice\.|image\.|shared\..*\.accept$|dns\.|minio\.|tf\.|drift\.)")
+include = re.compile(r"^(phase[0-9]+|policy\.|ai\.|ha\.|consumers\.|tenants\.|bindings\.|substrate\.|proposals\.|selfservice\.|image\.|shared\..*\.accept$|dns\.|minio\.|tf\.|drift\.|platform\.|go-live\.)")
 target_re = re.compile(r"^([A-Za-z0-9][A-Za-z0-9_.-]*)\s*:")
 
 targets = set()

@@ -1,0 +1,110 @@
+# Go-Live Entry Checklist
+
+Timestamp (UTC): 2026-01-04T08:15:11Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE17_STEP7_ACCEPTED.md
+  - Command: test -f acceptance/PHASE17_STEP7_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE13_ACCEPTED.md
+  - Command: test -f acceptance/PHASE13_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: docs/operator/PRODUCTION_PLAYBOOK.md
+  - Command: test -f docs/operator/PRODUCTION_PLAYBOOK.md
+  - Result: PASS
+- File present: docs/operator/cookbook.md
+  - Command: test -f docs/operator/cookbook.md
+  - Result: PASS
+- File present: docs/operator/README.md
+  - Command: test -f docs/operator/README.md
+  - Result: PASS
+- File present: docs/operator/evidence-and-artifacts.md
+  - Command: test -f docs/operator/evidence-and-artifacts.md
+  - Result: PASS
+- File present: acceptance/GO_LIVE_ENTRY_CHECKLIST.md
+  - Command: test -f acceptance/GO_LIVE_ENTRY_CHECKLIST.md
+  - Result: PASS
+- File present: ops/evidence/rebuild-index.sh
+  - Command: test -f ops/evidence/rebuild-index.sh
+  - Result: PASS
+- File present: ops/evidence/validate-index.sh
+  - Command: test -f ops/evidence/validate-index.sh
+  - Result: PASS
+- File present: ops/scripts/platform-regression.sh
+  - Command: test -f ops/scripts/platform-regression.sh
+  - Result: PASS
+- File present: ops/scripts/platform-doctor.sh
+  - Command: test -f ops/scripts/platform-doctor.sh
+  - Result: PASS
+- File present: ops/scripts/test-platform/test-acceptance-markers.sh
+  - Command: test -f ops/scripts/test-platform/test-acceptance-markers.sh
+  - Result: PASS
+- File present: ops/scripts/test-platform/test-policy-gates.sh
+  - Command: test -f ops/scripts/test-platform/test-policy-gates.sh
+  - Result: PASS
+- File present: ops/scripts/test-platform/test-no-exec-expansion.sh
+  - Command: test -f ops/scripts/test-platform/test-no-exec-expansion.sh
+  - Result: PASS
+- File present: ops/scripts/test-platform/test-go-live-invariants.sh
+  - Command: test -f ops/scripts/test-platform/test-go-live-invariants.sh
+  - Result: PASS
+- File present: ops/policy/policy-go-live.sh
+  - Command: test -f ops/policy/policy-go-live.sh
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: README.md
+  - Command: test -f README.md
+  - Result: PASS
+- Go-live policy wired
+  - Command: rg -n policy-go-live.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: platform.doctor
+  - Command: rg -n '^platform\.doctor:' Makefile
+  - Result: PASS
+- Makefile target present: platform.regression
+  - Command: rg -n '^platform\.regression:' Makefile
+  - Result: PASS
+- Makefile target present: go-live.entry.check
+  - Command: rg -n '^go-live\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: go-live.accept
+  - Command: rg -n '^go-live\.accept:' Makefile
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS
+- Evidence index validation
+  - Command: bash /home/aggelos/samakia-fabric/ops/evidence/validate-index.sh
+  - Result: PASS
+- Platform regression
+  - Command: make -C /home/aggelos/samakia-fabric platform.regression
+  - Result: PASS
+- Production playbook linked
+  - Command: rg -n 'PRODUCTION_PLAYBOOK' /home/aggelos/samakia-fabric/docs/operator/cookbook.md
+  - Result: PASS
+- Operator index linked
+  - Command: rg -n 'PRODUCTION_PLAYBOOK' /home/aggelos/samakia-fabric/docs/operator/README.md
+  - Result: PASS
+- README production section
+  - Command: rg -n 'Production' /home/aggelos/samakia-fabric/README.md
+  - Result: PASS

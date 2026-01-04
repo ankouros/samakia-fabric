@@ -865,11 +865,25 @@ Follow-up steps (safety prerequisites):
   - Acceptance marker: `acceptance/PHASE17_STEP6_ACCEPTED.md`
 - Step 7 (audited read-only MCP services + deploy/test harness): **COMPLETED**
   - Acceptance marker: `acceptance/PHASE17_STEP7_ACCEPTED.md`
+- Step 8 (production convergence + go-live lock): **COMPLETED**
+  - Acceptance marker: `acceptance/GO_LIVE_ACCEPTED.md`
 
 Non-scope:
 - No execution tooling.
 - No policy relaxation.
 - No CI live operations.
+
+---
+
+## Production (Go-Live) — LOCKED ✅
+
+Samakia Fabric is marked production-ready only when:
+- `acceptance/GO_LIVE_ACCEPTED.md` exists
+- platform regression suite passes
+- REQUIRED-FIXES.md has no OPEN items
+
+The production happy path is defined in:
+- `docs/operator/PRODUCTION_PLAYBOOK.md`
 
 ## Non-Goals
 

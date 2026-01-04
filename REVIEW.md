@@ -39,6 +39,12 @@ This document records what was implemented for the **Terraform remote state back
 - Added a CI-safe MCP test harness (fixtures + audit evidence checks).
 - Policy gates updated and Step 7 acceptance marker recorded.
 
+## Phase 17 Step 8 — Go-Live Convergence (Completed)
+
+- Added a single production playbook with copy/paste workflows and evidence expectations.
+- Introduced a deterministic evidence index with rebuild/validate tooling.
+- Added platform regression guards and a go-live policy gate + acceptance marker.
+
 ## Phase 13 Design — Governed Exposure (Design Only)
 
 - Defines exposure as a governed choreography (plan -> approve -> apply -> verify -> rollback).

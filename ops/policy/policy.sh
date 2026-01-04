@@ -49,6 +49,7 @@ scripts=(
   "policy-proposals.sh"
   "policy-selfservice.sh"
   "policy-exposure.sh"
+  "policy-go-live.sh"
 )
 
 for script in "${scripts[@]}"; do

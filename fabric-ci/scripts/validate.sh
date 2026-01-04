@@ -88,6 +88,9 @@ bash "$ROOT_DIR/ops/scripts/test-ai-invariants/test-routing-immutable.sh"
 bash "$ROOT_DIR/ops/scripts/test-ai-invariants/test-mcp-readonly.sh"
 bash "$ROOT_DIR/ops/scripts/test-ai-invariants/test-ai-contracts-locked.sh"
 
+# Platform regression guardrails (offline).
+bash "$ROOT_DIR/ops/scripts/platform-regression.sh"
+
 bash "$ROOT_DIR/fabric-ci/scripts/check-proxmox-ca-and-tls.sh"
 
 for env_dir in "$TERRAFORM_ENVS_DIR"/*; do

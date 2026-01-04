@@ -4,6 +4,8 @@ This cookbook is the **canonical operator source**. Commands here are copy/paste
 
 All tasks follow a consistent template.
 
+For the single production \"happy path\", see `PRODUCTION_PLAYBOOK.md`.
+
 ---
 
 ## Platform posture & safety model
@@ -94,6 +96,33 @@ Validation logs only (no artifacts generated).
 
 #### Rollback / safe exit
 Stop and remediate failures.
+
+### Task: Run platform regression suite
+
+#### Intent
+Verify go-live regression guards and evidence index determinism.
+
+#### Preconditions
+- `RUNNER_MODE=ci` (non-interactive)
+
+#### Command
+```bash
+RUNNER_MODE=ci make platform.regression
+```
+
+#### Expected result
+Regression suite PASS.
+
+#### Evidence outputs
+None (read-only checks; evidence index is validated in place).
+
+#### Failure modes
+- Missing acceptance markers
+- Missing policy gates or forbidden patterns
+- Evidence index out of date
+
+#### Rollback / safe exit
+Fix the failing guardrail and rerun the regression suite.
 
 ### Task: Rotate SSH known_hosts after replace/recreate
 
@@ -4563,6 +4592,35 @@ Acceptance PASS and markers created.
 #### Rollback / safe exit
 Stop; do not proceed to mutation.
 
+### Task: Go-live entry + acceptance (Phase 17 Step 8)
+
+#### Intent
+Lock the production go-live marker after platform regression passes.
+
+#### Preconditions
+- Phase 17 Step 7 accepted
+- No OPEN items in REQUIRED-FIXES.md
+- Working tree clean
+
+#### Command
+```bash
+make go-live.entry.check
+CI=1 make go-live.accept
+```
+
+#### Expected result
+Go-live entry checklist and acceptance marker created under `acceptance/`.
+
+#### Evidence outputs
+`acceptance/GO_LIVE_ENTRY_CHECKLIST.md` and `acceptance/GO_LIVE_ACCEPTED.md`.
+
+#### Failure modes
+- Missing acceptance markers or docs updates
+- Platform regression failures
+
+#### Rollback / safe exit
+Fix failed prerequisites and rerun the go-live flow.
+
 ### Task: Phase 17 Step 6 entry checklist (AI indexing + n8n)
 
 #### Intent
@@ -4825,6 +4883,10 @@ make phase11.part2.accept
 make phase11.part3.entry.check
 make phase11.part3.accept
 make policy.check
+make platform.doctor
+make platform.regression
+make go-live.entry.check
+make go-live.accept
 make docs.operator.check
 make docs.cookbook.lint
 make substrate.contracts.validate
