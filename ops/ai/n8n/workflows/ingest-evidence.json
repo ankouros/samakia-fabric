@@ -1,0 +1,121 @@
+{
+  "name": "ingest-evidence",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": [
+          {
+            "mode": "everyDay",
+            "hour": 3,
+            "minute": 15
+          }
+        ]
+      },
+      "id": "1",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "/srv/samakia-fabric/evidence/ai/index.md"
+      },
+      "id": "2",
+      "name": "Read Evidence Index",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        420,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "tenant",
+              "value": "platform"
+            },
+            {
+              "name": "source",
+              "value": "evidence"
+            },
+            {
+              "name": "mode",
+              "value": "offline"
+            },
+            {
+              "name": "root_path",
+              "value": "/srv/samakia-fabric/evidence"
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Build Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        640,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "/var/lib/samakia/ai-index-queue/ingest-evidence.request.json",
+        "dataPropertyName": "data"
+      },
+      "id": "4",
+      "name": "Queue Request",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        860,
+        200
+      ]
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Read Evidence Index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Evidence Index": {
+      "main": [
+        [
+          {
+            "node": "Build Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Request": {
+      "main": [
+        [
+          {
+            "node": "Queue Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "workflow-ingest-evidence"
+}

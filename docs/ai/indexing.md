@@ -12,11 +12,18 @@ make ai.index.offline TENANT=platform SOURCE=docs
 
 Live (operator-only, guarded):
 ```bash
+RUNNER_MODE=operator \
 AI_INDEX_EXECUTE=1 \
 AI_INDEX_REASON="ticket-123: refresh docs" \
 QDRANT_ENABLE=1 \
 OLLAMA_ENABLE=1 \
 make ai.index.live TENANT=platform SOURCE=docs
+```
+
+Qdrant doctor (offline config vs live connectivity):
+```bash
+make ai.qdrant.doctor
+RUNNER_MODE=operator AI_INDEX_EXECUTE=1 QDRANT_ENABLE=1 make ai.qdrant.doctor.live TENANT=platform
 ```
 
 ## Sources
@@ -27,8 +34,8 @@ make ai.index.live TENANT=platform SOURCE=docs
 
 ## Redaction
 Indexing refuses documents that match deny patterns (passwords, tokens, private
-keys, kubeconfig, test secret marker). Denied files are logged in the evidence
-packet and skipped.
+keys, kubeconfig, test secret marker). A denial **fails the run** and records
+the redaction report in the evidence packet.
 
 ## Evidence outputs
 Indexing writes evidence under:

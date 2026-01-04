@@ -37,6 +37,7 @@ make ai.index.offline TENANT=platform SOURCE=docs
 Live (guarded, operator-only):
 
 ```bash
+RUNNER_MODE=operator \
 AI_INDEX_EXECUTE=1 \
 AI_INDEX_REASON="ticket-123: refresh docs" \
 QDRANT_ENABLE=1 \
@@ -44,8 +45,26 @@ OLLAMA_ENABLE=1 \
 make ai.index.live TENANT=platform SOURCE=docs
 ```
 
+Qdrant doctor (offline config vs live connectivity):
+
+```bash
+make ai.qdrant.doctor
+RUNNER_MODE=operator AI_INDEX_EXECUTE=1 QDRANT_ENABLE=1 make ai.qdrant.doctor.live TENANT=platform
+```
+
 Evidence output:
 `evidence/ai/indexing/<tenant>/<UTC>/`
+
+## n8n ingestion workflows (read-only)
+
+Validate workflow JSON and safety gates:
+
+```bash
+make ai.n8n.validate
+```
+
+Evidence output:
+`evidence/ai/n8n/<UTC>/`
 
 ## MCP services (Phase 16 Part 3)
 

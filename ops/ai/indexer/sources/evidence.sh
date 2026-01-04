@@ -5,10 +5,12 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
-require_ci_mode
-
-
 mode="${INDEX_MODE:-offline}"
+if [[ "${mode}" == "live" ]]; then
+  require_operator_mode
+else
+  require_ci_mode
+fi
 
 if [[ "${mode}" == "offline" ]]; then
   root="${FABRIC_REPO_ROOT}/ops/ai/indexer/fixtures/sample-evidence"

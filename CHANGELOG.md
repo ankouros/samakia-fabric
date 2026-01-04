@@ -133,6 +133,12 @@ The format is inspired by:
 - Guarded cutover plan/apply/rollback tooling with evidence packets and rollback backups.
 - Policy gate, operator docs, and acceptance marker for the cutover workflow.
 
+#### AI indexing operations (Phase 17 Step 6)
+- Guarded live indexing support (operator-only) with strict Ollama/Qdrant enforcement and hard redaction failure.
+- Qdrant doctor for offline config checks and guarded live connectivity validation.
+- n8n ingestion workflow templates + validation with evidence output.
+- New policy gates + acceptance marker for Step 6.
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

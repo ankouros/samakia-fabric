@@ -1438,11 +1438,25 @@ make ai.index.offline TENANT=platform SOURCE=docs
 Live indexing requires explicit guards:
 
 ```bash
+RUNNER_MODE=operator \
 AI_INDEX_EXECUTE=1 \
 AI_INDEX_REASON="ticket-123: refresh docs" \
 QDRANT_ENABLE=1 \
 OLLAMA_ENABLE=1 \
 make ai.index.live TENANT=platform SOURCE=docs
+```
+
+Qdrant doctor (offline config vs live connectivity):
+
+```bash
+make ai.qdrant.doctor
+RUNNER_MODE=operator AI_INDEX_EXECUTE=1 QDRANT_ENABLE=1 make ai.qdrant.doctor.live TENANT=platform
+```
+
+n8n workflow validation (read-only):
+
+```bash
+make ai.n8n.validate
 ```
 
 MCP services (read-only context):

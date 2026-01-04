@@ -1568,6 +1568,19 @@ ai.index.live: ## AI indexing live run (guarded; TENANT, SOURCE required)
 	@TENANT="$(TENANT)" SOURCE="$(SOURCE)" \
 		bash "$(REPO_ROOT)/ops/ai/indexer/indexer.sh" index --tenant "$(TENANT)" --source "$(SOURCE)" --live
 
+.PHONY: ai.qdrant.doctor
+ai.qdrant.doctor: ## Qdrant doctor (offline; config only)
+	@bash "$(REPO_ROOT)/ops/ai/qdrant/doctor.sh"
+
+.PHONY: ai.qdrant.doctor.live
+ai.qdrant.doctor.live: ## Qdrant doctor (live; guarded)
+	@TENANT="$(TENANT)" AI_INDEX_EXECUTE="$(AI_INDEX_EXECUTE)" QDRANT_ENABLE="$(QDRANT_ENABLE)" \
+		bash "$(REPO_ROOT)/ops/ai/qdrant/doctor.sh" --live --tenant "$(TENANT)"
+
+.PHONY: ai.n8n.validate
+ai.n8n.validate: ## Validate n8n workflows (read-only)
+	@bash "$(REPO_ROOT)/ops/ai/n8n/validate-workflows.sh"
+
 .PHONY: ai.mcp.doctor
 ai.mcp.doctor: ## AI MCP config doctor (read-only)
 	@bash "$(REPO_ROOT)/ops/ai/mcp/doctor.sh"
@@ -2533,6 +2546,14 @@ phase17.step5.entry.check: ## Phase 17 Step 5 entry checklist (secrets rotation 
 .PHONY: phase17.step5.accept
 phase17.step5.accept: ## Phase 17 Step 5 acceptance (secrets rotation cutover)
 	@bash "$(OPS_SCRIPTS_DIR)/phase17-step5-accept.sh"
+
+.PHONY: phase17.step6.entry.check
+phase17.step6.entry.check: ## Phase 17 Step 6 entry checklist (AI live indexing + n8n)
+	@bash "$(OPS_SCRIPTS_DIR)/phase17-step6-entry-check.sh"
+
+.PHONY: phase17.step6.accept
+phase17.step6.accept: ## Phase 17 Step 6 acceptance (AI live indexing + n8n)
+	@bash "$(OPS_SCRIPTS_DIR)/phase17-step6-accept.sh"
 
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)

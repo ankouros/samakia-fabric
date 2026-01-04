@@ -1,0 +1,121 @@
+{
+  "name": "ingest-release-readiness",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": [
+          {
+            "mode": "everyDay",
+            "hour": 5,
+            "minute": 0
+          }
+        ]
+      },
+      "id": "1",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "/srv/samakia-fabric/ops/release/phase12/phase12-readiness-packet.sh"
+      },
+      "id": "2",
+      "name": "Read Readiness Script",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        420,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "tenant",
+              "value": "platform"
+            },
+            {
+              "name": "source",
+              "value": "release-readiness"
+            },
+            {
+              "name": "mode",
+              "value": "offline"
+            },
+            {
+              "name": "root_path",
+              "value": "/srv/samakia-fabric/evidence/release-readiness/phase12"
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Build Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        640,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "/var/lib/samakia/ai-index-queue/ingest-release-readiness.request.json",
+        "dataPropertyName": "data"
+      },
+      "id": "4",
+      "name": "Queue Request",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        860,
+        200
+      ]
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Read Readiness Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Readiness Script": {
+      "main": [
+        [
+          {
+            "node": "Build Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Request": {
+      "main": [
+        [
+          {
+            "node": "Queue Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "workflow-ingest-release-readiness"
+}

@@ -27,6 +27,12 @@ This document records what was implemented for the **Terraform remote state back
 - Canary DB user and database were ensured to match canary credentials before verification.
 - Consolidated evidence under `evidence/exposure-canary/canary/sample/2026-01-04T04:40:26Z` and recorded acceptance marker.
 
+## Phase 17 Step 6 — Guarded AI Indexing + n8n Ingestion (Completed)
+
+- Live indexing now requires operator mode with explicit guards; redaction denies abort runs.
+- Added Qdrant doctor (offline config + guarded live connectivity) and n8n ingestion workflow templates.
+- Validation for n8n workflows writes evidence under `evidence/ai/n8n/<UTC>/`; Step 6 acceptance marker recorded.
+
 ## Phase 13 Design — Governed Exposure (Design Only)
 
 - Defines exposure as a governed choreography (plan -> approve -> apply -> verify -> rollback).
@@ -164,6 +170,7 @@ This document records what was implemented for the **Terraform remote state back
 - Step 4 canary exposure executed against the internal shared Postgres service, with evidence and acceptance marker recorded.
 - Vault access is now documented as shared-VLAN only (shared runner or SSH port-forward), and live verification fails fast if required secret fields are empty before any TCP/TLS probes.
 - Step 5 adds an operator-controlled secrets rotation cutover helper with guarded plan/apply/rollback and evidence packets.
+- Step 6 adds guarded live AI indexing, Qdrant doctor checks, and n8n ingestion workflow validation with evidence.
 - Internal Postgres bootstrap hardened with etcd v2 enablement, ip:port host rendering, and a guarded reset flag for cluster rebootstrap.
 - Internal Postgres acceptance aligns HAProxy primary backend with Patroni leader via HAProxy stats.
 - Internal Postgres HAProxy allowlist now includes `FABRIC_ADMIN_CIDRS` (default `192.168.11.0/24`) for operator verification access.

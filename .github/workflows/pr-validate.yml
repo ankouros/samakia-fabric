@@ -61,6 +61,12 @@ jobs:
       - name: AI indexing offline (fixtures)
         run: make ai.index.offline TENANT=platform SOURCE=docs
 
+      - name: AI n8n workflow validation
+        run: make ai.n8n.validate
+
+      - name: Phase 17 Step 6 acceptance (CI-safe)
+        run: make phase17.step6.accept
+
       - name: AI MCP doctor
         run: make ai.mcp.doctor
 

@@ -5,7 +5,6 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
-require_ci_mode
 
 
 indexing_file="${FABRIC_REPO_ROOT}/contracts/ai/indexing.yml"
@@ -96,6 +95,12 @@ done
 if [[ "${command}" != "doctor" && "${command}" != "preview" && "${command}" != "index" ]]; then
   usage
   exit 2
+fi
+
+if [[ "${mode}" == "live" ]]; then
+  require_operator_mode
+else
+  require_ci_mode
 fi
 
 validate_contracts
@@ -202,12 +207,13 @@ if [[ "${command}" == "index" ]]; then
   mkdir -p "${evidence_dir}/inputs"
 fi
 
-COMMAND="${command}" MODE="${mode}" TENANT_ID="${tenant_id}" SOURCE_TYPE="${source_type}" STAMP="${timestamp_utc}" \
-INDEXING_FILE="${indexing_file}" QDRANT_FILE="${qdrant_file}" REPO_ROOT="${FABRIC_REPO_ROOT}" \
-SOURCE_LIST="${source_list}" WORK_DIR="${work_dir}" EVIDENCE_DIR="${evidence_dir}" \
-PROVIDER_FILE="${FABRIC_REPO_ROOT}/contracts/ai/provider.yml" \
-QDRANT_FILE_PATH="${qdrant_file}" \
-python3 - <<'PY'
+status=0
+if ! COMMAND="${command}" MODE="${mode}" TENANT_ID="${tenant_id}" SOURCE_TYPE="${source_type}" STAMP="${timestamp_utc}" \
+  INDEXING_FILE="${indexing_file}" QDRANT_FILE="${qdrant_file}" REPO_ROOT="${FABRIC_REPO_ROOT}" \
+  SOURCE_LIST="${source_list}" WORK_DIR="${work_dir}" EVIDENCE_DIR="${evidence_dir}" \
+  PROVIDER_FILE="${FABRIC_REPO_ROOT}/contracts/ai/provider.yml" \
+  QDRANT_FILE_PATH="${qdrant_file}" \
+  python3 - <<'PY'
 import base64
 import hashlib
 import json
@@ -242,6 +248,9 @@ overlap = int(indexing["chunking"]["overlap"])
 max_chars = int(indexing["chunking"]["max_chars"])
 embedding_model = indexing["embedding"]["model"]
 
+if embedding_model != "nomic-embed-text":
+    raise SystemExit("ERROR: embedding model must be nomic-embed-text")
+
 exclusions = indexing.get("exclusions", {}).get("patterns", [])
 redaction_patterns = indexing.get("redaction", {}).get("deny_patterns", [])
 
@@ -253,6 +262,16 @@ chunk_plan = []
 redactions = []
 points = []
 embedding_modes = set()
+denied_found = False
+sanitized_items = []
+
+env_base = os.environ.copy()
+env_base["INDEX_MODE"] = mode
+env_base["PROVIDER_FILE"] = provider_file
+if "OLLAMA_ENABLE" not in env_base:
+    env_base["OLLAMA_ENABLE"] = "0"
+if "QDRANT_ENABLE" not in env_base:
+    env_base["QDRANT_ENABLE"] = "0"
 
 def is_excluded(path_str):
     for pattern in exclusions:
@@ -295,14 +314,15 @@ for line in source_list.read_text(encoding="utf-8").splitlines():
         "size_bytes": size_bytes,
         "excluded": bool(excluded_by),
         "excluded_by": excluded_by,
+        "denied": False,
     }
 
     if excluded_by:
         sources.append(source_entry)
         continue
 
-    redaction_report = work_dir / "redaction.json"
-    sanitized_path = work_dir / "sanitized.txt"
+    redaction_report = work_dir / f"redaction-{content_sha}.json"
+    sanitized_path = work_dir / f"sanitized-{content_sha}.txt"
 
     redact_cmd = [
         "bash",
@@ -316,94 +336,103 @@ for line in source_list.read_text(encoding="utf-8").splitlines():
         "--report",
         str(redaction_report),
     ]
-    result = subprocess.run(redact_cmd)
+    result = subprocess.run(redact_cmd, env=env_base)
     if result.returncode == 2:
         report = json.loads(redaction_report.read_text(encoding="utf-8"))
         redactions.append(report)
         source_entry["denied"] = True
         sources.append(source_entry)
+        denied_found = True
         continue
     if result.returncode != 0:
         raise SystemExit(f"ERROR: redaction failed for {path}")
 
-    source_entry["denied"] = False
     sources.append(source_entry)
+    sanitized_items.append({
+        "entry": source_entry,
+        "sanitized_path": sanitized_path,
+        "content_sha": content_sha,
+    })
 
-    chunk_file = work_dir / "chunk.json"
-    chunk_cmd = [
-        "bash",
-        str(repo_root / "ops/ai/indexer/lib/chunk.sh"),
-        "--file",
-        str(sanitized_path),
-        "--max-chars",
-        str(chunk_size),
-        "--overlap",
-        str(overlap),
-        "--out",
-        str(chunk_file),
-    ]
-    subprocess.check_call(chunk_cmd)
-    chunk_payload = json.loads(chunk_file.read_text(encoding="utf-8"))
+if denied_found and command == "preview":
+    raise SystemExit("ERROR: redaction deny patterns matched; indexing aborted")
 
-    for chunk in chunk_payload.get("chunks", []):
-        start = chunk["start"]
-        end = chunk["end"]
-        text = chunk["text"]
-        if len(text) > max_chars:
-            text = text[:max_chars]
+if not denied_found:
+    for item in sanitized_items:
+        source_entry = item["entry"]
+        sanitized_path = item["sanitized_path"]
+        content_sha = item["content_sha"]
 
-        chunk_id = hashlib.sha256(
-            f"{source_entry['source_path']}:{start}:{end}:{content_sha}".encode("utf-8")
-        ).hexdigest()
-
-        chunk_plan.append({
-            "chunk_id": chunk_id,
-            "source_path": source_entry["source_path"],
-            "start": start,
-            "end": end,
-            "content_sha256": content_sha,
-        })
-
-        if command == "preview":
-            continue
-
-        temp_text = work_dir / "chunk.txt"
-        temp_text.write_text(text, encoding="utf-8")
-
-        env = os.environ.copy()
-        env["INDEX_MODE"] = mode
-        env["OLLAMA_ENABLE"] = env.get("OLLAMA_ENABLE", "0")
-        env["PROVIDER_FILE"] = provider_file
-
-        embed_cmd = [
+        chunk_file = work_dir / f"chunk-{content_sha}.json"
+        chunk_cmd = [
             "bash",
-            str(repo_root / "ops/ai/indexer/lib/ollama.sh"),
-            "--text-file",
-            str(temp_text),
-            "--model",
-            embedding_model,
+            str(repo_root / "ops/ai/indexer/lib/chunk.sh"),
+            "--file",
+            str(sanitized_path),
+            "--max-chars",
+            str(chunk_size),
+            "--overlap",
+            str(overlap),
+            "--out",
+            str(chunk_file),
         ]
-        embed_result = subprocess.run(embed_cmd, env=env, capture_output=True, text=True)
-        if embed_result.returncode != 0:
-            raise SystemExit(f"ERROR: embedding failed for {source_entry['source_path']}")
-        embed_payload = json.loads(embed_result.stdout)
-        embedding_modes.add(embed_payload.get("embedding_mode", "unknown"))
+        subprocess.check_call(chunk_cmd, env=env_base)
+        chunk_payload = json.loads(chunk_file.read_text(encoding="utf-8"))
 
-        points.append({
-            "id": chunk_id,
-            "vector": embed_payload.get("embedding"),
-            "payload": {
-                "tenant_id": tenant_id,
-                "env": os.environ.get("ENV", "unknown"),
-                "source_type": source_type,
+        for chunk in chunk_payload.get("chunks", []):
+            start = chunk["start"]
+            end = chunk["end"]
+            text = chunk["text"]
+            if len(text) > max_chars:
+                text = text[:max_chars]
+
+            chunk_id = hashlib.sha256(
+                f"{source_entry['source_path']}:{start}:{end}:{content_sha}".encode("utf-8")
+            ).hexdigest()
+
+            chunk_plan.append({
+                "chunk_id": chunk_id,
                 "source_path": source_entry["source_path"],
-                "commit_sha": commit_sha,
-                "timestamp_utc": timestamp,
+                "start": start,
+                "end": end,
                 "content_sha256": content_sha,
-                "chunk_start": start,
-                "chunk_end": end,
-            },
-        })
+            })
+
+            if command == "preview":
+                continue
+
+            temp_text = work_dir / f"chunk-{chunk_id}.txt"
+            temp_text.write_text(text, encoding="utf-8")
+
+            embed_cmd = [
+                "bash",
+                str(repo_root / "ops/ai/indexer/lib/ollama.sh"),
+                "--text-file",
+                str(temp_text),
+                "--model",
+                embedding_model,
+            ]
+            embed_result = subprocess.run(embed_cmd, env=env_base, capture_output=True, text=True)
+            if embed_result.returncode != 0:
+                raise SystemExit(f"ERROR: embedding failed for {source_entry['source_path']}")
+            embed_payload = json.loads(embed_result.stdout)
+            embedding_modes.add(embed_payload.get("embedding_mode", "unknown"))
+
+            points.append({
+                "id": chunk_id,
+                "vector": embed_payload.get("embedding"),
+                "payload": {
+                    "tenant_id": tenant_id,
+                    "env": os.environ.get("ENV", "unknown"),
+                    "source_type": source_type,
+                    "source_path": source_entry["source_path"],
+                    "commit_sha": commit_sha,
+                    "timestamp_utc": timestamp,
+                    "content_sha256": content_sha,
+                    "chunk_start": start,
+                    "chunk_end": end,
+                },
+            })
 
 if command == "preview":
     chunk_plan_sorted = sorted(chunk_plan, key=lambda item: item["chunk_id"])
@@ -426,6 +455,7 @@ evidence_dir.mkdir(parents=True, exist_ok=True)
 
 sources_sorted = sorted(sources, key=lambda item: item["source_path"])
 chunk_plan_sorted = sorted(chunk_plan, key=lambda item: item["chunk_id"])
+denied_count = len([s for s in sources if s.get("denied")])
 
 (evidence_dir / "sources.json").write_text(
     json.dumps({"sources": sources_sorted}, indent=2, sort_keys=True) + "\n",
@@ -443,6 +473,8 @@ chunk_plan_sorted = sorted(chunk_plan, key=lambda item: item["chunk_id"])
 )
 
 embedding_mode = "mixed" if len(embedding_modes) > 1 else (next(iter(embedding_modes), "stub"))
+if denied_found:
+    embedding_mode = "denied"
 (evidence_dir / "embedding.json").write_text(
     json.dumps({
         "model": embedding_model,
@@ -454,7 +486,7 @@ embedding_mode = "mixed" if len(embedding_modes) > 1 else (next(iter(embedding_m
 
 collection = qdrant["tenant_isolation"]["platform_collection"] if tenant_id == "platform" else f"{qdrant['tenant_isolation']['tenant_prefix']}{tenant_id}"
 
-qdrant_mode = "live" if mode == "live" else "dry-run"
+qdrant_mode = "blocked" if denied_found else ("live" if mode == "live" else "dry-run")
 vector_size = len(points[0]["vector"]) if points else 0
 
 (evidence_dir / "qdrant.json").write_text(
@@ -473,8 +505,9 @@ summary = [
     f"Tenant: {tenant_id}",
     f"Source: {source_type}",
     f"Mode: {mode}",
+    *([f"Status: denied (redaction patterns matched)"] if denied_found else []),
     f"Indexed files: {len([s for s in sources if not s.get('excluded') and not s.get('denied')])}",
-    f"Denied files: {len([s for s in sources if s.get('denied')])}",
+    f"Denied files: {denied_count}",
     f"Excluded files: {len([s for s in sources if s.get('excluded')])}",
     f"Chunks: {len(chunk_plan)}",
     f"Points: {len(points)}",
@@ -482,11 +515,10 @@ summary = [
 ]
 (evidence_dir / "summary.md").write_text("\n".join(summary) + "\n", encoding="utf-8")
 
-if mode == "live" and points:
+if mode == "live" and points and not denied_found:
     points_file = work_dir / "points.json"
     points_file.write_text(json.dumps({"points": points}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    env = os.environ.copy()
-    env["QDRANT_ENABLE"] = env.get("QDRANT_ENABLE", "0")
+    env = env_base.copy()
     env["QDRANT_FILE"] = qdrant_file_path
     subprocess.check_call([
         "bash",
@@ -506,21 +538,31 @@ if mode == "live" and points:
         "--points",
         str(points_file),
     ], env=env)
-PY
 
-if [[ "${command}" == "index" ]]; then
-  bash "${FABRIC_REPO_ROOT}/ops/ai/indexer/lib/manifest.sh" --dir "${evidence_dir}" --out "${evidence_dir}/manifest.sha256"
-  if [[ "${EVIDENCE_SIGN:-0}" == "1" ]]; then
-    if [[ -z "${EVIDENCE_GPG_KEY:-}" ]]; then
-      echo "ERROR: EVIDENCE_SIGN=1 but EVIDENCE_GPG_KEY is not set" >&2
-      exit 1
-    fi
-    if ! command -v gpg >/dev/null 2>&1; then
-      echo "ERROR: gpg not found; cannot sign evidence" >&2
-      exit 1
-    fi
-    gpg --batch --yes --local-user "${EVIDENCE_GPG_KEY}" \
-      --armor --detach-sign "${evidence_dir}/manifest.sha256"
-  fi
-  echo "OK: indexing evidence written to ${evidence_dir}"
+if denied_found:
+    raise SystemExit("ERROR: redaction deny patterns matched; indexing aborted")
+PY
+then
+  status=$?
 fi
+if [[ "${command}" == "index" ]]; then
+  if [[ -n "${evidence_dir}" && -d "${evidence_dir}" ]]; then
+    INDEX_MODE="${mode}" bash "${FABRIC_REPO_ROOT}/ops/ai/indexer/lib/manifest.sh" \
+      --dir "${evidence_dir}" --out "${evidence_dir}/manifest.sha256"
+    if [[ "${EVIDENCE_SIGN:-0}" == "1" ]]; then
+      if [[ -z "${EVIDENCE_GPG_KEY:-}" ]]; then
+        echo "ERROR: EVIDENCE_SIGN=1 but EVIDENCE_GPG_KEY is not set" >&2
+        exit 1
+      fi
+      if ! command -v gpg >/dev/null 2>&1; then
+        echo "ERROR: gpg not found; cannot sign evidence" >&2
+        exit 1
+      fi
+      gpg --batch --yes --local-user "${EVIDENCE_GPG_KEY}" \
+        --armor --detach-sign "${evidence_dir}/manifest.sha256"
+    fi
+    echo "OK: indexing evidence written to ${evidence_dir}"
+  fi
+fi
+
+exit "${status}"

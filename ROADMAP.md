@@ -861,6 +861,8 @@ Follow-up steps (safety prerequisites):
     - `acceptance/PHASE17_STEP4_ACCEPTED.md`
 - Step 5 (secrets rotation cutover helper): **COMPLETED**
   - Acceptance marker: `acceptance/PHASE17_STEP5_ACCEPTED.md`
+- Step 6 (guarded live AI indexing + n8n ingestion workflows): **COMPLETED**
+  - Acceptance marker: `acceptance/PHASE17_STEP6_ACCEPTED.md`
 
 Non-scope:
 - No execution tooling.

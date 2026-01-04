@@ -1,0 +1,128 @@
+# Phase 17 Step 6 Entry Checklist
+
+Timestamp (UTC): 2026-01-04T07:07:54Z
+
+## Criteria
+- Acceptance marker present: acceptance/PHASE16_PART1_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART1_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE16_PART2_ACCEPTED.md
+  - Command: test -f acceptance/PHASE16_PART2_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Command: test -f acceptance/MILESTONE_PHASE1_12_ACCEPTED.md
+  - Result: PASS
+- Acceptance marker present: acceptance/PHASE17_STEP5_ACCEPTED.md
+  - Command: test -f acceptance/PHASE17_STEP5_ACCEPTED.md
+  - Result: PASS
+- REQUIRED-FIXES.md has no OPEN items
+  - Command: rg -n "OPEN" REQUIRED-FIXES.md
+  - Result: PASS
+- File present: ops/ai/indexer/indexer.sh
+  - Command: test -f ops/ai/indexer/indexer.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/ollama.sh
+  - Command: test -f ops/ai/indexer/lib/ollama.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/qdrant.sh
+  - Command: test -f ops/ai/indexer/lib/qdrant.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/redact.sh
+  - Command: test -f ops/ai/indexer/lib/redact.sh
+  - Result: PASS
+- File present: ops/ai/indexer/lib/chunk.sh
+  - Command: test -f ops/ai/indexer/lib/chunk.sh
+  - Result: PASS
+- File present: ops/ai/qdrant/doctor.sh
+  - Command: test -f ops/ai/qdrant/doctor.sh
+  - Result: PASS
+- File present: ops/ai/n8n/README.md
+  - Command: test -f ops/ai/n8n/README.md
+  - Result: PASS
+- File present: ops/ai/n8n/validate-workflows.sh
+  - Command: test -f ops/ai/n8n/validate-workflows.sh
+  - Result: PASS
+- File present: ops/ai/n8n/workflows/ingest-evidence.json
+  - Command: test -f ops/ai/n8n/workflows/ingest-evidence.json
+  - Result: PASS
+- File present: ops/ai/n8n/workflows/ingest-contracts.json
+  - Command: test -f ops/ai/n8n/workflows/ingest-contracts.json
+  - Result: PASS
+- File present: ops/ai/n8n/workflows/ingest-runbooks.json
+  - Command: test -f ops/ai/n8n/workflows/ingest-runbooks.json
+  - Result: PASS
+- File present: ops/ai/n8n/workflows/ingest-release-readiness.json
+  - Command: test -f ops/ai/n8n/workflows/ingest-release-readiness.json
+  - Result: PASS
+- File present: ops/policy/policy-ai-live-indexing.sh
+  - Command: test -f ops/policy/policy-ai-live-indexing.sh
+  - Result: PASS
+- File present: ops/policy/policy-ai-n8n.sh
+  - Command: test -f ops/policy/policy-ai-n8n.sh
+  - Result: PASS
+- File present: docs/ai/indexing.md
+  - Command: test -f docs/ai/indexing.md
+  - Result: PASS
+- File present: docs/operator/ai.md
+  - Command: test -f docs/operator/ai.md
+  - Result: PASS
+- File present: docs/operator/cookbook.md
+  - Command: test -f docs/operator/cookbook.md
+  - Result: PASS
+- File present: OPERATIONS.md
+  - Command: test -f OPERATIONS.md
+  - Result: PASS
+- File present: ROADMAP.md
+  - Command: test -f ROADMAP.md
+  - Result: PASS
+- File present: CHANGELOG.md
+  - Command: test -f CHANGELOG.md
+  - Result: PASS
+- File present: REVIEW.md
+  - Command: test -f REVIEW.md
+  - Result: PASS
+- Live indexing policy wired
+  - Command: rg -n policy-ai-live-indexing.sh ops/policy/policy.sh
+  - Result: PASS
+- n8n policy wired
+  - Command: rg -n policy-ai-n8n.sh ops/policy/policy.sh
+  - Result: PASS
+- Makefile target present: ai.index.offline
+  - Command: rg -n '^ai\.index\.offline:' Makefile
+  - Result: PASS
+- Makefile target present: ai.index.live
+  - Command: rg -n '^ai\.index\.live:' Makefile
+  - Result: PASS
+- Makefile target present: ai.qdrant.doctor
+  - Command: rg -n '^ai\.qdrant\.doctor:' Makefile
+  - Result: PASS
+- Makefile target present: ai.qdrant.doctor.live
+  - Command: rg -n '^ai\.qdrant\.doctor\.live:' Makefile
+  - Result: PASS
+- Makefile target present: ai.n8n.validate
+  - Command: rg -n '^ai\.n8n\.validate:' Makefile
+  - Result: PASS
+- Makefile target present: phase17.step6.entry.check
+  - Command: rg -n '^phase17\.step6\.entry\.check:' Makefile
+  - Result: PASS
+- Makefile target present: phase17.step6.accept
+  - Command: rg -n '^phase17\.step6\.accept:' Makefile
+  - Result: PASS
+- Policy gates
+  - Command: make -C /home/aggelos/samakia-fabric policy.check
+  - Result: PASS
+- Operator docs check
+  - Command: make -C /home/aggelos/samakia-fabric docs.operator.check
+  - Result: PASS
+- Offline fixtures (docs source)
+  - Command: rg -n 'fixtures/sample-docs' /home/aggelos/samakia-fabric/ops/ai/indexer/sources/docs.sh
+  - Result: PASS
+- Offline fixtures (contracts source)
+  - Command: rg -n 'fixtures/sample-contracts' /home/aggelos/samakia-fabric/ops/ai/indexer/sources/contracts.sh
+  - Result: PASS
+- Offline fixtures (runbooks source)
+  - Command: rg -n 'fixtures/sample-runbooks' /home/aggelos/samakia-fabric/ops/ai/indexer/sources/runbooks.sh
+  - Result: PASS
+- Offline fixtures (evidence source)
+  - Command: rg -n 'fixtures/sample-evidence' /home/aggelos/samakia-fabric/ops/ai/indexer/sources/evidence.sh
+  - Result: PASS

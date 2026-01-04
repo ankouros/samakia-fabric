@@ -4,7 +4,13 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
-require_ci_mode
+
+index_mode="${INDEX_MODE:-offline}"
+if [[ "${index_mode}" == "live" ]]; then
+  require_operator_mode
+else
+  require_ci_mode
+fi
 
 
 usage() {
@@ -99,6 +105,16 @@ config = yaml.safe_load(path.read_text(encoding="utf-8"))
 print(config.get("base_url", ""))
 PY
 )"
+fi
+
+base_url="${base_url%/}"
+if [[ -z "${base_url}" ]]; then
+  echo "ERROR: qdrant base_url is empty" >&2
+  exit 1
+fi
+if [[ ! "${base_url}" =~ ^https?://(192\.168\.|10\.) ]]; then
+  echo "ERROR: qdrant base_url must be internal (got ${base_url})" >&2
+  exit 1
 fi
 
 if [[ "${QDRANT_ENABLE:-0}" != "1" ]]; then

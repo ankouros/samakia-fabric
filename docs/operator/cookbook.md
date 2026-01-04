@@ -906,6 +906,34 @@ None (stdout only).
 #### Rollback / safe exit
 Fix contract files and rerun the doctor check.
 
+### Task: Qdrant doctor (offline + live)
+
+#### Intent
+Validate Qdrant contract and (optionally) live connectivity.
+
+#### Preconditions
+- `FABRIC_REPO_ROOT` set
+- Live check requires operator guards
+
+#### Command
+```bash
+make ai.qdrant.doctor
+RUNNER_MODE=operator AI_INDEX_EXECUTE=1 QDRANT_ENABLE=1 make ai.qdrant.doctor.live TENANT=platform
+```
+
+#### Expected result
+Offline: config summary only. Live: Qdrant reachable and collections present.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- Missing collections
+- Qdrant unreachable
+
+#### Rollback / safe exit
+Fix Qdrant config or run guarded live indexing to create collections.
+
 ### Task: AI indexing preview (offline)
 
 #### Intent
@@ -952,6 +980,7 @@ Evidence packet written under `evidence/ai/indexing/`.
 
 #### Failure modes
 - Contract validation failure
+- Redaction deny patterns matched
 
 #### Rollback / safe exit
 Fix contracts and rerun the offline indexer.
@@ -968,6 +997,7 @@ Index live sources into Qdrant (operator-only, guarded).
 
 #### Command
 ```bash
+RUNNER_MODE=operator \
 AI_INDEX_EXECUTE=1 \
 AI_INDEX_REASON="ticket-123: refresh docs" \
 QDRANT_ENABLE=1 \
@@ -984,9 +1014,35 @@ Live indexing runs and writes evidence.
 #### Failure modes
 - Guard flags missing
 - Qdrant or Ollama unreachable
+- Redaction deny patterns matched
 
 #### Rollback / safe exit
 Disable live mode and use offline indexing until guards are satisfied.
+
+### Task: n8n workflow validation (read-only)
+
+#### Intent
+Validate n8n ingestion workflows and produce evidence.
+
+#### Preconditions
+- Workflow JSON present under `ops/ai/n8n/workflows/`
+
+#### Command
+```bash
+make ai.n8n.validate
+```
+
+#### Expected result
+Validation passes and evidence is written.
+
+#### Evidence outputs
+`evidence/ai/n8n/<UTC>/...`
+
+#### Failure modes
+- Disallowed node types or external endpoints
+
+#### Rollback / safe exit
+Fix workflow JSON and rerun validation.
 
 ### Task: AI MCP doctor (read-only)
 
@@ -4453,6 +4509,60 @@ Acceptance PASS and markers created.
 
 #### Rollback / safe exit
 Stop; do not proceed to mutation.
+
+### Task: Phase 17 Step 6 entry checklist (AI indexing + n8n)
+
+#### Intent
+Confirm entry conditions for Phase 17 Step 6.
+
+#### Preconditions
+- Phase 16 Part 1 + Part 2 accepted
+- Phase 17 Step 5 accepted
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase17.step6.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE17_STEP6_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE17_STEP6_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing files, policies, or docs
+- Policy or docs checks failing
+
+#### Rollback / safe exit
+Fix missing prerequisites and re-run the checklist.
+
+### Task: Phase 17 Step 6 acceptance (AI indexing + n8n)
+
+#### Intent
+Run the CI-safe acceptance suite for Step 6.
+
+#### Preconditions
+- Phase 17 Step 6 entry checklist passes
+
+#### Command
+```bash
+CI=1 make phase17.step6.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE17_STEP6_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE17_STEP6_ACCEPTED.md`
+
+#### Failure modes
+- Policy gate failures
+- Offline indexing or n8n validation failures
+
+#### Rollback / safe exit
+Stop and remediate failures before re-running acceptance.
 
 ### Task: Phase 15 Part 1 entry checklist (self-service proposals)
 

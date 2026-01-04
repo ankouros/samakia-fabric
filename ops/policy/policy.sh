@@ -35,6 +35,8 @@ scripts=(
   "policy-ai-routing.sh"
   "policy-ai-qdrant.sh"
   "policy-ai-indexing.sh"
+  "policy-ai-live-indexing.sh"
+  "policy-ai-n8n.sh"
   "policy-ai-analysis.sh"
   "policy-ai-phase-boundary.sh"
   "policy-ai-mcp.sh"

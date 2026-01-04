@@ -4,7 +4,6 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
-require_ci_mode
 
 
 usage() {
@@ -63,6 +62,12 @@ if [[ -z "${text}" || -z "${model}" ]]; then
 fi
 
 index_mode="${INDEX_MODE:-offline}"
+if [[ "${index_mode}" == "live" ]]; then
+  require_operator_mode
+else
+  require_ci_mode
+fi
+
 base_url="${OLLAMA_BASE_URL:-}"
 
 if [[ -z "${base_url}" ]]; then
@@ -84,6 +89,17 @@ provider = yaml.safe_load(path.read_text(encoding="utf-8"))
 print(provider.get("base_url", ""))
 PY
 )"
+fi
+
+base_url="${base_url%/}"
+expected_url="http://192.168.11.30:11434"
+if [[ -z "${base_url}" ]]; then
+  echo "ERROR: Ollama base_url is empty" >&2
+  exit 1
+fi
+if [[ "${base_url}" != "${expected_url}" ]]; then
+  echo "ERROR: Ollama base_url must be ${expected_url} (got ${base_url})" >&2
+  exit 1
 fi
 
 if [[ "${index_mode}" != "live" || "${OLLAMA_ENABLE:-0}" != "1" ]]; then
