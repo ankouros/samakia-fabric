@@ -35,6 +35,7 @@ backend; ensure the runner has:
 Connectivity requirements:
 - `db.canary.internal` must resolve on the runner (CNAME to `db.internal.shared`).
 - `db.internal.shared` must resolve to HAProxy nodes on the shared VLAN.
+- Runner must route to VLAN120 (shared plane) via the shared edge gateway.
 - TCP 5432 reachable with TLS required; HAProxy is TCP passthrough and Postgres
   terminates TLS. CA comes from the internal Postgres PKI (default:
   `~/.config/samakia-fabric/pki/postgres-internal-ca.crt`).
@@ -42,18 +43,18 @@ Connectivity requirements:
 ## Latest execution (2026-01-04)
 
 Sequence:
-- Plan: `evidence/exposure-plan/canary/sample/2026-01-03T19:44:28Z`
-- Approve: `evidence/exposure-approve/canary/sample/2026-01-03T19:44:34Z`
-- Apply: `evidence/exposure-apply/canary/sample/2026-01-03T19:44:40Z`
-- Verify (live): failed (Vault secret missing password)
-- Rollback: `evidence/exposure-rollback/canary/sample/2026-01-04T03:02:39Z`
-- Consolidated evidence: `evidence/exposure-canary/canary/sample/2026-01-04T03:03:55Z`
+- Plan: `evidence/exposure-plan/canary/sample/2026-01-04T04:30:25Z`
+- Approve: `evidence/exposure-approve/canary/sample/2026-01-04T04:30:32Z`
+- Apply: `evidence/exposure-apply/canary/sample/2026-01-04T04:30:47Z`
+- Verify (live): `evidence/exposure-verify/canary/sample/2026-01-04T04:39:05Z`
+- Rollback: `evidence/exposure-rollback/canary/sample/2026-01-04T04:39:19Z`
+- Consolidated evidence: `evidence/exposure-canary/canary/sample/2026-01-04T04:40:26Z`
 
-Blocker:
-- Vault secret `tenants/canary/database/sample` has an empty `password` value,
-  causing the Postgres probe to fail with `missing username/password in secret`.
+Outcome:
+- Live verify succeeded and rollback returned to baseline.
 
-Next steps:
-- Update the Vault secret to include a non-empty password (or point the binding
-  at a secret that contains credentials), then rerun live verify and the
-  rollback confirmation to complete Phase 17 Step 4.
+Notes:
+- Canary secret `ca_ref` must point to `postgres-internal-ca.crt` so TLS
+  verification succeeds against the internal Postgres PKI.
+- Canary DB user and database must exist with credentials that match the
+  canary secret before live verify runs.

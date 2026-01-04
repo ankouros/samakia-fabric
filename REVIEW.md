@@ -20,6 +20,13 @@ This document records what was implemented for the **Terraform remote state back
 - Wired policy enforcement to block VIP misuse and out-of-range allocations.
 - No runtime behavior changes; this is contract and documentation governance only.
 
+## Phase 17 Step 4 — Real Canary Exposure (Completed)
+
+- Executed plan/approve/apply/verify/rollback for the canary `sample` workload in `samakia-dev`.
+- Vault was unsealed and canary secret prerequisites corrected (password + CA reference) before live verify.
+- Canary DB user and database were ensured to match canary credentials before verification.
+- Consolidated evidence under `evidence/exposure-canary/canary/sample/2026-01-04T04:40:26Z` and recorded acceptance marker.
+
 ## Phase 13 Design — Governed Exposure (Design Only)
 
 - Defines exposure as a governed choreography (plan -> approve -> apply -> verify -> rollback).

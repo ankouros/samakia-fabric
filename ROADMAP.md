@@ -853,10 +853,12 @@ Follow-up steps (safety prerequisites):
 - Step 1 (Phase 8.3 image reproducibility hardening): **COMPLETED**
 - Step 2 (global non-interactive runner contract): **COMPLETED**
 - Step 3 (shared observability policy regression guard): **COMPLETED**
-- Step 4 (internal Postgres HA prerequisite + DNS alias):
+- Step 4 (internal Postgres HA prerequisite + DNS alias + real canary exposure): **COMPLETED**
   - `db.internal.shared` (HAProxy frontends)
   - `db.canary.internal` (alias for Phase 17 Step 4 verify)
-  - Acceptance marker: `acceptance/INTERNAL_POSTGRES_PATRONI_ACCEPTED.md`
+  - Acceptance markers:
+    - `acceptance/INTERNAL_POSTGRES_PATRONI_ACCEPTED.md`
+    - `acceptance/PHASE17_STEP4_ACCEPTED.md`
 
 Non-scope:
 - No execution tooling.

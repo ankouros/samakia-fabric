@@ -132,6 +132,7 @@ Tenant binding workflows live in:
   - Change windows + signing: `docs/exposure/change-window-and-signing.md`
   - Rollback: `docs/exposure/rollback.md`
   - Canary runbook + prerequisites: `docs/exposure/canary.md`
+  - Phase 17 Step 4 canary execution evidence: `evidence/exposure-canary/canary/sample/2026-01-04T04:40:26Z`
   - Part 1 (plan-only):
     - Validate policy: `make exposure.policy.check`
     - Plan exposure: `ENV=samakia-dev TENANT=canary WORKLOAD=sample make exposure.plan`

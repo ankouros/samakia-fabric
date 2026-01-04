@@ -123,6 +123,11 @@ The format is inspired by:
 - Internal Postgres apply now supports guarded resets (`POSTGRES_INTERNAL_RESET=1`) and ensures etcd data dir ownership.
 - Internal Postgres acceptance marker: `acceptance/INTERNAL_POSTGRES_PATRONI_ACCEPTED.md`.
 
+#### Phase 17 Step 4 canary exposure (real run)
+- Executed plan/approve/apply/verify/rollback for the canary `sample` workload in `samakia-dev`.
+- Consolidated evidence under `evidence/exposure-canary/canary/sample/2026-01-04T04:40:26Z`.
+- Added acceptance marker: `acceptance/PHASE17_STEP4_ACCEPTED.md`.
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

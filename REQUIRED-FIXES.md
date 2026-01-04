@@ -98,8 +98,7 @@ This document records what was fixed, what remains blocked (if anything), and th
 
 ## Still Blocked (if any)
 
-- Milestone Phase 1–12 verification (see MILESTONE-1-12-PHASE2-1-SHARED-POLICY).
-- Phase 17 Step 4 real canary exposure (see PHASE17-STEP4-CANARY-VERIFY-CREDENTIALS).
+None.
 
 ## Phase 17 Step 4 Blockers
 
@@ -188,11 +187,12 @@ This document records what was fixed, what remains blocked (if anything), and th
 - **Description:** `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample` failed because the Vault secret `tenants/canary/database/sample` has an empty `password` value, causing the Postgres probe to error with `missing username/password in secret`.
 - **Impact:** Phase 17 Step 4 cannot complete; live verification cannot authenticate to the canary database.
 - **Root cause:** Vault secret `tenants/canary/database/sample` was seeded with an empty `password`.
-- **Required remediation:** Update the Vault secret to include a non-empty password for the canary database user (or point the binding to a secret that has credentials), then rerun live verification.
-- **Resolution status:** **OPEN**
+- **Required remediation:** Update the Vault secret to include a non-empty password and correct CA reference for the canary database user, ensure the canary DB user/password exists, then rerun live verification.
+- **Resolution status:** **FIXED**
 - **Verification command(s):**
   - `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
-  - Latest attempt evidence: `evidence/exposure-canary/canary/sample/2026-01-04T03:03:55Z` (verify failed; rollback: `evidence/exposure-rollback/canary/sample/2026-01-04T03:02:39Z`)
+  - `ROLLBACK_EXECUTE=1 ROLLBACK_REQUESTED_BY=aggelos ROLLBACK_REASON="Phase17 mandatory rollback" make exposure.rollback ENV=samakia-dev TENANT=canary WORKLOAD=sample`
+  - Evidence: `evidence/exposure-canary/canary/sample/2026-01-04T04:40:26Z`
 
 ### PHASE17-POSTGRES-INTERNAL-TLS-PASSTHROUGH
 - **Description:** Live verify failed because Postgres clients could not negotiate SSL through HAProxy (TLS termination expected a direct TLS handshake instead of PostgreSQL SSLRequest).
