@@ -139,6 +139,11 @@ The format is inspired by:
 - n8n ingestion workflow templates + validation with evidence output.
 - New policy gates + acceptance marker for Step 6.
 
+#### MCP services hardening (Phase 17 Step 7)
+- Deployable MCP systemd units + operator start/stop wrapper scripts.
+- CI-safe MCP test harness (fixtures + audit evidence checks).
+- Policy gate updates + acceptance marker for Step 7.
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

@@ -1585,6 +1585,18 @@ ai.n8n.validate: ## Validate n8n workflows (read-only)
 ai.mcp.doctor: ## AI MCP config doctor (read-only)
 	@bash "$(REPO_ROOT)/ops/ai/mcp/doctor.sh"
 
+.PHONY: ai.mcp.test
+ai.mcp.test: ## AI MCP test harness (CI-safe)
+	@bash "$(REPO_ROOT)/ops/ai/mcp/test/run.sh"
+
+.PHONY: ai.mcp.start
+ai.mcp.start: ## Start MCP services via systemd (operator-only)
+	@bash "$(REPO_ROOT)/ops/ai/mcp/start.sh"
+
+.PHONY: ai.mcp.stop
+ai.mcp.stop: ## Stop MCP services via systemd (operator-only)
+	@bash "$(REPO_ROOT)/ops/ai/mcp/stop.sh"
+
 .PHONY: ai.mcp.repo.start
 ai.mcp.repo.start: ## Start repo MCP server (read-only; local)
 	@MCP_PORT="$(MCP_PORT)" bash "$(REPO_ROOT)/ops/ai/mcp/repo/server.sh"
@@ -2554,6 +2566,14 @@ phase17.step6.entry.check: ## Phase 17 Step 6 entry checklist (AI live indexing 
 .PHONY: phase17.step6.accept
 phase17.step6.accept: ## Phase 17 Step 6 acceptance (AI live indexing + n8n)
 	@bash "$(OPS_SCRIPTS_DIR)/phase17-step6-accept.sh"
+
+.PHONY: phase17.step7.entry.check
+phase17.step7.entry.check: ## Phase 17 Step 7 entry checklist (MCP services)
+	@bash "$(OPS_SCRIPTS_DIR)/phase17-step7-entry-check.sh"
+
+.PHONY: phase17.step7.accept
+phase17.step7.accept: ## Phase 17 Step 7 acceptance (MCP services)
+	@bash "$(OPS_SCRIPTS_DIR)/phase17-step7-accept.sh"
 
 .PHONY: phase12.part4.entry.check
 phase12.part4.entry.check: ## Phase 12 Part 4 entry checklist (proposal flow)

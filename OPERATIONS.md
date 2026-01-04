@@ -1463,16 +1463,21 @@ MCP services (read-only context):
 
 ```bash
 make ai.mcp.doctor
-make ai.mcp.repo.start
-make ai.mcp.evidence.start
-make ai.mcp.observability.start
-make ai.mcp.runbooks.start
-make ai.mcp.qdrant.start
+make ai.mcp.test
+RUNNER_MODE=operator make ai.mcp.start
+RUNNER_MODE=operator make ai.mcp.stop
+RUNNER_MODE=ci make ai.mcp.repo.start
+RUNNER_MODE=ci make ai.mcp.evidence.start
+RUNNER_MODE=ci make ai.mcp.observability.start
+RUNNER_MODE=ci make ai.mcp.runbooks.start
+RUNNER_MODE=ci make ai.mcp.qdrant.start
 ```
 
 Live MCP access is guarded (never in CI):
 - Observability: `OBS_LIVE=1`
 - Qdrant: `QDRANT_LIVE=1`
+
+Deployment artifacts live under `ops/ai/mcp/deploy/` (systemd units + env template).
 
 AI analysis (evidence-bound, read-only by default):
 

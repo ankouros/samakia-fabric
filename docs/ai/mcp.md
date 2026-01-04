@@ -55,13 +55,37 @@ No secrets are written; payloads are redacted or denied.
 
 - `MCP_TEST_MODE=1` (or `CI=1`) forces fixtures for MCPs that require network
   access (observability and Qdrant).
+- `RUNNER_MODE=ci` is treated as fixture mode.
 - Live access is guarded:
   - Observability: `OBS_LIVE=1`
   - Qdrant: `QDRANT_LIVE=1`
 
+## Deployment (systemd)
+
+Systemd units and an environment template live under:
+
+- `ops/ai/mcp/deploy/README.md`
+- `ops/ai/mcp/deploy/env.example`
+- `ops/ai/mcp/deploy/systemd/*.service`
+
+These units run as a non-root operator and log to journald. MCP audit evidence
+is written under `evidence/ai/mcp-audit/`.
+`MCP_BIND_ADDRESS` defaults to `127.0.0.1` and can be overridden in the env file.
+
+## Test harness (CI-safe)
+
+Run the local MCP test harness (fixtures, no live dependencies):
+
+```bash
+make ai.mcp.test
+```
+
 ## Operator entrypoints
 
 - `make ai.mcp.doctor`
+- `make ai.mcp.test`
+- `RUNNER_MODE=operator make ai.mcp.start`
+- `RUNNER_MODE=operator make ai.mcp.stop`
 - `make ai.mcp.repo.start`
 - `make ai.mcp.evidence.start`
 - `make ai.mcp.observability.start`

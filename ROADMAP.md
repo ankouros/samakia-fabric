@@ -863,6 +863,8 @@ Follow-up steps (safety prerequisites):
   - Acceptance marker: `acceptance/PHASE17_STEP5_ACCEPTED.md`
 - Step 6 (guarded live AI indexing + n8n ingestion workflows): **COMPLETED**
   - Acceptance marker: `acceptance/PHASE17_STEP6_ACCEPTED.md`
+- Step 7 (audited read-only MCP services + deploy/test harness): **COMPLETED**
+  - Acceptance marker: `acceptance/PHASE17_STEP7_ACCEPTED.md`
 
 Non-scope:
 - No execution tooling.

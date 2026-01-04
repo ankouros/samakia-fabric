@@ -9,6 +9,9 @@ require_ci_mode
 
 
 mcp_root="${FABRIC_REPO_ROOT}/ops/ai/mcp"
+common_root="${mcp_root}/common"
+deploy_root="${mcp_root}/deploy"
+test_root="${mcp_root}/test"
 
 require_file() {
   local path="$1"
@@ -25,6 +28,26 @@ require_exec() {
     exit 1
   fi
 }
+
+require_file "${common_root}/server.py"
+require_exec "${common_root}/http.sh"
+
+require_file "${deploy_root}/README.md"
+require_file "${deploy_root}/env.example"
+require_file "${deploy_root}/systemd/mcp-repo.service"
+require_file "${deploy_root}/systemd/mcp-evidence.service"
+require_file "${deploy_root}/systemd/mcp-observability.service"
+require_file "${deploy_root}/systemd/mcp-runbooks.service"
+require_file "${deploy_root}/systemd/mcp-qdrant.service"
+
+require_exec "${mcp_root}/start.sh"
+require_exec "${mcp_root}/stop.sh"
+require_exec "${test_root}/run.sh"
+require_exec "${test_root}/test-repo.sh"
+require_exec "${test_root}/test-evidence.sh"
+require_exec "${test_root}/test-observability.sh"
+require_exec "${test_root}/test-runbooks.sh"
+require_exec "${test_root}/test-qdrant.sh"
 
 kinds=(repo evidence observability runbooks qdrant)
 
@@ -71,6 +94,11 @@ if ! rg -n "MCP_TEST_MODE" "${mcp_root}/common/server.py" >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! rg -n "RUNNER_MODE" "${mcp_root}/common/server.py" >/dev/null 2>&1; then
+  echo "ERROR: MCP server missing runner-mode guard" >&2
+  exit 1
+fi
+
 if ! rg -n "OBS_LIVE" "${mcp_root}/common/server.py" >/dev/null 2>&1; then
   echo "ERROR: MCP server missing OBS_LIVE guard" >&2
   exit 1
@@ -78,6 +106,11 @@ fi
 
 if ! rg -n "QDRANT_LIVE" "${mcp_root}/common/server.py" >/dev/null 2>&1; then
   echo "ERROR: MCP server missing QDRANT_LIVE guard" >&2
+  exit 1
+fi
+
+if ! rg -n "write_audit" "${mcp_root}/common/server.py" >/dev/null 2>&1; then
+  echo "ERROR: MCP server missing audit logging" >&2
   exit 1
 fi
 

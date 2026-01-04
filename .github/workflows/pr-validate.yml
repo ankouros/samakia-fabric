@@ -70,6 +70,9 @@ jobs:
       - name: AI MCP doctor
         run: make ai.mcp.doctor
 
+      - name: AI MCP test harness
+        run: make ai.mcp.test
+
       - name: Hardening checklist validate
         run: make hardening.checklist.validate
 

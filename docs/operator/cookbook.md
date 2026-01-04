@@ -1072,18 +1072,18 @@ Fix MCP configuration and rerun the doctor check.
 ### Task: Start MCP servers (read-only)
 
 #### Intent
-Start read-only MCP servers for local analysis.
+Start read-only MCP servers for local analysis (fixture-safe).
 
 #### Preconditions
 - Operator workstation (never in CI)
 
 #### Command
 ```bash
-make ai.mcp.repo.start
-make ai.mcp.evidence.start
-make ai.mcp.observability.start
-make ai.mcp.runbooks.start
-make ai.mcp.qdrant.start
+RUNNER_MODE=ci make ai.mcp.repo.start
+RUNNER_MODE=ci make ai.mcp.evidence.start
+RUNNER_MODE=ci make ai.mcp.observability.start
+RUNNER_MODE=ci make ai.mcp.runbooks.start
+RUNNER_MODE=ci make ai.mcp.qdrant.start
 ```
 
 #### Expected result
@@ -1098,6 +1098,59 @@ Each MCP listens on localhost (default ports 8781–8785).
 
 #### Rollback / safe exit
 Stop the local process and re-run with a different `MCP_PORT`.
+
+### Task: MCP systemd start/stop (operator-only)
+
+#### Intent
+Start/stop MCP services via systemd units (deployable).
+
+#### Preconditions
+- MCP systemd units installed (`ops/ai/mcp/deploy/README.md`)
+- Operator context (never in CI)
+
+#### Command
+```bash
+RUNNER_MODE=operator make ai.mcp.start
+RUNNER_MODE=operator make ai.mcp.stop
+```
+
+#### Expected result
+Systemd reports services started/stopped successfully.
+
+#### Evidence outputs
+`evidence/ai/mcp-audit/<UTC>/...` per request.
+
+#### Failure modes
+- Missing unit files or environment file
+
+#### Rollback / safe exit
+Stop MCP services and correct the systemd unit configuration.
+
+### Task: MCP test harness (CI-safe)
+
+#### Intent
+Validate MCP allowlists, tenant isolation, and audit evidence using fixtures.
+
+#### Preconditions
+- Local runner or CI worker (no live dependencies)
+
+#### Command
+```bash
+make ai.mcp.test
+```
+
+#### Expected result
+All MCP test scripts pass and audit evidence is written.
+
+#### Evidence outputs
+`evidence/ai/mcp-audit/<UTC>/...` per request.
+
+#### Failure modes
+- MCP server fails to start
+- Allowlist or tenant isolation violations
+
+#### Rollback / safe exit
+Fix MCP configuration or allowlists and rerun the test harness.
 
 ### Task: Phase 16 Part 2 acceptance
 
@@ -4560,6 +4613,60 @@ Acceptance marker written under `acceptance/PHASE17_STEP6_ACCEPTED.md`.
 #### Failure modes
 - Policy gate failures
 - Offline indexing or n8n validation failures
+
+#### Rollback / safe exit
+Stop and remediate failures before re-running acceptance.
+
+### Task: Phase 17 Step 7 entry checklist (MCP services)
+
+#### Intent
+Confirm entry conditions for Phase 17 Step 7.
+
+#### Preconditions
+- Phase 17 Step 6 accepted
+- Phase 16 Part 1 + Part 2 accepted
+- No OPEN items in REQUIRED-FIXES.md
+
+#### Command
+```bash
+make phase17.step7.entry.check
+```
+
+#### Expected result
+Checklist written under `acceptance/PHASE17_STEP7_ENTRY_CHECKLIST.md`.
+
+#### Evidence outputs
+`acceptance/PHASE17_STEP7_ENTRY_CHECKLIST.md`
+
+#### Failure modes
+- Missing MCP deploy/test artifacts
+- Policy or docs checks failing
+
+#### Rollback / safe exit
+Fix missing prerequisites and re-run the checklist.
+
+### Task: Phase 17 Step 7 acceptance (MCP services)
+
+#### Intent
+Run the CI-safe acceptance suite for Step 7.
+
+#### Preconditions
+- Phase 17 Step 7 entry checklist passes
+
+#### Command
+```bash
+CI=1 make phase17.step7.accept
+```
+
+#### Expected result
+Acceptance marker written under `acceptance/PHASE17_STEP7_ACCEPTED.md`.
+
+#### Evidence outputs
+`acceptance/PHASE17_STEP7_ACCEPTED.md`
+
+#### Failure modes
+- MCP test harness failures
+- Policy gate failures
 
 #### Rollback / safe exit
 Stop and remediate failures before re-running acceptance.

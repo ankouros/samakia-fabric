@@ -4,7 +4,12 @@ set -euo pipefail
 
 # shellcheck disable=SC1091
 source "${FABRIC_REPO_ROOT}/ops/runner/guard.sh"
-require_ci_mode
+
+if [[ "${RUNNER_MODE:-ci}" == "operator" ]]; then
+  require_operator_mode
+else
+  require_ci_mode
+fi
 
 
 mcp_identity_header="X-MCP-Identity"

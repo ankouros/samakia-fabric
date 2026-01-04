@@ -74,14 +74,29 @@ Doctor (config + allowlists, read-only):
 make ai.mcp.doctor
 ```
 
-Start servers locally (read-only):
+Start/stop systemd services (operator-only):
 
 ```bash
-make ai.mcp.repo.start
-make ai.mcp.evidence.start
-make ai.mcp.observability.start
-make ai.mcp.runbooks.start
-make ai.mcp.qdrant.start
+RUNNER_MODE=operator make ai.mcp.start
+RUNNER_MODE=operator make ai.mcp.stop
+```
+
+Systemd deployment details live in `ops/ai/mcp/deploy/README.md`.
+
+Start servers locally (read-only, fixture-safe):
+
+```bash
+RUNNER_MODE=ci make ai.mcp.repo.start
+RUNNER_MODE=ci make ai.mcp.evidence.start
+RUNNER_MODE=ci make ai.mcp.observability.start
+RUNNER_MODE=ci make ai.mcp.runbooks.start
+RUNNER_MODE=ci make ai.mcp.qdrant.start
+```
+
+CI-safe test harness:
+
+```bash
+make ai.mcp.test
 ```
 
 Requests must include identity + tenant headers:

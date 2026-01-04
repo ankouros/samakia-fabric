@@ -254,7 +254,12 @@ class MCPServer(HTTPServer):
         self.identity_header = os.environ.get("MCP_IDENTITY_HEADER", "X-MCP-Identity")
         self.tenant_header = os.environ.get("MCP_TENANT_HEADER", "X-MCP-Tenant")
         self.request_id_header = os.environ.get("MCP_REQUEST_ID_HEADER", "X-MCP-Request-Id")
-        self.test_mode = os.environ.get("MCP_TEST_MODE", "0") == "1" or os.environ.get("CI", "0") == "1"
+        runner_mode = os.environ.get("RUNNER_MODE") or "ci"
+        self.test_mode = (
+            os.environ.get("MCP_TEST_MODE", "0") == "1"
+            or os.environ.get("CI", "0") == "1"
+            or runner_mode == "ci"
+        )
         self.redaction_patterns = load_redaction_patterns(
             self.repo_root / "contracts" / "ai" / "indexing.yml"
         )
@@ -554,6 +559,7 @@ class MCPServer(HTTPServer):
 
 if __name__ == "__main__":
     port = int(os.environ.get("MCP_PORT", "8781"))
-    server = MCPServer(("127.0.0.1", port), MCPHandler)
-    print(f"MCP {server.mcp_kind} listening on 127.0.0.1:{port}")
+    bind_address = os.environ.get("MCP_BIND_ADDRESS", "127.0.0.1")
+    server = MCPServer((bind_address, port), MCPHandler)
+    print(f"MCP {server.mcp_kind} listening on {bind_address}:{port}")
     server.serve_forever()

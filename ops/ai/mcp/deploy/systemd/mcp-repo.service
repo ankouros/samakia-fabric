@@ -1,0 +1,17 @@
+[Unit]
+Description=Samakia MCP Repo (read-only)
+After=network.target
+
+[Service]
+Type=simple
+User=samakia
+Group=samakia
+EnvironmentFile=/etc/samakia-fabric/mcp.env
+Environment=MCP_PORT=8781
+WorkingDirectory=/opt/samakia-fabric
+ExecStart=/usr/bin/env bash /opt/samakia-fabric/ops/ai/mcp/repo/server.sh
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
