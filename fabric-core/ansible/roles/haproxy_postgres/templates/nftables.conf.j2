@@ -1,0 +1,38 @@
+#!/usr/sbin/nft -f
+
+# Managed by Samakia Fabric (haproxy_postgres). Do not edit manually.
+
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+
+    iif "lo" accept
+    ct state established,related accept
+
+{% for cidr in haproxy_postgres_mgmt_ssh_allow_cidrs %}
+    ip saddr {{ cidr }} tcp dport 22 accept
+{% endfor %}
+
+    # VRRP (unicast) between HAProxy peers.
+    ip protocol vrrp ip saddr { {{ haproxy_postgres_bind_ip }}, {{ haproxy_postgres_peer_ip }} } accept
+
+{% for cidr in haproxy_postgres_allowed_source_cidrs %}
+    ip saddr {{ cidr }} ip daddr { {{ haproxy_postgres_bind_ip }}, {{ haproxy_postgres_vip }} } tcp dport {{ haproxy_postgres_port }} accept
+{% endfor %}
+  }
+
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+
+    ct state established,related accept
+  }
+
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}

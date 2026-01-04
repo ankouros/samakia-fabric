@@ -1,0 +1,27 @@
+---
+haproxy_postgres_bind_ip: "{{ ansible_host }}"
+haproxy_postgres_vip: 10.10.120.2
+haproxy_postgres_port: 5432
+haproxy_postgres_stats_port: 8404
+haproxy_postgres_rest_port: 8008
+haproxy_postgres_backends: []
+
+haproxy_postgres_tls_dir: /etc/haproxy/certs
+haproxy_postgres_tls_pem_src: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal.pem' }}"
+haproxy_postgres_tls_pem_dst: /etc/haproxy/certs/postgres-internal.pem
+haproxy_postgres_ca_key: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal-ca.key' }}"
+haproxy_postgres_ca_crt: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal-ca.crt' }}"
+haproxy_postgres_cert_key: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal.key' }}"
+haproxy_postgres_cert_csr: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal.csr' }}"
+haproxy_postgres_cert_crt: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal.crt' }}"
+haproxy_postgres_cert_ext: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal.ext' }}"
+
+haproxy_postgres_tls_sans:
+  - db.internal.shared
+  - db.canary.internal
+
+haproxy_postgres_mgmt_ssh_allow_cidrs: []
+haproxy_postgres_allowed_source_cidrs:
+  - 10.10.120.0/24
+
+haproxy_postgres_peer_ip: ""

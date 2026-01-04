@@ -36,6 +36,13 @@ table inet filter {
 
     ct state established,related accept
 
+{% if shared_edge_gateway_postgres_allow_cidrs | length > 0 %}
+    # Allow operator LAN access to internal Postgres (explicit allowlist).
+{% for cidr in shared_edge_gateway_postgres_allow_cidrs %}
+    ip saddr {{ cidr }} ip daddr { {{ shared_edge_gateway_postgres_vip }}, {{ shared_edge_gateway_postgres_nodes | join(', ') }} } tcp dport {{ shared_edge_gateway_postgres_port }} accept
+{% endfor %}
+{% endif %}
+
     # VLAN120 egress NAT to LAN uplink.
     iif "{{ shared_edge_gateway_vlan_iface }}" oif "{{ shared_edge_gateway_lan_iface }}" ip saddr {{ shared_edge_gateway_vlan_cidr }} accept
   }
@@ -50,6 +57,11 @@ table ip nat {
   chain postrouting {
     type nat hook postrouting priority 100;
     policy accept;
+
+{% if shared_edge_gateway_postgres_allow_cidrs | length > 0 %}
+    # Preserve Postgres source IPs for LAN operator access (no NAT).
+    ip saddr {{ shared_edge_gateway_vlan_cidr }} ip daddr { {{ shared_edge_gateway_postgres_allow_cidrs | join(', ') }} } tcp sport {{ shared_edge_gateway_postgres_port }} accept
+{% endif %}
 
     oif "{{ shared_edge_gateway_lan_iface }}" ip saddr {{ shared_edge_gateway_vlan_cidr }} masquerade
   }

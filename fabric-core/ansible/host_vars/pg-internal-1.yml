@@ -1,0 +1,5 @@
+ansible_host: 10.10.120.23
+ansible_become: true
+ansible_become_method: sudo
+# VLAN-only node: access via ntp edge jump hosts on LAN.
+ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new -o ProxyJump=samakia@192.168.11.106,samakia@192.168.11.107"

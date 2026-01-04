@@ -359,52 +359,142 @@ resource "proxmox_lxc" "obs_2" {
 }
 
 ###############################################################################
+# Internal Postgres (Patroni) + HAProxy frontends
+###############################################################################
+
+module "postgres_internal" {
+  source     = "../../modules/postgres-patroni"
+  depends_on = [null_resource.sdn_shared_plane]
+
+  lxc_template    = local.lxc_template
+  ssh_public_keys = var.ssh_public_keys
+  storage         = "pve-nfs"
+
+  tag_env   = local.tag_env
+  tag_plane = local.tag_plane
+
+  vlan_vnet    = local.vlan_vnet
+  vlan_gateway = local.vlan_gw_vip
+
+  patroni_nodes = {
+    pg_internal_1 = {
+      vmid        = 3311
+      hostname    = "pg-internal-1"
+      target_node = "proxmox1"
+      ip          = "10.10.120.23"
+      mac_address = "BC:24:11:AD:60:F1"
+      cores       = 2
+      memory      = 2048
+      swap        = 512
+      rootfs_size = "16G"
+      role        = "postgres"
+    }
+    pg_internal_2 = {
+      vmid        = 3312
+      hostname    = "pg-internal-2"
+      target_node = "proxmox2"
+      ip          = "10.10.120.24"
+      mac_address = "BC:24:11:AD:60:F2"
+      cores       = 2
+      memory      = 2048
+      swap        = 512
+      rootfs_size = "16G"
+      role        = "postgres"
+    }
+    pg_internal_3 = {
+      vmid        = 3313
+      hostname    = "pg-internal-3"
+      target_node = "proxmox3"
+      ip          = "10.10.120.25"
+      mac_address = "BC:24:11:AD:60:F3"
+      cores       = 2
+      memory      = 2048
+      swap        = 512
+      rootfs_size = "16G"
+      role        = "postgres"
+    }
+  }
+
+  haproxy_nodes = {
+    haproxy_pg_1 = {
+      vmid        = 3314
+      hostname    = "haproxy-pg-1"
+      target_node = "proxmox1"
+      ip          = "10.10.120.13"
+      mac_address = "BC:24:11:AD:60:F4"
+      cores       = 2
+      memory      = 1024
+      swap        = 512
+      rootfs_size = "8G"
+      role        = "pg-haproxy"
+    }
+    haproxy_pg_2 = {
+      vmid        = 3315
+      hostname    = "haproxy-pg-2"
+      target_node = "proxmox2"
+      ip          = "10.10.120.14"
+      mac_address = "BC:24:11:AD:60:F5"
+      cores       = 2
+      memory      = 1024
+      swap        = 512
+      rootfs_size = "8G"
+      role        = "pg-haproxy"
+    }
+  }
+}
+
+###############################################################################
 # Outputs for Ansible inventory + acceptance
 ###############################################################################
 
 output "lxc_inventory" {
   description = "Inventory data for Ansible"
-  value = {
-    ntp_1 = {
-      hostname = proxmox_lxc.ntp_1.hostname
-      node     = proxmox_lxc.ntp_1.target_node
-      vmid     = proxmox_lxc.ntp_1.vmid
-    }
-    ntp_2 = {
-      hostname = proxmox_lxc.ntp_2.hostname
-      node     = proxmox_lxc.ntp_2.target_node
-      vmid     = proxmox_lxc.ntp_2.vmid
-    }
-    vault_1 = {
-      hostname = proxmox_lxc.vault_1.hostname
-      node     = proxmox_lxc.vault_1.target_node
-      vmid     = proxmox_lxc.vault_1.vmid
-    }
-    vault_2 = {
-      hostname = proxmox_lxc.vault_2.hostname
-      node     = proxmox_lxc.vault_2.target_node
-      vmid     = proxmox_lxc.vault_2.vmid
-    }
-    obs_1 = {
-      hostname = proxmox_lxc.obs_1.hostname
-      node     = proxmox_lxc.obs_1.target_node
-      vmid     = proxmox_lxc.obs_1.vmid
-    }
-    obs_2 = {
-      hostname = proxmox_lxc.obs_2.hostname
-      node     = proxmox_lxc.obs_2.target_node
-      vmid     = proxmox_lxc.obs_2.vmid
-    }
-  }
+  value = merge(
+    {
+      ntp_1 = {
+        hostname = proxmox_lxc.ntp_1.hostname
+        node     = proxmox_lxc.ntp_1.target_node
+        vmid     = proxmox_lxc.ntp_1.vmid
+      }
+      ntp_2 = {
+        hostname = proxmox_lxc.ntp_2.hostname
+        node     = proxmox_lxc.ntp_2.target_node
+        vmid     = proxmox_lxc.ntp_2.vmid
+      }
+      vault_1 = {
+        hostname = proxmox_lxc.vault_1.hostname
+        node     = proxmox_lxc.vault_1.target_node
+        vmid     = proxmox_lxc.vault_1.vmid
+      }
+      vault_2 = {
+        hostname = proxmox_lxc.vault_2.hostname
+        node     = proxmox_lxc.vault_2.target_node
+        vmid     = proxmox_lxc.vault_2.vmid
+      }
+      obs_1 = {
+        hostname = proxmox_lxc.obs_1.hostname
+        node     = proxmox_lxc.obs_1.target_node
+        vmid     = proxmox_lxc.obs_1.vmid
+      }
+      obs_2 = {
+        hostname = proxmox_lxc.obs_2.hostname
+        node     = proxmox_lxc.obs_2.target_node
+        vmid     = proxmox_lxc.obs_2.vmid
+      }
+    },
+    module.postgres_internal.patroni_inventory,
+    module.postgres_internal.haproxy_inventory,
+  )
 }
 
 output "shared_endpoints" {
   description = "Shared services VIPs and node IPs"
   value = {
-    ntp_vip     = local.ntp_lan_vip
-    vault_vip   = local.vault_lan_vip
-    obs_vip     = local.obs_lan_vip
-    vlan_gw_vip = local.vlan_gw_vip
+    ntp_vip      = local.ntp_lan_vip
+    vault_vip    = local.vault_lan_vip
+    obs_vip      = local.obs_lan_vip
+    postgres_vip = "10.10.120.2"
+    vlan_gw_vip  = local.vlan_gw_vip
     ntp_edges = {
       ntp_1 = { lan_ip = "192.168.11.106", vlan_ip = "10.10.120.11" }
       ntp_2 = { lan_ip = "192.168.11.107", vlan_ip = "10.10.120.12" }
@@ -416,6 +506,15 @@ output "shared_endpoints" {
     obs_nodes = [
       "10.10.120.31",
       "10.10.120.32",
+    ]
+    postgres_nodes = [
+      "10.10.120.23",
+      "10.10.120.24",
+      "10.10.120.25",
+    ]
+    postgres_haproxy_nodes = [
+      "10.10.120.13",
+      "10.10.120.14",
     ]
   }
 }

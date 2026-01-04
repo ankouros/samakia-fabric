@@ -1,0 +1,327 @@
+---
+- name: Set Patroni bind IP
+  ansible.builtin.set_fact:
+    postgres_patroni_bind_ip: "{{ postgres_patroni_bind_ip | default(ansible_host) }}"
+
+- name: Assert Patroni secrets are provided
+  ansible.builtin.assert:
+    that:
+      - postgres_patroni_admin_password | length > 0
+      - postgres_patroni_replication_password | length > 0
+    fail_msg: "Missing Patroni credentials (set POSTGRES_INTERNAL_ADMIN_PASSWORD and POSTGRES_INTERNAL_REPLICATION_PASSWORD)."
+    quiet: true
+
+- name: Assert etcd members list is defined
+  ansible.builtin.assert:
+    that:
+      - postgres_patroni_etcd_members | length > 0
+    fail_msg: "postgres_patroni_etcd_members must be defined with name/ip entries."
+    quiet: true
+
+- name: Detect existing Patroni data dir
+  ansible.builtin.stat:
+    path: "{{ postgres_patroni_data_dir }}"
+  register: postgres_patroni_data_dir_stat
+
+- name: Detect existing etcd data dir
+  ansible.builtin.stat:
+    path: /var/lib/etcd
+  register: postgres_patroni_etcd_data_dir_stat
+
+- name: Reset Patroni cluster data (guarded)
+  when: postgres_patroni_reset_cluster | bool and
+        (postgres_patroni_data_dir_stat.stat.exists or postgres_patroni_etcd_data_dir_stat.stat.exists)
+  block:
+    - name: Stop Patroni service if present
+      ansible.builtin.service:
+        name: "{{ postgres_patroni_service_name }}"
+        state: stopped
+      failed_when: false
+
+    - name: Stop PostgreSQL service if present
+      ansible.builtin.service:
+        name: postgresql
+        state: stopped
+      failed_when: false
+
+    - name: Stop etcd service if present
+      ansible.builtin.service:
+        name: etcd
+        state: stopped
+      failed_when: false
+
+    - name: Remove Patroni data dir
+      ansible.builtin.file:
+        path: "{{ postgres_patroni_data_dir }}"
+        state: absent
+
+    - name: Remove etcd data dir
+      ansible.builtin.file:
+        path: /var/lib/etcd
+        state: absent
+
+- name: Ensure etcd data dir exists
+  ansible.builtin.file:
+    path: /var/lib/etcd
+    state: directory
+    owner: etcd
+    group: etcd
+    mode: "0700"
+
+- name: Build etcd cluster strings
+  ansible.builtin.set_fact:
+    postgres_patroni_etcd_initial_cluster: >-
+      {%- set items = [] -%}
+      {%- for member in postgres_patroni_etcd_members -%}
+      {%- set _ = items.append(member.name ~ '=http://' ~ member.ip ~ ':' ~ postgres_patroni_etcd_peer_port) -%}
+      {%- endfor -%}
+      {{ items | join(',') }}
+    postgres_patroni_etcd_hosts: >-
+      {{ postgres_patroni_etcd_members
+      | map(attribute='ip')
+      | map('regex_replace', '$', ':' ~ postgres_patroni_etcd_port)
+      | list }}
+
+- name: Detect existing etcd data dir
+  ansible.builtin.stat:
+    path: /var/lib/etcd/member
+  register: postgres_patroni_etcd_member_dir
+
+- name: Set etcd cluster state
+  ansible.builtin.set_fact:
+    postgres_patroni_etcd_cluster_state_effective: >-
+      {{ 'existing' if postgres_patroni_etcd_member_dir.stat.exists else postgres_patroni_etcd_cluster_state }}
+
+- name: Ensure Ubuntu universe repositories are present
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/ubuntu-universe.list
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe
+      deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-updates universe
+      deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
+  when: ansible_distribution == "Ubuntu"
+
+- name: Resolve etcd package list
+  ansible.builtin.set_fact:
+    postgres_patroni_etcd_packages_effective: >-
+      {{ postgres_patroni_etcd_packages_ubuntu if ansible_distribution == "Ubuntu"
+      else postgres_patroni_etcd_packages_default }}
+
+- name: Ensure required packages are installed
+  ansible.builtin.apt:
+    name: "{{ postgres_patroni_base_packages + postgres_patroni_etcd_packages_effective }}"
+    state: present
+    update_cache: true
+
+- name: Ensure local Postgres PKI directory exists (controller)
+  ansible.builtin.file:
+    path: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki' }}"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Bootstrap Postgres internal CA (controller, if missing)
+  ansible.builtin.command: >-
+    openssl req -x509 -new -nodes
+    -keyout "{{ postgres_patroni_tls_ca_key_src }}"
+    -out "{{ postgres_patroni_tls_ca_src }}"
+    -sha256 -days 3650
+    -subj "/CN=Samakia Internal Postgres CA"
+  args:
+    creates: "{{ postgres_patroni_tls_ca_src }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Bootstrap Postgres internal key (controller, if missing)
+  ansible.builtin.command:
+    argv: ["openssl", "genrsa", "-out", "{{ postgres_patroni_tls_key_src }}", "2048"]
+  args:
+    creates: "{{ postgres_patroni_tls_key_src }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Bootstrap Postgres internal CSR (controller, if missing)
+  ansible.builtin.command: >-
+    openssl req -new -key "{{ postgres_patroni_tls_key_src }}"
+    -subj "/CN=db.internal.shared"
+    -out "{{ postgres_patroni_tls_cert_src }}.csr"
+  args:
+    creates: "{{ postgres_patroni_tls_cert_src }}.csr"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Render Postgres internal SAN config (controller)
+  ansible.builtin.copy:
+    dest: "{{ postgres_patroni_tls_ext_src }}"
+    mode: "0600"
+    content: |
+      subjectAltName={{ postgres_patroni_tls_sans | map('regex_replace', '^', 'DNS:') | join(',') }}
+      basicConstraints=CA:FALSE
+      keyUsage=digitalSignature,keyEncipherment
+      extendedKeyUsage=serverAuth
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Bootstrap Postgres internal certificate (controller, if missing)
+  ansible.builtin.command: >-
+    openssl x509 -req -in "{{ postgres_patroni_tls_cert_src }}.csr"
+    -CA "{{ postgres_patroni_tls_ca_src }}"
+    -CAkey "{{ postgres_patroni_tls_ca_key_src }}" -CAcreateserial
+    -out "{{ postgres_patroni_tls_cert_src }}" -days 825 -sha256
+    -extfile "{{ postgres_patroni_tls_ext_src }}"
+  args:
+    creates: "{{ postgres_patroni_tls_cert_src }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Ensure Postgres TLS directory exists
+  ansible.builtin.file:
+    path: "{{ postgres_patroni_tls_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: "0750"
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Install Postgres TLS CA certificate
+  ansible.builtin.copy:
+    src: "{{ postgres_patroni_tls_ca_src }}"
+    dest: "{{ postgres_patroni_tls_ca_dst }}"
+    owner: postgres
+    group: postgres
+    mode: "0644"
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Install Postgres TLS certificate
+  ansible.builtin.copy:
+    src: "{{ postgres_patroni_tls_cert_src }}"
+    dest: "{{ postgres_patroni_tls_cert_dst }}"
+    owner: postgres
+    group: postgres
+    mode: "0644"
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Install Postgres TLS key
+  ansible.builtin.copy:
+    src: "{{ postgres_patroni_tls_key_src }}"
+    dest: "{{ postgres_patroni_tls_key_dst }}"
+    owner: postgres
+    group: postgres
+    mode: "0600"
+  no_log: true
+  when: postgres_patroni_tls_enabled | bool
+
+- name: Ensure etcd config directory exists
+  ansible.builtin.file:
+    path: /etc/etcd
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install etcd config
+  ansible.builtin.template:
+    src: etcd.conf.yml.j2
+    dest: /etc/etcd/etcd.conf.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart etcd
+
+- name: Ensure etcd systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/etcd.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install etcd systemd override
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/etcd.service.d/override.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Service]
+      Environment=ETCD_CONFIG_FILE=/etc/etcd/etcd.conf.yml
+      Restart=on-failure
+      RestartSec=5s
+  notify:
+    - Reload systemd
+    - Restart etcd
+
+- name: Ensure etcd is enabled and started
+  ansible.builtin.service:
+    name: etcd
+    enabled: true
+    state: started
+
+- name: Stop and disable default PostgreSQL service
+  ansible.builtin.service:
+    name: postgresql
+    enabled: false
+    state: stopped
+
+- name: Install Patroni configuration
+  ansible.builtin.template:
+    src: patroni.yml.j2
+    dest: "{{ postgres_patroni_config_path }}"
+    owner: postgres
+    group: postgres
+    mode: "0600"
+  no_log: true
+  notify: Restart Patroni
+
+- name: Install Patroni systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/patroni.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Patroni (Postgres HA)
+      After=network.target etcd.service
+      Wants=etcd.service
+
+      [Service]
+      User=postgres
+      Group=postgres
+      ExecStart={{ postgres_patroni_binary }} {{ postgres_patroni_config_path }}
+      Restart=on-failure
+      RestartSec=5s
+      LimitNOFILE=65536
+
+      [Install]
+      WantedBy=multi-user.target
+  notify:
+    - Reload systemd
+    - Restart Patroni
+
+- name: Ensure Patroni is enabled and started
+  ansible.builtin.service:
+    name: "{{ postgres_patroni_service_name }}"
+    enabled: true
+    state: started

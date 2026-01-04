@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PostgresPatroniProvider",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mode", "endpoint"],
+  "properties": {
+    "mode": {"enum": ["internal-only", "tenant"]},
+    "endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "port", "protocol", "tls_required"],
+      "properties": {
+        "host": {"type": "string"},
+        "port": {"type": "integer", "minimum": 1, "maximum": 65535},
+        "protocol": {"enum": ["tcp"]},
+        "tls_required": {"type": "boolean"}
+      }
+    },
+    "dcs": {"enum": ["etcd"]}
+  }
+}

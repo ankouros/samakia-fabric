@@ -10,5 +10,7 @@ newServer({address="127.0.0.1:{{ dns_edge_gateway_unbound_listen_port }}", pool=
 newServer({address="{{ ip }}:53", pool="auth"})
 {% endfor %}
 
-addAction("{{ dns_edge_gateway_zone_name }}.", PoolAction("auth"))
+{% for zone in dns_edge_gateway_auth_zones %}
+addAction("{{ zone }}.", PoolAction("auth"))
+{% endfor %}
 addAction(AllRule(), PoolAction("recursor"))

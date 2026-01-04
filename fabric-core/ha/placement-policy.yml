@@ -89,6 +89,22 @@
           "replicas": 2,
           "anti_affinity": true,
           "hosts": ["obs-1", "obs-2"]
+        },
+        {
+          "name": "pg-internal",
+          "tier": "tier1",
+          "ha_mode": "app",
+          "replicas": 3,
+          "anti_affinity": true,
+          "hosts": ["pg-internal-1", "pg-internal-2", "pg-internal-3"]
+        },
+        {
+          "name": "haproxy-pg",
+          "tier": "tier0",
+          "ha_mode": "vip",
+          "replicas": 2,
+          "anti_affinity": true,
+          "hosts": ["haproxy-pg-1", "haproxy-pg-2"]
         }
       ]
     },

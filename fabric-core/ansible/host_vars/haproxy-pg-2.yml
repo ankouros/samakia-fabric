@@ -1,0 +1,14 @@
+ansible_host: 10.10.120.14
+ansible_become: true
+ansible_become_method: sudo
+# VLAN-only node: access via ntp edge jump hosts on LAN.
+ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new -o ProxyJump=samakia@192.168.11.106,samakia@192.168.11.107"
+
+keepalived_vip_role: backup
+keepalived_vip_priority: 100
+keepalived_vip_router_id: 41
+keepalived_vip_address: 10.10.120.2
+keepalived_vip_local_ip: 10.10.120.14
+keepalived_vip_peer_ip: 10.10.120.13
+
+haproxy_postgres_peer_ip: 10.10.120.13

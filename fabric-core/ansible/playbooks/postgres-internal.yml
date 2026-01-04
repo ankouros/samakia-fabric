@@ -1,0 +1,38 @@
+---
+- name: Internal Postgres (Patroni)
+  hosts: pg-internal-*
+  become: true
+  vars:
+    postgres_patroni_etcd_members:
+      - name: pg-internal-1
+        ip: 10.10.120.23
+      - name: pg-internal-2
+        ip: 10.10.120.24
+      - name: pg-internal-3
+        ip: 10.10.120.25
+    postgres_patroni_reset_cluster: >-
+      {{ (lookup('ansible.builtin.env', 'POSTGRES_INTERNAL_RESET') | default('0', true)) == '1' }}
+    postgres_patroni_admin_password: "{{ lookup('ansible.builtin.env', 'POSTGRES_INTERNAL_ADMIN_PASSWORD') }}"
+    postgres_patroni_replication_password: "{{ lookup('ansible.builtin.env', 'POSTGRES_INTERNAL_REPLICATION_PASSWORD') }}"
+  roles:
+    - role: postgres_patroni
+
+- name: Internal Postgres HAProxy + VIP
+  hosts: haproxy-pg-*
+  become: true
+  vars:
+    haproxy_postgres_backends:
+      - 10.10.120.23
+      - 10.10.120.24
+      - 10.10.120.25
+    haproxy_postgres_allowed_source_cidrs: >-
+      {{ (['10.10.120.0/24']
+      + (lookup('ansible.builtin.env', 'FABRIC_ADMIN_CIDRS')
+      | default('192.168.11.0/24', true)).split(','))
+      | map('trim') | reject('equalto', '') | list }}
+    haproxy_postgres_mgmt_ssh_allow_cidrs: >-
+      {{ (lookup('ansible.builtin.env', 'FABRIC_ADMIN_CIDRS')
+      | default('192.168.11.0/24', true)).split(',') + ['10.10.120.11/32', '10.10.120.12/32'] }}
+  roles:
+    - role: haproxy_postgres
+    - role: keepalived_vip

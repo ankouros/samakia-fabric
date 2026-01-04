@@ -1,0 +1,30 @@
+provider: postgres-internal
+version: v1alpha1
+plane: shared
+vlan:
+  id: 120
+  cidr: 10.10.120.0/24
+  gateway_vip: 10.10.120.1
+replicas: 3
+dcs:
+  type: etcd
+  scope: postgres-internal
+  nodes: 3
+nodes:
+  patroni:
+    - name: pg-internal-1
+      host: proxmox1
+      ip: 10.10.120.23
+    - name: pg-internal-2
+      host: proxmox2
+      ip: 10.10.120.24
+    - name: pg-internal-3
+      host: proxmox3
+      ip: 10.10.120.25
+  haproxy:
+    - name: haproxy-pg-1
+      host: proxmox1
+      ip: 10.10.120.13
+    - name: haproxy-pg-2
+      host: proxmox2
+      ip: 10.10.120.14

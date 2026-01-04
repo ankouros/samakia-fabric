@@ -33,9 +33,9 @@ Notes:
 
 ## Example: Postgres Patroni cluster (internal)
 
-- Patroni nodes (workload range): `10.10.120.20`, `10.10.120.21`,
-  `10.10.120.22`
-- HAProxy nodes (proxy range): `10.10.120.11`, `10.10.120.12`
+- Patroni nodes (workload range): `10.10.120.23`, `10.10.120.24`,
+  `10.10.120.25`
+- HAProxy nodes (proxy range): `10.10.120.13`, `10.10.120.14`
 - VIP (registry): `10.10.120.2` (`postgres_internal`)
 - DNS: points to HAProxy nodes, not the VIP
 

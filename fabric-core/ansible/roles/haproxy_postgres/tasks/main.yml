@@ -1,0 +1,228 @@
+---
+- name: Resolve local TLS paths
+  ansible.builtin.set_fact:
+    haproxy_postgres_tls_pem_src_effective: "{{ haproxy_postgres_tls_pem_src }}"
+    haproxy_postgres_ca_key_effective: "{{ haproxy_postgres_ca_key }}"
+    haproxy_postgres_ca_crt_effective: "{{ haproxy_postgres_ca_crt }}"
+    haproxy_postgres_cert_key_effective: "{{ haproxy_postgres_cert_key }}"
+    haproxy_postgres_cert_csr_effective: "{{ haproxy_postgres_cert_csr }}"
+    haproxy_postgres_cert_crt_effective: "{{ haproxy_postgres_cert_crt }}"
+    haproxy_postgres_cert_ext_effective: "{{ haproxy_postgres_cert_ext }}"
+    haproxy_postgres_tls_san_line: >-
+      {{ ((haproxy_postgres_tls_sans | map('regex_replace', '^', 'DNS:') | list)
+      + ['IP:' ~ haproxy_postgres_vip, 'IP:' ~ haproxy_postgres_bind_ip])
+      | join(',') }}
+
+- name: Ensure local PKI directory exists (controller)
+  ansible.builtin.file:
+    path: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki' }}"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Bootstrap Postgres internal CA (controller, if missing)
+  ansible.builtin.command: >-
+    openssl req -x509 -new -nodes
+    -keyout "{{ haproxy_postgres_ca_key_effective }}"
+    -out "{{ haproxy_postgres_ca_crt_effective }}"
+    -sha256 -days 3650
+    -subj "/CN=Samakia Internal Postgres CA"
+  args:
+    creates: "{{ haproxy_postgres_ca_crt_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Bootstrap Postgres internal key (controller, if missing)
+  ansible.builtin.command:
+    argv: ["openssl", "genrsa", "-out", "{{ haproxy_postgres_cert_key_effective }}", "2048"]
+  args:
+    creates: "{{ haproxy_postgres_cert_key_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Bootstrap Postgres internal CSR (controller, if missing)
+  ansible.builtin.command: >-
+    openssl req -new -key "{{ haproxy_postgres_cert_key_effective }}"
+    -subj "/CN=db.internal.shared"
+    -out "{{ haproxy_postgres_cert_csr_effective }}"
+  args:
+    creates: "{{ haproxy_postgres_cert_csr_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Render Postgres internal SAN config (controller)
+  ansible.builtin.copy:
+    dest: "{{ haproxy_postgres_cert_ext_effective }}"
+    mode: "0600"
+    content: |
+      subjectAltName={{ haproxy_postgres_tls_san_line }}
+      basicConstraints=CA:FALSE
+      keyUsage=digitalSignature,keyEncipherment
+      extendedKeyUsage=serverAuth
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Bootstrap Postgres internal certificate (controller, if missing)
+  ansible.builtin.command: >-
+    openssl x509 -req -in "{{ haproxy_postgres_cert_csr_effective }}"
+    -CA "{{ haproxy_postgres_ca_crt_effective }}"
+    -CAkey "{{ haproxy_postgres_ca_key_effective }}" -CAcreateserial
+    -out "{{ haproxy_postgres_cert_crt_effective }}" -days 825 -sha256
+    -extfile "{{ haproxy_postgres_cert_ext_effective }}"
+  args:
+    creates: "{{ haproxy_postgres_cert_crt_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Bootstrap Postgres internal pem bundle (controller, if missing)
+  ansible.builtin.shell: >-
+    cat "{{ haproxy_postgres_cert_key_effective }}"
+    "{{ haproxy_postgres_cert_crt_effective }}"
+    "{{ haproxy_postgres_ca_crt_effective }}"
+    > "{{ haproxy_postgres_tls_pem_src_effective }}"
+  args:
+    creates: "{{ haproxy_postgres_tls_pem_src_effective }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+
+- name: Validate HAProxy TLS pem exists on controller
+  ansible.builtin.stat:
+    path: "{{ haproxy_postgres_tls_pem_src_effective }}"
+  delegate_to: localhost
+  become: false
+  register: haproxy_postgres_tls_pem_stat
+  changed_when: false
+
+- name: Fail if HAProxy TLS pem is missing
+  ansible.builtin.assert:
+    that:
+      - haproxy_postgres_tls_pem_src_effective | length > 0
+      - haproxy_postgres_tls_pem_stat.stat.exists
+    fail_msg: "Missing Postgres internal TLS pem on controller (expected {{ haproxy_postgres_tls_pem_src_effective }})."
+    quiet: true
+
+- name: Fail if SSH allowlist is empty
+  ansible.builtin.assert:
+    that:
+      - haproxy_postgres_mgmt_ssh_allow_cidrs | length > 0
+    fail_msg: "haproxy_postgres_mgmt_ssh_allow_cidrs must be set to an explicit allowlist (e.g. FABRIC_ADMIN_CIDRS)."
+    quiet: true
+
+- name: Fail if HAProxy peer or backends are missing
+  ansible.builtin.assert:
+    that:
+      - haproxy_postgres_peer_ip | length > 0
+      - haproxy_postgres_backends | length > 0
+    fail_msg: "haproxy_postgres_peer_ip and haproxy_postgres_backends must be set for internal Postgres HAProxy."
+    quiet: true
+
+- name: Ensure required packages are installed
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - haproxy
+      - nftables
+      - iproute2
+      - openssl
+    state: present
+    update_cache: true
+
+- name: Ensure HAProxy cert directory exists
+  ansible.builtin.file:
+    path: "{{ haproxy_postgres_tls_dir }}"
+    state: directory
+    owner: root
+    group: haproxy
+    mode: "0750"
+
+- name: Install HAProxy TLS cert+key bundle (pem)
+  ansible.builtin.copy:
+    src: "{{ haproxy_postgres_tls_pem_src_effective }}"
+    dest: "{{ haproxy_postgres_tls_pem_dst }}"
+    owner: root
+    group: haproxy
+    mode: "0640"
+  notify: Restart haproxy
+  no_log: true
+
+- name: Enable IPv4 non-local bind for VIP services
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/60-samakia-postgres-haproxy.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Samakia Fabric (haproxy_postgres). Do not edit manually.
+      net.ipv4.ip_nonlocal_bind = 1
+  notify: Restart nftables
+
+- name: Apply sysctl settings
+  ansible.builtin.command:
+    argv: ["sysctl", "--system"]
+  changed_when: false
+
+- name: Install HAProxy configuration
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart haproxy
+
+- name: Ensure haproxy is enabled and started
+  ansible.builtin.service:
+    name: haproxy
+    enabled: true
+    state: started
+
+- name: Install nftables ruleset
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nftables
+
+- name: Ensure nftables systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/nftables.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install nftables systemd restart policy override
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/nftables.service.d/override.conf
+    content: |
+      [Service]
+      Restart=on-failure
+      RestartSec=5s
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart nftables
+
+- name: Ensure nftables is enabled and started
+  ansible.builtin.service:
+    name: nftables
+    enabled: true
+    state: started

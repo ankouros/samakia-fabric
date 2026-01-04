@@ -147,3 +147,15 @@
   until: dns_auth_powerdns_slave_soa.stdout | trim != ""
   changed_when: false
   when: dns_auth_powerdns_role == "slave"
+
+###############################################################################
+# Extra zones (internal/shared)
+###############################################################################
+
+- name: Ensure extra zones (master + slave)
+  ansible.builtin.include_tasks: ensure_zone.yml
+  loop: "{{ dns_auth_powerdns_extra_zones }}"
+  loop_control:
+    loop_var: dns_auth_powerdns_zone
+    label: "{{ dns_auth_powerdns_zone.name }}"
+  when: dns_auth_powerdns_extra_zones | length > 0

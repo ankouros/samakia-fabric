@@ -31,6 +31,17 @@ No secret values are stored in Git.
 - Dragonfly: `password`, `tenant_key_prefix`, `tls_required`, `ca_ref`
 - Qdrant: `api_key`, `collection_prefix`, `tls_required`, `ca_ref`
 
+## Internal Postgres secrets (platform-only)
+
+Internal Postgres credentials live in Vault and are referenced by:
+
+- `platform/internal/postgres/admin`
+- `platform/internal/postgres/app`
+
+For canary verification, `tenants/canary/database/sample` is mapped to the same
+endpoint and should include `ca_ref: postgres-internal-ca.crt` so live verifies
+can locate the CA under `~/.config/samakia-fabric/pki/`.
+
 ## Secret backends
 
 Vault is the **default secrets backend** for operator and production workflows.

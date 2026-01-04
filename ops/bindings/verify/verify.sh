@@ -260,7 +260,9 @@ PY
 )"
       if [[ -n "${ca_file}" ]]; then
         if [[ ! -f "${ca_file}" ]]; then
-          if [[ -f "${FABRIC_REPO_ROOT}/ops/ca/${ca_file}" ]]; then
+          if [[ -f "${HOME}/.config/samakia-fabric/pki/${ca_file}" ]]; then
+            ca_file="${HOME}/.config/samakia-fabric/pki/${ca_file}"
+          elif [[ -f "${FABRIC_REPO_ROOT}/ops/ca/${ca_file}" ]]; then
             ca_file="${FABRIC_REPO_ROOT}/ops/ca/${ca_file}"
           elif [[ -f "${FABRIC_REPO_ROOT}/${ca_file}" ]]; then
             ca_file="${FABRIC_REPO_ROOT}/${ca_file}"

@@ -30,6 +30,13 @@ shared_edge_gateway_obs_backends:
   - 10.10.120.31
   - 10.10.120.32
 
+shared_edge_gateway_postgres_vip: 10.10.120.2
+shared_edge_gateway_postgres_port: 5432
+shared_edge_gateway_postgres_nodes:
+  - 10.10.120.13
+  - 10.10.120.14
+shared_edge_gateway_postgres_allow_cidrs: []
+
 shared_edge_gateway_tls_pem_src: ""
 shared_edge_gateway_tls_pem_dst: /etc/haproxy/certs/shared-edge.pem
 shared_edge_gateway_backend_ca_src: ""

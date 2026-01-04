@@ -1,0 +1,11 @@
+# Managed by Samakia Fabric (postgres_patroni). Do not edit manually.
+name: {{ inventory_hostname }}
+data-dir: /var/lib/etcd
+enable-v2: true
+initial-advertise-peer-urls: http://{{ postgres_patroni_bind_ip }}:{{ postgres_patroni_etcd_peer_port }}
+listen-peer-urls: http://{{ postgres_patroni_bind_ip }}:{{ postgres_patroni_etcd_peer_port }}
+listen-client-urls: http://{{ postgres_patroni_bind_ip }}:{{ postgres_patroni_etcd_port }},http://127.0.0.1:{{ postgres_patroni_etcd_port }}
+advertise-client-urls: http://{{ postgres_patroni_bind_ip }}:{{ postgres_patroni_etcd_port }}
+initial-cluster: {{ postgres_patroni_etcd_initial_cluster }}
+initial-cluster-state: {{ postgres_patroni_etcd_cluster_state_effective }}
+initial-cluster-token: {{ postgres_patroni_etcd_token }}

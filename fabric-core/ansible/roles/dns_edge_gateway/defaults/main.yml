@@ -10,3 +10,7 @@ dns_edge_gateway_upstream_auth_servers:
   - 10.10.100.21
   - 10.10.100.22
 dns_edge_gateway_unbound_listen_port: 5353
+dns_edge_gateway_auth_zones:
+  - "{{ dns_edge_gateway_zone_name }}"
+  - internal
+  - internal.shared

@@ -54,3 +54,9 @@ set file backend explicitly for exceptions.
 
 - File backend usage requires an explicit override and documented rationale.
 - Overrides must appear in evidence or review artifacts.
+
+## Internal Postgres CA
+
+The internal Postgres HAProxy TLS CA is stored runner-local by default:
+`~/.config/samakia-fabric/pki/postgres-internal-ca.crt`. Binding secrets should
+set `ca_ref: postgres-internal-ca.crt` to enable verify-full TLS checks.

@@ -118,6 +118,7 @@ ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/dns-auth.yml" --syntax-ch
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/minio.yml" --syntax-check
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/minio-edge.yml" --syntax-check
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/state-backend.yml" --syntax-check
+ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/postgres-internal.yml" --syntax-check
 ansible-playbook -i localhost, "$ANSIBLE_DIR/playbooks/ssh-keys-rotate.yml" --syntax-check
 
 echo "Validation checks completed"

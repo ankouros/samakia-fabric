@@ -1,0 +1,9 @@
+---
+keepalived_vip_interface: eth0
+keepalived_vip_address: ""
+keepalived_vip_prefix: 24
+keepalived_vip_router_id: 41
+keepalived_vip_priority: 100
+keepalived_vip_role: backup
+keepalived_vip_local_ip: ""
+keepalived_vip_peer_ip: ""

@@ -173,6 +173,106 @@ None (policy reference).
 #### Rollback / safe exit
 Stop and update the contract before proceeding.
 
+---
+
+## Internal Shared Postgres (Patroni)
+
+### Task: Internal Postgres health check
+
+#### Intent
+Validate DNS, TLS, and Patroni health for the internal Postgres service.
+
+#### Preconditions
+- Runner has access to shared VLAN DNS VIP
+- Runner source IP is in `haproxy_postgres_allowed_source_cidrs` (shared VLAN or `FABRIC_ADMIN_CIDRS`)
+- LAN runners must have a route to `10.10.120.0/24` via the shared edge and the shared edge gateway policy applied.
+- `~/.config/samakia-fabric/pki/postgres-internal-ca.crt` exists
+
+#### Command
+```bash
+ENV=samakia-shared make postgres.internal.doctor
+```
+
+#### Expected result
+DNS resolves `db.internal.shared` and `db.canary.internal`, TLS verifies with the
+internal CA, and Patroni reports a leader + replicas.
+
+#### Evidence outputs
+None (stdout only).
+
+#### Failure modes
+- DNS alias missing or incorrect
+- TLS handshake fails (missing CA or cert mismatch)
+- Patroni API not healthy
+
+#### Rollback / safe exit
+None required; fix DNS or service health and rerun.
+
+### Task: Internal Postgres apply (infra + config)
+
+#### Intent
+Provision and configure the internal Postgres HA service on the shared VLAN.
+
+#### Preconditions
+- Proxmox API token + runner env configured
+- Vault secret refs available for Patroni credentials
+
+#### Command
+```bash
+ENV=samakia-shared \
+POSTGRES_INTERNAL_ADMIN_PASSWORD=... \
+POSTGRES_INTERNAL_REPLICATION_PASSWORD=... \
+make postgres.internal.apply
+```
+
+#### Expected result
+Terraform applies the Postgres nodes and HAProxy frontends; Ansible configures
+Patroni, etcd, HAProxy, and Keepalived.
+
+#### Evidence outputs
+Terraform plan/apply logs; Ansible output (no secrets).
+
+#### Failure modes
+- Missing Postgres credential env vars
+- DNS or VLAN connectivity issues
+- Patroni/etcd service start failure
+
+#### Rollback / safe exit
+Re-run with corrected inputs; destroy/recreate via Terraform if needed.
+If Patroni reports a system ID mismatch or etcd cluster corruption, rerun
+with `POSTGRES_INTERNAL_RESET=1` to rebootstrap the internal cluster
+(destructive: wipes Patroni + etcd data).
+
+### Task: Internal Postgres acceptance + canary verify
+
+#### Intent
+Prove internal Postgres HA correctness and unblock Phase 17 canary verify.
+
+#### Preconditions
+- `make postgres.internal.apply` completed
+- Vault secrets for `tenants/canary/database/sample` are present
+- Runner source IP is in `haproxy_postgres_allowed_source_cidrs` (shared VLAN or `FABRIC_ADMIN_CIDRS`)
+- LAN runners must have a route to `10.10.120.0/24` via the shared edge and the shared edge gateway policy applied.
+
+#### Command
+```bash
+ENV=samakia-shared make postgres.internal.accept
+```
+
+#### Expected result
+Acceptance passes; Phase 17 canary verify succeeds using Vault backend.
+
+#### Evidence outputs
+`evidence/exposure-canary/...` (from canary verify)
+
+#### Failure modes
+- VIP not stable or HAProxy health checks fail
+- HAProxy primary alignment check fails (Patroni leader vs stats)
+- Missing Vault secrets for canary verify
+
+#### Rollback / safe exit
+Investigate service health and rerun acceptance.
+
 ### Task: Plan template upgrades (replace or blue/green only)
 
 #### Intent

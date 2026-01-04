@@ -195,6 +195,22 @@ fi
 pass "VIP returns dns.${DNS_ZONE} A=${DNS_VIP}"
 
 ###############################################################################
+# 2.1) Internal shared zone sanity (db.internal.shared + db.canary.internal)
+###############################################################################
+
+internal_db_a="$(dig_a "${DNS_VIP}" "db.internal.shared")"
+if [[ -z "${internal_db_a}" ]]; then
+  fail "VIP authoritative mismatch: db.internal.shared A missing"
+fi
+pass "VIP returns db.internal.shared A record(s)"
+
+internal_db_cname="$(dig +\"time=2\" +\"tries=3\" \"@${DNS_VIP}\" db.canary.internal CNAME +short | tr -d '\r')"
+if [[ "${internal_db_cname}" != "db.internal.shared." ]]; then
+  fail "VIP authoritative mismatch: db.canary.internal expected CNAME db.internal.shared. got ${internal_db_cname:-<empty>}"
+fi
+pass "VIP returns db.canary.internal CNAME=db.internal.shared."
+
+###############################################################################
 # 3) Recursion
 ###############################################################################
 

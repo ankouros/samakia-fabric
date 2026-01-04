@@ -1,0 +1,53 @@
+---
+- name: Create zone on master (if missing)
+  ansible.builtin.command:
+    argv:
+      - pdnsutil
+      - create-zone
+      - "{{ dns_auth_powerdns_zone.name }}"
+      - "{{ dns_auth_powerdns_zone.primary_ns }}"
+  register: dns_auth_powerdns_create_zone_extra
+  changed_when: true
+  when: dns_auth_powerdns_role == "master" and (dns_auth_powerdns_zone.name not in dns_auth_powerdns_zones.stdout_lines | default([]))
+
+- name: Read zone records (master)
+  ansible.builtin.command:
+    argv: ["pdnsutil", "list-zone", "{{ dns_auth_powerdns_zone.name }}"]
+  register: dns_auth_powerdns_zone_dump_extra
+  changed_when: false
+  when: dns_auth_powerdns_role == "master"
+
+- name: Ensure required rrsets exist on master
+  ansible.builtin.include_tasks: ensure_rrset.yml
+  loop: "{{ dns_auth_powerdns_zone.rrsets }}"
+  loop_control:
+    label: "{{ item.name }} {{ item.type }}"
+  vars:
+    dns_auth_powerdns_zone_name: "{{ dns_auth_powerdns_zone.name }}"
+    dns_auth_powerdns_rrset: "{{ item }}"
+    dns_auth_powerdns_zone_dump_text: "{{ dns_auth_powerdns_zone_dump_extra.stdout }}"
+  when: dns_auth_powerdns_role == "master"
+
+- name: Create slave zone (if missing)
+  ansible.builtin.command:
+    argv: ["pdnsutil", "create-slave-zone", "{{ dns_auth_powerdns_zone.name }}", "{{ dns_auth_powerdns_master_ip }}"]
+  register: dns_auth_powerdns_create_slave_extra
+  changed_when: true
+  when: dns_auth_powerdns_role == "slave" and (dns_auth_powerdns_zone.name not in dns_auth_powerdns_zones_slave.stdout_lines | default([]))
+
+- name: Trigger AXFR retrieve on slave
+  ansible.builtin.command:
+    argv: ["pdns_control", "retrieve", "{{ dns_auth_powerdns_zone.name }}"]
+  register: dns_auth_powerdns_retrieve_extra
+  changed_when: false
+  when: dns_auth_powerdns_role == "slave"
+
+- name: Verify slave answers for zone (best-effort wait)
+  ansible.builtin.command:
+    argv: ["dig", "@{{ dns_auth_powerdns_listen_ip }}", "{{ dns_auth_powerdns_zone.name }}", "SOA", "+short"]
+  register: dns_auth_powerdns_slave_soa_extra
+  retries: 15
+  delay: 2
+  until: dns_auth_powerdns_slave_soa_extra.stdout | trim != ""
+  changed_when: false
+  when: dns_auth_powerdns_role == "slave"

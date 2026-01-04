@@ -1,0 +1,67 @@
+# Managed by Samakia Fabric (postgres_patroni). Do not edit manually.
+
+scope: {{ postgres_patroni_scope }}
+namespace: {{ postgres_patroni_namespace }}
+name: {{ inventory_hostname }}
+
+restapi:
+  listen: {{ postgres_patroni_bind_ip }}:{{ postgres_patroni_rest_port }}
+  connect_address: {{ postgres_patroni_bind_ip }}:{{ postgres_patroni_rest_port }}
+
+etcd:
+  hosts:
+{% for host in postgres_patroni_etcd_hosts %}
+    - {{ host }}
+{% endfor %}
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    synchronous_mode: false
+    postgresql:
+      use_pg_rewind: true
+      parameters:
+        wal_level: replica
+        hot_standby: "on"
+        wal_keep_size: "64MB"
+        max_wal_senders: 10
+        max_replication_slots: 10
+        wal_log_hints: "on"
+{% if postgres_patroni_tls_enabled | bool %}
+        ssl: "on"
+        ssl_cert_file: "{{ postgres_patroni_tls_cert_dst }}"
+        ssl_key_file: "{{ postgres_patroni_tls_key_dst }}"
+        ssl_ca_file: "{{ postgres_patroni_tls_ca_dst }}"
+{% endif %}
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+  pg_hba:
+{% for cidr in postgres_patroni_allowed_cidrs %}
+    - "hostssl replication {{ postgres_patroni_replication_user }} {{ cidr }} md5"
+    - "hostssl all {{ postgres_patroni_admin_user }} {{ cidr }} md5"
+    - "hostssl all all {{ cidr }} md5"
+{% endfor %}
+
+postgresql:
+  listen: {{ postgres_patroni_bind_ip }}:{{ postgres_patroni_port }}
+  connect_address: {{ postgres_patroni_bind_ip }}:{{ postgres_patroni_port }}
+  data_dir: {{ postgres_patroni_data_dir }}
+  bin_dir: {{ postgres_patroni_bin_dir }}
+{% if postgres_patroni_tls_enabled | bool %}
+  parameters:
+    ssl: "on"
+    ssl_cert_file: "{{ postgres_patroni_tls_cert_dst }}"
+    ssl_key_file: "{{ postgres_patroni_tls_key_dst }}"
+    ssl_ca_file: "{{ postgres_patroni_tls_ca_dst }}"
+{% endif %}
+  authentication:
+    superuser:
+      username: {{ postgres_patroni_admin_user }}
+      password: {{ postgres_patroni_admin_password }}
+    replication:
+      username: {{ postgres_patroni_replication_user }}
+      password: {{ postgres_patroni_replication_password }}

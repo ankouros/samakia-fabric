@@ -66,6 +66,56 @@ vip_registry:
     description: >
       VIP for shared observability ingress.
 
+allocations:
+  shared_edges:
+    range: proxy
+    nodes:
+      - name: ntp-1
+        ip: 10.10.120.11
+        role: shared-edge
+      - name: ntp-2
+        ip: 10.10.120.12
+        role: shared-edge
+  vault_nodes:
+    range: workload
+    nodes:
+      - name: vault-1
+        ip: 10.10.120.21
+        role: vault
+      - name: vault-2
+        ip: 10.10.120.22
+        role: vault
+  observability_nodes:
+    range: workload
+    nodes:
+      - name: obs-1
+        ip: 10.10.120.31
+        role: observability
+      - name: obs-2
+        ip: 10.10.120.32
+        role: observability
+  postgres_internal_nodes:
+    range: workload
+    nodes:
+      - name: pg-internal-1
+        ip: 10.10.120.23
+        role: postgres-internal
+      - name: pg-internal-2
+        ip: 10.10.120.24
+        role: postgres-internal
+      - name: pg-internal-3
+        ip: 10.10.120.25
+        role: postgres-internal
+  postgres_internal_haproxy:
+    range: proxy
+    nodes:
+      - name: haproxy-pg-1
+        ip: 10.10.120.13
+        role: postgres-haproxy
+      - name: haproxy-pg-2
+        ip: 10.10.120.14
+        role: postgres-haproxy
+
 dns_policy:
   proxy_first: true
 

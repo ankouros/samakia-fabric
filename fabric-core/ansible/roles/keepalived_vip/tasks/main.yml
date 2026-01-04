@@ -1,0 +1,52 @@
+---
+- name: Assert keepalived VIP settings
+  ansible.builtin.assert:
+    that:
+      - keepalived_vip_address | length > 0
+      - keepalived_vip_local_ip | length > 0
+      - keepalived_vip_peer_ip | length > 0
+    fail_msg: "keepalived_vip_address/local_ip/peer_ip must be set for VIP configuration."
+    quiet: true
+
+- name: Ensure keepalived is installed
+  ansible.builtin.apt:
+    name: keepalived
+    state: present
+    update_cache: true
+
+- name: Install keepalived configuration
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart keepalived
+
+- name: Ensure keepalived systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/keepalived.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install keepalived systemd restart policy override
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/keepalived.service.d/override.conf
+    content: |
+      [Service]
+      Restart=on-failure
+      RestartSec=5s
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart keepalived
+
+- name: Ensure keepalived is enabled and started
+  ansible.builtin.service:
+    name: keepalived
+    enabled: true
+    state: started

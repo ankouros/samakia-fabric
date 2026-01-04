@@ -153,7 +153,13 @@ This document records what was implemented for the **Terraform remote state back
 - Adds autonomy action contract schema under `contracts/ai/autonomy/`.
 - Defines safety envelope, rollout stages, and audit evidence expectations.
 - No execution tooling or policy relaxation is introduced.
-- Step 4 canary exposure attempt executed (plan/approve/apply/rollback); live verify blocked by `db.canary.internal` DNS resolution (see `REQUIRED-FIXES.md`).
+- Internal Postgres HA prerequisite implemented (Patroni + HAProxy/VIP + DNS alias), providing `db.internal.shared` and `db.canary.internal`.
+- Step 4 canary verify now targets the internal shared Postgres service (Vault-backed secrets required).
+- Internal Postgres bootstrap hardened with etcd v2 enablement, ip:port host rendering, and a guarded reset flag for cluster rebootstrap.
+- Internal Postgres acceptance aligns HAProxy primary backend with Patroni leader via HAProxy stats.
+- Internal Postgres HAProxy allowlist now includes `FABRIC_ADMIN_CIDRS` (default `192.168.11.0/24`) for operator verification access.
+- Internal Postgres now uses HAProxy TCP passthrough with Postgres TLS enabled; verify probes implement Postgres SSL negotiation.
+- Shared edge gateway allows operator LAN access to Postgres VIP/nodes (allowlist + no-NAT return path).
 - Secrets file/vault helpers now parse decrypted payloads via temp files; ops secrets scripts are tracked to ensure operator tooling is available.
 
 ## MinIO HA Backend — What was implemented

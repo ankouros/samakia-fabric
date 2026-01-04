@@ -11,6 +11,13 @@ dns_auth_powerdns_edge_1_vlan_ip: 10.10.100.11
 dns_auth_powerdns_edge_2_vlan_ip: 10.10.100.12
 dns_auth_powerdns_dns_vip: 192.168.11.100
 dns_auth_powerdns_minio_vip: 192.168.11.101
+dns_auth_powerdns_internal_zone_name: internal
+dns_auth_powerdns_internal_shared_zone_name: internal.shared
+dns_auth_powerdns_postgres_haproxy_nodes:
+  - 10.10.120.13
+  - 10.10.120.14
+dns_auth_powerdns_primary_ns: "{{ dns_auth_powerdns_master_hostname }}.{{ dns_auth_powerdns_zone_name }}."
+dns_auth_powerdns_secondary_ns: "{{ dns_auth_powerdns_slave_hostname }}.{{ dns_auth_powerdns_zone_name }}."
 # PowerDNS binds to the node's VLAN address (VLAN-only service).
 dns_auth_powerdns_listen_ip: "{{ ansible_host }}"
 dns_auth_powerdns_rrsets:
@@ -48,3 +55,32 @@ dns_auth_powerdns_rrsets:
     type: "A"
     ttl: "{{ dns_auth_powerdns_zone_ttl }}"
     values: ["{{ dns_auth_powerdns_minio_vip }}"]
+
+dns_auth_powerdns_extra_zones:
+  - name: "{{ dns_auth_powerdns_internal_shared_zone_name }}"
+    primary_ns: "{{ dns_auth_powerdns_primary_ns }}"
+    rrsets:
+      - name: "@"
+        type: "NS"
+        ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+        values:
+          - "{{ dns_auth_powerdns_primary_ns }}"
+          - "{{ dns_auth_powerdns_secondary_ns }}"
+      - name: "db"
+        type: "A"
+        ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+        values: "{{ dns_auth_powerdns_postgres_haproxy_nodes }}"
+  - name: "{{ dns_auth_powerdns_internal_zone_name }}"
+    primary_ns: "{{ dns_auth_powerdns_primary_ns }}"
+    rrsets:
+      - name: "@"
+        type: "NS"
+        ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+        values:
+          - "{{ dns_auth_powerdns_primary_ns }}"
+          - "{{ dns_auth_powerdns_secondary_ns }}"
+      - name: "db.canary"
+        type: "CNAME"
+        ttl: "{{ dns_auth_powerdns_zone_ttl }}"
+        values:
+          - "db.internal.shared."

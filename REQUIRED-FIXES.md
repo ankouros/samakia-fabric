@@ -118,9 +118,81 @@ This document records what was fixed, what remains blocked (if anything), and th
 - **Impact:** Phase 17 Step 4 cannot complete because live verification cannot reach the canary database endpoint.
 - **Root cause:** Runner DNS does not resolve `db.canary.internal` (canary endpoint unreachable).
 - **Required remediation:** Ensure `db.canary.internal` resolves on the runner (DNS record or permitted resolver) and the endpoint is reachable on port 5432, then rerun live verification.
-- **Resolution status:** **OPEN**
+- **Resolution status:** **FIXED**
 - **Verification command(s):**
-  - `SECRETS_PASSPHRASE_FILE=/home/aggelos/.config/samakia-fabric/secrets-passphrase BIND_SECRETS_BACKEND=file VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
+  - `dig +short db.canary.internal @192.168.11.100`
+  - `ENV=samakia-shared make postgres.internal.doctor`
+
+### PHASE17-POSTGRES-INTERNAL-SECRETS
+- **Description:** `ENV=samakia-shared make postgres.internal.apply` failed during Patroni configuration because `POSTGRES_INTERNAL_ADMIN_PASSWORD` and `POSTGRES_INTERNAL_REPLICATION_PASSWORD` were unset.
+- **Impact:** Internal Postgres nodes are created but not configured; acceptance cannot proceed.
+- **Root cause:** Vault secrets for internal Postgres credentials are not materialized into runner env vars.
+- **Required remediation:** Seed Vault for `platform/internal/postgres/admin` and `platform/internal/postgres/app`, export the credentials to the runner env (`POSTGRES_INTERNAL_ADMIN_PASSWORD`, `POSTGRES_INTERNAL_REPLICATION_PASSWORD`), then rerun `postgres.internal.apply`.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `VAULT_ADDR=https://192.168.11.121:8200 VAULT_CACERT=~/.config/samakia-fabric/pki/shared-bootstrap-ca.crt VAULT_TOKEN=... vault kv metadata get secret/platform/internal/postgres/admin`
+  - `VAULT_ADDR=https://192.168.11.121:8200 VAULT_CACERT=~/.config/samakia-fabric/pki/shared-bootstrap-ca.crt VAULT_TOKEN=... vault kv metadata get secret/platform/internal/postgres/app`
+  - `ENV=samakia-shared POSTGRES_INTERNAL_ADMIN_PASSWORD=... POSTGRES_INTERNAL_REPLICATION_PASSWORD=... make postgres.internal.apply`
+
+### PHASE17-POSTGRES-INTERNAL-DNS
+- **Description:** `ENV=samakia-shared make postgres.internal.accept` failed because `db.internal.shared` did not resolve via `192.168.11.100`.
+- **Impact:** Internal Postgres acceptance and Phase 17 canary verify remain blocked.
+- **Root cause:** Internal DNS zones (`internal`, `internal.shared`) are not yet applied or the runner cannot reach the DNS VIP.
+- **Required remediation:** Apply DNS auth/edge configuration to publish `db.internal.shared` and `db.canary.internal`, confirm resolution from the runner, then rerun acceptance.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-dns make dns.ansible.apply`
+  - `dig +short db.internal.shared @192.168.11.100`
+
+### PHASE17-POSTGRES-INTERNAL-BOOTSTRAP
+- **Description:** Patroni failed to start with `Invalid IPv6 URL` and later `system ID mismatch` after initial provisioning.
+- **Impact:** Internal Postgres acceptance blocked; HAProxy primary routing could not be validated.
+- **Root cause:** Patroni etcd hosts were rendered with URL schemes, triggering invalid IPv6 parsing, and stale etcd/Postgres data caused system ID drift after retries.
+- **Required remediation:** Render Patroni etcd hosts as ip:port, enable etcd v2 API, add guarded reset to wipe Patroni/etcd data and recreate `/var/lib/etcd` ownership, then re-run apply with the reset guard.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `POSTGRES_INTERNAL_RESET=1 POSTGRES_INTERNAL_ADMIN_PASSWORD=... POSTGRES_INTERNAL_REPLICATION_PASSWORD=... ENV=samakia-shared make postgres.internal.apply`
+  - `ENV=samakia-shared make postgres.internal.accept` (internal checks pass; canary verify still blocked by Vault)
+
+### PHASE17-STEP4-CANARY-VERIFY-VAULT
+- **Description:** `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample` failed with `failed to read secret_ref tenants/canary/database/sample via backend vault`.
+- **Impact:** Phase 17 Step 4 cannot complete because live verification cannot retrieve the canary secret from Vault.
+- **Root cause:** Vault VIP was returning HTTP 503 and the canary path `tenants/canary/database/sample` was not retrievable.
+- **Required remediation:** Restore Vault HA (VIP healthy) and seed `tenants/canary/database/sample`, then rerun live verification.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-shared make shared.vault.accept`
+  - `vault kv list secret/tenants/canary/database`
+  - `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
+
+### PHASE17-VAULT-VIP-UNAVAILABLE
+- **Description:** Vault VIP `https://192.168.11.121:8200` returns HTTP 503 (`No server is available to handle this request`).
+- **Impact:** Vault seeding and Vault-backed verification paths are blocked, including internal Postgres secret sourcing and canary verify.
+- **Root cause:** Vault HA backend was unavailable or not serving through HAProxy.
+- **Required remediation:** Restore Vault service health so `/v1/sys/health` returns 200/429, then seed required secret refs.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `curl -sk -o /dev/null -w '%{http_code}\n' https://192.168.11.121:8200/v1/sys/health`
+
+### PHASE17-STEP4-CANARY-VERIFY-LAN-ROUTING
+- **Description:** `VERIFY_LIVE=1 make exposure.verify` timed out connecting to `db.canary.internal:5432` from the LAN runner.
+- **Impact:** Phase 17 Step 4 live verify could not reach the internal Postgres endpoint.
+- **Root cause:** Shared edge gateway only allowed VLAN120 -> LAN egress NAT; LAN -> VLAN forwarding (5432) and no-NAT return path were missing.
+- **Required remediation:** Allow LAN operator CIDRs to forward to the Postgres HAProxy VIP/nodes on 5432 and preserve source IPs on return traffic, then rerun live verify.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-shared ANSIBLE_FLAGS="--limit ntp-*" make shared.ansible.apply`
+  - `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
+
+### PHASE17-POSTGRES-INTERNAL-TLS-PASSTHROUGH
+- **Description:** Live verify failed because Postgres clients could not negotiate SSL through HAProxy (TLS termination expected a direct TLS handshake instead of PostgreSQL SSLRequest).
+- **Impact:** TLS-backed Postgres verification and client access failed, blocking Phase 17 Step 4.
+- **Root cause:** HAProxy terminated TLS on 5432, but standard Postgres clients require the SSLRequest negotiation; Postgres SSL was disabled.
+- **Required remediation:** Switch HAProxy to TCP passthrough, enable Postgres SSL with internal CA certificates, and update TCP/TLS probes to perform PostgreSQL SSL negotiation.
+- **Resolution status:** **FIXED**
+- **Verification command(s):**
+  - `ENV=samakia-shared POSTGRES_INTERNAL_ADMIN_PASSWORD=... make postgres.internal.accept`
+  - `BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 make exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample`
 
 ## Milestone Phase 1–12 Blockers
 

@@ -542,6 +542,48 @@ Notes:
 - SSH allowlist for shared edges is controlled via `FABRIC_ADMIN_CIDRS` (comma-separated CIDRs).
 - No DNS dependency for bootstrap or acceptance (use VIP IPs).
 
+---
+
+## Internal Shared Postgres (Patroni)
+
+Internal Postgres is a shared, HA service used for platform verification and
+Phase 17 canary exposure. It is **internal-only** and not tenant-exposed by
+default.
+
+Endpoints:
+- Primary DNS: `db.internal.shared` (A → `10.10.120.13`, `10.10.120.14`)
+- Alias: `db.canary.internal` (CNAME → `db.internal.shared`)
+- VIP: `10.10.120.2` (Keepalived on HAProxy nodes; never a DNS target)
+
+Topology (shared VLAN):
+- Patroni nodes: `pg-internal-1..3` (`10.10.120.23`–`10.10.120.25`)
+- HAProxy nodes: `haproxy-pg-1/2` (`10.10.120.13`, `10.10.120.14`)
+
+HAProxy behavior:
+- TCP 5432, TLS passthrough; Postgres handles TLS.
+- Backend selection uses Patroni REST (`/patroni` + `/primary`) to route to the leader.
+- Stats endpoint is local-only (127.0.0.1).
+- Source allowlist: `10.10.120.0/24` plus `FABRIC_ADMIN_CIDRS` (defaults to `192.168.11.0/24`).
+- LAN runner access requires the shared edge gateway forward rule (applied via `shared-ntp`).
+
+Secrets (Vault default; no secrets in Git):
+- Admin: `platform/internal/postgres/admin`
+- App: `platform/internal/postgres/app`
+- Canary verify: `tenants/canary/database/sample`
+
+Operations:
+```bash
+ENV=samakia-shared make postgres.internal.plan
+ENV=samakia-shared make postgres.internal.apply
+ENV=samakia-shared make postgres.internal.accept
+ENV=samakia-shared make postgres.internal.doctor
+```
+
+Guarded rebootstrap (destructive; wipes Patroni + etcd data on internal nodes):
+```bash
+POSTGRES_INTERNAL_RESET=1 ENV=samakia-shared make postgres.internal.apply
+```
+
 ### Phase 2.2 — Control Plane Correctness & Invariants
 
 Phase 2.2 tightens shared control-plane correctness beyond reachability.

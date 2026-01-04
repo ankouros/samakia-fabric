@@ -1,0 +1,37 @@
+# Managed by Samakia Fabric (haproxy_postgres). Do not edit manually.
+
+global
+  log /dev/log local0
+  maxconn 4096
+  user haproxy
+  group haproxy
+  daemon
+
+defaults
+  log     global
+  mode    tcp
+  option  tcplog
+  timeout connect 5s
+  timeout client  60s
+  timeout server  60s
+
+frontend postgres_tls
+  bind {{ haproxy_postgres_bind_ip }}:{{ haproxy_postgres_port }}
+  bind {{ haproxy_postgres_vip }}:{{ haproxy_postgres_port }}
+  mode tcp
+  default_backend postgres_primary
+
+backend postgres_primary
+  mode tcp
+  option httpchk GET /primary
+  http-check expect status 200
+  default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+{% for ip in haproxy_postgres_backends %}
+  server pg_{{ loop.index }} {{ ip }}:{{ haproxy_postgres_port }} check port {{ haproxy_postgres_rest_port }}
+{% endfor %}
+
+listen stats
+  bind 127.0.0.1:{{ haproxy_postgres_stats_port }}
+  mode http
+  stats enable
+  stats uri /

@@ -1,0 +1,24 @@
+provider: postgres-internal
+version: v1alpha1
+port: 5432
+protocol: tcp
+vip:
+  address: 10.10.120.2
+  role: postgres-ha-frontend
+  keepalived_group: postgres
+dns:
+  primary: db.internal.shared
+  aliases:
+    - db.canary.internal
+  records:
+    - name: db.internal.shared
+      type: A
+      values:
+        - 10.10.120.13
+        - 10.10.120.14
+    - name: db.canary.internal
+      type: CNAME
+      value: db.internal.shared
+notes:
+  - DNS resolves to HAProxy nodes (proxy-first); VIP is never a primary DNS target.
+  - db.canary.internal exists only to unblock Phase 17 Step 4 verification.

@@ -2157,6 +2157,66 @@ shared.accept: ## Shared services acceptance (SDN + NTP + Vault + PKI + Observab
 	@ENV="$(ENV)" $(MAKE) shared.pki.accept
 	@ENV="$(ENV)" $(MAKE) shared.obs.accept
 
+###############################################################################
+# Internal Postgres (Patroni) on shared VLAN
+###############################################################################
+
+.PHONY: postgres.internal.plan
+postgres.internal.plan: ## Terraform plan for internal Postgres (ENV=samakia-shared)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@ENV="$(ENV)" TF_PLAN_FLAGS="-target=module.postgres_internal" $(MAKE) tf.plan
+
+.PHONY: postgres.internal.ansible.apply
+postgres.internal.ansible.apply: ## Ansible apply for internal Postgres
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@test -d "$(ANSIBLE_DIR)" || (echo "ERROR: ANSIBLE_DIR not found: $(ANSIBLE_DIR)"; exit 1)
+	@command -v ansible-playbook >/dev/null 2>&1 || (echo "ERROR: ansible-playbook not found in PATH"; exit 1)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		FABRIC_TERRAFORM_ENV="$(ENV)" ANSIBLE_CONFIG="$(ANSIBLE_DIR)/ansible.cfg" \
+			ansible-playbook -i "$(ANSIBLE_INVENTORY_PATH)" "$(ANSIBLE_DIR)/playbooks/postgres-internal.yml" -u "$(ANSIBLE_USER)" $(ANSIBLE_FLAGS); \
+	'
+
+.PHONY: postgres.internal.apply
+postgres.internal.apply: ## Terraform + bootstrap + Ansible apply for internal Postgres
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash -euo pipefail -c '\
+		env_file="$(RUNNER_ENV_FILE)"; \
+		if [[ -f "$$env_file" ]]; then source "$$env_file"; fi; \
+		$(MAKE) runner.env.check; \
+		TF_APPLY_FLAGS="-target=module.postgres_internal" $(MAKE) tf.apply ENV="$(ENV)" CI=1; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" apply -refresh-only -input=false -auto-approve; \
+		terraform -chdir="$(TERRAFORM_ENV_DIR)" output -json > "$(TERRAFORM_ENV_DIR)/terraform-output.json"; \
+		jump=""; \
+		for ip in 192.168.11.106 192.168.11.107; do \
+			if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "samakia@$$ip" true >/dev/null 2>&1; then jump="samakia@$$ip"; break; fi; \
+		done; \
+		if [[ -z "$$jump" ]]; then echo "ERROR: cannot reach any shared edge as samakia (192.168.11.106/107); bootstrap cannot proceed" >&2; exit 1; fi; \
+		vlan_bootstrap_hosts=(); \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.13" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("haproxy-pg-1"); fi; \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.14" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("haproxy-pg-2"); fi; \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.23" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("pg-internal-1"); fi; \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.24" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("pg-internal-2"); fi; \
+		if ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o ProxyJump="$$jump" "root@10.10.120.25" true >/dev/null 2>&1; then vlan_bootstrap_hosts+=("pg-internal-3"); fi; \
+		if [[ "$${#vlan_bootstrap_hosts[@]}" -gt 0 ]]; then \
+			vlan_bootstrap_list="$$(IFS=,; echo "$${vlan_bootstrap_hosts[*]}")"; \
+			ANSIBLE_FLAGS="$(ANSIBLE_FLAGS) --limit $${vlan_bootstrap_list}" $(MAKE) ansible.bootstrap ENV="$(ENV)"; \
+		fi; \
+		$(MAKE) postgres.internal.ansible.apply ENV="$(ENV)"; \
+	'
+
+.PHONY: postgres.internal.doctor
+postgres.internal.doctor: ## Read-only health checks for internal Postgres
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OPS_SCRIPTS_DIR)/postgres-internal-doctor.sh"
+
+.PHONY: postgres.internal.accept
+postgres.internal.accept: ## Acceptance for internal Postgres (includes canary verify)
+	@test "$(ENV)" = "samakia-shared" || (echo "ERROR: set ENV=samakia-shared"; exit 2)
+	@bash "$(OPS_SCRIPTS_DIR)/postgres-internal-accept.sh"
+	@BIND_SECRETS_BACKEND=vault VERIFY_LIVE=1 $(MAKE) exposure.verify ENV=samakia-dev TENANT=canary WORKLOAD=sample
+
 .PHONY: shared.up
 shared.up: ## One-command shared services deployment (tf apply -> bootstrap -> shared -> acceptance)
 	@bash -euo pipefail -c '\

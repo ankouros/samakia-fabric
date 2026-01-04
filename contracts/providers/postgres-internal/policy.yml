@@ -1,0 +1,20 @@
+provider: postgres-internal
+version: v1alpha1
+scope: internal-only
+exposure:
+  tenant_access: false
+  notes:
+    - No tenant exposure by default.
+    - Any tenant opt-in requires a future phase and explicit approval.
+network:
+  allowed_source_cidrs:
+    - 10.10.120.0/24
+    - 192.168.11.0/24
+  deny_by_default: true
+tls:
+  required: true
+  frontend_terminates: false
+secrets:
+  admin_secret_ref: platform/internal/postgres/admin
+  app_secret_ref: platform/internal/postgres/app
+  canary_secret_ref: tenants/canary/database/sample

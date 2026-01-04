@@ -70,6 +70,7 @@ entry_path = Path(sys.argv[1])
 ca_file = sys.argv[2] if len(sys.argv) > 2 else ""
 entry = json.loads(entry_path.read_text())
 endpoint = entry.get("endpoint", {})
+provider = entry.get("consumer", {}).get("provider")
 
 host = endpoint.get("host")
 port = endpoint.get("port")
@@ -110,6 +111,12 @@ if not tls_required:
     sys.exit(0)
 
 try:
+    if provider == "postgres":
+        import struct
+        sock.sendall(struct.pack("!ii", 8, 80877103))
+        resp = sock.recv(1)
+        if resp != b"S":
+            raise RuntimeError(f"postgres SSL negotiation failed: {resp!r}")
     context = ssl.create_default_context()
     if ca_file:
         ca_path = Path(ca_file)

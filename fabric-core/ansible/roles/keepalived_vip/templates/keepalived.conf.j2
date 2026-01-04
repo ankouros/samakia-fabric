@@ -1,0 +1,23 @@
+! Managed by Samakia Fabric (keepalived_vip). Do not edit manually.
+
+global_defs {
+  enable_script_security
+  router_id {{ inventory_hostname }}
+}
+
+vrrp_instance VI_POSTGRES_INTERNAL {
+  state {{ 'MASTER' if (keepalived_vip_role | default('backup')) == 'master' else 'BACKUP' }}
+  interface {{ keepalived_vip_interface }}
+  virtual_router_id {{ keepalived_vip_router_id }}
+  priority {{ keepalived_vip_priority }}
+  advert_int 1
+
+  unicast_src_ip {{ keepalived_vip_local_ip }}
+  unicast_peer {
+    {{ keepalived_vip_peer_ip }}
+  }
+
+  virtual_ipaddress {
+    {{ keepalived_vip_address }}/{{ keepalived_vip_prefix }} dev {{ keepalived_vip_interface }}
+  }
+}

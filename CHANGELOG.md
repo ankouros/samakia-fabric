@@ -95,6 +95,29 @@ The format is inspired by:
 - CI regression test and policy gate for shared observability enforcement.
 - Shared acceptance/apply flows now hard-fail on policy violations.
 
+#### Internal Postgres prerequisite (Phase 17 Step 4)
+- Internal Postgres HA template (Patroni + etcd) on the shared VLAN with dedicated HAProxy + Keepalived VIP.
+- DNS zones for `internal` and `internal.shared` with `db.internal.shared` + `db.canary.internal` alias (proxy-first).
+- Internal Postgres ops targets (`postgres.internal.*`) with acceptance/doctor scripts and canary verify hook.
+- `postgres.internal.apply` now refreshes Terraform outputs after targeted apply to keep inventory in sync.
+- IPAM DNS VIP checks now match full IP tokens to avoid proxy-first false positives.
+- `.terraform-precommit/` is ignored to keep Terraform init artifacts out of Git.
+- HA placement policy now classifies internal Postgres and HAProxy nodes for enforcement checks.
+- Ubuntu universe repos are explicitly enabled on Patroni nodes to install etcd.
+- Patroni package install now selects Ubuntu etcd packages explicitly to avoid missing `etcd` errors.
+- Fixed HAProxy Postgres TLS SAN rendering to join the full SAN list reliably.
+- Internal Postgres doctor now connects via VIP-resolved IPs while validating TLS with the DNS name.
+- Internal Postgres acceptance now runs the leader check via a shared-node SSH probe to honor CIDR policy.
+- Patroni now renders etcd hosts as ip:port list entries to avoid invalid URL parsing on startup.
+- HAProxy Postgres SSH allowlist now includes shared edge VLAN IPs for ProxyJump access.
+- Etcd now enables the v2 API to support Patroni's etcd client.
+- HAProxy Postgres source allowlist now includes `FABRIC_ADMIN_CIDRS` (default `192.168.11.0/24`) for operator verification.
+- Internal Postgres TLS is now handled by Postgres (HAProxy TCP passthrough) with SSL enabled in Patroni and Postgres SSLRequest support in TCP/TLS probes.
+- Shared edge gateway now forwards operator allowlisted Postgres traffic from LAN to VLAN and preserves source IPs (no NAT) for 5432.
+- Internal Postgres acceptance now validates HAProxy primary routing via stats + Patroni leader alignment.
+- Internal Postgres apply now supports guarded resets (`POSTGRES_INTERNAL_RESET=1`) and ensures etcd data dir ownership.
+- Internal Postgres acceptance marker: `acceptance/INTERNAL_POSTGRES_PATRONI_ACCEPTED.md`.
+
 #### VM golden images (Phase 8 design)
 - ADR-0025 locking VM image contract scope (artifact-first; no VM lifecycle)
 - VM image contract schema + example contracts (Ubuntu 24.04, Debian 12)

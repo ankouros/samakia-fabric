@@ -212,11 +212,12 @@ if errors:
 dns_defaults = repo_root / "fabric-core/ansible/roles/dns_auth_powerdns/defaults/main.yml"
 if dns_defaults.exists():
     dns_text = dns_defaults.read_text(encoding="utf-8")
-    dns_hits = [vip for vip in vip_values if vip in dns_text]
+    dns_ips = set(re.findall(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", dns_text))
+    dns_hits = sorted(set(vip_values) & dns_ips)
     if dns_hits:
         raise SystemExit(
             "ERROR: VIPs referenced in DNS records (proxy-first required): "
-            + ", ".join(sorted(dns_hits))
+            + ", ".join(dns_hits)
         )
 
 print("PASS: shared VLAN IP/VIP allocation contract enforced")

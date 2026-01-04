@@ -88,8 +88,7 @@ if not user or not password:
     sys.exit(1)
 
 sslmode = "verify-full" if endpoint.get("tls_required") else "disable"
-psql_cmd = [
-    "psql",
+conn_parts = [
     f"host={host}",
     f"port={port}",
     f"dbname={database}",
@@ -97,7 +96,9 @@ psql_cmd = [
     f"sslmode={sslmode}",
 ]
 if ca_path and ca_path.exists():
-    psql_cmd.append(f"sslrootcert={ca_path}")
+    conn_parts.append(f"sslrootcert={ca_path}")
+conn_str = " ".join(conn_parts)
+psql_cmd = ["psql", conn_str]
 
 env = os.environ.copy()
 env["PGPASSWORD"] = str(password)

@@ -1,0 +1,53 @@
+---
+postgres_patroni_scope: postgres-internal
+postgres_patroni_namespace: /service/
+postgres_patroni_rest_port: 8008
+postgres_patroni_port: 5432
+postgres_patroni_pg_version: "16"
+postgres_patroni_bin_dir: "/usr/lib/postgresql/{{ postgres_patroni_pg_version }}/bin"
+postgres_patroni_data_dir: "/var/lib/postgresql/{{ postgres_patroni_pg_version }}/main"
+postgres_patroni_config_path: /etc/patroni.yml
+postgres_patroni_service_name: patroni
+postgres_patroni_binary: /usr/bin/patroni
+postgres_patroni_reset_cluster: false
+
+postgres_patroni_admin_user: postgres
+postgres_patroni_admin_password: ""
+postgres_patroni_replication_user: replicator
+postgres_patroni_replication_password: ""
+
+postgres_patroni_tls_enabled: true
+postgres_patroni_tls_dir: /etc/postgresql/ssl
+postgres_patroni_tls_ca_src: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal-ca.crt' }}"
+postgres_patroni_tls_ca_key_src: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal-ca.key' }}"
+postgres_patroni_tls_cert_src: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal.crt' }}"
+postgres_patroni_tls_key_src: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal.key' }}"
+postgres_patroni_tls_ext_src: "{{ lookup('ansible.builtin.env', 'HOME') ~ '/.config/samakia-fabric/pki/postgres-internal.ext' }}"
+postgres_patroni_tls_ca_dst: "{{ postgres_patroni_tls_dir }}/postgres-internal-ca.crt"
+postgres_patroni_tls_cert_dst: "{{ postgres_patroni_tls_dir }}/postgres-internal.crt"
+postgres_patroni_tls_key_dst: "{{ postgres_patroni_tls_dir }}/postgres-internal.key"
+postgres_patroni_tls_sans:
+  - db.internal.shared
+  - db.canary.internal
+
+postgres_patroni_allowed_cidrs:
+  - 10.10.120.0/24
+
+postgres_patroni_etcd_token: postgres-internal
+postgres_patroni_etcd_port: 2379
+postgres_patroni_etcd_peer_port: 2380
+postgres_patroni_etcd_cluster_state: new
+postgres_patroni_etcd_members: []
+
+postgres_patroni_base_packages:
+  - ca-certificates
+  - curl
+  - postgresql
+  - postgresql-client
+  - python3-psycopg2
+  - patroni
+postgres_patroni_etcd_packages_default:
+  - etcd
+postgres_patroni_etcd_packages_ubuntu:
+  - etcd-server
+  - etcd-client
