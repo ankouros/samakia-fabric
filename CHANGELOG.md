@@ -15,6 +15,11 @@ The format is inspired by:
 ## [Unreleased]
 
 ### Added
+#### Vault access + secret validation guardrails
+- Vault access contract documenting shared-VLAN-only reachability with SSH port-forward exceptions.
+- Secret validation guard to fail fast on empty required fields before live verification probes.
+- Policy gate for non-empty live-verify secrets (skips when secrets backend is not configured).
+
 #### Platform consumers (Phase 6 design)
 - Consumer contract schema + ready/enabled manifests for kubernetes/database/message-queue/cache
 - Phase 6 entry checklist + acceptance plan (design-only; no deployments)

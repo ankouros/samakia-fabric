@@ -68,6 +68,8 @@ Any change that violates a contract must be redesigned before merging.
 - Runner mode is a contract: `RUNNER_MODE=ci|operator` (default `ci`); CI mode forbids prompts and requires explicit inputs.
 - Tenant bindings and substrate executor contracts are metadata-only by default; enabled.yml is contract-first and execution is always guarded, auditable, and opt-in.
 - Binding secret materialization and rotation are guarded and evidence-backed; Vault is default and file backend is an explicit exception; `secret_ref` only with no secrets in Git.
+- Vault access is shared-VLAN only; off-VLAN access requires a shared runner or SSH port-forward (no external exposure).
+- Live verification must fail fast on empty required secret fields before any TCP/TLS probes.
 - Substrate runtime observability and drift classification are read-only; evidence is mandatory and drift never auto-remediates or fails CI by itself.
 - Drift alert routing defaults are evidence-only; external delivery is disabled unless explicitly enabled and allowed.
 - Shared observability must satisfy HA policy: replicas >= 2, anti_affinity = true, and placement across at least two hosts.

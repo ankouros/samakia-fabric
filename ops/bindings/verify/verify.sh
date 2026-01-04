@@ -231,11 +231,29 @@ print(entry.get("consumer", {}).get("secret_ref", ""))
 PY
 )"
 
+    required_fields=()
+    case "${provider}" in
+      postgres|mariadb|rabbitmq)
+        required_fields=(username password)
+        ;;
+    esac
+
     secret_file=""
     if [[ "${mode}" == "live" ]]; then
       if [[ -z "${secret_ref}" ]]; then
         echo "ERROR: secret_ref missing for ${binding_path}" >&2
         exit 1
+      fi
+      if [[ ${#required_fields[@]} -gt 0 ]]; then
+        validate_args=()
+        for field in "${required_fields[@]}"; do
+          validate_args+=(--require "${field}")
+        done
+        if ! SECRETS_BACKEND="${backend}" \
+          "${FABRIC_REPO_ROOT}/ops/secrets/validate-secret.sh" "${secret_ref}" \
+          "${validate_args[@]}"; then
+          exit 1
+        fi
       fi
       secret_file="${binding_tmp}/secret-${consumer_type}.json"
       if ! "${backend_script}" get "${secret_ref}" > "${secret_file}" 2>/dev/null; then

@@ -14,6 +14,13 @@ runner prerequisites. It is intentionally narrow in scope and secrets-safe.
 Rationale: minimal blast radius with a single database consumer and a
 low-risk canary tenant/workload.
 
+## Prerequisites for Phase 17 Step 4 (Live Verify)
+
+- Vault reachable from the runner (shared VLAN runner or SSH port-forward).
+- Secret `secret/tenants/canary/database/sample` exists (KV mount `secret/`).
+- `username` and `password` fields are non-empty.
+- Database endpoint resolves and accepts TLS.
+
 ## Runner prerequisites (secrets-safe)
 
 Live verification requires a seeded secrets backend and resolvable canary

@@ -15,6 +15,7 @@ This directory contains Samakia Fabric documentation.
 - `secrets/`: secrets backend expectations and defaults
 - `exposure/`: exposure semantics, rollback, change windows
 - `runtime/`: runtime signal taxonomy, incident lifecycle, and SLO design
+- `security/`: security access and operational guardrails
 - `network/`: IP/VIP allocation contracts and networking governance
 - `selfservice/`: self-service proposal lifecycle and governance design
 - `ai/`: AI analysis contracts, routing, and governance

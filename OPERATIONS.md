@@ -1130,6 +1130,14 @@ file backend is an explicit exception for bootstrap/CI/local use. Set
 `SECRETS_BACKEND=file` explicitly for exceptions.
 Runtime defaults now resolve to Vault; no secrets were migrated.
 
+Vault access is **shared-VLAN only**. Operators must use a shared-VLAN runner
+or an explicit SSH port-forward; do not assume off-VLAN access. See
+`docs/security/vault-access.md`.
+
+Live verification now validates required secret fields and fails fast before
+any TCP/TLS probes if credentials are malformed or empty. Phase 17 canary
+verification must stop on these failures before acceptance.
+
 Commands:
 ```bash
 # Show configuration (no secrets)

@@ -21,6 +21,7 @@ It contains exports needed for:
   - Terraform (Proxmox + S3 backend for MinIO)
   - Packer template upload (PM_* vars)
   - SSH bootstrap keys (TF_VAR_ssh_public_keys JSON list)
+  - Vault access (VAULT_ADDR/VAULT_CACERT)
   - Optional local secrets backend overrides (file backend only)
 
 Security rules:
@@ -238,6 +239,10 @@ export TF_BACKEND_S3_CA_SRC=$(single_quote "${s3_ca_src}")
 export AWS_ACCESS_KEY_ID=$(single_quote "${aws_access_key_id}")
 export AWS_SECRET_ACCESS_KEY=$(single_quote "${aws_secret_access_key}")
 
+# Vault access (shared VLAN). Uncomment and set when using Vault directly.
+# export VAULT_ADDR='https://192.168.11.121:8200'
+# export VAULT_CACERT="$HOME/.config/samakia-fabric/pki/shared-bootstrap-ca.crt"
+
 # Secrets backend (default: Vault). Uncomment only for local exceptions.
 # export SECRETS_BACKEND=file
 # export BIND_SECRETS_BACKEND=file
@@ -246,6 +251,13 @@ EOF
 install -m 0600 "${tmp}" "${env_file}"
 
 echo "OK: wrote runner env file: ${env_file}"
+if [[ -n "${VAULT_ADDR:-}" && "${VAULT_ADDR}" == https://* ]]; then
+  if command -v vault >/dev/null 2>&1; then
+    if ! vault status >/dev/null 2>&1; then
+      echo "Vault is on the shared VLAN. Use a shared runner or SSH port-forward." >&2
+    fi
+  fi
+fi
 echo "Next:"
 echo "  source ${env_file}"
 echo "  bash ops/scripts/runner-env-check.sh --file ${env_file}"
